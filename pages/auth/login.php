@@ -11,7 +11,7 @@
     <!-- Google Font: DM Sans -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-[url('/assets/bg.png')] bg-cover bg-center bg-fixed font-['DM_Sans',Tahoma,Geneva,Verdana,sans-serif] flex items-center justify-center">
+<body class="min-h-screen bg-[url('/assets/images/bg.png')] bg-cover bg-center bg-fixed font-['DM_Sans',Tahoma,Geneva,Verdana,sans-serif] flex items-center justify-center">
 
     <!-- Wrapper to ensure margins on both sides -->
     <div class="w-full px-4 sm:px-6 lg:px-8 py-8 flex items-center justify-center">
@@ -21,7 +21,7 @@
 
             <!-- Logo -->
             <div class="flex justify-center mb-4 sm:mb-5">
-                <img src="/assets/logo.png" alt="Company Logo"
+                <img src="/assets/images/logo.png" alt="Company Logo"
                      class="w-14 h-14 sm:w-16 sm:h-16 object-contain">
             </div>
 

@@ -11,7 +11,7 @@
     <!-- Google Font: DM Sans -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
-<body class="min-h-screen bg-[url('/assets/bg.png')] bg-cover bg-center bg-fixed font-['DM_Sans',Tahoma,Geneva,Verdana,sans-serif] flex items-center justify-center">
+<body class="min-h-screen bg-[url('/assets/images/bg.png')] bg-cover bg-center bg-fixed font-['DM_Sans',Tahoma,Geneva,Verdana,sans-serif] flex items-center justify-center">
 
     <!-- Wrapper for consistent margins -->
     <div class="w-full px-4 sm:px-6 lg:px-8 py-10 flex items-center justify-center">
@@ -22,7 +22,7 @@
             <!-- Header -->
             <div class="text-center mb-6">
                 <div class="flex justify-center mb-4">
-                    <img src="/assets/logo.png" alt="Company Logo" class="w-16 h-16 object-contain">
+                    <img src="/assets/images/logo.png" alt="Company Logo" class="w-16 h-16 object-contain">
                 </div>
                 <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">
                     Public Employment Division
@@ -33,7 +33,7 @@
             </div>
 
             <!-- Sign Up Form -->
-            <form method="POST" action="signup_process.php" class="space-y-5">
+            <form method="POST" action="../../auth/signup_handler.php" class="space-y-5">
 
                 <!-- Row 1: First Name, Last Name, Middle Initial -->
                 <div class="space-y-4">
@@ -94,18 +94,33 @@
 
                 <!-- Row 2: Contact Number and Email -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <!-- Contact -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Contact Number</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Contact Number
+                        </label>
+
                         <input type="tel" name="contact" placeholder="09XXXXXXXXX" required
-                               pattern="^09\d{9}$"
-                               class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                        <p id="contactError" class="text-xs text-red-500 mt-1 hidden"></p>
+
                         <p class="text-xs text-gray-500 mt-1">Format: 09XXXXXXXXX</p>
                     </div>
+
+                    <!-- Email -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                            Email Address
+                        </label>
+
                         <input type="email" name="email" required
-                               class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+                        <p id="emailError" class="text-xs text-red-500 mt-1 hidden"></p>
                     </div>
+
                 </div>
 
                 <!-- Row 3: Password and Confirm Password -->
@@ -160,10 +175,11 @@
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit"
-                        class="w-full bg-blue-600 text-white py-3 text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
-                    Create Account & Verify Email
-                </button>
+                <button id="submitBtn" type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg opacity-50 cursor-not-allowed"
+                    disabled>
+                Create Account & Verify Email
+            </button>
             </form>
 
             <!-- Sign In Link -->
@@ -213,6 +229,11 @@
     </div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            emailValid = false;
+            contactValid = false;
+            updateButton();
+        });
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirm_password');
         const strengthBar = document.getElementById('strengthBar');
@@ -297,9 +318,179 @@
         password.addEventListener('input', () => {
             evaluatePassword();
             validatePasswordMatch();
+            updateButton(); 
+        });
+
+        confirmPassword.addEventListener('input', () => {
+            validatePasswordMatch();
+            updateButton(); // ✅ Add this
         });
 
         confirmPassword.addEventListener('input', validatePasswordMatch);
+
+        const email = document.querySelector('input[name="email"]');
+        const contact = document.querySelector('input[name="contact"]');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const emailError = document.getElementById('emailError');
+        const contactError = document.getElementById('contactError');
+
+        let emailValid = false;
+        let contactValid = false;
+
+        let emailChecked = false;
+        let contactChecked = false;
+
+        // debounce helper
+        function debounce(fn, delay) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        // check email format
+        function isValidEmailFormat(email) {
+            return /^[^\s@]+@(gmail\.com|yahoo\.com|outlook\.com|hotmail\.com)$/.test(email);
+        }
+
+        // check contact format
+        function isValidContact(contact) {
+            return /^09\d{9}$/.test(contact);
+        }
+
+        // API CHECK EMAIL
+        async function checkEmail(emailValue) {
+            const res = await fetch('../../auth/check_user.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.value })
+            });
+
+            return await res.json();
+        }
+
+        // API CHECK CONTACT
+        async function checkContact(contactValue) {
+            const res = await fetch('../../auth/check_user.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contact: contactValue })
+            });
+
+            return await res.json();
+        }
+
+        // EMAIL VALIDATION
+        email.addEventListener('input', debounce(async () => {
+
+        console.log("📧 Email typing:", email.value);
+
+        emailChecked = false;
+
+        emailError.classList.add('hidden');
+        emailError.textContent = "";
+
+        if (!isValidEmailFormat(email.value)) {
+            console.log("❌ Invalid email format");
+
+            emailValid = false;
+            updateButton();
+
+            emailError.textContent = "Invalid email provider";
+            emailError.classList.remove('hidden');
+            return;
+        }
+
+        console.log("⏳ Checking email in database...");
+
+        const res = await fetch('../../auth/check_user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: email.value })
+        });
+
+        const data = await res.json();
+        console.log("📩 Email API response:", data);
+
+        emailChecked = true;
+
+        if (data.exists) {
+            emailValid = false;
+            emailError.textContent = "Email already used";
+            emailError.classList.remove('hidden');
+        } else {
+            emailValid = true;
+            emailError.classList.add('hidden');
+        }
+
+        updateButton();
+
+    }, 500));
+
+    // CONTACT VALIDATION
+    contact.addEventListener('input', debounce(async () => {
+
+        console.log("📱 Contact typing:", contact.value);
+
+        contactChecked = false;
+
+        contactError.classList.add('hidden');
+        contactError.textContent = "";
+
+        if (!isValidContact(contact.value)) {
+            console.log("❌ Invalid contact format");
+
+            contactValid = false;
+            updateButton();
+
+            contactError.textContent = "Invalid contact number";
+            contactError.classList.remove('hidden');
+            return;
+        }
+
+        console.log("⏳ Checking contact in database...");
+
+        const res = await fetch('../../auth/check_user.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ contact: contact.value })
+        });
+
+        const data = await res.json();
+        console.log("📩 Contact API response:", data);
+
+        contactChecked = true;
+
+        if (data.exists) {
+            contactValid = false;
+            contactError.textContent = "Contact already used";
+            contactError.classList.remove('hidden');
+        } else {
+            contactValid = true;
+            contactError.classList.add('hidden');
+        }
+
+        updateButton();
+
+    }, 500));
+
+    // ENABLE BUTTON ONLY IF VALID
+    function updateButton() {
+        const passwordMatch = password.value === confirmPassword.value;
+        const passwordNotEmpty = password.value.length > 0;
+
+        const canSubmit =
+            emailValid &&
+            contactValid &&
+            passwordNotEmpty &&
+            passwordMatch;
+
+        submitBtn.disabled = !canSubmit;
+        submitBtn.classList.toggle("opacity-50", !canSubmit);
+        submitBtn.classList.toggle("cursor-not-allowed", !canSubmit);
+    }
     </script>
 
 </body>
