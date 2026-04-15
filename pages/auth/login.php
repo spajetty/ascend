@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (isset($_SESSION['user_id'])) {
+    header("Location: /pages/dashboard.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,8 +41,28 @@
                 Centralized Database System
             </p>
 
+            <?php if (isset($_GET['error'])): ?>
+                <div class="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm">
+                    <?php
+                        switch ($_GET['error']) {
+                            case 'empty':
+                                echo "Please fill in all fields.";
+                                break;
+                            case 'invalid':
+                                echo "Invalid email or password.";
+                                break;
+                            case 'not_verified':
+                                echo "Please verify your email before logging in.";
+                                break;
+                            default:
+                                echo "An error occurred.";
+                        }
+                    ?>
+                </div>
+            <?php endif; ?>
+
             <!-- Login Form -->
-            <form method="POST" action="login_process.php" class="space-y-4 sm:space-y-5 text-left">
+            <form method="POST" action="../../auth/login_handler.php" class="space-y-4 sm:space-y-5 text-left">
 
                 <!-- Email Field -->
                 <div>
