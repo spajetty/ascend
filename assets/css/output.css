@@ -813,8 +813,8 @@ video {
   background-color: rgb(234 179 8 / var(--tw-bg-opacity, 1));
 }
 
-.bg-\[url\(\'\/assets\/bg\.png\'\)\] {
-  background-image: url('/assets/bg.png');
+.bg-\[url\(\'\/assets\/images\/bg\.png\'\)\] {
+  background-image: url('/assets/images/bg.png');
 }
 
 .bg-cover {
@@ -963,6 +963,10 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.opacity-50 {
+  opacity: 0.5;
 }
 
 .shadow-2xl {
