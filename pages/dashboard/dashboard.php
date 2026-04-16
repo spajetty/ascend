@@ -143,7 +143,7 @@ if (!isset($_SESSION['user_id'])) {
         <!-- Navigation -->
         <nav class="flex flex-col gap-1 flex-1">
 
-            <a href="#" class="nav-item nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm">
+            <a href="/pages/dashboard/dashboard.php" class="nav-item nav-active flex items-center gap-3 px-4 py-3 rounded-xl font-semibold text-sm">
                 <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                     <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
@@ -151,7 +151,7 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="sidebar-text">Dashboard</span>
             </a>
 
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
+            <a href="/pages/programs/program.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
                 <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="7" width="20" height="14" rx="2"/>
                     <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
@@ -160,14 +160,14 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="sidebar-text">Employment Programs</span>
             </a>
 
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
+            <a href="/pages/beneficiaries/beneficiary.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
                 <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="sidebar-text">Beneficiaries</span>
             </a>
 
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
+            <a href="/pages/imports/import.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
                 <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
@@ -175,7 +175,7 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="sidebar-text">Import Data</span>
             </a>
 
-            <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
+            <a href="/pages/reports/report.php" class="nav-item flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 font-medium text-sm">
                 <svg class="nav-icon w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
                     <line x1="6" y1="20" x2="6" y2="14"/>
@@ -448,15 +448,15 @@ if (!isset($_SESSION['user_id'])) {
 
         <div id="mobileNav" class="flex items-center gap-6 overflow-hidden flex-1 px-2 scroll-smooth">
 
-            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-orange-500">
+            <a href="/pages/dashboard/dashboard.php" class="flex flex-col items-center gap-1 px-3 py-1 text-orange-500">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                     <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
                 </svg>
-                <span class="text-xs font-semibold">Home</span>
+                <span class="text-xs font-semibold">Dashboard</span>
             </a>
 
-            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+            <a href="/pages/programs/program.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="2" y="7" width="20" height="14" rx="2"/>
                     <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
@@ -464,14 +464,14 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="text-xs font-medium">Programs</span>
             </a>
 
-            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+            <a href="/pages/beneficiaries/beneficiary.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                 </svg>
                 <span class="text-xs font-medium">Beneficiaries</span>
             </a>
 
-            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+            <a href="/pages/imports/import.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="17 8 12 3 7 8"/>
@@ -480,7 +480,7 @@ if (!isset($_SESSION['user_id'])) {
                 <span class="text-xs font-medium">Import</span>
             </a>
 
-            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+            <a href="/pages/reports/report.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
                 <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <line x1="18" y1="20" x2="18" y2="10"/>
                     <line x1="12" y1="20" x2="12" y2="4"/>
