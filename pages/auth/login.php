@@ -98,10 +98,18 @@ if (isset($_SESSION['user_id'])) {
 
                 <!-- Sign In Button -->
                 <button
+                    id="loginBtn"
                     type="submit"
-                    class="w-full bg-blue-600 text-white py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md"
+                    class="w-full bg-blue-600 text-white py-2.5 sm:py-3 text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 transition duration-200 shadow-md flex items-center justify-center gap-2"
                 >
-                    Sign In
+                    <span id="loginText">Sign In</span>
+                    <svg id="loginSpinner" class="hidden animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                            stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
                 </button>
             </form>
 
@@ -116,5 +124,27 @@ if (isset($_SESSION['user_id'])) {
         </div>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const loginForm = document.querySelector('form');
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loginSpinner = document.getElementById('loginSpinner');
+
+            loginForm.addEventListener('submit', function (e) {
+                e.preventDefault(); // Prevent immediate submission
+
+                // Disable button and show loading state
+                loginBtn.disabled = true;
+                loginBtn.classList.add('opacity-70', 'cursor-not-allowed');
+                loginText.textContent = 'Signing In...';
+                loginSpinner.classList.remove('hidden');
+
+                setTimeout(() => {
+                    loginForm.submit();
+                }, 3000);
+            });
+        });
+    </script>
 </body>
 </html>

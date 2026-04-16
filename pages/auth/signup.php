@@ -176,10 +176,17 @@
 
                 <!-- Submit Button -->
                 <button id="submitBtn" type="submit"
-                    class="w-full bg-blue-600 text-white py-3 rounded-lg opacity-50 cursor-not-allowed"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
                     disabled>
-                Create Account & Verify Email
-            </button>
+                    <span id="signupText">Create Account & Verify Email</span>
+                    <svg id="signupSpinner" class="hidden animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                            stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8v8z"></path>
+                    </svg>
+                </button>
             </form>
 
             <!-- Sign In Link -->
@@ -301,15 +308,13 @@
         function openModal() {
             modal.classList.remove('hidden');
             modal.classList.add('flex');
-            evaluatePassword(); // Ensure requirements reflect current input
+            evaluatePassword(); 
         }
 
         function closeModal() {
             modal.classList.add('hidden');
             modal.classList.remove('flex');
         }
-
-        // Close modal when clicking outside
         modal.addEventListener('click', function(e) {
             if (e.target === modal) closeModal();
         });
@@ -323,7 +328,7 @@
 
         confirmPassword.addEventListener('input', () => {
             validatePasswordMatch();
-            updateButton(); // ✅ Add this
+            updateButton(); 
         });
 
         confirmPassword.addEventListener('input', validatePasswordMatch);
@@ -341,7 +346,6 @@
         let emailChecked = false;
         let contactChecked = false;
 
-        // debounce helper
         function debounce(fn, delay) {
             let timer;
             return (...args) => {
@@ -385,112 +389,129 @@
         // EMAIL VALIDATION
         email.addEventListener('input', debounce(async () => {
 
-        console.log("📧 Email typing:", email.value);
+            console.log("📧 Email typing:", email.value);
 
-        emailChecked = false;
+            emailChecked = false;
 
-        emailError.classList.add('hidden');
-        emailError.textContent = "";
-
-        if (!isValidEmailFormat(email.value)) {
-            console.log("❌ Invalid email format");
-
-            emailValid = false;
-            updateButton();
-
-            emailError.textContent = "Invalid email provider";
-            emailError.classList.remove('hidden');
-            return;
-        }
-
-        console.log("⏳ Checking email in database...");
-
-        const res = await fetch('../../auth/check_user.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: email.value })
-        });
-
-        const data = await res.json();
-        console.log("📩 Email API response:", data);
-
-        emailChecked = true;
-
-        if (data.exists) {
-            emailValid = false;
-            emailError.textContent = "Email already used";
-            emailError.classList.remove('hidden');
-        } else {
-            emailValid = true;
             emailError.classList.add('hidden');
-        }
+            emailError.textContent = "";
 
-        updateButton();
+            if (!isValidEmailFormat(email.value)) {
+                console.log("❌ Invalid email format");
 
-    }, 500));
+                emailValid = false;
+                updateButton();
 
-    // CONTACT VALIDATION
-    contact.addEventListener('input', debounce(async () => {
+                emailError.textContent = "Invalid email provider";
+                emailError.classList.remove('hidden');
+                return;
+            }
 
-        console.log("📱 Contact typing:", contact.value);
+            console.log("⏳ Checking email in database...");
 
-        contactChecked = false;
+            const res = await fetch('../../auth/check_user.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.value })
+            });
 
-        contactError.classList.add('hidden');
-        contactError.textContent = "";
+            const data = await res.json();
+            console.log("📩 Email API response:", data);
 
-        if (!isValidContact(contact.value)) {
-            console.log("❌ Invalid contact format");
+            emailChecked = true;
 
-            contactValid = false;
+            if (data.exists) {
+                emailValid = false;
+                emailError.textContent = "Email already used";
+                emailError.classList.remove('hidden');
+            } else {
+                emailValid = true;
+                emailError.classList.add('hidden');
+            }
+
             updateButton();
 
-            contactError.textContent = "Invalid contact number";
-            contactError.classList.remove('hidden');
-            return;
-        }
+        }, 500));
 
-        console.log("⏳ Checking contact in database...");
+        // CONTACT VALIDATION
+        contact.addEventListener('input', debounce(async () => {
 
-        const res = await fetch('../../auth/check_user.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contact: contact.value })
-        });
+            console.log("📱 Contact typing:", contact.value);
 
-        const data = await res.json();
-        console.log("📩 Contact API response:", data);
+            contactChecked = false;
 
-        contactChecked = true;
-
-        if (data.exists) {
-            contactValid = false;
-            contactError.textContent = "Contact already used";
-            contactError.classList.remove('hidden');
-        } else {
-            contactValid = true;
             contactError.classList.add('hidden');
+            contactError.textContent = "";
+
+            if (!isValidContact(contact.value)) {
+                console.log("❌ Invalid contact format");
+
+                contactValid = false;
+                updateButton();
+
+                contactError.textContent = "Invalid contact number";
+                contactError.classList.remove('hidden');
+                return;
+            }
+
+            console.log("⏳ Checking contact in database...");
+
+            const res = await fetch('../../auth/check_user.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ contact: contact.value })
+            });
+
+            const data = await res.json();
+            console.log("📩 Contact API response:", data);
+
+            contactChecked = true;
+
+            if (data.exists) {
+                contactValid = false;
+                contactError.textContent = "Contact already used";
+                contactError.classList.remove('hidden');
+            } else {
+                contactValid = true;
+                contactError.classList.add('hidden');
+            }
+
+            updateButton();
+
+        }, 500));
+
+        function updateButton() {
+            const passwordMatch = password.value === confirmPassword.value;
+            const passwordNotEmpty = password.value.length > 0;
+
+            const canSubmit =
+                emailValid &&
+                contactValid &&
+                passwordNotEmpty &&
+                passwordMatch;
+
+            submitBtn.disabled = !canSubmit;
+            submitBtn.classList.toggle("opacity-50", !canSubmit);
+            submitBtn.classList.toggle("cursor-not-allowed", !canSubmit);
         }
 
-        updateButton();
+        const signupForm = document.querySelector('form');
+        const signupText = document.getElementById('signupText');
+        const signupSpinner = document.getElementById('signupSpinner');
 
-    }, 500));
+        signupForm.addEventListener('submit', function (e) {
+            e.preventDefault(); 
 
-    // ENABLE BUTTON ONLY IF VALID
-    function updateButton() {
-        const passwordMatch = password.value === confirmPassword.value;
-        const passwordNotEmpty = password.value.length > 0;
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
 
-        const canSubmit =
-            emailValid &&
-            contactValid &&
-            passwordNotEmpty &&
-            passwordMatch;
+            signupText.textContent = 'Creating Account...';
+            signupSpinner.classList.remove('hidden');
 
-        submitBtn.disabled = !canSubmit;
-        submitBtn.classList.toggle("opacity-50", !canSubmit);
-        submitBtn.classList.toggle("cursor-not-allowed", !canSubmit);
-    }
+            setTimeout(() => {
+                signupForm.submit();
+            }, 3000);
+        });
     </script>
 
 </body>
