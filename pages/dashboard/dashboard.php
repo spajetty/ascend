@@ -438,41 +438,74 @@ if (!isset($_SESSION['user_id'])) {
     </main>
 
     <!-- ════════════════ MOBILE BOTTOM NAV ════════════════ -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 flex items-center justify-around px-2 py-2">
-        <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 rounded-xl" style="color:#f97316">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 py-2 flex items-center">
+
+        <button id="navLeft" class="px-2 text-gray-400 active:scale-95">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                <polyline points="15 18 9 12 15 6"/>
             </svg>
-            <span class="text-xs font-semibold">Home</span>
-        </a>
-        <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+        </button>
+
+        <div id="mobileNav" class="flex items-center gap-6 overflow-hidden flex-1 px-2 scroll-smooth">
+
+            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-orange-500">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span class="text-xs font-semibold">Home</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                </svg>
+                <span class="text-xs font-medium">Programs</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+                <span class="text-xs font-medium">Beneficiaries</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="17 8 12 3 7 8"/>
+                    <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <span class="text-xs font-medium">Import</span>
+            </a>
+
+            <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="20" x2="18" y2="10"/>
+                    <line x1="12" y1="20" x2="12" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="14"/>
+                </svg>
+                <span class="text-xs font-medium">Reports</span>
+            </a>
+
+            <a href="/auth/logout.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
+                <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                <span class="text-xs font-medium">Logout</span>
+            </a>
+
+        </div>
+
+        <button id="navRight" class="px-2 text-gray-400 active:scale-95">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="7" width="20" height="14" rx="2"/>
-                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                <polyline points="9 18 15 12 9 6"/>
             </svg>
-            <span class="text-xs font-medium">Programs</span>
-        </a>
-        <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-            <span class="text-xs font-medium">Beneficiaries</span>
-        </a>
-        <a href="#" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/>
-                <line x1="6" y1="20" x2="6" y2="14"/>
-            </svg>
-            <span class="text-xs font-medium">Reports</span>
-        </a>
-        <a href="/auth/logout.php" class="flex flex-col items-center gap-1 px-3 py-1 text-gray-400">
-            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            <span class="text-xs font-medium">Logout</span>
-        </a>
+        </button>
+
     </nav>
 
     <!-- bottom padding for mobile nav -->
@@ -496,6 +529,19 @@ toggleBtn.addEventListener('click', () => {
         main.classList.add('md:ml-56');
         icon.style.transform = 'rotate(0deg)';
     }
+});
+const nav = document.getElementById('mobileNav');
+const left = document.getElementById('navLeft');
+const right = document.getElementById('navRight');
+
+const scrollAmount = 120;
+
+left.addEventListener('click', () => {
+    nav.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+});
+
+right.addEventListener('click', () => {
+    nav.scrollBy({ left: scrollAmount, behavior: 'smooth' });
 });
 </script>
 </body>
