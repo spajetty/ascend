@@ -35,7 +35,7 @@ if ($result->num_rows === 1) {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['user_name'] = $user['fname'] . ' ' . $user['lname'];
 
-    header("Location: /pages/dashboard.php");
+    header("Location: /pages/dashboard/dashboard.php");
     exit;
 } else {
     header("Location: /pages/auth/login.php?error=invalid");
