@@ -228,9 +228,9 @@ if (!isset($_SESSION['user_id'])) {
                     </p>
                     <p class="text-xs text-gray-400">Admin</p>
                 </div>
-                <svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!--<svg class="w-4 h-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="6 9 12 15 18 9"/>
-                </svg>
+                </svg> -->
             </div>
         </header>
 
