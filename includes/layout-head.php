@@ -133,6 +133,17 @@ if ($_initials === '') {
         ::-webkit-scrollbar       { width: 5px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        /* ── Modals ────────────────────────────────────────── */
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: translateY(16px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)    scale(1);    }
+        }
+        .animate-modal { animation: modalIn 0.22s ease-out forwards; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen flex">
