@@ -7,7 +7,6 @@ $pageHeading = 'Import Data';
 
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
-require_once __DIR__ . '/../../helpers/modal-helper.php';
 ?>
 
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
@@ -23,5 +22,7 @@ require_once __DIR__ . '/../../helpers/modal-helper.php';
     </div>
 </main>
 
-<?php require_once __DIR__ . '/../../includes/import/modal.php'; ?>
+<script src="../../assets/js/address-data.js"></script>
+<script src="../../assets/js/import.js"></script>
+
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
