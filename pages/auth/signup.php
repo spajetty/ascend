@@ -125,68 +125,136 @@
 
                 <!-- Row 3: Password and Confirm Password -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    
-                    <!-- Password Field -->
-                    <div>
-                        <div class="flex items-center justify-between mb-1">
-                            <label for="password" class="block text-sm font-medium text-gray-700">
-                                Password
-                            </label>
-                            <!-- Info Icon -->
-                            <button type="button" onclick="openModal()" 
-                                class="text-blue-600 hover:text-blue-800" aria-label="Password requirements">
-                                <!-- Info Icon SVG -->
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
-                                </svg>
-                            </button>
-                        </div>
+    
+    <!-- Password Field -->
+    <div>
+        <div class="flex items-center justify-between mb-1">
+            <label for="password" class="block text-sm font-medium text-gray-700">
+                Password
+            </label>
+            <!-- Info Icon -->
+            <button type="button" onclick="openModal()" 
+                class="text-blue-600 hover:text-blue-800" aria-label="Password requirements">
+                <!-- Info Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z" />
+                </svg>
+            </button>
+        </div>
 
-                        <input type="password" name="password" id="password" required
-                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
+       <div class="relative">
+    <input type="password" name="password" id="password" required
+        class="w-full px-4 py-2 pr-11 text-sm border border-gray-300 rounded-lg
+                focus:outline-none focus:ring-2 focus:ring-blue-500">
 
-                        <!-- Password Strength Bar -->
-                        <div class="mt-2">
-                            <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div id="strengthBar"
-                                    class="h-full w-0 bg-red-500 transition-all duration-300"></div>
-                            </div>
-                            <p id="strengthText" class="text-xs mt-1 text-gray-600">
-                                Password strength: Too weak
-                            </p>
-                        </div>
-                    </div>
+    <button type="button" id="togglePassword"
+        class="absolute right-3 top-0 h-full flex items-center z-10 text-gray-500 hover:text-gray-700">
+        
+        <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5
+                   c4.478 0 8.268 2.943 9.542 7
+                   -1.274 4.057-5.064 7-9.542 7
+                   -4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
 
-                    <!-- Confirm Password Field -->
-                    <div>
-                        <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">
-                            Confirm Password
-                        </label>
-                        <input type="password" name="confirm_password" id="confirm_password" required
-                            class="w-full px-4 py-2 text-sm border border-gray-300 rounded-lg
-                                    focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <p id="passwordError" class="text-xs text-red-500 mt-1 hidden">
-                            Passwords do not match.
-                        </p>
-                    </div>
-                </div>
+        <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.94 17.94A10.94 10.94 0 0112 19
+                   c-5 0-9.27-3.11-11-7
+                   a11.83 11.83 0 012.92-4.36" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.9 4.24A10.94 10.94 0 0112 4
+                   c5 0 9.27 3.11 11 7
+                   a11.82 11.82 0 01-1.67 2.68" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M14.12 14.12A3 3 0 019.88 9.88" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3l18 18" />
+        </svg>
+    </button>
+</div>
 
-                <!-- Submit Button -->
-                <button id="submitBtn" type="submit"
-                    class="w-full bg-blue-600 text-white py-3 rounded-lg opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
-                    disabled>
-                    <span id="signupText">Create Account & Verify Email</span>
-                    <svg id="signupSpinner" class="hidden animate-spin h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                            stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor"
-                            d="M4 12a8 8 0 018-8v8z"></path>
-                    </svg>
-                </button>
+        <!-- Password Strength Bar -->
+        <div class="mt-2">
+            <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div id="strengthBar"
+                    class="h-full w-0 bg-red-500 transition-all duration-300"></div>
+            </div>
+            <p id="strengthText" class="text-xs mt-1 text-gray-600">
+                Password strength: Too weak
+            </p>
+        </div>
+    </div>
+
+    <!-- Confirm Password Field -->
+    <div>
+        <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1">
+            Confirm Password
+        </label>
+
+        <div class="relative">
+    <input type="password" name="confirm_password" id="confirm_password" required
+        class="w-full px-4 py-2 pr-11 text-sm border border-gray-300 rounded-lg
+                focus:outline-none focus:ring-2 focus:ring-blue-500">
+
+    <button type="button" id="toggleConfirmPassword"
+        class="absolute right-3 top-0 h-full flex items-center z-10 text-gray-500 hover:text-gray-700">
+
+        <svg id="eyeOpenConfirm" xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M15 12a3 3 0 11-6 0 3 3 0 016 0"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M2.458 12C3.732 7.943 7.523 5 12 5
+                   c4.478 0 8.268 2.943 9.542 7
+                   -1.274 4.057-5.064 7-9.542 7
+                   -4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+
+        <svg id="eyeClosedConfirm" xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17.94 17.94A10.94 10.94 0 0112 19
+                   c-5 0-9.27-3.11-11-7
+                   a11.83 11.83 0 012.92-4.36" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9.9 4.24A10.94 10.94 0 0112 4
+                   c5 0 9.27 3.11 11 7
+                   a11.82 11.82 0 01-1.67 2.68" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M14.12 14.12A3 3 0 019.88 9.88" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3l18 18" />
+        </svg>
+    </button>
+</div>
+
+        <p id="passwordError" class="text-xs text-red-500 mt-1 hidden">
+            Passwords do not match.
+        </p>
+    </div>
+</div>
+
+<!-- Submit Button -->
+<button id="submitBtn" type="submit"
+    class="w-full bg-blue-600 text-white py-3 rounded-lg opacity-50 cursor-not-allowed flex items-center justify-center gap-2"
+    disabled>
+    <span id="signupText">Create Account & Verify Email</span>
+    <svg id="signupSpinner" class="hidden animate-spin h-5 w-5 text-white"
+        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10"
+            stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor"
+            d="M4 12a8 8 0 018-8v8z"></path>
+    </svg>
+</button>
             </form>
 
             <!-- Sign In Link -->
@@ -512,7 +580,32 @@
                 signupForm.submit();
             }, 3000);
         });
+
+            document.getElementById('togglePassword').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+
+    eyeOpen.classList.toggle('hidden', isPassword);
+    eyeClosed.classList.toggle('hidden', !isPassword);
+});
+
+document.getElementById('toggleConfirmPassword').addEventListener('click', function () {
+    const input = document.getElementById('confirm_password');
+    const eyeOpen = document.getElementById('eyeOpenConfirm');
+    const eyeClosed = document.getElementById('eyeClosedConfirm');
+
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+
+    eyeOpen.classList.toggle('hidden', isPassword);
+    eyeClosed.classList.toggle('hidden', !isPassword);
+});
     </script>
 
 </body>
 </html>
+
