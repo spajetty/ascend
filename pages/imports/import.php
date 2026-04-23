@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../includes/auth-check.php';
 
 $currentPage = 'imports';
-$pageTitle   = 'ASCEND PED System – Import Data';
+$pageTitle = 'ASCEND PED System – Import Data';
 $pageHeading = 'Import Data';
 
 require_once __DIR__ . '/../../includes/layout/head.php';
@@ -22,7 +22,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
     </div>
 </main>
 
+<script src="../../assets/js/xlsx.full.min.js"></script>
 <script src="../../assets/js/address-data.js"></script>
-<script src="../../assets/js/import.js"></script>
-
+<script type="module" src="../../assets/js/imports/excel.js?v=<?= time() ?>"></script>
+<script type="module" src="../../assets/js/imports/resume.js?v=<?= time() ?>"></script>
+<script type="module" src="../../assets/js/imports/manual.js?v=<?= time() ?>"></script>
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
