@@ -134,6 +134,24 @@ if ($_initials === '') {
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
+        .preview-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e1 #f1f5f9;
+        }
+
+        .preview-scrollbar::-webkit-scrollbar {
+            height: 3px;
+        }
+
+        .preview-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
+        }
+
+        .preview-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
         /* ── Modals ────────────────────────────────────────── */
         .modal-backdrop {
             background-color: rgba(0, 0, 0, 0.4);
