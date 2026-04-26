@@ -82,19 +82,59 @@ if (isset($_SESSION['user_id'])) {
 
                 <!-- Password Field -->
                 <div>
-                    <label for="password"
-                           class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
-                        Password
-                    </label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        required
-                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
-                    >
-                </div>
+    <label for="password"
+           class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+        Password
+    </label>
+
+    <div class="relative w-full">
+        <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            required
+            class="w-full px-3 sm:px-4 py-2 sm:py-2.5 pr-10 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+        >
+
+        <button
+            type="button"
+            id="togglePassword"
+            class="absolute right-3 top-0 h-full flex items-center text-gray-500 hover:text-gray-700"
+        >
+            <!-- Eye Open -->
+            <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5
+                       c4.478 0 8.268 2.943 9.542 7
+                       -1.274 4.057-5.064 7-9.542 7
+                       -4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+
+            <!-- Eye Closed -->
+            <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5 hidden" fill="none"
+                viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13.875 18.825A10.05 10.05 0 0112 19
+                       c-4.478 0-8.268-2.943-9.542-7
+                       a9.956 9.956 0 012.293-3.95"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M6.223 6.223A9.953 9.953 0 0112 5
+                       c4.478 0 8.268 2.943 9.542 7
+                       a9.97 9.97 0 01-4.132 5.411"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 12a3 3 0 00-3-3"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 3l18 18"/>
+            </svg>
+        </button>
+    </div>
+</div>
 
                 <!-- Sign In Button -->
                 <button
@@ -125,6 +165,21 @@ if (isset($_SESSION['user_id'])) {
     </div>
 
     <script>
+
+            const passwordInput = document.getElementById('password');
+            const togglePassword = document.getElementById('togglePassword');
+            const eyeOpen = document.getElementById('eyeOpen');
+            const eyeClosed = document.getElementById('eyeClosed');
+
+        togglePassword.addEventListener('click', function () {
+            const isPassword = passwordInput.type === 'password';
+
+        passwordInput.type = isPassword ? 'text' : 'password';
+
+        eyeOpen.classList.toggle('hidden', isPassword);
+        eyeClosed.classList.toggle('hidden', !isPassword);
+    });
+
         document.addEventListener("DOMContentLoaded", function () {
             const loginForm = document.querySelector('form');
             const loginBtn = document.getElementById('loginBtn');
@@ -148,3 +203,4 @@ if (isset($_SESSION['user_id'])) {
     </script>
 </body>
 </html>
+
