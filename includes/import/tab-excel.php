@@ -106,6 +106,28 @@
             </button>
         </div>
 
+        <!-- Import period detection + editable confirmation -->
+        <div id="importPeriodPanel" class="hidden mt-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-4">
+            <p id="periodSuggestionText" class="text-sm text-blue-800 font-medium mb-3"></p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Month</label>
+                    <select id="importMonth"
+                        class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="">Select month...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Year</label>
+                    <select id="importYear"
+                        class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="">Select year...</option>
+                    </select>
+                </div>
+            </div>
+            <p class="text-xs text-blue-700 mt-2">Suggestion is pre-filled but editable before final import.</p>
+        </div>
+
         <!-- Guidelines -->
         <div class="mt-5 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
             <p class="text-sm font-semibold text-yellow-700 flex items-center gap-2 mb-2">
