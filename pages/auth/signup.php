@@ -33,7 +33,7 @@
             </div>
 
             <!-- Sign Up Form -->
-            <form method="POST" action="../../auth/signup_handler.php" class="space-y-5">
+            <form method="POST" action="../../backend/auth/signup_handler.php" class="space-y-5">
 
                 <!-- Row 1: First Name, Last Name, Middle Initial -->
                 <div class="space-y-4">
@@ -366,7 +366,7 @@
 
         // API CHECK EMAIL
         async function checkEmail(emailValue) {
-            const res = await fetch('../../auth/check_user.php', {
+            const res = await fetch('../../backend/auth/check_user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email.value })
@@ -377,7 +377,7 @@
 
         // API CHECK CONTACT
         async function checkContact(contactValue) {
-            const res = await fetch('../../auth/check_user.php', {
+            const res = await fetch('../../backend/auth/check_user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact: contactValue })
@@ -409,7 +409,7 @@
 
             console.log("⏳ Checking email in database...");
 
-            const res = await fetch('../../auth/check_user.php', {
+            const res = await fetch('../../backend/auth/check_user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email.value })
@@ -456,7 +456,7 @@
 
             console.log("⏳ Checking contact in database...");
 
-            const res = await fetch('../../auth/check_user.php', {
+            const res = await fetch('../../backend/auth/check_user.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contact: contact.value })
