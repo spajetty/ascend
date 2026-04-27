@@ -34,6 +34,9 @@ if (cancelImportBtn) {
         if (periodPanel) periodPanel.classList.add('hidden');
         if (monthSelect) monthSelect.value = '';
         if (yearSelect)  yearSelect.value  = '';
+        
+        const monthWrapper = document.getElementById('importMonthWrapper');
+        if (monthWrapper) monthWrapper.classList.remove('hidden');
 
         setProgramSelectorsLocked(false);
         resetPreviewPaginationState();
@@ -52,8 +55,9 @@ if (confirmImportBtn) {
         const importYear  = document.getElementById('importYear')?.value  ?? '';
         const btn         = document.getElementById('confirmImport');
 
-        if (!importMonth || !importYear) {
-            showToast('Please confirm Month and Year before importing.', 'warning');
+        const needsGlobalMonth = program !== 'Employers Accreditation';
+        if ((needsGlobalMonth && !importMonth) || !importYear) {
+            showToast(needsGlobalMonth ? 'Please confirm Month and Year before importing.' : 'Please confirm Year before importing.', 'warning');
             return;
         }
 
@@ -64,7 +68,7 @@ if (confirmImportBtn) {
 
         openImportConfirmModal({
             program,
-            period:       `${importMonth} ${importYear}`,
+            period:       `${importMonth} ${importYear}`.trim(),
             fileName:     state.selectedFile?.name ?? 'N/A',
             rowsToImport: importableRows,
             skipped:      skippedRows,
