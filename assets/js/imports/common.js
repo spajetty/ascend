@@ -32,11 +32,13 @@ const SKIP_FIELDS = new Set([
 const PINNED_LAST = ['Classification'];
 
 // ─── Import status pill (system concept: new / duplicate / invalid) ──────────
-export function importStatusPill(badgeStatus) {
+export function importStatusPill(badgeStatus, message = null) {
     const key = (badgeStatus ?? '').toLowerCase();
     const style = importStatusStyles[key] ?? importStatusStyles['invalid'];
+    const titleAttr = message ? ` title="${message}"` : '';
+    const cursorCls = message ? ' cursor-help' : '';
     return `
-        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${style.pill}">
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${style.pill}${cursorCls}"${titleAttr}>
             <span>${style.icon}</span>
             <span>${style.label}</span>
         </span>`;
@@ -116,7 +118,7 @@ export function previewTableRows(rows, allowedCols = null) {
         }).join('');
 
         // Import status pill (always last)
-        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${importStatusPill(r.badge_status)}</td>`;
+        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${importStatusPill(r.badge_status, r.status_message)}</td>`;
 
         return `<tr class="${rowCls}">${dataCells}${pinnedCells}${statusCell}</tr>`;
     }).join('');
