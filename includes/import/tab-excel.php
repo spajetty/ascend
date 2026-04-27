@@ -1,7 +1,7 @@
 <!-- ─── TAB CONTENT: EXCEL ─── -->
 <div id="tab-excel" class="tab-content space-y-5">
 
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <div id="importFormScreen" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <h2 class="text-base font-bold text-gray-800 mb-1">Import Data from Excel</h2>
         <p class="text-sm text-gray-400 mb-5">Select a section and program before uploading your file.</p>
 
@@ -192,6 +192,143 @@
                 </thead>
                 <tbody id="previewBody" class="divide-y divide-gray-50"></tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- Import Results View (shown after successful import) -->
+    <div id="importResultsView" class="hidden space-y-5">
+
+        <!-- ── Header bar ── -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M20 6L9 17l-5-5" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-base font-bold text-gray-900">Import Complete</h2>
+                        <p id="importResultsMetaLine" class="text-xs text-gray-400 mt-0.5"></p>
+                    </div>
+                </div>
+                <button id="backToImportBtn" type="button"
+                    class="flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 5l-7 7 7 7" />
+                    </svg>
+                    New Import
+                </button>
+            </div>
+
+            <!-- Summary stat cards -->
+            <div id="importResultsSummary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-5"></div>
+
+            <!-- Warnings accordion (hidden by default) -->
+            <div id="importResultsWarnings" class="hidden mt-4">
+                <button type="button" id="warningsToggleBtn"
+                    class="w-full flex items-center justify-between gap-2 px-4 py-3 rounded-xl border border-amber-200 bg-amber-50 text-sm font-semibold text-amber-800 hover:bg-amber-100 transition-colors">
+                    <span class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                        </svg>
+                        <span id="warningsCount">Warnings</span>
+                    </span>
+                    <svg id="warningsChevron" class="w-4 h-4 text-amber-500 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                </button>
+                <div id="warningsList" class="hidden mt-2 rounded-xl border border-amber-100 bg-amber-50/60 px-4 py-3 space-y-1 text-sm text-amber-800"></div>
+            </div>
+        </div>
+
+        <!-- ── Detail tabs ── -->
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+            <!-- Tab buttons -->
+            <div class="flex flex-wrap gap-2 pb-4 border-b border-gray-100">
+                <button type="button" data-results-tab="new-employers"
+                    class="results-tab-btn inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all bg-blue-600 text-white shadow-sm">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
+                    New Employers
+                    <span id="tabBadgeNewEmployers" class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-white/30 px-1.5 text-xs font-bold">0</span>
+                </button>
+                <button type="button" data-results-tab="duplicates"
+                    class="results-tab-btn inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <rect x="9" y="9" width="13" height="13" rx="2" />
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                    </svg>
+                    Duplicates
+                    <span id="tabBadgeDuplicates" class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-gray-300/60 px-1.5 text-xs font-bold">0</span>
+                </button>
+                <button type="button" data-results-tab="errors"
+                    class="results-tab-btn inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all bg-gray-100 text-gray-600 hover:bg-gray-200">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="15" y1="9" x2="9" y2="15" />
+                        <line x1="9" y1="9" x2="15" y2="15" />
+                    </svg>
+                    Errors
+                    <span id="tabBadgeErrors" class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-gray-300/60 px-1.5 text-xs font-bold">0</span>
+                </button>
+            </div>
+
+            <!-- Tab panels -->
+            <div class="mt-4 max-h-[440px] overflow-auto rounded-xl">
+                <div id="resultsPanelNewEmployers" class="results-tab-panel"></div>
+                <div id="resultsPanelDuplicates" class="results-tab-panel hidden"></div>
+                <div id="resultsPanelErrors" class="results-tab-panel hidden"></div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="mt-5 flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100">
+                <button id="downloadErrorReportBtn" type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                    <svg class="w-4 h-4 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Download Error Report
+                </button>
+                <button id="proceedToJobFairBtn" type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    Proceed to Job Fair
+                </button>
+                <button id="addAccreditationBtn" type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="8" r="6" />
+                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
+                    </svg>
+                    Add Accreditation
+                </button>
+                <button id="reviewEmployersBtn" type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                    Review Employers
+                </button>
+
+                <!-- Rollback button — only visible when an undo token exists -->
+                <button id="rollbackImportBtn" type="button"
+                    class="hidden ml-auto inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                    Rollback Import
+                </button>
+            </div>
         </div>
     </div>
 
