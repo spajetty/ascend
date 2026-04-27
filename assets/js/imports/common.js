@@ -100,9 +100,13 @@ export function previewTableRows(rows, allowedCols = null) {
         const dataCells = dataKeys.map(k => {
             const val = r[k] !== undefined && r[k] !== '' ? r[k] : null;
             const isName = k.toLowerCase().includes('name') || ['fname', 'lname'].includes(k.toLowerCase());
+            const isSkillsColumn = ['skills required for the job', 'skills deficiencies'].includes(k.toLowerCase());
             const textCls = isName ? 'font-semibold text-gray-800' : 'text-gray-600';
             const display = val !== null ? val : ''; // Missing data → show empty cells
-            return `<td class="px-4 py-3 ${textCls} whitespace-nowrap max-w-[180px] truncate" title="${val ?? ''}">${display}</td>`;
+            const cellCls = isSkillsColumn
+                ? 'whitespace-normal max-w-[360px] break-words align-top'
+                : 'whitespace-nowrap max-w-[180px] truncate';
+            return `<td class="px-4 py-3 ${textCls} ${cellCls}" title="${val ?? ''}">${display}</td>`;
         }).join('');
 
         // Pinned columns (Classification as badge)
