@@ -106,11 +106,13 @@ export function handleFile(file) {
 
         if (json.length === 0) { showToast('The uploaded file is empty.', 'warning'); return; }
 
-        // Header validation
-        const headers  = Object.keys(json[0] || {});
-        const required = (programHeaders[program]) ? programHeaders[program] : (programHeaders['DEFAULT'] ?? []);
-        const missing  = required.filter(h => !headers.includes(h));
-        const extra    = headers.filter(h => !required.includes(h));
+        // Header validation — case-insensitive
+        const headers      = Object.keys(json[0] || {});
+        const headersLower = headers.map(h => h.toLowerCase());
+        const required     = programHeaders[program] ?? programHeaders['DEFAULT'] ?? [];
+        const requiredLower = required.map(h => h.toLowerCase());
+        const missing = required.filter(h => !headersLower.includes(h.toLowerCase()));
+        const extra   = headers.filter(h => !requiredLower.includes(h.toLowerCase()));
 
         if (missing.length > 0) {
             showToast(`Missing required columns:\n${missing.join(', ')}`, 'error', 6000);
@@ -135,7 +137,8 @@ export function handleFile(file) {
             confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
             source:     byName.month || byName.year ? 'filename' : 'content',
         };
-        applyDetectedPeriod(state.detectedPeriod);
+        const isAccreditation = program === 'Employers Accreditation';
+        applyDetectedPeriod(state.detectedPeriod, { hideMonth: isAccreditation });
 
         // Validation request
         document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
@@ -207,6 +210,9 @@ if (removeFile) {
         if (periodPanel)  periodPanel.classList.add('hidden');
         if (monthSelect)  monthSelect.value = '';
         if (yearSelect)   yearSelect.value  = '';
+        // Restore month wrapper in case it was hidden for Employers Accreditation
+        const monthWrapper = document.getElementById('importMonthWrapper');
+        if (monthWrapper) monthWrapper.classList.remove('hidden');
         document.getElementById('dataPreview').classList.add('hidden');
         setProgramSelectorsLocked(false);
         resetPreviewPaginationState();
