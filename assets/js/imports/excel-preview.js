@@ -196,16 +196,32 @@ export function detectPeriodFromRows(rows) {
     };
 }
 
-export function applyDetectedPeriod(period) {
-    if (!monthSelect || !yearSelect || !periodPanel || !periodSuggestionText) return;
+export function applyDetectedPeriod(period, { hideMonth = false } = {}) {
+    if (!yearSelect || !periodPanel || !periodSuggestionText) return;
+
+    const monthWrapper = document.getElementById('importMonthWrapper');
 
     periodPanel.classList.remove('hidden');
-    if (period.month) monthSelect.value = period.month;
-    if (period.year)  yearSelect.value  = period.year;
 
-    periodSuggestionText.textContent = (period.month && period.year)
-        ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
-        : 'Could not confidently detect period. Please select month and year before import.';
+    if (hideMonth) {
+        // Program supplies month per-row in the file — hide the global month picker.
+        if (monthWrapper) monthWrapper.classList.add('hidden');
+        if (monthSelect)  monthSelect.value = ''; // clear so backend ignores it
+
+        // Pre-select current year (user can still change it).
+        if (yearSelect && !yearSelect.value) {
+            yearSelect.value = String(new Date().getFullYear());
+        }
+        periodSuggestionText.textContent = 'Month is taken from each row. Confirm the import year below.';
+    } else {
+        if (monthWrapper) monthWrapper.classList.remove('hidden');
+        if (period.month && monthSelect) monthSelect.value = period.month;
+        if (period.year)  yearSelect.value = period.year;
+
+        periodSuggestionText.textContent = (period.month && period.year)
+            ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
+            : 'Could not confidently detect period. Please select month and year before import.';
+    }
 }
 
 // ─── Main preview renderer ────────────────────────────────────────────────────
