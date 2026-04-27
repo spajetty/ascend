@@ -50,7 +50,8 @@ export function previewTableHeaders(firstRow, allowedCols = null) {
         .filter(k => !SKIP_FIELDS.has(k) && !PINNED_LAST.includes(k));
 
     if (allowedCols) {
-        dataKeys = dataKeys.filter(k => allowedCols.includes(k));
+        const allowedLower = allowedCols.map(c => c.toLowerCase());
+        dataKeys = dataKeys.filter(k => allowedLower.includes(k.toLowerCase()));
     }
 
     const pinnedKeys = PINNED_LAST.filter(k => k in firstRow);
@@ -81,7 +82,8 @@ export function previewTableRows(rows, allowedCols = null) {
     let dataKeys = Object.keys(firstRow).filter(k => !SKIP_FIELDS.has(k) && !PINNED_LAST.includes(k));
 
     if (allowedCols) {
-        dataKeys = dataKeys.filter(k => allowedCols.includes(k));
+        const allowedLower = allowedCols.map(c => c.toLowerCase());
+        dataKeys = dataKeys.filter(k => allowedLower.includes(k.toLowerCase()));
     }
 
     const pinnedKeys = PINNED_LAST.filter(k => k in firstRow);
