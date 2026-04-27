@@ -188,7 +188,7 @@ export const programHeaders = {
     'DEFAULT': ['LastName', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'DOB', 'Contact'],
 
     // Non-person programs
-    'Employers Accreditation': ['Month', 'Accreditation', 'Company', 'Establishment Type', 'Industry', 'City/Municipality'],
+    'Employers Accreditation': ['Month', 'Accreditation', 'Company', 'Est. Type', 'Industry', 'City/Municipality/Province'],
     'Workers Hiring for Infrastructure Projects — Beneficiaries': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'Position', 'Date Hired', 'Company', 'Name of Project', 'Duration', 'Budget', 'Resume', 'B-Cert', 'Valid ID', 'Brgy Clearance'],
     'Workers Hiring for Infrastructure Projects — Projects': ['Project Title / Name of Implementing Partner', 'Nature of Project', 'Duration', 'Budget', 'Fund Source', 'Jobs Generated', 'No. of Persons Employed from the Locality', 'Skills Required for the Job', 'Skills Deficiencies', 'Project Contractor', 'Legitimate Contractors (YES or NO)', 'Filled', 'Unfilled'],
 
