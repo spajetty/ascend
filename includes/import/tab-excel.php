@@ -18,7 +18,7 @@
                         <option value="employment_facilitation">Employment Facilitation</option>
                         <option value="employers_engagement">Employers Engagement</option>
                         <option value="youth_employability">Youth Employability</option>
-                        <option value="career_development">Career Development</option>
+                        <!-- <option value="career_development">Career Development</option> -->
                     </select>
                     <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -124,6 +124,16 @@
                         <option value="">Select year...</option>
                     </select>
                 </div>
+            </div>
+            <!-- SPES Category Dropdown (hidden by default, shown only for SPES) -->
+            <div id="spesCategoryWrapper" class="hidden mt-4">
+                <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">SPES Category</label>
+                <select id="spesCategory"
+                    class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <option value="">Select category...</option>
+                    <option value="lgu">SPES LGU</option>
+                    <option value="private">SPES Private</option>
+                </select>
             </div>
             <p class="text-xs text-blue-700 mt-2">Suggestion is pre-filled but editable before final import.</p>
         </div>
@@ -251,7 +261,7 @@
                     <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                         <path d="M12 5v14M5 12h14" />
                     </svg>
-                    New Employers
+                    <span id="tabLabelNewEmployers">New Employers</span>
                     <span id="tabBadgeNewEmployers" class="ml-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-white/30 px-1.5 text-xs font-bold">0</span>
                 </button>
                 <button type="button" data-results-tab="duplicates"
