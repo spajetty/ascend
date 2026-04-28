@@ -72,7 +72,25 @@ if (excelSection && excelProgram) {
     });
 
     excelProgram.addEventListener('change', function () {
-        if (state.selectedFile) { setUploadEnabled(false); return; }
+        // Show/hide SPES category dropdown based on selected program
+        const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
+        if (spesCategoryWrapper) {
+            if (this.value === 'SPES') {
+                spesCategoryWrapper.classList.remove('hidden');
+            } else {
+                spesCategoryWrapper.classList.add('hidden');
+            }
+        }
+
+        // Store program choice for later use in file handler
+        // Period panel visibility will be controlled by applyDetectedPeriod after file selection
+        state.selectedProgram = this.value;
+
+        if (state.selectedFile) {
+            setUploadEnabled(false);
+            return;
+        }
+
         setUploadStateFromProgramSelection();
     });
 }
@@ -138,7 +156,11 @@ export function handleFile(file) {
             source:     byName.month || byName.year ? 'filename' : 'content',
         };
         const isAccreditation = program === 'Employers Accreditation';
-        applyDetectedPeriod(state.detectedPeriod, { hideMonth: isAccreditation });
+        const isSchools = program === 'Schools';
+        applyDetectedPeriod(state.detectedPeriod, {
+            hideMonth: isAccreditation || isSchools,
+            hideYear: isSchools,
+        });
 
         // Validation request
         document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
@@ -213,6 +235,8 @@ if (removeFile) {
         // Restore month wrapper in case it was hidden for Employers Accreditation
         const monthWrapper = document.getElementById('importMonthWrapper');
         if (monthWrapper) monthWrapper.classList.remove('hidden');
+        const yearWrapper = document.getElementById('importYear')?.closest('div');
+        if (yearWrapper) yearWrapper.classList.remove('hidden');
         document.getElementById('dataPreview').classList.add('hidden');
         setProgramSelectorsLocked(false);
         resetPreviewPaginationState();
