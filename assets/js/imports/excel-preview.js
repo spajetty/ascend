@@ -196,25 +196,44 @@ export function detectPeriodFromRows(rows) {
     };
 }
 
-export function applyDetectedPeriod(period, { hideMonth = false } = {}) {
+export function applyDetectedPeriod(period, { hideMonth = false, hideYear = false } = {}) {
     if (!yearSelect || !periodPanel || !periodSuggestionText) return;
 
     const monthWrapper = document.getElementById('importMonthWrapper');
+    const yearWrapper = document.getElementById('importYear')?.closest('div');
 
     periodPanel.classList.remove('hidden');
 
-    if (hideMonth) {
-        // Program supplies month per-row in the file — hide the global month picker.
-        if (monthWrapper) monthWrapper.classList.add('hidden');
-        if (monthSelect)  monthSelect.value = ''; // clear so backend ignores it
+    if (hideMonth || hideYear) {
+        if (monthWrapper) monthWrapper.classList.toggle('hidden', hideMonth);
+        if (yearWrapper) yearWrapper.classList.toggle('hidden', hideYear);
 
-        // Pre-select current year (user can still change it).
-        if (yearSelect && !yearSelect.value) {
-            yearSelect.value = String(new Date().getFullYear());
+        if (hideMonth && monthSelect) monthSelect.value = '';
+        if (hideYear && yearSelect) yearSelect.value = '';
+
+        if (hideMonth && hideYear) {
+            periodPanel.classList.add('hidden');
+            periodSuggestionText.textContent = '';
+            return;
         }
-        periodSuggestionText.textContent = 'Month is taken from each row. Confirm the import year below.';
+
+        if (hideMonth) {
+            // Program supplies month per-row in the file — hide the global month picker.
+            // Pre-select current year (user can still change it).
+            if (yearSelect && !yearSelect.value) {
+                yearSelect.value = String(new Date().getFullYear());
+            }
+            periodSuggestionText.textContent = 'Month is taken from each row. Confirm the import year below.';
+            return;
+        }
+
+        if (hideYear) {
+            periodSuggestionText.textContent = 'Year is taken from the file. Confirm the import month below.';
+            return;
+        }
     } else {
         if (monthWrapper) monthWrapper.classList.remove('hidden');
+        if (yearWrapper) yearWrapper.classList.remove('hidden');
         if (period.month && monthSelect) monthSelect.value = period.month;
         if (period.year)  yearSelect.value = period.year;
 
