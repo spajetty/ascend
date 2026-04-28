@@ -20,6 +20,7 @@ $rows = $input['data'];
 $importMonthRaw = trim((string)($input['importMonth'] ?? ''));
 $importYearRaw = trim((string)($input['importYear'] ?? ''));
 $sourceFileName = trim((string)($input['fileName'] ?? ''));
+$spesCategoryRaw = trim((string)($input['spesCategory'] ?? ''));
 
 // Shared helpers
 require_once __DIR__ . '/helpers/db_utils.php';
@@ -32,7 +33,8 @@ require_once __DIR__ . '/savers/save_employers_accreditation.php';
 require_once __DIR__ . '/savers/save_whip_projects.php';
 require_once __DIR__ . '/savers/save_whip_beneficiaries.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
-require_once __DIR__ . '/savers/save_youth_employability.php';
+require_once __DIR__ . '/savers/save_spes.php';
+require_once __DIR__ . '/savers/save_schools.php';
 
 $conn->begin_transaction();
 
@@ -51,6 +53,9 @@ $state = [
     'insertedWhipTable' => null,
     'insertedProjectIds' => [],
     'insertedProjectTable' => null,
+    'insertedSPESIds' => [],
+    'insertedSPESEmploymentIds' => [],
+    'insertedSchoolIds' => [],
     'createdEmployerIds' => [],
     'insertedAccreditationIds' => [],
     'warnings' => [],
@@ -92,6 +97,7 @@ try {
         'batchId' => $batchId,
         'importMonthRaw' => $importMonthRaw,
         'importYearRaw' => $importYearRaw,
+        'spesCategory' => $spesCategoryRaw,
     ];
 
     foreach ($rows as $row) {
@@ -102,6 +108,16 @@ try {
 
         if ($program === 'Employers Accreditation') {
             $result = saveEmployersAccreditationRow($conn, $row, $ctx, $state);
+            if ($result === 'saved') {
+                $saved++;
+            } else {
+                $skipped++;
+            }
+            continue;
+        }
+
+        if ($program === 'Schools') {
+            $result = saveSchoolsRow($conn, $row, $ctx, $state);
             if ($result === 'saved') {
                 $saved++;
             } else {
@@ -130,6 +146,10 @@ try {
             $result = saveWhipBeneficiariesRow($conn, $row, $benefId, $ctx, $state);
         } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
             $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
+        } elseif ($program === 'SPES') {
+            // Pass category through row for SPES
+            $row['_spes_category'] = $spesCategoryRaw;
+            $result = saveSPESRow($conn, $row, $benefId, $ctx, $state);
         } else {
             $result = saveYouthEmployabilityRow($conn, $row, $benefId, $ctx, $state);
         }
@@ -151,6 +171,9 @@ try {
         !empty($state['insertedFirstJobSeekIds']) ||
         !empty($state['insertedWhipIds']) ||
         !empty($state['insertedProjectIds']) ||
+        !empty($state['insertedSPESIds']) ||
+        !empty($state['insertedSPESEmploymentIds']) ||
+        !empty($state['insertedSchoolIds']) ||
         !empty($state['insertedAccreditationIds']) ||
         $batchId !== null;
 
@@ -181,6 +204,9 @@ try {
             'whip_table' => $state['insertedWhipTable'],
             'project_ids' => array_values(array_unique(array_map('intval', $state['insertedProjectIds']))),
             'project_table' => $state['insertedProjectTable'],
+            'spes_ids' => array_values(array_unique(array_map('intval', $state['insertedSPESIds']))),
+            'spes_employment_ids' => array_values(array_unique(array_map('intval', $state['insertedSPESEmploymentIds']))),
+            'school_ids' => array_values(array_unique(array_map('intval', $state['insertedSchoolIds']))),
             'employer_ids' => array_values(array_unique(array_map('intval', $state['createdEmployerIds']))),
             'accreditation_ids' => array_values(array_unique(array_map('intval', $state['insertedAccreditationIds']))),
         ];
