@@ -28,12 +28,14 @@ if (cancelImportBtn) {
         const periodPanel = document.getElementById('importPeriodPanel');
         const monthSelect = document.getElementById('importMonth');
         const yearSelect  = document.getElementById('importYear');
+        const spesCategory = document.getElementById('spesCategory');
 
         if (fileInput) fileInput.value = '';
         if (fileInfo)  fileInfo.classList.add('hidden');
         if (periodPanel) periodPanel.classList.add('hidden');
         if (monthSelect) monthSelect.value = '';
         if (yearSelect)  yearSelect.value  = '';
+        if (spesCategory) spesCategory.value = '';
         
         const monthWrapper = document.getElementById('importMonthWrapper');
         if (monthWrapper) monthWrapper.classList.remove('hidden');
@@ -55,11 +57,16 @@ if (confirmImportBtn) {
         const importYear  = document.getElementById('importYear')?.value  ?? '';
         const btn         = document.getElementById('confirmImport');
 
-        const needsGlobalMonth = program !== 'Employers Accreditation';
-        if ((needsGlobalMonth && !importMonth) || !importYear) {
+        const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools';
+        const needsGlobalYear = program !== 'Schools';
+        if ((needsGlobalMonth && !importMonth) || (needsGlobalYear && !importYear)) {
             showToast(needsGlobalMonth ? 'Please confirm Month and Year before importing.' : 'Please confirm Year before importing.', 'warning');
             return;
         }
+
+        const periodLabel = program === 'Schools'
+            ? 'Not required'
+            : `${importMonth} ${importYear}`.trim();
 
         const duplicateRows  = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'duplicate').length;
         const invalidRows    = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'invalid').length;
@@ -68,7 +75,7 @@ if (confirmImportBtn) {
 
         openImportConfirmModal({
             program,
-            period:       `${importMonth} ${importYear}`.trim(),
+            period:       periodLabel,
             fileName:     state.selectedFile?.name ?? 'N/A',
             rowsToImport: importableRows,
             skipped:      skippedRows,
@@ -87,6 +94,7 @@ if (confirmImportBtn) {
                     importMonth,
                     importYear,
                     fileName:    state.selectedFile?.name ?? '',
+                    spesCategory: program === 'SPES' ? (document.getElementById('spesCategory')?.value ?? '') : '',
                 }),
             })
                 .then(async res => {
@@ -111,6 +119,12 @@ if (confirmImportBtn) {
                         const newEmployers     = warnings
                             .map(w => { const m = String(w).match(/^New company created:\s*(.+)$/i); return m ? m[1].trim() : ''; })
                             .filter(Boolean);
+                        const newSchools       = program === 'Schools'
+                            ? rowsSnapshot
+                                .filter(r => (r.badge_status ?? '').toLowerCase() === 'new')
+                                .map(r => (r.school_name || r['School Name'] || '').trim())
+                                .filter(Boolean)
+                            : [];
 
                         // Reset the form/preview before showing results
                         document.getElementById('cancelImport').click();
@@ -121,10 +135,11 @@ if (confirmImportBtn) {
                             duplicates:   duplicateRows.length,
                             errors:       errorRows.length,
                             program,
-                            period:       `${importMonth} ${importYear}`,
+                            period:       periodLabel,
                             fileName:     importedFileName,
                             warnings,
                             newEmployers,
+                            newSchools,
                             duplicateRows,
                             errorRows,
                         }, result.undo_token ?? null);
