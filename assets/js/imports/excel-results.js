@@ -3,6 +3,7 @@
 
 import { showToast } from '../toast.js';
 import { state } from './excel-state.js';
+import { formatColumnName } from './common.js';
 
 // ─── Shared DOM refs ──────────────────────────────────────────────────────────
 const importFormScreen   = document.getElementById('importFormScreen');
@@ -77,17 +78,32 @@ function buildRowsTable(rows, emptyLabel) {
             </div>`;
     }
 
+    // Build dynamic headers from first row keys (filter out internal/system fields)
+    const firstRow = rows[0] || {};
+    const SKIP = new Set(['badge_status', 'status_message', '_sys_is_existing', '_sys_user_id', '_sys_benef_id', '_sys_skip', '_parsed_dob', 'is_new', 'duplicate']);
+    const keys = Object.keys(firstRow).filter(k => !SKIP.has(k));
+
+    const headerCols = keys.map(k => `
+        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider whitespace-nowrap">${formatColumnName(k)}</th>`).join('');
+
     const body = rows.map((r, i) => {
-        const fullName = [r.fname, r.lname].filter(Boolean).join(' ').trim() || r['First Name'] || '—';
-        const dob      = r._parsed_dob || r.DOB || r.Birthday || '';
-        const contact  = r.Contact || r.contact || r.Email || r.email || '';
         const status   = r.status_message || r.badge_status || '';
         const rowBg    = i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60';
+        const cells = keys.map(k => {
+            let val = r[k];
+            // Friendly fallbacks for common DOB/contact/name keys
+            if ((k.toLowerCase().includes('dob') || k.toLowerCase().includes('birth')) && !val) val = r._parsed_dob || r.DOB || r.Birthday || '';
+            if ((k.toLowerCase().includes('email') || k.toLowerCase().includes('contact')) && !val) val = r.Contact || r.contact || r.Email || r.email || '';
+            if (!val && (k.toLowerCase() === 'first name' || k.toLowerCase() === 'fname')) val = r.fname || '';
+            if (!val && (k.toLowerCase() === 'last name' || k.toLowerCase() === 'lname')) val = r.lname || '';
+            const display = val !== undefined && val !== null ? escapeHtml(val) : '';
+            const cellCls = String(val || '').length > 40 ? 'whitespace-normal max-w-[360px] break-words align-top' : 'whitespace-nowrap max-w-[180px] truncate';
+            return `<td class="px-4 py-3 text-sm text-gray-600 ${cellCls}" title="${escapeHtml(val ?? '')}">${display}</td>`;
+        }).join('');
+
         return `
             <tr class="${rowBg} hover:bg-blue-50/30 transition-colors">
-                <td class="px-4 py-3 text-sm font-semibold text-gray-800 whitespace-nowrap">${escapeHtml(fullName)}</td>
-                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">${escapeHtml(dob)}</td>
-                <td class="px-4 py-3 text-sm text-gray-500 whitespace-nowrap">${escapeHtml(contact)}</td>
+                ${cells}
                 <td class="px-4 py-3 whitespace-nowrap">${resultStatusPill(status)}</td>
             </tr>`;
     }).join('');
@@ -97,10 +113,8 @@ function buildRowsTable(rows, emptyLabel) {
             <table class="min-w-full text-left">
                 <thead class="sticky top-0 bg-gray-50 border-b border-gray-100">
                     <tr>
-                        <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Name</th>
-                        <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Date of Birth</th>
-                        <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Contact</th>
-                        <th class="px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500">Status</th>
+                        ${headerCols}
+                        <th class="text-left px-4 py-3 text-xs font-bold uppercase tracking-wider text-gray-500 whitespace-nowrap">Status</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">${body}</tbody>
@@ -125,6 +139,10 @@ function statCard(value, label, c, iconPath) {
 // ─── Render results view ──────────────────────────────────────────────────────
 export function renderImportResultsView(data) {
     if (!importResultsView || !importResultsSummary || !importResultsWarnings) return;
+    const isSchools = (data.program || '') === 'Schools';
+    const primaryLabel = isSchools ? 'New Schools' : 'New Employers';
+    const emptyPrimaryLabel = isSchools ? 'No new schools were created in this import.' : 'No new employers were created in this import.';
+    const createdItems = isSchools ? (data.newSchools || []) : (data.newEmployers || []);
 
     // Meta line
     const metaLine = document.getElementById('importResultsMetaLine');
@@ -162,26 +180,28 @@ export function renderImportResultsView(data) {
     }
 
     // Tab badge counts
+    const labelNE = document.getElementById('tabLabelNewEmployers');
     const badgeNE  = document.getElementById('tabBadgeNewEmployers');
     const badgeDup = document.getElementById('tabBadgeDuplicates');
     const badgeErr = document.getElementById('tabBadgeErrors');
-    if (badgeNE)  badgeNE.textContent  = data.newEmployers.length;
+    if (labelNE) labelNE.textContent = primaryLabel;
+    if (badgeNE)  badgeNE.textContent  = createdItems.length;
     if (badgeDup) badgeDup.textContent = data.duplicateRows.length;
     if (badgeErr) badgeErr.textContent = data.errorRows.length;
 
-    // Panel content — New Employers
+    // Panel content — New Schools / New Employers
     const newEmployersPanel = document.getElementById('resultsPanelNewEmployers');
     if (newEmployersPanel) {
-        if (!data.newEmployers.length) {
+        if (!createdItems.length) {
             newEmployersPanel.innerHTML = `
                 <div class="flex flex-col items-center justify-center gap-3 py-10 text-center">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
                         <svg class="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" /></svg>
                     </div>
-                    <p class="text-sm text-gray-500">No new employers were created in this import.</p>
+                    <p class="text-sm text-gray-500">${escapeHtml(emptyPrimaryLabel)}</p>
                 </div>`;
         } else {
-            const items = data.newEmployers.map((name, i) => `
+            const items = createdItems.map((name, i) => `
                 <div class="flex items-center gap-3 px-4 py-3 ${i % 2 === 0 ? 'bg-white' : 'bg-gray-50/60'} hover:bg-blue-50/30 transition-colors rounded-lg">
                     <div class="flex-shrink-0 w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center">
                         <svg class="w-3.5 h-3.5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
@@ -190,7 +210,7 @@ export function renderImportResultsView(data) {
                     <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">New</span>
                 </div>`).join('');
             newEmployersPanel.innerHTML = `
-                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${data.newEmployers.length} employer${data.newEmployers.length !== 1 ? 's' : ''} created</p></div>
+                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${createdItems.length} ${isSchools ? 'school' : 'employer'}${createdItems.length !== 1 ? 's' : ''} created</p></div>
                 <div class="space-y-1 rounded-xl border border-gray-100 overflow-hidden">${items}</div>`;
         }
     }
