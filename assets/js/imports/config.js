@@ -14,17 +14,18 @@ export const programs = {
         ],
     youth_employability:
         [
-            'SPES Baby',
+            'SPES',
+            'Schools',
             //'4Ps Beneficiaries',
             //'PWD',
             'Government Internship Program',
             'Work Immersion and Internship Referral Program'
         ],
-    career_development:
+    /*career_development:
         [
             'Career Development Support Program',
             'LMI Orientation'
-        ],
+        ],*/
 };
 
 // Import status - (new / duplicate / invalid)
@@ -139,7 +140,7 @@ export const programFields = {
     ],
 
     // ── Youth Employability ──────────────────────────────────────────────────
-    'SPES Baby': [
+    'SPES': [
         { name: 'school', label: 'School', type: 'text', placeholder: 'Enter school name', required: true },
         { name: 'year_level', label: 'Year Level', type: 'select', options: ['Grade 11', 'Grade 12', '1st Year', '2nd Year', '3rd Year', '4th Year'], required: true },
         { name: 'guardian_name', label: "Guardian's Name", type: 'text', placeholder: "Enter guardian's name", required: true },
@@ -309,9 +310,48 @@ export const programHeaders = {
         'Valid ID',
         'Brgy Clearance',
     ],
-    'SPES Baby': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Student/OSY', 'Program', 'Classification', 'School', 'Highest Educ Attainment', 'Course', 'PWD', '4PS Beneficiary', '4PS Beneficiary ID No.', 'Company', 'Store Assignment', 'Start of Contract', 'End of Contract', 'Resume', 'B-Cert', 'Valid ID', 'Brgy Clearance'],
+    
+    'SPES': [
+        'Last Name', 
+        'First Name', 
+        'Middle Name', 
+        'Suffix', 
+        'Sex', 
+        'House No/Street', 
+        'Barangay', 
+        'City', 
+        'District', 
+        'Birthday', 
+        'Age', 
+        'Email', 
+        'Contact', 
+        'Civil Status', 
+        'Student/OSY', 
+        'Program', 
+        'Classification', 
+        'School', 
+        'Highest Educ. Attainment', 
+        'Course', 
+        'OFW Dependent',
+        'PWD', 
+        '4PS Beneficiary', 
+        '4PS Household ID No.', 
+        'Company', 
+        'Store Assignment', 
+        'Start of Contract', 
+        'End of Contract', 
+        'Resume', 
+        'B-Cert', 
+        'Valid ID', 
+        'Brgy Clearance'
+    ],
+    'Schools': [
+        'School Name',
+        'Congressional District',
+        'Grades Offered'
+    ],
     'Government Internship Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Student/OSY', 'Program', 'Classification', 'School', 'Highest Educ Attainment', 'Course', 'PWD', '4PS Beneficiary', '4PS Beneficiary ID No.', 'Company', 'Store Assignment', 'Start of Contract', 'End of Contract', 'Resume', 'B-Cert', 'Valid ID', 'Brgy Clearance'],
     'Work Immersion and Internship Referral Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'Inquiry Via', 'School', 'Year Level', 'Course', 'Immersion Hours', 'Preferred Host Organization Type', 'Preferred Industry', 'Willing to be assigned outside preferred field?', 'Resume', 'Proof of Residency', 'Latest Credentials', 'Letter of Intent', 'Reco Letter'],
-    'Career Development Support Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'CareerGoal', 'TrainingNeeded', 'CurrentStatus'],
-    'LMI Orientation': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'OrientationDate', 'Venue', 'CurrentStatus']
+    //'Career Development Support Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'CareerGoal', 'TrainingNeeded', 'CurrentStatus'],
+    //'LMI Orientation': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'OrientationDate', 'Venue', 'CurrentStatus']
 };
