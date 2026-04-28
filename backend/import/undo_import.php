@@ -72,6 +72,33 @@ $conn->begin_transaction();
 try {
     $deletedFirstJobSeek = deleteByIds($conn, 'firstJobSeek', 'jobseek_id', (array)($payload['first_job_seek_ids'] ?? []));
     $deletedJobFair = deleteByIds($conn, 'jobFair', 'jobfair_id', (array)($payload['jobfair_ids'] ?? []));
+    $deletedSPESEmployment = deleteByIds($conn, 'spes_employment', 'employment_id', (array)($payload['spes_employment_ids'] ?? []));
+
+    $deletedSPES = deleteByIds($conn, 'spes', 'spes_id', (array)($payload['spes_ids'] ?? []));
+    // Fallback for older payloads that may not include spes_ids but include beneficiary_ids.
+    if ($deletedSPES === 0) {
+        $benefIds = array_values(array_unique(array_filter(array_map('intval', (array)($payload['beneficiary_ids'] ?? [])), static fn($id) => $id > 0)));
+        if (!empty($benefIds)) {
+            $ph = implode(',', array_fill(0, count($benefIds), '?'));
+            $types = str_repeat('i', count($benefIds));
+            $selSpes = $conn->prepare("SELECT spes_id FROM spes WHERE benef_id IN ({$ph})");
+            $selSpes->bind_param($types, ...$benefIds);
+            $selSpes->execute();
+            $resSpes = $selSpes->get_result();
+            $spesIdsByBenef = [];
+            while ($spesRow = $resSpes->fetch_assoc()) {
+                $spesIdsByBenef[] = (int)$spesRow['spes_id'];
+            }
+
+            if (!empty($spesIdsByBenef)) {
+                // Ensure child rows are removed first before deleting spes.
+                $deletedSPESEmployment += deleteByIds($conn, 'spes_employment', 'spes_id', $spesIdsByBenef);
+                $deletedSPES += deleteByIds($conn, 'spes', 'spes_id', $spesIdsByBenef);
+            }
+        }
+    }
+
+    $deletedSchools = deleteByIds($conn, 'schools', 'school_id', (array)($payload['school_ids'] ?? []));
 
     $deletedWhip = 0;
     $whipIds = (array)($payload['whip_ids'] ?? []);
@@ -145,7 +172,7 @@ try {
     $employerIds = array_values(array_unique(array_filter(array_map('intval', (array)($payload['employer_ids'] ?? [])), static fn($id) => $id > 0)));
     foreach ($employerIds as $employerId) {
         $stillUsed = false;
-        foreach (['jobMatch', 'jobFair', 'firstJobSeek', 'projects', 'whip_projects', 'whipProject', 'whip_project', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects'] as $refTable) {
+        foreach (['jobMatch', 'jobFair', 'firstJobSeek', 'spes_employment', 'projects', 'whip_projects', 'whipProject', 'whip_project', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects'] as $refTable) {
             $companyIdCol = findExistingColumn($conn, $refTable, ['company_id']);
             if ($companyIdCol === null) {
                 continue;
@@ -186,6 +213,9 @@ try {
         'deleted' => [
             'first_job_seek' => $deletedFirstJobSeek,
             'jobfair' => $deletedJobFair,
+            'spes_employment' => $deletedSPESEmployment,
+            'spes' => $deletedSPES,
+            'schools' => $deletedSchools,
             'jobmatch' => $deletedJobMatch,
             'whip' => $deletedWhip,
             'projects' => $deletedProjects,
