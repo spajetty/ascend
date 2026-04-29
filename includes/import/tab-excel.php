@@ -135,6 +135,17 @@
                     <option value="private">SPES Private</option>
                 </select>
             </div>
+            <!-- WIIRP Category Dropdown (hidden by default, shown only for WIIRP) -->
+            <div id="wiirpCategoryWrapper" class="hidden mt-4">
+                <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">WIIRP Category</label>
+                <select id="wiirpCategory"
+                    class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                    <option value="">Select category...</option>
+                    <option value="inquiry">Inquiry</option>
+                    <option value="peso-assigned">PESO Assigned</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
             <p class="text-xs text-blue-700 mt-2">Suggestion is pre-filled but editable before final import.</p>
         </div>
 
