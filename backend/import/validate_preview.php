@@ -11,6 +11,7 @@ if (!$input || !isset($input['data']) || !isset($input['program'])) {
 
 $program = trim((string)$input['program']);
 $rows = $input['data'];
+$wiirpCategory = trim((string)($input['wiirpCategory'] ?? ''));
 
 // Require shared helper functions
 require_once __DIR__ . '/helpers/db_utils.php';
@@ -21,6 +22,7 @@ require_once __DIR__ . '/helpers/program_utils.php';
 require_once __DIR__ . '/validators/validate_employers_accreditation.php';
 require_once __DIR__ . '/validators/validate_whip_projects.php';
 require_once __DIR__ . '/validators/validate_whip_beneficiaries.php';
+require_once __DIR__ . '/validators/validate_wiirp.php';
 require_once __DIR__ . '/validators/validate_job_matching.php';
 require_once __DIR__ . '/validators/validate_spes.php';
 require_once __DIR__ . '/validators/validate_schools.php';
@@ -34,6 +36,8 @@ if ($program === 'Employers Accreditation') {
     $validatedData = validateWhipProjects($conn, $rows);
 } elseif (isWhipBeneficiariesProgram($program)) {
     $validatedData = validateWhipBeneficiaries($conn, $rows);
+} elseif (isWiirpProgram($program)) {
+    $validatedData = validateWiirp($conn, $rows, $wiirpCategory);
 } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
     $validatedData = validateJobMatchingFamily($conn, $rows, $program);
 } elseif ($program === 'SPES') {
