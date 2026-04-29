@@ -100,6 +100,35 @@ try {
 
     $deletedSchools = deleteByIds($conn, 'schools', 'school_id', (array)($payload['school_ids'] ?? []));
 
+    // Undo WIIRP imports (Work Immersion and Internship Referral Program)
+    $deletedWiirp = 0;
+    $wiirpIds = (array)($payload['wiirp_ids'] ?? []);
+    if (!empty($wiirpIds)) {
+        $wiirpTable = trim((string)($payload['wiirp_table'] ?? ''));
+        if ($wiirpTable === '' || !tableExists($conn, $wiirpTable)) {
+            foreach (['wiirp'] as $candidateTable) {
+                if (tableExists($conn, $candidateTable)) {
+                    $wiirpTable = $candidateTable;
+                    break;
+                }
+            }
+        }
+
+        if ($wiirpTable !== '') {
+            // First delete private details if present to avoid FK constraint errors
+            $privateIds = (array)($payload['wiirp_private_ids'] ?? []);
+            if (!empty($privateIds) && tableExists($conn, 'wiirp_private_details')) {
+                deleteByIds($conn, 'wiirp_private_details', 'id', $privateIds);
+            }
+
+            $wiirpIdCol = findExistingColumn($conn, $wiirpTable, ['work_immersion_id', 'id']);
+            if ($wiirpIdCol !== null) {
+                $deletedWiirp = deleteByIds($conn, $wiirpTable, $wiirpIdCol, $wiirpIds);
+            }
+        }
+    }
+
+    // Undo WHIP beneficiary imports (Workers Hiring for Infrastructure Projects - Beneficiaries)
     $deletedWhip = 0;
     $whipIds = (array)($payload['whip_ids'] ?? []);
     if (!empty($whipIds)) {
@@ -217,6 +246,7 @@ try {
             'spes' => $deletedSPES,
             'schools' => $deletedSchools,
             'jobmatch' => $deletedJobMatch,
+            'wiirp' => $deletedWiirp,
             'whip' => $deletedWhip,
             'projects' => $deletedProjects,
             'docs' => $deletedDocs,
