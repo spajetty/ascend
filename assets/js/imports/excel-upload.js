@@ -15,6 +15,48 @@ import {
     resetPreviewPaginationState,
 } from './excel-preview.js';
 
+const WIIRP_PRIVATE_PREVIEW_HEADERS = [
+    '# of hours',
+    'Starting Date',
+    'Est. End',
+    'Office Assignment',
+    'Endorsement 1',
+    'Endorsement 2',
+];
+
+const WIIRP_PRIVATE_HEADER_ALIASES = {
+    '# of hours': ['# of hours', 'number of hours', 'hours'],
+    'Starting Date': ['starting date', 'start date', 'starting_date'],
+    'Est. End': ['est. end', 'estimated end', 'est end', 'end date'],
+    'Office Assignment': ['office assignment', 'office assign', 'office assginment', 'office_assignment'],
+    'Endorsement 1': ['endorsement 1', 'endorsement_1'],
+    'Endorsement 2': ['endorsement 2', 'endorsement_2'],
+};
+
+function resolveWiirpPrivatePreviewCols(rowKeys = []) {
+    const present = new Set(rowKeys.map(k => String(k).trim().toLowerCase()));
+    const resolved = [];
+
+    for (const canonical of WIIRP_PRIVATE_PREVIEW_HEADERS) {
+        const aliases = WIIRP_PRIVATE_HEADER_ALIASES[canonical] ?? [canonical.toLowerCase()];
+        const matchedAlias = aliases.find(a => present.has(a.toLowerCase()));
+        if (matchedAlias) {
+            const originalKey = rowKeys.find(k => String(k).trim().toLowerCase() === matchedAlias.toLowerCase());
+            resolved.push(originalKey || canonical);
+        }
+    }
+
+    return Array.from(new Set(resolved));
+}
+
+function isKnownWiirpPrivateHeader(header) {
+    const key = String(header || '').trim().toLowerCase();
+    for (const aliases of Object.values(WIIRP_PRIVATE_HEADER_ALIASES)) {
+        if (aliases.some(a => a.toLowerCase() === key)) return true;
+    }
+    return false;
+}
+
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const fileInput    = document.getElementById('fileInput');
 const dropZone     = document.getElementById('dropZone');
@@ -28,6 +70,51 @@ const periodPanel  = document.getElementById('importPeriodPanel');
 const excelSection = document.getElementById('excelSection');
 const excelProgram = document.getElementById('excelProgram');
 const excelBrowseBtn = document.getElementById('excelBrowseBtn');
+
+export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
+    const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
+    const wiirpCategoryWrapper = document.getElementById('wiirpCategoryWrapper');
+
+    if (spesCategoryWrapper) {
+        spesCategoryWrapper.classList.toggle('hidden', program !== 'SPES');
+    }
+
+    if (wiirpCategoryWrapper) {
+        wiirpCategoryWrapper.classList.toggle('hidden', program !== 'Work Immersion and Internship Referral Program');
+    }
+}
+
+// Show notice when WIIRP category changes to Private after a preview has been rendered
+const wiirpCategoryEl = document.getElementById('wiirpCategory');
+if (wiirpCategoryEl) {
+    wiirpCategoryEl.addEventListener('change', function () {
+        const val = (this.value || '').trim().toLowerCase();
+        const previewMeta = document.getElementById('previewMeta');
+        if (!previewMeta) return;
+
+        // Remove existing private notice if present
+        const existing = document.getElementById('wiirpPrivateNotice');
+        if (existing) existing.remove();
+
+        if (val === 'private') {
+            // Only show notice if there is an active preview
+            const dataPreview = document.getElementById('dataPreview');
+            if (dataPreview && !dataPreview.classList.contains('hidden')) {
+                const notice = document.createElement('div');
+                notice.id = 'wiirpPrivateNotice';
+                notice.className = 'mt-3 p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded text-sm';
+                notice.innerHTML = '<strong>Note:</strong> You selected the <em>Private</em> WIIRP category. Required private columns are office assignment and endorsements. Hours and start/end dates are optional.';
+                previewMeta.insertAdjacentElement('afterbegin', notice);
+            }
+        }
+
+        // If a WIIRP file is already loaded, re-run validation so preview columns match current category
+        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+        if (selectedProgram === 'Work Immersion and Internship Referral Program' && state.selectedFile) {
+            handleFile(state.selectedFile);
+        }
+    });
+}
 
 // ─── Upload zone toggle ───────────────────────────────────────────────────────
 export function setProgramSelectorsLocked(locked) {
@@ -72,15 +159,7 @@ if (excelSection && excelProgram) {
     });
 
     excelProgram.addEventListener('change', function () {
-        // Show/hide SPES category dropdown based on selected program
-        const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
-        if (spesCategoryWrapper) {
-            if (this.value === 'SPES') {
-                spesCategoryWrapper.classList.remove('hidden');
-            } else {
-                spesCategoryWrapper.classList.add('hidden');
-            }
-        }
+        syncProgramSpecificFields(this.value);
 
         // Store program choice for later use in file handler
         // Period panel visibility will be controlled by applyDetectedPeriod after file selection
@@ -167,10 +246,11 @@ export function handleFile(file) {
         document.getElementById('previewBody').innerHTML  = '';
         document.getElementById('dataPreview').classList.remove('hidden');
 
+        const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
         fetch('../../backend/import/validate_preview.php', {
             method:  'POST',
             headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ program, section, data: json }),
+            body:    JSON.stringify({ program, section, data: json, wiirpCategory }),
         })
             .then(async res => {
                 const raw = await res.text();
@@ -187,7 +267,15 @@ export function handleFile(file) {
             .then(result => {
                 if (result.success) {
                     state.parsedExcelData = result.data;
-                    showExcelPreview(result.data, result.summary, required, extra);
+                    const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
+                    const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
+                    const previewCols = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
+                        ? Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]))
+                        : required;
+                    const extraColsForPreview = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
+                        ? (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col))
+                        : extra;
+                    showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
                 } else {
                     showToast('Validation error: ' + (result.error ?? 'Unknown error'), 'error');
                     document.getElementById('dataPreview').classList.add('hidden');
