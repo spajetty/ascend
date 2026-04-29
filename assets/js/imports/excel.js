@@ -7,10 +7,27 @@ import { state } from './excel-state.js';
 import { initImportResultsUi, showImportResultsView } from './excel-results.js';
 import { openImportConfirmModal } from './excel-modals.js';
 import { resetPreviewPaginationState } from './excel-preview.js';
-import { setProgramSelectorsLocked, setUploadStateFromProgramSelection } from './excel-upload.js';
+import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProgramSpecificFields } from './excel-upload.js';
 
 // Side-effect imports — these modules wire their own DOM event listeners on load.
 import './excel-upload.js';
+
+const WIIRP_PRIVATE_PREVIEW_HEADERS = [
+    '# of hours',
+    'Starting Date',
+    'Est. End',
+    'Office Assignment',
+    'Endorsement 1',
+    'Endorsement 2',
+];
+
+const WIIRP_PRIVATE_REQUIRED_HEADERS = [
+    'Office Assignment',
+    'Endorsement 1',
+    'Endorsement 2',
+];
+
+// Note: WIIRP_PRIVATE_PREVIEW_HEADERS is defined in excel-upload.js
 
 // ─── Initialise results UI ────────────────────────────────────────────────────
 initImportResultsUi();
@@ -29,6 +46,7 @@ if (cancelImportBtn) {
         const monthSelect = document.getElementById('importMonth');
         const yearSelect  = document.getElementById('importYear');
         const spesCategory = document.getElementById('spesCategory');
+        const wiirpCategory = document.getElementById('wiirpCategory');
 
         if (fileInput) fileInput.value = '';
         if (fileInfo)  fileInfo.classList.add('hidden');
@@ -36,11 +54,13 @@ if (cancelImportBtn) {
         if (monthSelect) monthSelect.value = '';
         if (yearSelect)  yearSelect.value  = '';
         if (spesCategory) spesCategory.value = '';
+        if (wiirpCategory) wiirpCategory.value = '';
         
         const monthWrapper = document.getElementById('importMonthWrapper');
         if (monthWrapper) monthWrapper.classList.remove('hidden');
 
         setProgramSelectorsLocked(false);
+        syncProgramSpecificFields(document.getElementById('excelProgram')?.value ?? '');
         resetPreviewPaginationState();
         setUploadStateFromProgramSelection();
     });
@@ -55,6 +75,7 @@ if (confirmImportBtn) {
         const program     = document.getElementById('excelProgram').value;
         const importMonth = document.getElementById('importMonth')?.value ?? '';
         const importYear  = document.getElementById('importYear')?.value  ?? '';
+        const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
         const btn         = document.getElementById('confirmImport');
 
         const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools';
@@ -62,6 +83,29 @@ if (confirmImportBtn) {
         if ((needsGlobalMonth && !importMonth) || (needsGlobalYear && !importYear)) {
             showToast(needsGlobalMonth ? 'Please confirm Month and Year before importing.' : 'Please confirm Year before importing.', 'warning');
             return;
+        }
+
+        if (program === 'Work Immersion and Internship Referral Program' && !wiirpCategory) {
+            showToast('Please select a WIIRP category before importing.', 'warning');
+            return;
+        }
+
+        // If category is Private, ensure private-only columns are present in the preview
+        if (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private') {
+            const sampleRow = state.parsedExcelData[0] || {};
+            const headers = Object.keys(sampleRow).map(h => String(h).trim().toLowerCase());
+            const privateCols = WIIRP_PRIVATE_REQUIRED_HEADERS;
+            const missingPrivateCols = privateCols.filter(pc => !headers.includes(pc.toLowerCase()));
+            if (missingPrivateCols.length > 0) {
+                showToast('Cannot import: selected "Private" but file is missing private-only columns: ' + missingPrivateCols.join(', '), 'error');
+                return;
+            }
+            // Also guard against per-row validation errors about missing required WIIRP fields
+            const hasMissingRequired = state.parsedExcelData.some(r => ((r.badge_status||'').toLowerCase() === 'invalid') && (String(r.status_message||'').toLowerCase().includes('missing required wiirp field')));
+            if (hasMissingRequired) {
+                showToast('Cannot import: some rows are missing required WIIRP fields for Private category. Fix the file and re-upload.', 'error');
+                return;
+            }
         }
 
         const periodLabel = program === 'Schools'
@@ -95,6 +139,7 @@ if (confirmImportBtn) {
                     importYear,
                     fileName:    state.selectedFile?.name ?? '',
                     spesCategory: program === 'SPES' ? (document.getElementById('spesCategory')?.value ?? '') : '',
+                    wiirpCategory: program === 'Work Immersion and Internship Referral Program' ? wiirpCategory : '',
                 }),
             })
                 .then(async res => {
