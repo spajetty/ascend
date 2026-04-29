@@ -234,6 +234,11 @@ export function applyDetectedPeriod(period, { hideMonth = false, hideYear = fals
     } else {
         if (monthWrapper) monthWrapper.classList.remove('hidden');
         if (yearWrapper) yearWrapper.classList.remove('hidden');
+        const wiirpCategoryWrapper = document.getElementById('wiirpCategoryWrapper');
+        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+        if (wiirpCategoryWrapper) {
+            wiirpCategoryWrapper.classList.toggle('hidden', selectedProgram !== 'Work Immersion and Internship Referral Program');
+        }
         if (period.month && monthSelect) monthSelect.value = period.month;
         if (period.year)  yearSelect.value = period.year;
 
