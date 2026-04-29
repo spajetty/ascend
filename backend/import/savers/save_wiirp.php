@@ -21,7 +21,7 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 		return 'skipped';
 	}
 
-	$shape = resolveWhipTableSchema($conn);
+	$shape = resolveWiirpTableSchema($conn);
 
 	$contractPeriod = trim((string)($ctx['importMonthRaw'] ?? '') . ' ' . (string)($ctx['importYearRaw'] ?? ''));
 	$school = s(rowValue($row, ['School Name', 'School', 'school'], ''));
@@ -151,9 +151,9 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 	$stmt->execute();
 
 	$insertedId = (int)$stmt->insert_id;
-	$state['insertedWhipIds'][] = $insertedId;
-	if (empty($state['insertedWhipTable'])) {
-		$state['insertedWhipTable'] = $table;
+	$state['insertedWiirpIds'][] = $insertedId;
+	if (empty($state['insertedWiirpTable'])) {
+		$state['insertedWiirpTable'] = $table;
 	}
 
 	// If this is a private WIIRP, also insert into wiirp_private_details (if the table exists)
