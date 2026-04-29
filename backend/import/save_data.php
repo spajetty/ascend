@@ -53,7 +53,9 @@ $state = [
     'insertedFirstJobSeekIds' => [],
     'insertedWhipIds' => [],
     'insertedWhipTable' => null,
-        'insertedWiirpPrivateIds' => [],
+    'insertedWiirpIds' => [],
+    'insertedWiirpTable' => null,
+    'insertedWiirpPrivateIds' => [],
     'insertedProjectIds' => [],
     'insertedProjectTable' => null,
     'insertedSPESIds' => [],
@@ -185,6 +187,7 @@ try {
         !empty($state['insertedJobFairIds']) ||
         !empty($state['insertedFirstJobSeekIds']) ||
         !empty($state['insertedWhipIds']) ||
+        !empty($state['insertedWiirpIds']) ||
         !empty($state['insertedProjectIds']) ||
         !empty($state['insertedSPESIds']) ||
         !empty($state['insertedSPESEmploymentIds']) ||
@@ -217,7 +220,9 @@ try {
             'first_job_seek_ids' => array_values(array_unique(array_map('intval', $state['insertedFirstJobSeekIds']))),
             'whip_ids' => array_values(array_unique(array_map('intval', $state['insertedWhipIds']))),
             'whip_table' => $state['insertedWhipTable'],
-                'wiirp_private_ids' => array_values(array_unique(array_map('intval', $state['insertedWiirpPrivateIds']))),
+            'wiirp_ids' => array_values(array_unique(array_map('intval', $state['insertedWiirpIds']))),
+            'wiirp_table' => $state['insertedWiirpTable'],
+            'wiirp_private_ids' => array_values(array_unique(array_map('intval', $state['insertedWiirpPrivateIds']))),
             'project_ids' => array_values(array_unique(array_map('intval', $state['insertedProjectIds']))),
             'project_table' => $state['insertedProjectTable'],
             'spes_ids' => array_values(array_unique(array_map('intval', $state['insertedSPESIds']))),
