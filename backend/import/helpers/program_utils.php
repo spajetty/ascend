@@ -80,11 +80,11 @@ function buildWhipProjectDuplicateKey(array $row): ?string {
     ]);
 }
 
-function resolveWhipTableSchema(mysqli $conn): array {
+function resolveWiirpTableSchema(mysqli $conn): array {
     static $schema = null;
     if ($schema !== null) return $schema;
 
-    $tables = ['wiirp', 'whip', 'whip_beneficiaries', 'whipBeneficiaries'];
+    $tables = ['wiirp'];
     $table = null;
     foreach ($tables as $candidate) {
         if (tableExists($conn, $candidate)) {
@@ -100,7 +100,7 @@ function resolveWhipTableSchema(mysqli $conn): array {
 
     $schema = [
         'table' => $table,
-        'id_col' => firstExistingColumn($conn, $table, ['work_immersion_id', 'whip_id', 'id']),
+        'id_col' => firstExistingColumn($conn, $table, ['work_immersion_id', 'id']),
         'benef_id_col' => firstExistingColumn($conn, $table, ['benef_id']),
         'contract_period_col' => firstExistingColumn($conn, $table, ['contract_period']),
         'school_col' => firstExistingColumn($conn, $table, ['school']),
@@ -111,13 +111,44 @@ function resolveWhipTableSchema(mysqli $conn): array {
         'preferred_industry_col' => firstExistingColumn($conn, $table, ['preferred_industry']),
         'is_willing_outside_col' => firstExistingColumn($conn, $table, ['is_willing_outside']),
         'internship_sched_col' => firstExistingColumn($conn, $table, ['internship_sched']),
-            'start_col' => firstExistingColumn($conn, $table, ['start']),
-            'end_col' => firstExistingColumn($conn, $table, ['end', 'end_date', 'est_end', 'est_end_date', 'estimated_end']),
-            'office_assignment_col' => firstExistingColumn($conn, $table, ['office_assignment', 'office_assignment_endorsement', 'office_assignment_endorsement_1']),
-            'endorsement1_col' => firstExistingColumn($conn, $table, ['endorsement_1', 'endorsement1', 'endorsement_a']),
-            'endorsement2_col' => firstExistingColumn($conn, $table, ['endorsement_2', 'endorsement2', 'endorsement_b']),
+        'start_col' => firstExistingColumn($conn, $table, ['start']),
+        'end_col' => firstExistingColumn($conn, $table, ['end', 'end_date', 'est_end', 'est_end_date', 'estimated_end']),
+        'office_assignment_col' => firstExistingColumn($conn, $table, ['office_assignment', 'office_assignment_endorsement', 'office_assignment_endorsement_1']),
+        'endorsement1_col' => firstExistingColumn($conn, $table, ['endorsement_1', 'endorsement1', 'endorsement_a']),
+        'endorsement2_col' => firstExistingColumn($conn, $table, ['endorsement_2', 'endorsement2', 'endorsement_b']),
         'year_level_col' => firstExistingColumn($conn, $table, ['year_level']),
         'type_col' => firstExistingColumn($conn, $table, ['type']),
+    ];
+
+    return $schema;
+}
+
+function resolveWhipTableSchema(mysqli $conn): array {
+    static $schema = null;
+    if ($schema !== null) return $schema;
+
+    $tables = ['whip', 'whip_beneficiaries', 'whipBeneficiaries'];
+    $table = null;
+    foreach ($tables as $candidate) {
+        if (tableExists($conn, $candidate)) {
+            $table = $candidate;
+            break;
+        }
+    }
+
+    if ($table === null) {
+        $schema = ['table' => null];
+        return $schema;
+    }
+
+    $schema = [
+        'table' => $table,
+        'id_col' => firstExistingColumn($conn, $table, ['whip_id', 'id']),
+        'benef_id_col' => firstExistingColumn($conn, $table, ['benef_id']),
+        'project_id_col' => firstExistingColumn($conn, $table, ['project_id']),
+        'position_col' => firstExistingColumn($conn, $table, ['position']),
+        'date_hired_col' => firstExistingColumn($conn, $table, ['date_hired', 'datehired']),
+        'batch_id_col' => firstExistingColumn($conn, $table, ['batch_id']),
     ];
 
     return $schema;
