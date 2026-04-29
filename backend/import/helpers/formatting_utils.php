@@ -77,6 +77,12 @@ function parseDateNullable($value): ?string {
     $raw = trim((string)($value ?? ''));
     if ($raw === '') return null;
 
+    // Normalize Unicode whitespace (NBSP, narrow NBSP, zero-width, BOM) to regular spaces
+    // and collapse repeated whitespace so strtotime can parse reliably.
+    $raw = preg_replace('/[\x{00A0}\x{202F}\x{200B}\x{FEFF}]+/u', ' ', $raw);
+    $raw = preg_replace('/\s+/u', ' ', $raw);
+    $raw = trim($raw);
+
     // Handle Excel numeric dates
     if (is_numeric($raw) && (int)$raw > 1000) {
         $unix = ((int)$raw - 25569) * 86400;
