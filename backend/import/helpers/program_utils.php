@@ -18,6 +18,11 @@ function isWiirpProgram(string $program): bool {
     return $program === 'Work Immersion and Internship Referral Program';
 }
 
+function isGipProgram(string $program): bool {
+    return $program === 'Government Internship Program';
+}
+
+
 function whipProjectRowFields(array $row): array {
     return [
         'title'      => getRowVal($row, ['Project Title / Name of Implementing Partner', 'Project Title', 'Project Name', 'project_title']),
