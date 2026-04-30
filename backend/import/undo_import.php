@@ -128,6 +128,18 @@ try {
         }
     }
 
+    // Undo GIP (Government Internship Program) imports
+    $deletedGip = 0;
+    $gipIds = (array)($payload['gip_ids'] ?? []);
+    if (!empty($gipIds)) {
+        if (tableExists($conn, 'gip')) {
+            $gipIdCol = findExistingColumn($conn, 'gip', ['gip_id', 'id']);
+            if ($gipIdCol !== null) {
+                $deletedGip = deleteByIds($conn, 'gip', $gipIdCol, $gipIds);
+            }
+        }
+    }
+
     // Undo WHIP beneficiary imports (Workers Hiring for Infrastructure Projects - Beneficiaries)
     $deletedWhip = 0;
     $whipIds = (array)($payload['whip_ids'] ?? []);
@@ -247,6 +259,7 @@ try {
             'schools' => $deletedSchools,
             'jobmatch' => $deletedJobMatch,
             'wiirp' => $deletedWiirp,
+            'gip' => $deletedGip,
             'whip' => $deletedWhip,
             'projects' => $deletedProjects,
             'docs' => $deletedDocs,
