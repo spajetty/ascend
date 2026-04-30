@@ -22,6 +22,7 @@ $importYearRaw = trim((string)($input['importYear'] ?? ''));
 $sourceFileName = trim((string)($input['fileName'] ?? ''));
 $spesCategoryRaw = trim((string)($input['spesCategory'] ?? ''));
 $wiirpCategoryRaw = trim((string)($input['wiirpCategory'] ?? ''));
+$gipCategoryRaw = trim((string)($input['gipCategory'] ?? ''));
 
 // Shared helpers
 require_once __DIR__ . '/helpers/db_utils.php';
@@ -34,6 +35,7 @@ require_once __DIR__ . '/savers/save_employers_accreditation.php';
 require_once __DIR__ . '/savers/save_whip_projects.php';
 require_once __DIR__ . '/savers/save_whip_beneficiaries.php';
 require_once __DIR__ . '/savers/save_wiirp.php';
+require_once __DIR__ . '/savers/save_gip.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
 require_once __DIR__ . '/savers/save_spes.php';
 require_once __DIR__ . '/savers/save_schools.php';
@@ -56,6 +58,7 @@ $state = [
     'insertedWiirpIds' => [],
     'insertedWiirpTable' => null,
     'insertedWiirpPrivateIds' => [],
+    'insertedGipIds' => [],
     'insertedProjectIds' => [],
     'insertedProjectTable' => null,
     'insertedSPESIds' => [],
@@ -74,8 +77,10 @@ try {
         'First Time Jobseeker',
         'Job Fair',
         'Work Immersion and Internship Referral Program',
+        'Government Internship Program',
         'Workers Hiring for Infrastructure Projects - Beneficiaries',
         'Workers Hiring for Infrastructure Projects — Beneficiaries',
+            'SPES',
     ];
     $needsBatch = in_array($program, $batchTrackedPrograms, true) && tableExists($conn, 'import_batches');
 
@@ -105,6 +110,7 @@ try {
         'importYearRaw' => $importYearRaw,
         'spesCategory' => $spesCategoryRaw,
         'wiirpCategory' => $wiirpCategoryRaw,
+        'gipCategory' => $gipCategoryRaw,
     ];
 
     foreach ($rows as $row) {
@@ -153,6 +159,16 @@ try {
             continue;
         }
 
+        if (isGipProgram($program)) {
+            $result = saveGipRow($conn, $row, $ctx, $state);
+            if ($result === 'saved') {
+                $saved++;
+            } else {
+                $skipped++;
+            }
+            continue;
+        }
+
         $benefId = ensurePersonBeneficiaryAndDocs($conn, $row, $ctx, $state);
         if (!$benefId) {
             $skipped++;
@@ -188,6 +204,7 @@ try {
         !empty($state['insertedFirstJobSeekIds']) ||
         !empty($state['insertedWhipIds']) ||
         !empty($state['insertedWiirpIds']) ||
+        !empty($state['insertedGipIds']) ||
         !empty($state['insertedProjectIds']) ||
         !empty($state['insertedSPESIds']) ||
         !empty($state['insertedSPESEmploymentIds']) ||
@@ -223,6 +240,7 @@ try {
             'wiirp_ids' => array_values(array_unique(array_map('intval', $state['insertedWiirpIds']))),
             'wiirp_table' => $state['insertedWiirpTable'],
             'wiirp_private_ids' => array_values(array_unique(array_map('intval', $state['insertedWiirpPrivateIds']))),
+            'gip_ids' => array_values(array_unique(array_map('intval', $state['insertedGipIds']))),
             'project_ids' => array_values(array_unique(array_map('intval', $state['insertedProjectIds']))),
             'project_table' => $state['insertedProjectTable'],
             'spes_ids' => array_values(array_unique(array_map('intval', $state['insertedSPESIds']))),
