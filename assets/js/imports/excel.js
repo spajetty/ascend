@@ -47,6 +47,7 @@ if (cancelImportBtn) {
         const yearSelect  = document.getElementById('importYear');
         const spesCategory = document.getElementById('spesCategory');
         const wiirpCategory = document.getElementById('wiirpCategory');
+        const gipCategory = document.getElementById('gipCategory');
 
         if (fileInput) fileInput.value = '';
         if (fileInfo)  fileInfo.classList.add('hidden');
@@ -55,6 +56,7 @@ if (cancelImportBtn) {
         if (yearSelect)  yearSelect.value  = '';
         if (spesCategory) spesCategory.value = '';
         if (wiirpCategory) wiirpCategory.value = '';
+        if (gipCategory) gipCategory.value = '';
         
         const monthWrapper = document.getElementById('importMonthWrapper');
         if (monthWrapper) monthWrapper.classList.remove('hidden');
@@ -76,6 +78,7 @@ if (confirmImportBtn) {
         const importMonth = document.getElementById('importMonth')?.value ?? '';
         const importYear  = document.getElementById('importYear')?.value  ?? '';
         const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+        const gipCategory = document.getElementById('gipCategory')?.value ?? '';
         const btn         = document.getElementById('confirmImport');
 
         const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools';
@@ -87,6 +90,11 @@ if (confirmImportBtn) {
 
         if (program === 'Work Immersion and Internship Referral Program' && !wiirpCategory) {
             showToast('Please select a WIIRP category before importing.', 'warning');
+            return;
+        }
+
+        if (program === 'Government Internship Program' && !gipCategory) {
+            showToast('Please select a GIP category before importing.', 'warning');
             return;
         }
 
@@ -140,6 +148,7 @@ if (confirmImportBtn) {
                     fileName:    state.selectedFile?.name ?? '',
                     spesCategory: program === 'SPES' ? (document.getElementById('spesCategory')?.value ?? '') : '',
                     wiirpCategory: program === 'Work Immersion and Internship Referral Program' ? wiirpCategory : '',
+                    gipCategory: program === 'Government Internship Program' ? (document.getElementById('gipCategory')?.value ?? '') : '',
                 }),
             })
                 .then(async res => {
