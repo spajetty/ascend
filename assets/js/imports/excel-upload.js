@@ -74,6 +74,7 @@ const excelBrowseBtn = document.getElementById('excelBrowseBtn');
 export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
     const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
     const wiirpCategoryWrapper = document.getElementById('wiirpCategoryWrapper');
+    const gipCategoryWrapper = document.getElementById('gipCategoryWrapper');
 
     if (spesCategoryWrapper) {
         spesCategoryWrapper.classList.toggle('hidden', program !== 'SPES');
@@ -81,6 +82,10 @@ export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
 
     if (wiirpCategoryWrapper) {
         wiirpCategoryWrapper.classList.toggle('hidden', program !== 'Work Immersion and Internship Referral Program');
+    }
+
+    if (gipCategoryWrapper) {
+        gipCategoryWrapper.classList.toggle('hidden', program !== 'Government Internship Program');
     }
 }
 
@@ -269,9 +274,14 @@ export function handleFile(file) {
                     state.parsedExcelData = result.data;
                     const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
                     const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
+                    
+                    // For WIIRP Private uploads, include private-specific columns in preview (e.g., office assignment, endorsements).
+                    // For other programs or WIIRP Public, show only standard required columns.
                     const previewCols = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
                         ? Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]))
                         : required;
+                    
+                    // For WIIRP Private, filter out private-specific headers from the "extra columns" list to avoid duplication.
                     const extraColsForPreview = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
                         ? (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col))
                         : extra;
