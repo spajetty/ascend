@@ -350,7 +350,41 @@ export const programHeaders = {
         'Congressional District',
         'Grades Offered'
     ],
-    'Government Internship Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Student/OSY', 'Program', 'Classification', 'School', 'Highest Educ Attainment', 'Course', 'PWD', '4PS Beneficiary', '4PS Beneficiary ID No.', 'Company', 'Store Assignment', 'Start of Contract', 'End of Contract', 'Resume', 'B-Cert', 'Valid ID', 'Brgy Clearance'],
+    'Government Internship Program': 
+    [
+        'Last Name', 
+        'First Name', 
+        'Middle Name', 
+        'Extension Name', 
+        'Sex', 
+        'House/Block No./Street', 
+        'Barangay', 
+        'City', 
+        'District', 
+        //'Birthday', 
+        'Age', 
+        'Email address', 
+        'Contact Number', 
+        'Civil Status', 
+        'Program', 
+        'Classification', 
+        'Inquiry Via', 
+        'School Name', 
+        'Year Level', 
+        'Course/Degree/Strand', 
+        'Required Work Immersion / Internship Hours', 
+        'Preferred Host Organization Type', 
+        'Preferred Industry / Field of Internship', 
+        'Are you willing to be assigned outside your preferred field if not available?', 
+        'Internship Schedule / Availability',
+        'Internship Availability Date (Start of Internship)',
+        'Curriculum Vitae / Resume', 
+        'Proof of Residency', 
+        'Latest Credentials', 
+        'Letter of Intent', 
+        'Recommendation Letter'
+    ],
+
     'Work Immersion and Internship Referral Program': 
     [
         'Last Name', 
