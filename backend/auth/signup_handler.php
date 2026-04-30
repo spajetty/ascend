@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../api/db.php';
-require_once __DIR__ . '/../helpers/user_helper.php';
+require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../../helpers/user_helper.php';
 
 // Get POST data
 $fname   = $_POST['fname'];

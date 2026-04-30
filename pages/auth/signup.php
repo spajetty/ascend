@@ -33,7 +33,7 @@
             </div>
 
             <!-- Sign Up Form -->
-            <form method="POST" action="../../auth/signup_handler.php" class="space-y-5">
+            <form method="POST" action="../../backend/auth/signup_handler.php" class="space-y-5">
 
                 <!-- Row 1: First Name, Last Name, Middle Initial -->
                 <div class="space-y-4">

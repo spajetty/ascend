@@ -62,7 +62,7 @@ if (isset($_SESSION['user_id'])) {
             <?php endif; ?>
 
             <!-- Login Form -->
-            <form method="POST" action="../../auth/login_handler.php" class="space-y-4 sm:space-y-5 text-left">
+            <form method="POST" action="../../backend/auth/login_handler.php" class="space-y-4 sm:space-y-5 text-left">
 
                 <!-- Email Field -->
                 <div>
