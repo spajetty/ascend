@@ -187,7 +187,7 @@ export const programFields = {
 // Defines the EXACT columns expected in the Excel upload for each program.
 // Any missing columns will flag the file as invalid.
 export const programHeaders = {
-    'DEFAULT': ['LastName', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'DOB', 'Contact'],
+    'DEFAULT': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'Birthday', 'Contact Number'],
 
     // Non-person programs
     'Employers Accreditation': 
@@ -258,6 +258,7 @@ export const programHeaders = {
         'Program',
         'Classification',
         'Company',
+        'Position',
         'Resume',
         'B-Cert',
         'Valid ID',
@@ -279,6 +280,8 @@ export const programHeaders = {
         'Contact',
         'Civil Status',
         'Program',
+        'Occ. Permit',
+        'Health Card',
         'Classification',
         'Company',
         'Resume',
