@@ -77,6 +77,7 @@ if (confirmImportBtn) {
         const program     = document.getElementById('excelProgram').value;
         const importMonth = document.getElementById('importMonth')?.value ?? '';
         const importYear  = document.getElementById('importYear')?.value  ?? '';
+        const spesCategory = document.getElementById('spesCategory')?.value ?? '';
         const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
         const gipCategory = document.getElementById('gipCategory')?.value ?? '';
         const btn         = document.getElementById('confirmImport');
@@ -90,6 +91,11 @@ if (confirmImportBtn) {
 
         if (program === 'Work Immersion and Internship Referral Program' && !wiirpCategory) {
             showToast('Please select a WIIRP category before importing.', 'warning');
+            return;
+        }
+
+        if (program === 'SPES' && !spesCategory) {
+            showToast('Please select a SPES category before importing.', 'warning');
             return;
         }
 
