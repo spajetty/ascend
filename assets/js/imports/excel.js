@@ -27,6 +27,11 @@ const WIIRP_PRIVATE_REQUIRED_HEADERS = [
     'Endorsement 2',
 ];
 
+const WIIRP_PESO_REQUIRED_HEADERS = [
+    '# of hours',
+    'Office Assignment',
+];
+
 // Note: WIIRP_PRIVATE_PREVIEW_HEADERS is defined in excel-upload.js
 
 // ─── Initialise results UI ────────────────────────────────────────────────────
@@ -104,20 +109,33 @@ if (confirmImportBtn) {
             return;
         }
 
-        // If category is Private, ensure private-only columns are present in the preview
-        if (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private') {
+        // If category is Private or Peso-assigned, ensure required columns are present in the preview
+        if (program === 'Work Immersion and Internship Referral Program') {
             const sampleRow = state.parsedExcelData[0] || {};
             const headers = Object.keys(sampleRow).map(h => String(h).trim().toLowerCase());
-            const privateCols = WIIRP_PRIVATE_REQUIRED_HEADERS;
-            const missingPrivateCols = privateCols.filter(pc => !headers.includes(pc.toLowerCase()));
-            if (missingPrivateCols.length > 0) {
-                showToast('Cannot import: selected "Private" but file is missing private-only columns: ' + missingPrivateCols.join(', '), 'error');
-                return;
+
+            if ((wiirpCategory || '').toLowerCase() === 'private') {
+                const privateCols = WIIRP_PRIVATE_REQUIRED_HEADERS;
+                const missingPrivateCols = privateCols.filter(pc => !headers.includes(pc.toLowerCase()));
+                if (missingPrivateCols.length > 0) {
+                    showToast('Cannot import: selected "Private" but file is missing private-only columns: ' + missingPrivateCols.join(', '), 'error');
+                    return;
+                }
             }
+
+            if ((wiirpCategory || '').toLowerCase() === 'peso-assigned') {
+                const pesoCols = WIIRP_PESO_REQUIRED_HEADERS;
+                const missingPesoCols = pesoCols.filter(pc => !headers.includes(pc.toLowerCase()));
+                if (missingPesoCols.length > 0) {
+                    showToast('Cannot import: selected "Peso-assigned" but file is missing required columns: ' + missingPesoCols.join(', '), 'error');
+                    return;
+                }
+            }
+
             // Also guard against per-row validation errors about missing required WIIRP fields
             const hasMissingRequired = state.parsedExcelData.some(r => ((r.badge_status||'').toLowerCase() === 'invalid') && (String(r.status_message||'').toLowerCase().includes('missing required wiirp field')));
             if (hasMissingRequired) {
-                showToast('Cannot import: some rows are missing required WIIRP fields for Private category. Fix the file and re-upload.', 'error');
+                showToast('Cannot import: some rows are missing required WIIRP fields for selected category. Fix the file and re-upload.', 'error');
                 return;
             }
         }

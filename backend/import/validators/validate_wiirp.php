@@ -59,14 +59,21 @@ function validateWiirp(mysqli $conn, array $rows, string $wiirpCategory = ''): a
 			'Internship Availability Date (Start of Internship)' => ['Internship Availability Date (Start of Internship)', 'start'],
 		];
 
-		// If WIIRP category is private, require additional columns specific to private placements
-		if (strtolower(trim($wiirpCategory)) === 'private') {
+		$cat = strtolower(trim($wiirpCategory));
+		if ($cat === 'private') {
 			$privateExtra = [
 				'Office Assignment' => ['Office Assign', 'Office Assignment', 'Office Assginment', 'office_assignment'],
-                'Endorsement 1' => ['Endorsement 1', 'Endorsement_1', 'endorsement 1'],
+				'Endorsement 1' => ['Endorsement 1', 'Endorsement_1', 'endorsement 1'],
 				'Endorsement 2' => ['Endorsement 2', 'Endorsement_2', 'endorsement 2'],
 			];
 			$requiredFields = array_merge($requiredFields, $privateExtra);
+		} elseif ($cat === 'peso-assigned') {
+			// For peso-assigned, require office assignment and hours as well
+			$pesoExtra = [
+				'Office Assignment' => ['Office Assign', 'Office Assignment', 'Office Assginment', 'office_assignment'],
+				'# of hours' => ['# of hours', 'Number of hours', 'Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'],
+			];
+			$requiredFields = array_merge($requiredFields, $pesoExtra);
 		}
 
 		$missing = [];
@@ -99,10 +106,12 @@ function validateWiirp(mysqli $conn, array $rows, string $wiirpCategory = ''): a
 			$previewRow['End Date'] = date('d/m/Y', strtotime($endDate));
 		}
 
-		// Explicitly set private WIIRP columns in preview if category is private
-		if (strtolower(trim($wiirpCategory)) === 'private') {
-			$previewRow['# of hours'] = rowValue($row, ['# of hours', 'Number of hours', 'Number of Hours', 'Hours'], '');
+		// Explicitly set WIIRP assignment columns in preview for private and peso-assigned categories
+		if (in_array($cat, ['private', 'peso-assigned'], true)) {
+			$previewRow['# of hours'] = rowValue($row, ['# of hours', 'Number of hours', 'Number of Hours', 'Hours', 'Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'], '');
 			$previewRow['Office Assignment'] = rowValue($row, ['Office Assign', 'Office Assignment', 'office_assignment', 'Office Assginment'], '');
+		}
+		if ($cat === 'private') {
 			$previewRow['Endorsement 1'] = rowValue($row, ['Endorsement 1', 'Endorsement_1', 'endorsement 1'], '');
 			$previewRow['Endorsement 2'] = rowValue($row, ['Endorsement 2', 'Endorsement_2', 'endorsement 2'], '');
 		}

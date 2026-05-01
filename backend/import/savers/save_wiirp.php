@@ -156,32 +156,35 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 		$state['insertedWiirpTable'] = $table;
 	}
 
-	// If this is a private WIIRP, also insert into wiirp_private_details (if the table exists)
-	if (strtolower($wiirpType) === 'private') {
-		$privateTable = 'wiirp_private_details';
-		if (tableExists($conn, $privateTable)) {
+	// If this is a private or peso-assigned WIIRP, also insert into wiirp_assignment_details (if the table exists)
+	$lowerType = strtolower($wiirpType);
+	if (in_array($lowerType, ['private', 'peso-assigned'], true)) {
+		$assignTable = 'wiirp_assignment_details';
+		if (tableExists($conn, $assignTable)) {
 			$pdCols = [];
 			$pdPlaceholders = [];
 			$pdTypes = '';
 			$pdValues = [];
 
-			// work_immersion_id
+			// work_immersion_id (FK)
 			$pdCols[] = 'work_immersion_id'; $pdPlaceholders[] = '?'; $pdTypes .= 'i'; $pdValues[] = $insertedId;
-			// office_assignment
-			if ($officeAssignment !== '') { $pdCols[] = 'office_assignment'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $officeAssignment; }
-			// endorsement_1
-			if ($endorsement1 !== '') { $pdCols[] = 'endorsement_1'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $endorsement1; }
-			// endorsement_2
-			if ($endorsement2 !== '') { $pdCols[] = 'endorsement_2'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $endorsement2; }
 			// start_date
 			if (!empty($startDate)) { $pdCols[] = 'start_date'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $startDate; }
 			// end_date
 			if (!empty($endDate)) { $pdCols[] = 'end_date'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $endDate; }
 			// required_hours
 			if ($requiredHours !== null) { $pdCols[] = 'required_hours'; $pdPlaceholders[] = '?'; $pdTypes .= 'i'; $pdValues[] = $requiredHours; }
+			// office_assignment
+			if ($officeAssignment !== '') { $pdCols[] = 'office_assignment'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $officeAssignment; }
+
+			// endorsements only used for private
+			if ($lowerType === 'private') {
+				if ($endorsement1 !== '') { $pdCols[] = 'endorsement_1'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $endorsement1; }
+				if ($endorsement2 !== '') { $pdCols[] = 'endorsement_2'; $pdPlaceholders[] = '?'; $pdTypes .= 's'; $pdValues[] = $endorsement2; }
+			}
 
 			if (!empty($pdCols)) {
-				$sql = sprintf('INSERT INTO `%s` (%s) VALUES (%s)', $privateTable, implode(', ', array_map(fn($c) => '`' . $c . '`', $pdCols)), implode(', ', $pdPlaceholders));
+				$sql = sprintf('INSERT INTO `%s` (%s) VALUES (%s)', $assignTable, implode(', ', array_map(fn($c) => '`' . $c . '`', $pdCols)), implode(', ', $pdPlaceholders));
 				$ins = $conn->prepare($sql);
 				$ins->bind_param($pdTypes, ...$pdValues);
 				$ins->execute();
