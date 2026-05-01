@@ -24,8 +24,9 @@ export function classificationBadge(value) {
 const SKIP_FIELDS = new Set([
     'badge_status', 'status_message',
     '_sys_is_existing', '_sys_user_id', '_sys_benef_id',
-    '_sys_skip', '_parsed_dob',
-    'is_new', 'duplicate',
+    '_sys_skip', '_parsed_dob', '_parsed_start_date',
+    '_program_override', '_program_mismatch', '_excel_program',
+    'is_new', 'duplicate', 'type',
 ]);
 
 // Columns always shown last in a fixed order
@@ -92,7 +93,20 @@ export function previewTableRows(rows, allowedCols = null) {
 
     return rows.map(r => {
         const badgeStatus = (r.badge_status ?? '').toLowerCase();
-        const style = importStatusStyles[badgeStatus] ?? importStatusStyles['invalid'];
+        const hasMismatch = r._program_mismatch === true;
+        
+        // Use mismatch styling if program mismatch, otherwise use badge status styling
+        let style;
+        if (hasMismatch) {
+            style = {
+                row: 'bg-orange-50/60 border-l-4 border-orange-400',
+                pill: 'bg-orange-100 text-orange-700',
+                icon: '❌',
+                label: `Mismatch: ${r._excel_program ?? '?'}`,
+            };
+        } else {
+            style = importStatusStyles[badgeStatus] ?? importStatusStyles['invalid'];
+        }
 
         // Row classes: left border color + background tint + dim if skipped
         const skipped = badgeStatus === 'duplicate' || badgeStatus === 'invalid';
@@ -117,8 +131,14 @@ export function previewTableRows(rows, allowedCols = null) {
             return `<td class="px-4 py-3 whitespace-nowrap">${classificationBadge(val)}</td>`;
         }).join('');
 
-        // Import status pill (always last)
-        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${importStatusPill(r.badge_status, r.status_message)}</td>`;
+        // Import status pill (always last) - show mismatch or regular status
+        const statusPill = hasMismatch 
+            ? `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold ${style.pill} cursor-help" title="Row program (${r._excel_program}) does not match selected program">
+                <span>${style.icon}</span>
+                <span>${style.label}</span>
+              </span>`
+            : importStatusPill(r.badge_status, r.status_message);
+        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${statusPill}</td>`;
 
         return `<tr class="${rowCls}">${dataCells}${pinnedCells}${statusCell}</tr>`;
     }).join('');
