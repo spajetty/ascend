@@ -320,7 +320,7 @@ function findWhipBeneficiaryProjectId(mysqli $conn, array $row): array {
     if ($matchedTitleMismatchedContractor) {
         return ['id' => null, 'error' => 'Project title found, but Contractor/Company mismatch'];
     }
-    return ['id' => null, 'error' => 'Project not found (check title)'];
+    return ['id' => null, 'error' => 'Project not found (make sure to add the project first)'];
 }
 
 function findProjectIdForWhipBeneficiary(mysqli $conn, array $row, array $projectSchema): ?int {
