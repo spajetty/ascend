@@ -14,16 +14,6 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     <div class="px-6 md:px-8 py-6">
 
-        <!-- Back Button + Heading -->
-        <div class="flex items-center gap-3 mb-6">
-            <a href="/programs" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-bold text-2xl">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Employers Engagement Section
-            </a>
-        </div>
-
         <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
