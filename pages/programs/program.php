@@ -18,7 +18,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
             <!-- Employment Facilitation Section -->
-            <a href="/programs/employment-facilitation" class="flex flex-col bg-white rounded-2xl border-t-4 border-yellow-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
+            <a href="/pages/programs/employment-facilitation.php" class="flex flex-col bg-white rounded-2xl border-t-4 border-yellow-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
                 <div class="flex items-start justify-between flex-1">
                     <div class="flex items-start gap-4">
                         <div class="bg-yellow-100 p-3 rounded-xl flex-shrink-0">
@@ -52,7 +52,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </a>
 
             <!-- Employers Engagement Section -->
-            <a href="/programs/employers-engagement" class="flex flex-col bg-white rounded-2xl border-t-4 border-red-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
+            <a href="/pages/programs/employers-engagement.php" class="flex flex-col bg-white rounded-2xl border-t-4 border-red-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
                 <div class="flex items-start justify-between flex-1">
                     <div class="flex items-start gap-4">
                         <div class="bg-red-100 p-3 rounded-xl flex-shrink-0">
@@ -80,8 +80,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </div>
             </a>
 
-            <!-- Youth Employability -->
-            <a href="/programs/youth-employability" class="flex flex-col bg-white rounded-2xl border-t-4 border-blue-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
+            <!-- Youth Employability Section -->
+            <a href="/pages/programs/youth-employability.php" class="flex flex-col bg-white rounded-2xl border-t-4 border-blue-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
                 <div class="flex items-start justify-between flex-1">
                     <div class="flex items-start gap-4">
                         <div class="bg-blue-100 p-3 rounded-xl flex-shrink-0">
@@ -123,7 +123,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </a>
 
             <!-- Career Development Section -->
-            <a href="/programs/career-development" class="flex flex-col bg-white rounded-2xl border-t-4 border-orange-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
+            <a href="/pages/programs/career-development.php" class="flex flex-col bg-white rounded-2xl border-t-4 border-orange-400 shadow-sm hover:shadow-md transition-shadow p-6 group h-52">
                 <div class="flex items-start justify-between flex-1">
                     <div class="flex items-start gap-4">
                         <div class="bg-orange-100 p-3 rounded-xl flex-shrink-0">
