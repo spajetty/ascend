@@ -14,6 +14,7 @@ import {
     showExcelPreview,
     resetPreviewPaginationState,
 } from './excel-preview.js';
+import { openProgramMismatchModal } from './excel-modals.js';
 
 const WIIRP_PRIVATE_PREVIEW_HEADERS = [
     '# of hours',
@@ -221,83 +222,152 @@ export function handleFile(file) {
             return;
         }
 
-        // Show file info row
-        state.selectedFile = file;
-        fileName.textContent = file.name;
-        fileSize.textContent = formatBytes(file.size);
-        fileInfo.classList.remove('hidden');
-        setProgramSelectorsLocked(true);
-        setUploadEnabled(false);
+        // ─── Program mismatch detection ───────────────────────────────────────────
+        const programColumnCandidates = ['Program', 'program', 'PROGRAM'];
+        const programColumnKey = Object.keys(json[0] || {}).find(k =>
+            programColumnCandidates.some(cand => String(k).toLowerCase() === cand.toLowerCase())
+        );
 
-        // Period detection
-        const byName    = detectPeriodFromFilename(file.name);
-        const byContent = detectPeriodFromRows(json);
-        state.detectedPeriod = byName.confidence === 'high' ? byName : {
-            ...byContent,
-            month:      byName.month || byContent.month,
-            year:       byName.year  || byContent.year,
-            confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
-            source:     byName.month || byName.year ? 'filename' : 'content',
-        };
-        const isAccreditation = program === 'Employers Accreditation';
-        const isSchools = program === 'Schools';
-        applyDetectedPeriod(state.detectedPeriod, {
-            hideMonth: isAccreditation || isSchools,
-            hideYear: isSchools,
-        });
-
-        // Validation request
-        document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
-        document.getElementById('previewBody').innerHTML  = '';
-        document.getElementById('dataPreview').classList.remove('hidden');
-
-        const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
-        fetch('../../backend/import/validate_preview.php', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ program, section, data: json, wiirpCategory }),
-        })
-            .then(async res => {
-                const raw = await res.text();
-                let result;
-                try {
-                    result = JSON.parse(raw);
-                } catch {
-                    const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
-                    throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+        let hasProgramMismatch = false;
+        let programMismatches = [];
+        
+        if (programColumnKey) {
+            json.forEach((row, idx) => {
+                const excelProgram = (String(row[programColumnKey] || '').trim());
+                if (excelProgram && excelProgram !== program) {
+                    hasProgramMismatch = true;
+                    programMismatches.push({ rowIndex: idx, excelProgram });
                 }
-                if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
-                return result;
+            });
+        }
+
+        if (hasProgramMismatch) {
+            // Hard stop: show program mismatch modal
+            state.excelFileData = json;
+            state.selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileInfo.classList.remove('hidden');
+            setProgramSelectorsLocked(true);
+            setUploadEnabled(false);
+
+            openProgramMismatchModal(program, programMismatches,
+                // Option 1: Use selected program for all rows
+                () => {
+                    json.forEach(row => {
+                        row._program_override = true;
+                    });
+                    proceedWithValidation();
+                },
+                // Option 2: Show preview with mismatches highlighted
+                () => {
+                    json.forEach((row, idx) => {
+                        const excelProgram = (String(row[programColumnKey] || '').trim());
+                        if (excelProgram && excelProgram !== program) {
+                            row._program_mismatch = true;
+                            row._excel_program = excelProgram;
+                        }
+                    });
+                    proceedWithValidation();
+                },
+                // Option 3: Cancel
+                () => {
+                    showToast('Import cancelled.', 'info');
+                    state.selectedFile = null;
+                    state.excelFileData = null;
+                    fileInput.value = '';
+                    fileInfo.classList.add('hidden');
+                    setProgramSelectorsLocked(false);
+                    setUploadStateFromProgramSelection();
+                }
+            );
+            return;
+        }
+
+        // Helper function to proceed with validation after mismatch handling
+        function proceedWithValidation() {
+            state.selectedFile = file;
+            fileName.textContent = file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileInfo.classList.remove('hidden');
+            setProgramSelectorsLocked(true);
+            setUploadEnabled(false);
+
+            // Period detection
+            const byName    = detectPeriodFromFilename(file.name);
+            const byContent = detectPeriodFromRows(json);
+            state.detectedPeriod = byName.confidence === 'high' ? byName : {
+                ...byContent,
+                month:      byName.month || byContent.month,
+                year:       byName.year  || byContent.year,
+                confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
+                source:     byName.month || byName.year ? 'filename' : 'content',
+            };
+            const isAccreditation = program === 'Employers Accreditation';
+            const isSchools = program === 'Schools';
+            applyDetectedPeriod(state.detectedPeriod, {
+                hideMonth: isAccreditation || isSchools,
+                hideYear: isSchools,
+            });
+
+            // Validation request
+            document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
+            document.getElementById('previewBody').innerHTML  = '';
+            document.getElementById('dataPreview').classList.remove('hidden');
+
+            // Capture category values so preview validation can apply program-specific rules.
+            const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+            const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+            fetch('../../backend/import/validate_preview.php', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ program, section, data: json, wiirpCategory, gipCategory }),
             })
-            .then(result => {
-                if (result.success) {
-                    state.parsedExcelData = result.data;
-                    const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
-                    const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
-                    
-                    // For WIIRP Private uploads, include private-specific columns in preview (e.g., office assignment, endorsements).
-                    // For other programs or WIIRP Public, show only standard required columns.
-                    const previewCols = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
-                        ? Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]))
-                        : required;
-                    
-                    // For WIIRP Private, filter out private-specific headers from the "extra columns" list to avoid duplication.
-                    const extraColsForPreview = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
-                        ? (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col))
-                        : extra;
-                    showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
-                } else {
-                    showToast('Validation error: ' + (result.error ?? 'Unknown error'), 'error');
+                .then(async res => {
+                    const raw = await res.text();
+                    let result;
+                    try {
+                        result = JSON.parse(raw);
+                    } catch {
+                        const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+                        throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+                    }
+                    if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+                    return result;
+                })
+                .then(result => {
+                    if (result.success) {
+                        state.parsedExcelData = result.data;
+                        const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
+                        const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
+                        
+                        // For WIIRP Private uploads, include private-specific columns in preview (e.g., office assignment, endorsements).
+                        // For other programs or WIIRP Public, show only standard required columns.
+                        const previewCols = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
+                            ? Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]))
+                            : required;
+                        
+                        // For WIIRP Private, filter out private-specific headers from the "extra columns" list to avoid duplication.
+                        const extraColsForPreview = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
+                            ? (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col))
+                            : extra;
+                        showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
+                    } else {
+                        showToast('Validation error: ' + (result.error ?? 'Unknown error'), 'error');
+                        document.getElementById('dataPreview').classList.add('hidden');
+                        resetPreviewPaginationState();
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Validation failed: ' + (err.message ?? 'Unknown error'), 'error');
                     document.getElementById('dataPreview').classList.add('hidden');
                     resetPreviewPaginationState();
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                showToast('Validation failed: ' + (err.message ?? 'Unknown error'), 'error');
-                document.getElementById('dataPreview').classList.add('hidden');
-                resetPreviewPaginationState();
-            });
+                });
+        }
+
+        // Normal path: no program mismatch, proceed directly
+        proceedWithValidation();
     };
     reader.readAsArrayBuffer(file);
 }
