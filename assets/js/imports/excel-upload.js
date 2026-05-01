@@ -58,6 +58,46 @@ function isKnownWiirpPrivateHeader(header) {
     return false;
 }
 
+const WIIRP_PESO_PREVIEW_HEADERS = [
+    '# of hours',
+    'Starting Date',
+    'Est. End',
+    'Office Assignment',
+    'Full Name',
+];
+
+const WIIRP_PESO_HEADER_ALIASES = {
+    '# of hours': ['# of hours', 'number of hours', 'hours', 'required work immersion / internship hours', 'required hours'],
+    'Starting Date': ['starting date', 'start date', 'starting_date'],
+    'Est. End': ['est. end', 'estimated end', 'est end', 'end date'],
+    'Office Assignment': ['office assignment', 'office assign', 'office assginment', 'office_assignment'],
+    'Full Name': ['full name', 'fullname', 'name'],
+};
+
+function resolveWiirpPesoPreviewCols(rowKeys = []) {
+    const present = new Set(rowKeys.map(k => String(k).trim().toLowerCase()));
+    const resolved = [];
+
+    for (const canonical of WIIRP_PESO_PREVIEW_HEADERS) {
+        const aliases = WIIRP_PESO_HEADER_ALIASES[canonical] ?? [canonical.toLowerCase()];
+        const matchedAlias = aliases.find(a => present.has(a.toLowerCase()));
+        if (matchedAlias) {
+            const originalKey = rowKeys.find(k => String(k).trim().toLowerCase() === matchedAlias.toLowerCase());
+            resolved.push(originalKey || canonical);
+        }
+    }
+
+    return Array.from(new Set(resolved));
+}
+
+function isKnownWiirpPesoHeader(header) {
+    const key = String(header || '').trim().toLowerCase();
+    for (const aliases of Object.values(WIIRP_PESO_HEADER_ALIASES)) {
+        if (aliases.some(a => a.toLowerCase() === key)) return true;
+    }
+    return false;
+}
+
 // ─── DOM refs ─────────────────────────────────────────────────────────────────
 const fileInput    = document.getElementById('fileInput');
 const dropZone     = document.getElementById('dropZone');
@@ -340,17 +380,29 @@ export function handleFile(file) {
                         state.parsedExcelData = result.data;
                         const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
                         const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
-                        
-                        // For WIIRP Private uploads, include private-specific columns in preview (e.g., office assignment, endorsements).
-                        // For other programs or WIIRP Public, show only standard required columns.
-                        const previewCols = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
-                            ? Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]))
-                            : required;
-                        
-                        // For WIIRP Private, filter out private-specific headers from the "extra columns" list to avoid duplication.
-                        const extraColsForPreview = (program === 'Work Immersion and Internship Referral Program' && (wiirpCategory || '').toLowerCase() === 'private')
-                            ? (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col))
-                            : extra;
+                        const resolvedPesoCols = resolveWiirpPesoPreviewCols(firstPreviewRowKeys);
+
+                        // For WIIRP uploads, include category-specific preview columns.
+                        let previewCols = required;
+                        if (program === 'Work Immersion and Internship Referral Program') {
+                            const cat = (wiirpCategory || '').toLowerCase();
+                            if (cat === 'private') {
+                                previewCols = Array.from(new Set([...(required ?? []), ...resolvedPrivateCols]));
+                            } else if (cat === 'peso-assigned') {
+                                previewCols = Array.from(new Set([...(required ?? []), ...resolvedPesoCols]));
+                            }
+                        }
+
+                        // Filter out category-specific headers from the "extra columns" list so they aren't shown as unmapped.
+                        let extraColsForPreview = extra;
+                        if (program === 'Work Immersion and Internship Referral Program') {
+                            const cat = (wiirpCategory || '').toLowerCase();
+                            if (cat === 'private') {
+                                extraColsForPreview = (extra ?? []).filter(col => !isKnownWiirpPrivateHeader(col));
+                            } else if (cat === 'peso-assigned') {
+                                extraColsForPreview = (extra ?? []).filter(col => !isKnownWiirpPesoHeader(col));
+                            }
+                        }
                         showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
                     } else {
                         showToast('Validation error: ' + (result.error ?? 'Unknown error'), 'error');
