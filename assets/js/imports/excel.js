@@ -116,6 +116,13 @@ if (confirmImportBtn) {
             }
         }
 
+        // Check for unresolved program mismatches
+        const mismatchedRows = state.parsedExcelData.filter(r => r._program_mismatch === true);
+        if (mismatchedRows.length > 0) {
+            showToast(`Cannot import: ${mismatchedRows.length} row(s) have mismatched programs. Please fix your Excel file and re-upload.`, 'error');
+            return;
+        }
+
         const periodLabel = program === 'Schools'
             ? 'Not required'
             : `${importMonth} ${importYear}`.trim();
@@ -133,6 +140,16 @@ if (confirmImportBtn) {
             skipped:      skippedRows,
             duplicates:   duplicateRows,
             invalid:      invalidRows,
+            category:     program === 'SPES'
+                ? (document.getElementById('spesCategory')?.value ?? '')
+                : program === 'Work Immersion and Internship Referral Program'
+                    ? wiirpCategory
+                    : program === 'Government Internship Program'
+                        ? gipCategory
+                        : '',
+            categoryLabel: program === 'SPES' || program === 'Work Immersion and Internship Referral Program' || program === 'Government Internship Program'
+                ? 'Category'
+                : '',
         }, () => {
             btn.disabled    = true;
             btn.textContent = 'Importing…';
