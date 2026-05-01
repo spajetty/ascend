@@ -26,6 +26,17 @@ function toCsvCell(value) {
     return '"' + str.replace(/"/g, '""') + '"';
 }
 
+function getRollbackEntityLabel(program) {
+    switch (program) {
+        case 'Job Matching and Referral':
+        case 'First Time Jobseeker':
+        case 'Job Fair':
+            return 'employer records';
+        default:
+            return null;
+    }
+}
+
 // ─── Tab switching ────────────────────────────────────────────────────────────
 export function setResultsTab(tabKey) {
     document.querySelectorAll('.results-tab-btn').forEach(btn => {
@@ -140,8 +151,17 @@ function statCard(value, label, c, iconPath) {
 export function renderImportResultsView(data) {
     if (!importResultsView || !importResultsSummary || !importResultsWarnings) return;
     const isSchools = (data.program || '') === 'Schools';
-    const primaryLabel = isSchools ? 'New Schools' : 'New Employers';
-    const emptyPrimaryLabel = isSchools ? 'No new schools were created in this import.' : 'No new employers were created in this import.';
+    const isWhipBeneficiaries = (data.program || '') === 'Workers Hiring for Infrastructure Projects - Beneficiaries';
+    const primaryLabel = isSchools
+        ? 'New Schools'
+        : isWhipBeneficiaries
+            ? 'New WHIP Beneficiaries'
+            : 'New Employers';
+    const emptyPrimaryLabel = isSchools
+        ? 'No new schools were created in this import.'
+        : isWhipBeneficiaries
+            ? 'No new WHIP beneficiaries were created in this import.'
+            : 'No new employers were created in this import.';
     const createdItems = isSchools ? (data.newSchools || []) : (data.newEmployers || []);
 
     // Meta line
@@ -189,7 +209,7 @@ export function renderImportResultsView(data) {
     if (badgeDup) badgeDup.textContent = data.duplicateRows.length;
     if (badgeErr) badgeErr.textContent = data.errorRows.length;
 
-    // Panel content — New Schools / New Employers
+    // Panel content — program-specific created items
     const newEmployersPanel = document.getElementById('resultsPanelNewEmployers');
     if (newEmployersPanel) {
         if (!createdItems.length) {
@@ -210,7 +230,7 @@ export function renderImportResultsView(data) {
                     <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">New</span>
                 </div>`).join('');
             newEmployersPanel.innerHTML = `
-                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${createdItems.length} ${isSchools ? 'school' : 'employer'}${createdItems.length !== 1 ? 's' : ''} created</p></div>
+                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${createdItems.length} ${isSchools ? 'school' : isWhipBeneficiaries ? 'WHIP beneficiary' : 'employer'}${createdItems.length !== 1 ? 's' : ''} created</p></div>
                 <div class="space-y-1 rounded-xl border border-gray-100 overflow-hidden">${items}</div>`;
         }
     }
@@ -312,10 +332,11 @@ function ensureRollbackConfirmModal() {
                 <div>
                     <h3 class="text-base font-bold text-gray-900">Rollback Import?</h3>
                     <p class="mt-1 text-sm text-gray-500">All records added in this batch will be <strong class="text-red-600">permanently removed</strong> from the database. This action cannot be undone.</p>
+                    <p class="mt-2 text-sm text-gray-600">Program: <span id="rollbackProgramText" class="font-semibold text-gray-900">—</span></p>
                 </div>
             </div>
             <div class="rounded-xl bg-red-50 border border-red-100 px-4 py-3 mb-5">
-                <p class="text-xs text-red-700 font-medium">⚠️ Newly created employer records linked to this import will also be deleted.</p>
+                <p id="rollbackImpactNote" class="text-xs text-red-700 font-medium">⚠️ Newly created records linked to this import will also be deleted.</p>
             </div>
             <div class="flex items-center justify-end gap-3">
                 <button id="rollbackConfirmCancel" type="button"
@@ -343,6 +364,21 @@ function ensureRollbackConfirmModal() {
 function openRollbackConfirmModal(onConfirm) {
     const modal = ensureRollbackConfirmModal();
     if (!modal) return;
+
+    const rollbackProgramText = modal.querySelector('#rollbackProgramText');
+    if (rollbackProgramText) {
+        rollbackProgramText.textContent = state.latestImportResultsData?.program ?? 'Unknown program';
+    }
+
+    const rollbackImpactNote = modal.querySelector('#rollbackImpactNote');
+    if (rollbackImpactNote) {
+        const program = state.latestImportResultsData?.program ?? '';
+        const entityLabel = getRollbackEntityLabel(program);
+        rollbackImpactNote.textContent = entityLabel
+            ? `⚠️ Newly created ${entityLabel} linked to this import will also be deleted.`
+            : '⚠️ Newly created records linked to this import will also be deleted.';
+    }
+
     const proceedBtn = modal.querySelector('#rollbackConfirmProceed');
     if (proceedBtn) {
         proceedBtn.onclick = () => {
