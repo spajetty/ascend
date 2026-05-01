@@ -39,6 +39,35 @@ function ensurePaginationContainer() {
     return container;
 }
 
+function buildPageWindow(totalPages, currentPage) {
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
+    }
+
+    if (currentPage <= 4) {
+        return [1, 2, 3, 4, 5, 'ellipsis', totalPages];
+    }
+
+    if (currentPage >= totalPages - 3) {
+        return [1, 'ellipsis', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+    }
+
+    return [1, 'ellipsis', currentPage - 1, currentPage, currentPage + 1, 'ellipsis', totalPages];
+}
+
+function buildPageButtonMarkup(page, currentPage) {
+    const isActive = page === currentPage;
+    const activeClasses = 'bg-blue-600 text-white border-blue-600 shadow-sm';
+    const idleClasses = 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50';
+
+    return `
+        <button type="button" data-preview-page="${page}"
+            class="min-w-9 px-3 py-1.5 text-xs sm:text-sm rounded-lg border transition-colors ${isActive ? activeClasses : idleClasses}"
+            ${isActive ? 'disabled' : ''}>
+            ${page}
+        </button>`;
+}
+
 export function resetPreviewPaginationState() {
     previewAllRows      = [];
     previewRequiredCols = [];
@@ -76,17 +105,22 @@ export function renderPreviewPage(page = 1) {
     }
 
     pagination.classList.remove('hidden');
+    const pageWindow = buildPageWindow(totalPages, previewCurrentPage);
     pagination.innerHTML = `
         <div class="text-xs sm:text-sm text-gray-500">
             Showing <span class="font-semibold text-gray-700">${startIdx + 1}</span> to
             <span class="font-semibold text-gray-700">${endIdx}</span> of
             <span class="font-semibold text-gray-700">${totalRows}</span> rows
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <button id="previewPrevPage" type="button"
                 class="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                 ${previewCurrentPage <= 1 ? 'disabled' : ''}>Previous</button>
-            <span class="text-xs sm:text-sm text-gray-600">Page ${previewCurrentPage} of ${totalPages}</span>
+            <div class="flex items-center gap-1">
+                ${pageWindow.map(page => page === 'ellipsis'
+                    ? '<span class="px-2 text-gray-400 text-xs sm:text-sm">...</span>'
+                    : buildPageButtonMarkup(page, previewCurrentPage)).join('')}
+            </div>
             <button id="previewNextPage" type="button"
                 class="px-3 py-1.5 text-xs sm:text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                 ${previewCurrentPage >= totalPages ? 'disabled' : ''}>Next</button>
@@ -94,6 +128,12 @@ export function renderPreviewPage(page = 1) {
 
     document.getElementById('previewPrevPage')?.addEventListener('click', () => renderPreviewPage(previewCurrentPage - 1));
     document.getElementById('previewNextPage')?.addEventListener('click', () => renderPreviewPage(previewCurrentPage + 1));
+    pagination.querySelectorAll('[data-preview-page]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const page = Number(btn.getAttribute('data-preview-page'));
+            if (Number.isFinite(page)) renderPreviewPage(page);
+        });
+    });
 }
 
 // ─── Period selectors ─────────────────────────────────────────────────────────
