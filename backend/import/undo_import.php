@@ -115,10 +115,10 @@ try {
         }
 
         if ($wiirpTable !== '') {
-            // First delete private details if present to avoid FK constraint errors
-            $privateIds = (array)($payload['wiirp_private_ids'] ?? []);
-            if (!empty($privateIds) && tableExists($conn, 'wiirp_private_details')) {
-                deleteByIds($conn, 'wiirp_private_details', 'id', $privateIds);
+            // First delete assignment/private details if present to avoid FK constraint errors
+            $assignmentIds = (array)($payload['wiirp_assignment_ids'] ?? []);
+            if (!empty($assignmentIds) && tableExists($conn, 'wiirp_assignment_details')) {
+                deleteByIds($conn, 'wiirp_assignment_details', 'id', $assignmentIds);
             }
 
             $wiirpIdCol = findExistingColumn($conn, $wiirpTable, ['work_immersion_id', 'id']);
