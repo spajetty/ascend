@@ -34,6 +34,7 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         : parseDateNullable(rowValue($row, ['Internship Availability Date (Start of Internship)', 'Starting Date', 'start'], ''));
 
     $gipType = strtoupper(trim((string)($ctx['gipCategory'] ?? '')));
+    $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
 
     $dupStmt = $conn->prepare('SELECT 1 FROM `gip` WHERE `benef_id` = ? AND `contract_period` = ? AND `type` = ? LIMIT 1');
     $dupStmt->bind_param('iss', $benefId, $contractPeriod, $gipType);
@@ -42,9 +43,21 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         return 'skipped';
     }
 
-    $stmt = $conn->prepare('INSERT INTO `gip` (`benef_id`, `contract_period`, `school`, `course`, `year_level`, `required_hours`, `preferred_org_type`, `preferred_industry`, `is_willing_outside`, `internship_sched`, `start`, `type`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-    $stmt->bind_param(
-        'issssississs',
+    $columns = [
+        '`benef_id`',
+        '`contract_period`',
+        '`school`',
+        '`course`',
+        '`year_level`',
+        '`required_hours`',
+        '`preferred_org_type`',
+        '`preferred_industry`',
+        '`is_willing_outside`',
+        '`internship_sched`',
+        '`start`',
+        '`type`',
+    ];
+    $values = [
         $benefId,
         $contractPeriod,
         $school,
@@ -56,8 +69,19 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         $isWillingOutside,
         $internshipSched,
         $startDate,
-        $gipType
-    );
+        $gipType,
+    ];
+    $types = 'issssississs';
+
+    if (tableHasColumn($conn, 'gip', 'batch_id')) {
+        $columns[] = '`batch_id`';
+        $values[] = $batchId;
+        $types .= 'i';
+    }
+
+    $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+    $stmt = $conn->prepare('INSERT INTO `gip` (' . implode(', ', $columns) . ') VALUES (' . $placeholders . ')');
+    $stmt->bind_param($types, ...$values);
     $stmt->execute();
 
     $state['insertedGipIds'][] = (int)$stmt->insert_id;

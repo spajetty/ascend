@@ -5,18 +5,29 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
     $studentType = s(rowValue($row, ['Student/OSY', 'student_type'], ''));
     $highestEduc = s(rowValue($row, ['HIGHEST EDUC. ATTAINMENT', 'highest_educ', 'Highest Educ Attainment'], '')) ?: null;
     $course = s(rowValue($row, ['Course', 'course'], '')) ?: null;
+    $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
 
     // Normalize student type to enum values
     $studentTypeLower = strtolower($studentType);
     $studentTypeNorm = in_array($studentTypeLower, ['student', 'osy'], true) ? $studentTypeLower : 'student';
 
     // Insert SPES record
-    $insSPES = $conn->prepare('
-        INSERT INTO spes
-            (benef_id, student_type, highest_educ, course, school)
-        VALUES (?, ?, ?, ?, ?)
-    ');
-    $insSPES->bind_param('issss', $benefId, $studentTypeNorm, $highestEduc, $course, $school);
+    $spesHasBatchId = tableHasColumn($conn, 'spes', 'batch_id');
+    if ($spesHasBatchId) {
+        $insSPES = $conn->prepare('
+            INSERT INTO spes
+                (benef_id, student_type, highest_educ, course, school, batch_id)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ');
+        $insSPES->bind_param('issssi', $benefId, $studentTypeNorm, $highestEduc, $course, $school, $batchId);
+    } else {
+        $insSPES = $conn->prepare('
+            INSERT INTO spes
+                (benef_id, student_type, highest_educ, course, school)
+            VALUES (?, ?, ?, ?, ?)
+        ');
+        $insSPES->bind_param('issss', $benefId, $studentTypeNorm, $highestEduc, $course, $school);
+    }
     $insSPES->execute();
     $spesId = (int)$insSPES->insert_id;
 
@@ -76,12 +87,22 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
         }
 
         // Insert SPES employment record
-        $insEmp = $conn->prepare('
-            INSERT INTO spes_employment
-                (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        ');
-        $insEmp->bind_param('iisssis', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm);
+        $empHasBatchId = tableHasColumn($conn, 'spes_employment', 'batch_id');
+        if ($empHasBatchId) {
+            $insEmp = $conn->prepare('
+                INSERT INTO spes_employment
+                    (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category, batch_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ');
+            $insEmp->bind_param('iisssisi', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm, $batchId);
+        } else {
+            $insEmp = $conn->prepare('
+                INSERT INTO spes_employment
+                    (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            ');
+            $insEmp->bind_param('iisssis', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm);
+        }
         $insEmp->execute();
         $employmentId = (int)$insEmp->insert_id;
 

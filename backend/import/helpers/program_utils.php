@@ -107,6 +107,7 @@ function resolveWiirpTableSchema(mysqli $conn): array {
         'table' => $table,
         'id_col' => firstExistingColumn($conn, $table, ['work_immersion_id', 'id']),
         'benef_id_col' => firstExistingColumn($conn, $table, ['benef_id']),
+        'batch_id_col' => firstExistingColumn($conn, $table, ['batch_id']),
         'contract_period_col' => firstExistingColumn($conn, $table, ['contract_period']),
         'school_col' => firstExistingColumn($conn, $table, ['school']),
         'course_col' => firstExistingColumn($conn, $table, ['course']),
