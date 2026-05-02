@@ -37,6 +37,26 @@ function getRollbackEntityLabel(program) {
     }
 }
 
+function shouldShowEmployerResultsTab(data) {
+    if (['Work Immersion and Internship Referral Program', 'Government Internship Program', 'SPES'].includes(data.program || '')) {
+        return false;
+    }
+    return true;
+}
+
+function getProceedButtonLabel(program) {
+    const p = String(program || '').trim();
+    if (!p) return 'Proceed';
+    const ACRONYMS = {
+        'First Time Jobseeker': 'FTJS',
+        'Work Immersion and Internship Referral Program': 'WIIRP',
+        'Workers Hiring for Infrastructure Projects - Beneficiaries': 'WHIP',
+        'Government Internship Program': 'GIP',
+    };
+    const abbr = ACRONYMS[p] || null;
+    return `Proceed to ${abbr || p}`;
+}
+
 // ─── Tab switching ────────────────────────────────────────────────────────────
 export function setResultsTab(tabKey) {
     document.querySelectorAll('.results-tab-btn').forEach(btn => {
@@ -120,7 +140,7 @@ function buildRowsTable(rows, emptyLabel) {
     }).join('');
 
     return `
-        <div class="overflow-auto rounded-xl border border-gray-100">
+        <div class="overflow-x-auto overflow-y-hidden preview-scrollbar rounded-xl border border-gray-100">
             <table class="min-w-full text-left">
                 <thead class="sticky top-0 bg-gray-50 border-b border-gray-100">
                     <tr>
@@ -152,6 +172,7 @@ export function renderImportResultsView(data) {
     if (!importResultsView || !importResultsSummary || !importResultsWarnings) return;
     const isSchools = (data.program || '') === 'Schools';
     const isWhipBeneficiaries = (data.program || '') === 'Workers Hiring for Infrastructure Projects - Beneficiaries';
+    const showEmployerTab = shouldShowEmployerResultsTab(data);
     const primaryLabel = isSchools
         ? 'New Schools'
         : isWhipBeneficiaries
@@ -162,7 +183,11 @@ export function renderImportResultsView(data) {
         : isWhipBeneficiaries
             ? 'No new WHIP beneficiaries were created in this import.'
             : 'No new employers were created in this import.';
-    const createdItems = isSchools ? (data.newSchools || []) : (data.newEmployers || []);
+    const createdItems = isSchools
+        ? (data.newSchools || [])
+        : showEmployerTab
+            ? (data.newEmployers || [])
+            : [];
 
     // Meta line
     const metaLine = document.getElementById('importResultsMetaLine');
@@ -204,15 +229,32 @@ export function renderImportResultsView(data) {
     const badgeNE  = document.getElementById('tabBadgeNewEmployers');
     const badgeDup = document.getElementById('tabBadgeDuplicates');
     const badgeErr = document.getElementById('tabBadgeErrors');
+    const proceedBtn = document.getElementById('proceedToJobFairBtn');
+    const employerTabBtn = document.querySelector('[data-results-tab="new-employers"]');
+    const employerTabPanel = document.getElementById('resultsPanelNewEmployers');
+    const reviewEmployersBtn = document.getElementById('reviewEmployersBtn');
+    const addAccreditationBtn = document.getElementById('addAccreditationBtn');
+
+    if (employerTabBtn) employerTabBtn.classList.toggle('hidden', !showEmployerTab);
+    if (employerTabPanel) employerTabPanel.classList.toggle('hidden', !showEmployerTab);
+    if (reviewEmployersBtn) reviewEmployersBtn.classList.toggle('hidden', !showEmployerTab);
+    if (addAccreditationBtn) addAccreditationBtn.classList.toggle('hidden', !showEmployerTab);
+
+    if (proceedBtn) {
+        proceedBtn.textContent = getProceedButtonLabel(data.program || '');
+    }
+
     if (labelNE) labelNE.textContent = primaryLabel;
     if (badgeNE)  badgeNE.textContent  = createdItems.length;
     if (badgeDup) badgeDup.textContent = data.duplicateRows.length;
     if (badgeErr) badgeErr.textContent = data.errorRows.length;
 
     // Panel content — program-specific created items
-    const newEmployersPanel = document.getElementById('resultsPanelNewEmployers');
+    const newEmployersPanel = employerTabPanel;
     if (newEmployersPanel) {
-        if (!createdItems.length) {
+        if (!showEmployerTab) {
+            newEmployersPanel.innerHTML = '';
+        } else if (!createdItems.length) {
             newEmployersPanel.innerHTML = `
                 <div class="flex flex-col items-center justify-center gap-3 py-10 text-center">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -241,7 +283,7 @@ export function renderImportResultsView(data) {
     const errorsPanel = document.getElementById('resultsPanelErrors');
     if (errorsPanel) errorsPanel.innerHTML = buildRowsTable(data.errorRows, 'No errors — all records passed validation.');
 
-    setResultsTab('new-employers');
+    setResultsTab(showEmployerTab ? 'new-employers' : 'duplicates');
 }
 
 // ─── Show / hide views ────────────────────────────────────────────────────────
