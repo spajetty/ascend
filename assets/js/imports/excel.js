@@ -77,6 +77,13 @@ if (cancelImportBtn) {
 const confirmImportBtn = document.getElementById('confirmImport');
 if (confirmImportBtn) {
     confirmImportBtn.addEventListener('click', () => {
+        const getSelectedLabel = (selectId) => {
+            const el = document.getElementById(selectId);
+            if (!el) return '';
+            const selected = el.options?.[el.selectedIndex];
+            return (selected?.textContent || '').trim();
+        };
+
         if (!state.parsedExcelData.length) return;
 
         const program     = document.getElementById('excelProgram').value;
@@ -165,11 +172,11 @@ if (confirmImportBtn) {
             duplicates:   duplicateRows,
             invalid:      invalidRows,
             category:     program === 'SPES'
-                ? (document.getElementById('spesCategory')?.value ?? '')
+                ? getSelectedLabel('spesCategory')
                 : program === 'Work Immersion and Internship Referral Program'
-                    ? wiirpCategory
+                    ? getSelectedLabel('wiirpCategory')
                     : program === 'Government Internship Program'
-                        ? gipCategory
+                        ? getSelectedLabel('gipCategory')
                         : '',
             categoryLabel: program === 'SPES' || program === 'Work Immersion and Internship Referral Program' || program === 'Government Internship Program'
                 ? 'Category'
@@ -230,6 +237,9 @@ if (confirmImportBtn) {
                             duplicates:   duplicateRows.length,
                             errors:       errorRows.length,
                             program,
+                            category:     program === 'Work Immersion and Internship Referral Program'
+                                ? wiirpCategory
+                                : '',
                             period:       periodLabel,
                             fileName:     importedFileName,
                             warnings,
