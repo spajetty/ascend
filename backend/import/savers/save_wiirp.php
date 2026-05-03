@@ -68,6 +68,7 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 	$placeholders = ['?'];
 	$types = 'i';
 	$values = [$benefId];
+	$batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : 0;
 
 	// Helper to add a column if the schema has it
 	$addCol = function($colName, $val, $typeChar) use (&$columns, &$placeholders, &$types, &$values) {
@@ -129,6 +130,12 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 		$col = $shape['type_col'] ?? 'type';
 		$addCol($col, $wiirpType, 's');
 	}
+	if ($batchId > 0) {
+		$col = $shape['batch_id_col'] ?? null;
+		if ($col) {
+			$addCol($col, $batchId, 'i');
+		}
+	}
 
 	// Private-specific fields: office assignment and endorsements
 	if ($officeAssignment !== '') {
@@ -188,7 +195,7 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 				$ins = $conn->prepare($sql);
 				$ins->bind_param($pdTypes, ...$pdValues);
 				$ins->execute();
-				$state['insertedWiirpPrivateIds'][] = (int)$ins->insert_id;
+				$state['insertedWiirpAssignmentIds'][] = (int)$ins->insert_id;
 			}
 		}
 	}

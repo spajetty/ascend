@@ -91,6 +91,17 @@ function validateWiirp(mysqli $conn, array $rows, string $wiirpCategory = ''): a
 			continue;
 		}
 
+		if ($cat === 'peso-assigned') {
+			$officeAssignment = s(rowValue($row, ['Office Assign', 'Office Assignment', 'Office Assginment', 'office_assignment'], ''));
+			if ($officeAssignment === '' || !preg_match('/^PESO\s*-\s*/i', $officeAssignment)) {
+				$previewRow['status_message'] = 'Invalid Office Assignment format for Peso-assigned WIIRP. Expected a value starting with "PESO -".';
+				$previewRow['badge_status'] = 'invalid';
+				$previewRow['_sys_skip'] = true;
+				$validatedData[] = $previewRow;
+				continue;
+			}
+		}
+
 		$startDate = parseExcelDate(rowValue($row, ['Internship Availability Date (Start of Internship)', 'Starting Date', 'start'], ''));
 		$previewRow['_parsed_start_date'] = $startDate;
 		if ($startDate !== null && $startDate !== '') {
