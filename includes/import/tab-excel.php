@@ -109,7 +109,7 @@
         <!-- Import period detection + editable confirmation -->
         <div id="importPeriodPanel" class="hidden mt-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-4">
             <p id="periodSuggestionText" class="text-sm text-blue-800 font-medium mb-3"></p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="importPeriodGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div id="importMonthWrapper">
                     <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Month</label>
                     <select id="importMonth"
@@ -117,11 +117,29 @@
                         <option value="">Select month...</option>
                     </select>
                 </div>
-                <div>
+                <div id="importYearWrapper">
                     <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Year</label>
                     <select id="importYear"
                         class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
                         <option value="">Select year...</option>
+                    </select>
+                </div>
+                <div id="importDurationMonthsWrapper" class="hidden">
+                    <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Duration (Months)</label>
+                    <select id="importDurationMonths"
+                        class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                        <option value="1">1 month</option>
+                        <option value="2">2 months</option>
+                        <option value="3" selected>3 months</option>
+                        <option value="4">4 months</option>
+                        <option value="5">5 months</option>
+                        <option value="6">6 months</option>
+                        <option value="7">7 months</option>
+                        <option value="8">8 months</option>
+                        <option value="9">9 months</option>
+                        <option value="10">10 months</option>
+                        <option value="11">11 months</option>
+                        <option value="12">12 months</option>
                     </select>
                 </div>
             </div>
