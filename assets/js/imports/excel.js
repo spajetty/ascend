@@ -158,6 +158,22 @@ if (confirmImportBtn) {
             ? 'Not required'
             : `${importMonth} ${importYear}`.trim();
 
+        // Compute contract period for GIP
+        let contractPeriodDisplay = '';
+        if (program === 'Government Internship Program' && importMonth && importYear) {
+            const durationMonths = parseInt(document.getElementById('importDurationMonths')?.value ?? '3', 10);
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const monthMap = { 'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5, 'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11 };
+            const monthNum = monthMap[importMonth] ?? new Date(`${importMonth} 1`).getMonth();
+            if (monthNum !== undefined && !isNaN(monthNum)) {
+                const startMonth = monthNames[monthNum];
+                const endMonthIndex = (monthNum + durationMonths - 1) % 12;
+                const endYear = parseInt(importYear) + Math.floor((monthNum + durationMonths - 1) / 12);
+                const endMonth = monthNames[endMonthIndex];
+                contractPeriodDisplay = `${startMonth} ${importYear} - ${endMonth} ${endYear} (${durationMonths} months)`;
+            }
+        }
+
         const duplicateRows  = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'duplicate').length;
         const invalidRows    = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'invalid').length;
         const skippedRows    = state.parsedExcelData.filter(r => !!r._sys_skip).length;
@@ -166,6 +182,7 @@ if (confirmImportBtn) {
         openImportConfirmModal({
             program,
             period:       periodLabel,
+            contractPeriod: contractPeriodDisplay,
             fileName:     state.selectedFile?.name ?? 'N/A',
             rowsToImport: importableRows,
             skipped:      skippedRows,
@@ -193,6 +210,7 @@ if (confirmImportBtn) {
                     data:        state.parsedExcelData,
                     importMonth,
                     importYear,
+                    importDurationMonths: parseInt(document.getElementById('importDurationMonths')?.value ?? '3', 10),
                     fileName:    state.selectedFile?.name ?? '',
                     spesCategory: program === 'SPES' ? (document.getElementById('spesCategory')?.value ?? '') : '',
                     wiirpCategory: program === 'Work Immersion and Internship Referral Program' ? wiirpCategory : '',
