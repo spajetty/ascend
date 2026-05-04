@@ -37,10 +37,14 @@ export function openImportConfirmModal(summary, onConfirm) {
         const categoryRow = summary.category
             ? `<div class="rounded-lg bg-gray-50 px-3 py-2"><strong>${summary.categoryLabel || 'Category'}:</strong> ${summary.category}</div>`
             : '';
+        const contractPeriodRow = summary.contractPeriod
+            ? `<div class="rounded-lg bg-gray-50 px-3 py-2"><strong>Contract Period:</strong> ${summary.contractPeriod}</div>`
+            : '';
         summaryEl.innerHTML = `
             <div class="rounded-lg bg-gray-50 px-3 py-2"><strong>Program:</strong> ${summary.program}</div>
             ${categoryRow}
             <div class="rounded-lg bg-gray-50 px-3 py-2"><strong>Period:</strong> ${summary.period}</div>
+            ${contractPeriodRow}
             <div class="rounded-lg bg-gray-50 px-3 py-2"><strong>File:</strong> ${summary.fileName}</div>
             <div class="rounded-lg bg-gray-50 px-3 py-2"><strong>Rows to import:</strong> ${summary.rowsToImport}</div>
             <div class="rounded-lg bg-gray-50 px-3 py-2"><strong>Skipped:</strong> ${summary.skipped} (${summary.duplicates} duplicate, ${summary.invalid} invalid)</div>`;
