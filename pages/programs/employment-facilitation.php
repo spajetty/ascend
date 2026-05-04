@@ -14,16 +14,6 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     <div class="px-6 md:px-8 py-6">
 
-        <!-- Back Button -->
-        <div class="flex items-center gap-3 mb-6">
-            <a href="/programs" class="flex items-center gap-2 text-gray-700 hover:text-gray-900 font-bold text-2xl">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
-                </svg>
-                Employment Facilitation Section
-            </a>
-        </div>
-
         <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
@@ -177,7 +167,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/employment-facilitation/job-matching" class="text-sm text-teal-600 hover:text-teal-800 font-medium">See More →</a>
+                <a href="/pages/programs/emp-facilitation/job-match.php" class="text-sm text-teal-600 hover:text-teal-800 font-medium">See More →</a>
             </div>
         </div>
 
@@ -268,7 +258,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/employment-facilitation/first-time-jobseekers" class="text-sm text-purple-600 hover:text-purple-800 font-medium">See More →</a>
+                <a href="/pages/programs/emp-facilitation/first-time.php" class="text-sm text-purple-600 hover:text-purple-800 font-medium">See More →</a>
             </div>
         </div>
 
@@ -386,7 +376,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/employment-facilitation/job-fair" class="text-sm text-blue-600 hover:text-blue-800 font-medium">See More →</a>
+                <a href="/pages/programs/emp-facilitation/job-fair.php" class="text-sm text-blue-600 hover:text-blue-800 font-medium">See More →</a>
             </div>
         </div>
 
