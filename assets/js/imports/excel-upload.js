@@ -108,14 +108,17 @@ const removeFile   = document.getElementById('removeFile');
 const monthSelect  = document.getElementById('importMonth');
 const yearSelect   = document.getElementById('importYear');
 const periodPanel  = document.getElementById('importPeriodPanel');
+const periodGrid   = document.getElementById('importPeriodGrid');
 const excelSection = document.getElementById('excelSection');
 const excelProgram = document.getElementById('excelProgram');
 const excelBrowseBtn = document.getElementById('excelBrowseBtn');
 
 export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
+    const isGip = program === 'Government Internship Program';
     const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
     const wiirpCategoryWrapper = document.getElementById('wiirpCategoryWrapper');
     const gipCategoryWrapper = document.getElementById('gipCategoryWrapper');
+    const durationMonthsWrapper = document.getElementById('importDurationMonthsWrapper');
 
     if (spesCategoryWrapper) {
         spesCategoryWrapper.classList.toggle('hidden', program !== 'SPES');
@@ -126,7 +129,16 @@ export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
     }
 
     if (gipCategoryWrapper) {
-        gipCategoryWrapper.classList.toggle('hidden', program !== 'Government Internship Program');
+        gipCategoryWrapper.classList.toggle('hidden', !isGip);
+    }
+
+    if (durationMonthsWrapper) {
+        durationMonthsWrapper.classList.toggle('hidden', !isGip);
+    }
+
+    if (periodGrid) {
+        periodGrid.classList.toggle('md:grid-cols-3', isGip);
+        periodGrid.classList.toggle('md:grid-cols-2', !isGip);
     }
 }
 
@@ -224,21 +236,33 @@ if (excelSection && excelProgram) {
 export function handleFile(file) {
     if (!file) return;
 
+    const resetFileSelectionForRetry = () => {
+        state.selectedFile = null;
+        state.excelFileData = null;
+        if (fileInput) fileInput.value = '';
+    };
+
     const allowed = ['.xlsx', '.xls', '.csv'];
     const ext = '.' + file.name.split('.').pop().toLowerCase();
     if (!allowed.includes(ext)) {
         showToast('Please upload a .xlsx, .xls, or .csv file.', 'error');
+        resetFileSelectionForRetry();
         return;
     }
     if (file.size > 10 * 1024 * 1024) {
         showToast('File exceeds 10MB limit.', 'error');
+        resetFileSelectionForRetry();
         return;
     }
 
     const sectionEl = document.getElementById('excelSection');
     const section   = sectionEl.options[sectionEl.selectedIndex].text;
     const program   = document.getElementById('excelProgram').value;
-    if (!program) { showToast('Please select a program first.', 'warning'); return; }
+    if (!program) {
+        showToast('Please select a program first.', 'warning');
+        resetFileSelectionForRetry();
+        return;
+    }
 
     const reader = new FileReader();
     reader.onload = function (e) {
@@ -247,7 +271,11 @@ export function handleFile(file) {
         const sheet    = workbook.Sheets[workbook.SheetNames[0]];
         const json     = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
-        if (json.length === 0) { showToast('The uploaded file is empty.', 'warning'); return; }
+        if (json.length === 0) {
+            showToast('The uploaded file is empty.', 'warning');
+            resetFileSelectionForRetry();
+            return;
+        }
 
         // Header validation — case-insensitive
         const headers      = Object.keys(json[0] || {});
@@ -259,6 +287,7 @@ export function handleFile(file) {
 
         if (missing.length > 0) {
             showToast(`Missing required columns:\n${missing.join(', ')}`, 'error', 6000);
+            resetFileSelectionForRetry();
             return;
         }
 
@@ -452,6 +481,8 @@ if (removeFile) {
         if (periodPanel)  periodPanel.classList.add('hidden');
         if (monthSelect)  monthSelect.value = '';
         if (yearSelect)   yearSelect.value  = '';
+        const durationSelect = document.getElementById('importDurationMonths');
+        if (durationSelect)  durationSelect.value  = '3';
         // Restore month wrapper in case it was hidden for Employers Accreditation
         const monthWrapper = document.getElementById('importMonthWrapper');
         if (monthWrapper) monthWrapper.classList.remove('hidden');
