@@ -20,18 +20,35 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         return 'skipped';
     }
 
-    $contractPeriod = trim((string)($ctx['importMonthRaw'] ?? '') . ' ' . (string)($ctx['importYearRaw'] ?? ''));
+    // Build contract period from import month/year + duration (months). Default duration is 3 months.
+    $monthRaw = trim((string)($ctx['importMonthRaw'] ?? ''));
+    $yearRaw = trim((string)($ctx['importYearRaw'] ?? ''));
+    $durationMonths = isset($ctx['importDurationMonths']) ? (int)$ctx['importDurationMonths'] : 3;
+    $contractPeriod = trim($monthRaw . ' ' . $yearRaw);
+    $monthInt = monthToInt($monthRaw);
+    $yearInt = is_numeric($yearRaw) ? (int)$yearRaw : null;
+    if ($monthInt !== null && $yearInt !== null) {
+        try {
+            $start = new DateTime();
+            $start->setDate($yearInt, $monthInt, 1);
+            $end = clone $start;
+            if ($durationMonths > 1) {
+                $end->modify('+' . ($durationMonths - 1) . ' months');
+            }
+            $contractPeriod = $start->format('M Y') . ' - ' . $end->format('M Y') . ' (' . $durationMonths . ' months)';
+        } catch (Throwable $e) {
+            // fallback to raw text
+            $contractPeriod = trim($monthRaw . ' ' . $yearRaw);
+        }
+    }
     $school = s(rowValue($row, ['School Name', 'School', 'school'], ''));
     $course = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
-    $yearLevel = s(rowValue($row, ['Year Level', 'year_level'], ''));
     $requiredHours = parseIntNullable(rowValue($row, ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'], ''));
     $preferredOrgType = s(rowValue($row, ['Preferred Host Organization Type', 'preferred_org_type'], ''));
     $preferredIndustry = s(rowValue($row, ['Preferred Industry / Field of Internship', 'preferred_industry'], ''));
     $isWillingOutside = toBoolInt(rowValue($row, ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'], ''));
-    $internshipSched = s(rowValue($row, ['Internship Schedule / Availability', 'internship_sched'], ''));
-    $startDate = !empty($row['_parsed_start_date'])
-        ? (string)$row['_parsed_start_date']
-        : parseDateNullable(rowValue($row, ['Internship Availability Date (Start of Internship)', 'Starting Date', 'start'], ''));
+    $officeAssignment = s(rowValue($row, ['Office Assignment', 'office_assignment'], ''));
+    $collegeOrShs = s(rowValue($row, ['College/SHS', 'College or SHS', 'college_or_shs'], ''));
 
     $gipType = strtoupper(trim((string)($ctx['gipCategory'] ?? '')));
     $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
@@ -48,13 +65,12 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         '`contract_period`',
         '`school`',
         '`course`',
-        '`year_level`',
         '`required_hours`',
         '`preferred_org_type`',
         '`preferred_industry`',
         '`is_willing_outside`',
-        '`internship_sched`',
-        '`start`',
+        '`office_assignment`',
+        '`college_or_shs`',
         '`type`',
     ];
     $values = [
@@ -62,16 +78,15 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         $contractPeriod,
         $school,
         $course,
-        $yearLevel,
         $requiredHours,
         $preferredOrgType,
         $preferredIndustry,
         $isWillingOutside,
-        $internshipSched,
-        $startDate,
+        $officeAssignment,
+        $collegeOrShs,
         $gipType,
     ];
-    $types = 'issssississs';
+    $types = 'isssississs';
 
     if (tableHasColumn($conn, 'gip', 'batch_id')) {
         $columns[] = '`batch_id`';

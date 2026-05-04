@@ -19,6 +19,8 @@ $program = trim((string)$input['program']);
 $rows = $input['data'];
 $importMonthRaw = trim((string)($input['importMonth'] ?? ''));
 $importYearRaw = trim((string)($input['importYear'] ?? ''));
+    // Optional: duration in months for contract period (GIP). Defaults to 3 if not provided.
+    $importDurationMonths = isset($input['importDurationMonths']) ? (int)$input['importDurationMonths'] : 3;
 $sourceFileName = trim((string)($input['fileName'] ?? ''));
 $spesCategoryRaw = trim((string)($input['spesCategory'] ?? ''));
 $wiirpCategoryRaw = trim((string)($input['wiirpCategory'] ?? ''));
@@ -80,7 +82,9 @@ try {
         'Government Internship Program',
         'Workers Hiring for Infrastructure Projects - Beneficiaries',
         'Workers Hiring for Infrastructure Projects — Beneficiaries',
-            'SPES',
+        'Workers Hiring for Infrastructure Projects - Projects',
+        'Workers Hiring for Infrastructure Projects — Projects',
+        'SPES',
     ];
     $needsBatch = in_array($program, $batchTrackedPrograms, true) && tableExists($conn, 'import_batches');
 
@@ -107,6 +111,7 @@ try {
         'programId' => $programId,
         'batchId' => $batchId,
         'importMonthRaw' => $importMonthRaw,
+        'importDurationMonths' => $importDurationMonths,
         'importYearRaw' => $importYearRaw,
         'spesCategory' => $spesCategoryRaw,
         'wiirpCategory' => $wiirpCategoryRaw,

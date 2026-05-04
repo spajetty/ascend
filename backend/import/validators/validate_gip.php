@@ -41,16 +41,23 @@ function validateGip(mysqli $conn, array $rows, string $gipCategory = ''): array
             continue;
         }
 
+        // Required GIP fields (not all headers are required to have values)
         $requiredFields = [
+            // Basic info
+            'Last Name' => ['Last Name', 'LastName', 'lname'],
+            'First Name' => ['First Name', 'FirstName', 'fname'],
+            'Sex' => ['Sex', 'sex', 'Gender', 'gender'],
+            'Contact Number' => ['Contact Number', 'Contact', 'contact'],
+
+            // GIP-required program fields
             'School Name' => ['School Name', 'School', 'school'],
-            'Year Level' => ['Year Level', 'year_level'],
+            'College/SHS' => ['College/SHS', 'College or SHS', 'college_or_shs'],
+            'Office Assignment' => ['Office Assignment', 'office_assignment'],
             'Course/Degree/Strand' => ['Course/Degree/Strand', 'Course', 'course'],
-            'Required Work Immersion / Internship Hours' => ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'],
+            'Required Hours' => ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'],
             'Preferred Host Organization Type' => ['Preferred Host Organization Type', 'preferred_org_type'],
             'Preferred Industry / Field of Internship' => ['Preferred Industry / Field of Internship', 'preferred_industry'],
             'Are you willing to be assigned outside your preferred field if not available?' => ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'],
-            'Internship Schedule / Availability' => ['Internship Schedule / Availability', 'internship_sched'],
-            'Internship Availability Date (Start of Internship)' => ['Internship Availability Date (Start of Internship)', 'Starting Date', 'start'],
         ];
 
         $missing = [];
@@ -68,12 +75,15 @@ function validateGip(mysqli $conn, array $rows, string $gipCategory = ''): array
             continue;
         }
 
-        $startDate = parseExcelDate(rowValue($row, ['Internship Availability Date (Start of Internship)', 'Starting Date', 'start'], ''));
-        $previewRow['_parsed_start_date'] = $startDate;
-        if ($startDate !== null && $startDate !== '') {
-            $previewRow['Internship Availability Date (Start of Internship)'] = date('d/m/Y', strtotime($startDate));
-            $previewRow['Starting Date'] = date('d/m/Y', strtotime($startDate));
-        }
+        // parse optional fields
+        $previewRow['school'] = s(rowValue($row, ['School Name', 'School', 'school'], ''));
+        $previewRow['course'] = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
+        $previewRow['required_hours'] = parseIntNullable(rowValue($row, ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'], ''));
+        $previewRow['preferred_org_type'] = s(rowValue($row, ['Preferred Host Organization Type', 'preferred_org_type'], ''));
+        $previewRow['preferred_industry'] = s(rowValue($row, ['Preferred Industry / Field of Internship', 'preferred_industry'], ''));
+        $previewRow['is_willing_outside'] = toBoolInt(rowValue($row, ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'], ''));
+        $previewRow['office_assignment'] = s(rowValue($row, ['Office Assignment', 'office_assignment'], ''));
+        $previewRow['college_or_shs'] = s(rowValue($row, ['College/SHS', 'College or SHS', 'college_or_shs', 'college_or_shs'], ''));
 
         $excelDupKey = buildExcelDuplicateKey($fname, $lname, null);
         if ($excelDupKey !== null) {
