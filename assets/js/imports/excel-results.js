@@ -38,7 +38,10 @@ function getRollbackEntityLabel(program) {
 }
 
 function shouldShowEmployerResultsTab(data) {
-    if (['Work Immersion and Internship Referral Program', 'Government Internship Program', 'SPES'].includes(data.program || '')) {
+    if (['Work Immersion and Internship Referral Program', 
+        'Government Internship Program', 'SPES', 
+        'Workers Hiring for Infrastructure Projects - Beneficiaries', 
+        'Workers Hiring for Infrastructure Projects — Beneficiaries'].includes(data.program || '')) {
         return false;
     }
     return true;
@@ -51,6 +54,7 @@ function getProceedButtonLabel(program) {
         'First Time Jobseeker': 'FTJS',
         'Work Immersion and Internship Referral Program': 'WIIRP',
         'Workers Hiring for Infrastructure Projects - Beneficiaries': 'WHIP',
+        'Workers Hiring for Infrastructure Projects - Projects': 'Projects',
         'Government Internship Program': 'GIP',
     };
     const abbr = ACRONYMS[p] || null;
@@ -171,18 +175,13 @@ function statCard(value, label, c, iconPath) {
 export function renderImportResultsView(data) {
     if (!importResultsView || !importResultsSummary || !importResultsWarnings) return;
     const isSchools = (data.program || '') === 'Schools';
-    const isWhipBeneficiaries = (data.program || '') === 'Workers Hiring for Infrastructure Projects - Beneficiaries';
     const showEmployerTab = shouldShowEmployerResultsTab(data);
     const primaryLabel = isSchools
         ? 'New Schools'
-        : isWhipBeneficiaries
-            ? 'New WHIP Beneficiaries'
-            : 'New Employers';
+        : 'New Employers';
     const emptyPrimaryLabel = isSchools
         ? 'No new schools were created in this import.'
-        : isWhipBeneficiaries
-            ? 'No new WHIP beneficiaries were created in this import.'
-            : 'No new employers were created in this import.';
+        : 'No new employers were created in this import.';
     const createdItems = isSchools
         ? (data.newSchools || [])
         : showEmployerTab
@@ -272,7 +271,7 @@ export function renderImportResultsView(data) {
                     <span class="ml-auto inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">New</span>
                 </div>`).join('');
             newEmployersPanel.innerHTML = `
-                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${createdItems.length} ${isSchools ? 'school' : isWhipBeneficiaries ? 'WHIP beneficiary' : 'employer'}${createdItems.length !== 1 ? 's' : ''} created</p></div>
+                <div class="mb-3"><p class="text-sm font-semibold text-gray-700">${createdItems.length} ${isSchools ? 'school' : 'employer'}${createdItems.length !== 1 ? 's' : ''} created</p></div>
                 <div class="space-y-1 rounded-xl border border-gray-100 overflow-hidden">${items}</div>`;
         }
     }
