@@ -144,7 +144,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/employers-engagement/accreditation" class="text-sm text-green-600 hover:text-green-800 font-medium">See More →</a>
+                <a href="/pages/programs/emp-engagement/emp-accreditation.php" class="text-sm text-green-600 hover:text-green-800 font-medium">See More →</a>
             </div>
         </div>
 
@@ -201,7 +201,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/employers-engagement/whip" class="text-sm text-orange-600 hover:text-orange-800 font-medium">See More →</a>
+                <a href="/pages/programs/emp-engagement/whip.php" class="text-sm text-orange-600 hover:text-orange-800 font-medium">See More →</a>
             </div>
         </div>
 
