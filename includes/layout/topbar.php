@@ -5,7 +5,9 @@
         <button id="toggleSidebar" class="hidden md:flex mr-3 p-2 rounded-full hover:bg-gray-100 hover:shadow-sm transition items-center justify-center">
             <svg id="toggleIcon" class="w-5 h-5 text-gray-600 transition-transform duration-300"
                  fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <polyline points="15 18 9 12 15 6"/>
+                <line x1="3" y1="6" x2="21" y2="6"/>
+                <line x1="3" y1="12" x2="21" y2="12"/>
+                <line x1="3" y1="18" x2="21" y2="18"/>
             </svg>
         </button>
         <h1 class="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">

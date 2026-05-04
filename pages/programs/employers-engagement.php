@@ -19,9 +19,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <line x1="19" y1="12" x2="5" y2="12"/>
                 <polyline points="12 19 5 12 12 5"/>
             </svg>
-            Back
+            Back to Employment Programs
         </a>
-        <h2 class="text-2xl font-extrabold text-gray-900">Employers Engagement Section</h2>
     </div>
 
     <div class="px-6 md:px-8 py-6">
