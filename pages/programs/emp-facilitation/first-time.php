@@ -12,9 +12,19 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-6 md:px-8 pt-6">
+        <a href="/pages/programs/employment-facilitation.php"
+           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back
+        </a>
+        <h2 class="text-2xl font-extrabold text-gray-900">First-Time Jobseekers</h2>
+    </div>
 
-        <!-- Summary Cards -->
+    <div class="px-6 md:px-8 py-6">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
             <!-- Total Jobseekers -->
