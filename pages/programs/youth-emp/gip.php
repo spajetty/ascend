@@ -244,7 +244,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td class="px-4 py-3 text-center font-bold text-gray-700">900 hrs</td>
+                            <td class="px-4 py-3 text-center font-bold text-gray-700">—</td>
                             <td class="px-3 py-3 text-center text-gray-700 border-l border-gray-100">30</td>
                             <td class="px-3 py-3 text-center text-gray-700">45</td>
                             <td class="px-3 py-3 text-center font-bold text-teal-600 bg-teal-100">75</td>

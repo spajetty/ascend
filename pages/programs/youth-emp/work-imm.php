@@ -216,7 +216,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <table class="w-full text-xs" id="wiTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">MONTH</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">CONTRACT PERIOD</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium w-28" rowspan="2">COLLEGE / SHS</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">COURSE</th>
@@ -438,7 +438,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         <!-- TOTAL Row -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
                             <td class="px-3 py-3 text-gray-800 font-bold" colspan="5">TOTAL</td>
-                            <td class="px-3 py-3 text-center font-bold text-gray-700">1,520 hrs</td>
+                            <td class="px-3 py-3 text-center font-bold text-gray-700">—</td>
                             <!-- Participants -->
                             <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-2 py-3 text-center text-gray-700">83</td><td class="px-2 py-3 text-center font-bold text-teal-600 bg-teal-100">151</td>
                             <!-- Inquired -->

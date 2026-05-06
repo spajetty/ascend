@@ -271,7 +271,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         <!-- TOTAL -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
                             <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
-                            <td class="px-4 py-2 font-bold text-gray-700">900 hrs</td>
+                            <td class="px-4 py-2 font-bold text-gray-700">—</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-2 text-center text-gray-700">45</td><td class="px-2 py-2 text-center font-bold text-teal-600 bg-teal-100">75</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">19</td><td class="px-2 py-2 text-center text-gray-700">30</td><td class="px-2 py-2 text-center font-bold text-pink-500 bg-pink-100">49</td>
                         </tr>
@@ -292,7 +292,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100">
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">MONTH</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">CONTRACT PERIOD</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COLLEGE / SHS</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COURSE</th>
@@ -365,7 +365,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         <!-- TOTAL -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
                             <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
-                            <td class="px-4 py-2 font-bold text-gray-700">1520 hrs</td>
+                            <td class="px-4 py-2 font-bold text-gray-700">—</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-2 py-2 text-center text-gray-700">83</td><td class="px-2 py-2 text-center font-bold text-orange-500 bg-orange-100">151</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">85</td><td class="px-2 py-2 text-center text-gray-700">102</td><td class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100">187</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-2 py-2 text-center text-gray-700">83</td><td class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100">151</td>
