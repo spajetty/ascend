@@ -26,66 +26,151 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     <div class="px-6 md:px-8 py-2 pb-8">
 
         <!-- ===== SUMMARY CARDS ===== -->
-        <!-- Row 1: 4 main metric cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <!-- Row 1: Pipeline funnel metrics -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
 
             <!-- Total Interns -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">720</span>
-                    <div class="bg-teal-100 p-2 rounded-lg">
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">75</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">30M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">45F</span>
+                        </div>
+                    </div>
+                    <div class="bg-teal-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Total Interns</span>
+                <span class="text-xs text-gray-500">Total Participants</span>
             </div>
 
-            <!-- Male Interns -->
+            <!-- Total Inquired -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">397</span>
-                        <span class="text-xs text-gray-400 ml-1">M</span>
-                        <span class="mx-1 text-gray-300">/</span>
-                        <span class="text-2xl font-bold text-gray-800">323</span>
-                        <span class="text-xs text-gray-400 ml-1">F</span>
+                        <span class="text-2xl font-bold text-gray-800">92</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">38M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">54F</span>
+                        </div>
                     </div>
-                    <div class="bg-blue-100 p-2 rounded-lg">
+                    <div class="bg-blue-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Male / Female Interns</span>
+                <span class="text-xs text-gray-500">Total Inquired</span>
             </div>
 
-            <!-- Total PESO Accepted -->
+            <!-- Total Referred -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-violet-400">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">75</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">30M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">45F</span>
+                        </div>
+                    </div>
+                    <div class="bg-violet-100 p-2.5 rounded-xl">
+                        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500">Total Referred</span>
+            </div>
+
+            <!-- Total Interviewed -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-amber-400">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">61</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">25M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">36F</span>
+                        </div>
+                    </div>
+                    <div class="bg-amber-100 p-2.5 rounded-xl">
+                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500">Total Interviewed</span>
+            </div>
+        </div>
+
+        <!-- Row 2: Acceptance outcomes -->
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+
+            <!-- PESO-Accepted -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">49</span>
-                    <div class="bg-orange-100 p-2 rounded-lg">
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">49</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">19M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">30F</span>
+                        </div>
+                    </div>
+                    <div class="bg-orange-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Total PESO Accepted</span>
+                <span class="text-xs text-gray-500">PESO-Accepted</span>
             </div>
 
-            <!-- Total Schools / Universities -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
+            <!-- Privately-Accepted -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">3</span>
-                    <div class="bg-purple-100 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">14</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">6M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">8F</span>
+                        </div>
+                    </div>
+                    <div class="bg-green-100 p-2.5 rounded-xl">
+                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Total Schools / Universities</span>
+                <span class="text-xs text-gray-500">Privately-Accepted</span>
+            </div>
+
+            <!-- Not Proceeded -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <span class="text-2xl font-bold text-gray-800">8</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">4M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">4F</span>
+                        </div>
+                    </div>
+                    <div class="bg-red-100 p-2.5 rounded-xl">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500">Not Proceeded</span>
             </div>
         </div>
 
@@ -131,49 +216,79 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <table class="w-full text-xs" id="gipTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-40">CONTRACT PERIOD</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium">SCHOOL</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-28">COLLEGE / SHS</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-24">COURSE</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium">OFFICE ASSIGNMENT</th>
-                            <th class="px-4 py-3 text-center text-gray-500 font-medium w-20">REQ. HRS.</th>
-                            <th colspan="3" class="px-2 py-3 text-center text-teal-600 font-semibold tracking-wide border-l border-gray-100">PARTICIPANTS</th>
-                            <th colspan="3" class="px-2 py-3 text-center text-orange-500 font-semibold tracking-wide border-l border-gray-100">PESO-ACCEPTED</th>
-                            <th class="px-2 py-3 text-center text-gray-400 font-semibold tracking-wide border-l border-gray-100">ACTIONS</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-36" rowspan="2">CONTRACT PERIOD</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-28" rowspan="2">COLLEGE / SHS</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">COURSE</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
+                            <th class="px-3 py-3 text-center text-gray-500 font-medium w-20" rowspan="2">REQ. HRS.</th>
+                            <!-- Group headers -->
+                            <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">INQUIRED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-violet-500 font-semibold border-l border-gray-100">REFERRED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-amber-500 font-semibold border-l border-gray-100">INTERVIEWED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-500 font-semibold border-l border-gray-100">PESO-ACCEPTED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold border-l border-gray-100">PRIVATELY-ACCEPTED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold border-l border-gray-100">NOT PROCEEDED</th>
+                            <th class="px-2 py-2 text-center text-gray-400 font-semibold border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th colspan="6" class="border-b border-gray-100"></th>
                             <!-- Participants -->
-                            <th class="px-3 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-3 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-3 py-2 text-center font-semibold text-teal-600">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-teal-600">T</th>
+                            <!-- Inquired -->
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-blue-500">T</th>
+                            <!-- Referred -->
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-violet-500">T</th>
+                            <!-- Interviewed -->
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-amber-500">T</th>
                             <!-- PESO-Accepted -->
-                            <th class="px-3 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-3 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-3 py-2 text-center font-semibold text-orange-500">T</th>
-                            <th class="border-l border-gray-100"></th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-orange-500">T</th>
+                            <!-- Privately-Accepted -->
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-green-500">T</th>
+                            <!-- Not Proceeded -->
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
+                            <th class="px-2 py-2 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
                     <tbody>
 
                         <!-- Row 1 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="davao del sur state college" data-type="college">
-                            <td class="px-4 py-3 text-gray-700 font-medium">January – March 2026</td>
-                            <td class="px-4 py-3 text-gray-700">Davao del Sur State College</td>
-                            <td class="px-4 py-3">
+                            <td class="px-3 py-3 text-gray-700 font-medium">January – March 2026</td>
+                            <td class="px-3 py-3 text-gray-700">Davao del Sur State College</td>
+                            <td class="px-3 py-3">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
                             </td>
-                            <td class="px-4 py-3 text-gray-600">BSBA</td>
-                            <td class="px-4 py-3 text-gray-600">PESO Digos City Office</td>
-                            <td class="px-4 py-3 text-center text-gray-700 font-medium">300</td>
+                            <td class="px-3 py-3 text-gray-600">BSBA</td>
+                            <td class="px-3 py-3 text-gray-600">PESO Digos City Office</td>
+                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
                             <!-- Participants -->
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">8</td>
-                            <td class="px-3 py-3 text-center text-gray-600">12</td>
-                            <td class="px-3 py-3 text-center font-semibold text-teal-600 bg-teal-50">20</td>
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">20</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">25</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">20</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-600">10</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">16</td>
                             <!-- PESO-Accepted -->
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">5</td>
-                            <td class="px-3 py-3 text-center text-gray-600">8</td>
-                            <td class="px-3 py-3 text-center font-semibold text-orange-500 bg-orange-50">13</td>
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-3 text-center text-gray-600">8</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">13</td>
+                            <!-- Privately-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">3</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">5</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-3 text-center text-gray-600">2</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">3</td>
                             <!-- Actions -->
                             <td class="px-3 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="1">
@@ -187,20 +302,29 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
                         <!-- Row 2 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="holy cross of davao college" data-type="college">
-                            <td class="px-4 py-3 text-gray-700 font-medium">February – April 2026</td>
-                            <td class="px-4 py-3 text-gray-700">Holy Cross of Davao College</td>
-                            <td class="px-4 py-3">
+                            <td class="px-3 py-3 text-gray-700 font-medium">February – April 2026</td>
+                            <td class="px-3 py-3 text-gray-700">Holy Cross of Davao College</td>
+                            <td class="px-3 py-3">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
                             </td>
-                            <td class="px-4 py-3 text-gray-600">BSIT</td>
-                            <td class="px-4 py-3 text-gray-600">DOLE Regional Office XI</td>
-                            <td class="px-4 py-3 text-center text-gray-700 font-medium">300</td>
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">10</td>
-                            <td class="px-3 py-3 text-center text-gray-600">15</td>
-                            <td class="px-3 py-3 text-center font-semibold text-teal-600 bg-teal-50">25</td>
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">6</td>
-                            <td class="px-3 py-3 text-center text-gray-600">10</td>
-                            <td class="px-3 py-3 text-center font-semibold text-orange-500 bg-orange-50">16</td>
+                            <td class="px-3 py-3 text-gray-600">BSIT</td>
+                            <td class="px-3 py-3 text-gray-600">DOLE Regional Office XI</td>
+                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">25</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-2 py-3 text-center text-gray-600">20</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">34</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">25</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">20</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-600">10</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">16</td>
+                            <!-- Privately-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">3</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">5</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">1</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">3</td>
+                            <!-- Actions -->
                             <td class="px-3 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="2">
                                     <button onclick="toggleEditMode(2)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -213,20 +337,29 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
                         <!-- Row 3 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="university of southeastern philippines" data-type="college">
-                            <td class="px-4 py-3 text-gray-700 font-medium">March – May 2026</td>
-                            <td class="px-4 py-3 text-gray-700">University of Southeastern Philippines</td>
-                            <td class="px-4 py-3">
+                            <td class="px-3 py-3 text-gray-700 font-medium">March – May 2026</td>
+                            <td class="px-3 py-3 text-gray-700">University of Southeastern Philippines</td>
+                            <td class="px-3 py-3">
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
                             </td>
-                            <td class="px-4 py-3 text-gray-600">BSED</td>
-                            <td class="px-4 py-3 text-gray-600">PESO Provincial Office</td>
-                            <td class="px-4 py-3 text-center text-gray-700 font-medium">300</td>
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">12</td>
-                            <td class="px-3 py-3 text-center text-gray-600">18</td>
-                            <td class="px-3 py-3 text-center font-semibold text-teal-600 bg-teal-50">30</td>
-                            <td class="px-3 py-3 text-center text-gray-600 border-l border-gray-100">8</td>
-                            <td class="px-3 py-3 text-center text-gray-600">12</td>
-                            <td class="px-3 py-3 text-center font-semibold text-orange-500 bg-orange-50">20</td>
+                            <td class="px-3 py-3 text-gray-600">BSED</td>
+                            <td class="px-3 py-3 text-gray-600">PESO Provincial Office</td>
+                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-3 text-center text-gray-600">18</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">30</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-2 py-3 text-center text-gray-600">19</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">33</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-3 text-center text-gray-600">18</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">30</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">11</td><td class="px-2 py-3 text-center text-gray-600">14</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">25</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">20</td>
+                            <!-- Privately-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">2</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">4</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-3 text-center text-gray-600">1</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">2</td>
+                            <!-- Actions -->
                             <td class="px-3 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="3">
                                     <button onclick="toggleEditMode(3)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
@@ -239,18 +372,22 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
                         <!-- TOTAL Row -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-                            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td class="px-4 py-3 text-center font-bold text-gray-700">—</td>
-                            <td class="px-3 py-3 text-center text-gray-700 border-l border-gray-100">30</td>
-                            <td class="px-3 py-3 text-center text-gray-700">45</td>
-                            <td class="px-3 py-3 text-center font-bold text-teal-600 bg-teal-100">75</td>
-                            <td class="px-3 py-3 text-center text-gray-700 border-l border-gray-100">19</td>
-                            <td class="px-3 py-3 text-center text-gray-700">30</td>
-                            <td class="px-3 py-3 text-center font-bold text-orange-500 bg-orange-100">49</td>
+                            <td class="px-3 py-3 text-gray-800 font-bold" colspan="5">TOTAL</td>
+                            <td class="px-3 py-3 text-center font-bold text-gray-700">—</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-3 text-center text-gray-700">45</td><td class="px-2 py-3 text-center font-bold text-teal-600 bg-teal-100">75</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">38</td><td class="px-2 py-3 text-center text-gray-700">54</td><td class="px-2 py-3 text-center font-bold text-blue-500 bg-blue-100">92</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-3 text-center text-gray-700">45</td><td class="px-2 py-3 text-center font-bold text-violet-500 bg-violet-100">75</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">25</td><td class="px-2 py-3 text-center text-gray-700">36</td><td class="px-2 py-3 text-center font-bold text-amber-500 bg-amber-100">61</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">19</td><td class="px-2 py-3 text-center text-gray-700">30</td><td class="px-2 py-3 text-center font-bold text-orange-500 bg-orange-100">49</td>
+                            <!-- Privately-Accepted -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-700">8</td><td class="px-2 py-3 text-center font-bold text-green-500 bg-green-100">14</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">4</td><td class="px-2 py-3 text-center text-gray-700">4</td><td class="px-2 py-3 text-center font-bold text-red-400 bg-red-100">8</td>
                             <td class="border-l border-gray-100"></td>
                         </tr>
                     </tbody>
@@ -331,12 +468,12 @@ function getVisibleFilteredRows() {
 }
 
 function applyFilters() {
-    const query  = document.getElementById('searchSchool').value.toLowerCase().trim();
-    const type   = document.getElementById('filterType').value.toLowerCase();
+    const query = document.getElementById('searchSchool').value.toLowerCase().trim();
+    const type  = document.getElementById('filterType').value.toLowerCase();
 
     getAllDataRows().forEach(row => {
-        const school    = (row.dataset.school || '').toLowerCase();
-        const rowType   = (row.dataset.type  || '').toLowerCase();
+        const school  = (row.dataset.school || '').toLowerCase();
+        const rowType = (row.dataset.type  || '').toLowerCase();
 
         const matchSearch = !query || school.includes(query);
         const matchType   = !type  || rowType === type;
@@ -402,9 +539,9 @@ function toggleEditMode(rowId) {
     if (row.classList.contains('editing')) { cancelEdit(null, rowId); return; }
 
     row.classList.add('editing', 'bg-yellow-50');
-    // Editable: numeric cells only (participants & PESO-accepted = last 6 tds before actions)
+    // Editable: all numeric cells (indices 6 to end, excluding last actions cell)
     const allCells = Array.from(row.querySelectorAll('td'));
-    const editableCells = allCells.slice(6, 12); // indices 6-11
+    const editableCells = allCells.slice(6, -1);
     editableCells.forEach((cell, idx) => {
         editingData[`cell_${rowId}_${idx}`] = cell.textContent.trim();
         cell.contentEditable = 'true';
@@ -421,7 +558,7 @@ function cancelEdit(event, rowId) {
     const row = getRowByIndex(rowId);
     if (!row) return;
     const allCells = Array.from(row.querySelectorAll('td'));
-    const editableCells = allCells.slice(6, 12);
+    const editableCells = allCells.slice(6, -1);
     editableCells.forEach((cell, idx) => {
         cell.contentEditable = 'false';
         cell.textContent = editingData[`cell_${rowId}_${idx}`] || '';
@@ -479,7 +616,7 @@ function confirmSave() {
     const row = getRowByIndex(savingRowId);
     if (row) {
         const allCells = Array.from(row.querySelectorAll('td'));
-        const editableCells = allCells.slice(6, 12);
+        const editableCells = allCells.slice(6, -1);
         editableCells.forEach(cell => {
             cell.contentEditable = 'false';
             cell.classList.remove('border', 'border-yellow-300', 'bg-white');

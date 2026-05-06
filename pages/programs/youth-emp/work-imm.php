@@ -185,17 +185,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 </select>
             </div>
 
-            <!-- College / SHS filter -->
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Type:</span>
-                <select id="filterType" onchange="applyFilters()"
-                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option value="">All</option>
-                    <option value="college">College</option>
-                    <option value="shs">SHS</option>
-                </select>
-            </div>
-
             <!-- Search school -->
             <div class="relative flex-1 max-w-sm">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -218,7 +207,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">CONTRACT PERIOD</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-28" rowspan="2">COLLEGE / SHS</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-28" rowspan="2">YEAR LEVEL</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">COURSE</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
                             <th class="px-3 py-3 text-center text-gray-500 font-medium w-20" rowspan="2">REQ. HRS.</th>

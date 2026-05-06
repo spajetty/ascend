@@ -226,15 +226,42 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">REQ. HRS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">INQUIRED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-teal-500 font-semibold border-l border-gray-100">REFERRED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-purple-500 font-semibold border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-pink-500 font-semibold border-l border-gray-100">PESO-ACCEPTED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold border-l border-gray-100">PRIVATE-ACCEPTED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold border-l border-gray-100">NOT PROCEEDED</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
+                            <!-- Participants -->
                             <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
                             <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
                             <th class="px-2 py-1 text-center font-semibold text-teal-600">T</th>
+                            <!-- Inquired -->
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
+                            <th class="px-2 py-1 text-center font-semibold text-blue-500">T</th>
+                            <!-- Referred -->
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
+                            <th class="px-2 py-1 text-center font-semibold text-teal-500">T</th>
+                            <!-- Interviewed -->
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
+                            <th class="px-2 py-1 text-center font-semibold text-purple-500">T</th>
+                            <!-- PESO-Accepted -->
                             <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
                             <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
                             <th class="px-2 py-1 text-center font-semibold text-pink-500">T</th>
+                            <!-- Private-Accepted -->
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
+                            <th class="px-2 py-1 text-center font-semibold text-green-500">T</th>
+                            <!-- Not Proceeded -->
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th>
+                            <th class="px-2 py-1 text-center text-gray-400 font-medium">F</th>
+                            <th class="px-2 py-1 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -245,8 +272,20 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <td class="px-4 py-2 text-gray-600">BSBA</td>
                             <td class="px-4 py-2 text-gray-600">PESO Digos City Office</td>
                             <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">20</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-2 text-center text-gray-600">8</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">13</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
                         </tr>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
                             <td class="px-4 py-2 text-gray-700 font-semibold">February – April 2026</td>
@@ -255,8 +294,20 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <td class="px-4 py-2 text-gray-600">BSIT</td>
                             <td class="px-4 py-2 text-gray-600">DOLE Regional Office XI</td>
                             <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">25</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-2 text-center text-gray-600">10</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">16</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
                         </tr>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
                             <td class="px-4 py-2 text-gray-700 font-semibold">March – May 2026</td>
@@ -265,15 +316,32 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <td class="px-4 py-2 text-gray-600">BSED</td>
                             <td class="px-4 py-2 text-gray-600">PESO Provincial Office</td>
                             <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-2 text-center text-gray-600">18</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">30</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
                             <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">20</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
                         </tr>
                         <!-- TOTAL -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
                             <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
                             <td class="px-4 py-2 font-bold text-gray-700">—</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-2 text-center text-gray-700">45</td><td class="px-2 py-2 text-center font-bold text-teal-600 bg-teal-100">75</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-purple-500 bg-purple-100">0</td>
                             <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">19</td><td class="px-2 py-2 text-center text-gray-700">30</td><td class="px-2 py-2 text-center font-bold text-pink-500 bg-pink-100">49</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-green-500 bg-green-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-red-400 bg-red-100">0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -294,7 +362,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">CONTRACT PERIOD</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COLLEGE / SHS</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">YEAR LEVEL</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COURSE</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
                             <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">REQ. HRS</th>
