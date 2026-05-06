@@ -92,6 +92,16 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     <option>2024</option>
                 </select>
             </div>
+
+            <!-- Search school -->
+            <div class="relative flex-1 max-w-sm">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" id="searchSchool" placeholder="Search school..."
+                    oninput="applyFilters()"
+                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+            </div>
         </div>
 
         <!-- Table -->
@@ -115,7 +125,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     <tbody>
 
                         <!-- Row 1 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
                             <td class="px-4 py-3 text-gray-700 font-medium">January 15, 2026</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">48</td>
@@ -148,7 +158,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         </tr>
 
                         <!-- Row 2 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
                             <td class="px-4 py-3 text-gray-700 font-medium">January 29, 2026</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">62</td>
@@ -181,7 +191,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         </tr>
 
                         <!-- Row 3 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
                             <td class="px-4 py-3 text-gray-700 font-medium">February 1, 2026</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">55</td>
@@ -299,30 +309,52 @@ function getAllDataRows() {
     return Array.from(document.querySelectorAll('tbody tr:not(.total-row)'));
 }
 
+function getVisibleFilteredRows() {
+    return getAllDataRows().filter(r => r.dataset.filtered !== 'true');
+}
+
+function applyFilters() {
+    const query = document.getElementById('searchSchool').value.toLowerCase().trim();
+
+    getAllDataRows().forEach(row => {
+        const school = (row.dataset.school || '').toLowerCase();
+        const matchSearch = !query || school.includes(query);
+
+        row.dataset.filtered = matchSearch ? 'false' : 'true';
+        if (row.dataset.filtered === 'true') row.style.display = 'none';
+    });
+
+    currentPage = 1;
+    renderPage();
+}
+
 function getTotalPages() {
-    return Math.max(1, Math.ceil(getAllDataRows().length / ROWS_PER_PAGE));
+    return Math.max(1, Math.ceil(getVisibleFilteredRows().length / ROWS_PER_PAGE));
 }
 
 function renderPage() {
-    const rows = getAllDataRows();
+    const rows = getVisibleFilteredRows();
     const total = rows.length;
     const totalPages = getTotalPages();
     const start = (currentPage - 1) * ROWS_PER_PAGE;
     const end = Math.min(start + ROWS_PER_PAGE, total);
 
+    getAllDataRows().forEach(r => {
+        if (r.dataset.filtered === 'true') r.style.display = 'none';
+    });
     rows.forEach((row, i) => {
         row.style.display = (i >= start && i < end) ? '' : 'none';
     });
 
     document.getElementById('paginationInfo').textContent =
-        total === 0 ? 'No entries' : `Showing ${start + 1}–${end} of ${total} entries`;
+        total === 0 ? 'No entries found' : `Showing ${start + 1}–${end} of ${total} entries`;
 
     document.getElementById('prevBtn').disabled = currentPage <= 1;
-    document.getElementById('nextBtn').disabled = currentPage >= totalPages;
+    document.getElementById('nextBtn').disabled = currentPage >= getTotalPages();
 
     const container = document.getElementById('pageNumbers');
     container.innerHTML = '';
-    for (let p = 1; p <= totalPages; p++) {
+    for (let p = 1; p <= getTotalPages(); p++) {
         const btn = document.createElement('button');
         btn.textContent = p;
         btn.className = `px-3 py-1.5 rounded-lg text-sm border font-medium transition-colors ` +
@@ -444,6 +476,7 @@ document.addEventListener('click', (e) => {
     }
 });
 
+getAllDataRows().forEach(r => r.dataset.filtered = 'false');
 renderPage();
 </script>
 
