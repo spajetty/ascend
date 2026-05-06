@@ -12,6 +12,17 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
     <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>
 
+    <div class="px-6 md:px-8 pt-6">
+        <a href="/pages/programs/program.php"
+           class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="19" y1="12" x2="5" y2="12"/>
+                <polyline points="12 19 5 12 12 5"/>
+            </svg>
+            Back to Employment Programs
+        </a>
+    </div>
+
     <div class="px-6 md:px-8 py-6">
 
         <!-- Summary Cards -->
@@ -123,7 +134,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/career-development/cdsp" class="text-sm text-green-600 hover:text-green-800 font-medium">See More →</a>
+                <a href="/pages/programs/career-dev/cdsp.php" class="text-sm text-green-600 hover:text-green-800 font-medium">See More →</a>
             </div>
         </div>
 
@@ -179,7 +190,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </table>
             </div>
             <div class="flex justify-end px-6 py-3 border-t border-gray-100">
-                <a href="/programs/career-development/lmi" class="text-sm text-orange-600 hover:text-orange-800 font-medium">See More →</a>
+                <a href="/pages/programs/career-dev/lmi-orientation.php" class="text-sm text-orange-600 hover:text-orange-800 font-medium">See More →</a>
             </div>
         </div>
 

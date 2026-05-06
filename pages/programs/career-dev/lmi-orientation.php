@@ -2,8 +2,8 @@
 require_once __DIR__ . '/../../../includes/auth-check.php';
 
 $currentPage = 'programs';
-$pageTitle   = 'ASCEND PED System – Workers Hiring for Infrastructure Projects';
-$pageHeading = 'Workers Hiring for Infrastructure Projects';
+$pageTitle   = 'ASCEND PED System – LMI Orientation';
+$pageHeading = 'LMI Orientation';
 
 require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
@@ -13,69 +13,71 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
     <div class="px-6 md:px-8 pt-6">
-        <a href="/pages/programs/employers-engagement.php"
+        <a href="/pages/programs/career-development.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <line x1="19" y1="12" x2="5" y2="12"/>
                 <polyline points="12 19 5 12 12 5"/>
             </svg>
-            Back to Employers Engagement Section
+            Back to Career Development Section
         </a>
     </div>
 
     <div class="px-6 md:px-8 py-6">
+
+        <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
-            <!-- Workers Hired (Total) -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <!-- LMI Orientations -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">235</span>
-                    <div class="bg-blue-100 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM6 20a6 6 0 0112 0v2H6v-2z"/>
+                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <div class="bg-teal-100 p-2 rounded-lg">
+                        <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Workers Hired (Total)</span>
+                <span class="text-xs text-gray-500">LMI Orientations</span>
             </div>
 
-            <!-- Workers Hired (Male) -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <!-- LMI Participants (Total) -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+                <div class="flex items-center justify-between">
+                    <span class="text-2xl font-bold text-gray-800">1,067</span>
+                    <div class="bg-blue-100 p-2 rounded-lg">
+                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500">LMI Participants (Total)</span>
+            </div>
+
+            <!-- LMI Participants (Male) -->
+            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
                     <span class="text-2xl font-bold text-gray-800">165</span>
-                    <div class="bg-teal-100 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="bg-cyan-100 p-2 rounded-lg">
+                        <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Workers Hired (Male)</span>
+                <span class="text-xs text-gray-500">LMI Participants (Male)</span>
             </div>
 
-            <!-- Workers Hired (Female) -->
+            <!-- LMI Participants (Female) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">70</span>
+                    <span class="text-2xl font-bold text-gray-800">902</span>
                     <div class="bg-pink-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Workers Hired (Female)</span>
-            </div>
-
-            <!-- Infrastructure Projects -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
-                <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">3</span>
-                    <div class="bg-orange-100 p-2 rounded-lg">
-                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                    </div>
-                </div>
-                <span class="text-xs text-gray-500">Infrastructure Projects</span>
+                <span class="text-xs text-gray-500">LMI Participants (Female)</span>
             </div>
 
         </div>
@@ -92,40 +94,33 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             </div>
         </div>
 
-        <!-- Workers Hiring Table -->
+        <!-- Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="font-bold text-gray-800 text-base">Workers Hiring for Infrastructure Projects</h2>
-                <span class="text-sm font-semibold text-orange-500 bg-orange-100 px-3 py-1 rounded-full">235 Total</span>
+            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h2 class="font-bold text-gray-800 text-base">LMI Orientation</h2>
+                <span class="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">1,067 Total</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-36">MONTH</th>
-                            <th class="px-4 py-3 text-center text-teal-600 font-semibold border-l border-gray-100">MALE</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-40">DATE</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">SCHOOL / INSTITUTION / EVENT</th>
+                            <th class="px-4 py-3 text-center text-cyan-500 font-semibold border-l border-gray-100">MALE</th>
                             <th class="px-4 py-3 text-center text-pink-500 font-semibold border-l border-gray-100">FEMALE</th>
-                            <th class="px-4 py-3 text-center text-orange-500 font-semibold border-l border-gray-100">TOTAL</th>
-                            <th class="px-4 py-3 text-center text-gray-500 font-semibold border-l border-gray-100">PROJECTS</th>
+                            <th class="px-4 py-3 text-center text-blue-600 font-semibold border-l border-gray-100">TOTAL</th>
                             <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody>
 
-                        <!-- January 2026 -->
+                        <!-- Row 1 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700 font-medium">January 2026</td>
+                            <td class="px-4 py-3 text-gray-700 font-medium">January 15, 2026</td>
+                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School / Event Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">48</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">22</td>
-                            <td class="px-4 py-3 text-center font-semibold text-orange-500 bg-orange-50 border-l border-gray-100">70</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">
-                                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg font-medium">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-                                    </svg>
-                                    Project Name
-                                </span>
-                            </td>
+                            <td class="px-4 py-3 text-center font-semibold text-blue-600 bg-blue-50 border-l border-gray-100">70</td>
                             <td class="px-4 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="1">
                                     <button onclick="toggleEditMode(1)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
@@ -152,20 +147,13 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             </td>
                         </tr>
 
-                        <!-- February 2026 -->
+                        <!-- Row 2 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700 font-medium">February 2026</td>
+                            <td class="px-4 py-3 text-gray-700 font-medium">January 29, 2026</td>
+                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School / Event Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">62</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">18</td>
-                            <td class="px-4 py-3 text-center font-semibold text-orange-500 bg-orange-50 border-l border-gray-100">80</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">
-                                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg font-medium">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-                                    </svg>
-                                    Project Name
-                                </span>
-                            </td>
+                            <td class="px-4 py-3 text-center font-semibold text-blue-600 bg-blue-50 border-l border-gray-100">80</td>
                             <td class="px-4 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="2">
                                     <button onclick="toggleEditMode(2)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
@@ -192,20 +180,13 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             </td>
                         </tr>
 
-                        <!-- March 2026 -->
+                        <!-- Row 3 -->
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-4 py-3 text-gray-700 font-medium">March 2026</td>
+                            <td class="px-4 py-3 text-gray-700 font-medium">February 1, 2026</td>
+                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School / Event Name</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">55</td>
                             <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">30</td>
-                            <td class="px-4 py-3 text-center font-semibold text-orange-500 bg-orange-50 border-l border-gray-100">85</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">
-                                <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg font-medium">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-                                    </svg>
-                                    Project Name
-                                </span>
-                            </td>
+                            <td class="px-4 py-3 text-center font-semibold text-blue-600 bg-blue-50 border-l border-gray-100">85</td>
                             <td class="px-4 py-3 text-center border-l border-gray-100">
                                 <div class="flex items-center justify-center gap-2 action-buttons" data-row="3">
                                     <button onclick="toggleEditMode(3)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
@@ -235,10 +216,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         <!-- TOTAL Row -->
                         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
                             <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-                            <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">165</td>
-                            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">70</td>
-                            <td class="px-4 py-3 text-center font-bold text-orange-500 bg-orange-100 border-l border-gray-100">235</td>
-                            <td class="px-4 py-3 text-center border-l border-gray-100"></td>
+                            <td class="px-4 py-3 border-l border-gray-100"></td>
+                            <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">165</td>
+                            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">902</td>
+                            <td class="px-4 py-3 text-center font-bold text-blue-600 bg-blue-100 border-l border-gray-100">1,067</td>
                             <td class="border-l border-gray-100"></td>
                         </tr>
 
@@ -369,10 +350,10 @@ function toggleEditMode(rowId) {
     if (isEditing) { cancelEdit(null, rowId); return; }
 
     row.classList.add('editing', 'bg-yellow-50');
-    // editable cells: male, female, total (indices 0,1,2), skip projects (3)
+    // editable: school/event(0), male(1), female(2), total(3)
     const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
     cells.forEach((cell, idx) => {
-        if (idx < 3) {
+        if (idx < 4) {
             editingData[`cell_${rowId}_${idx}`] = cell.textContent.trim();
             cell.contentEditable = 'true';
             cell.classList.add('border', 'border-yellow-300', 'bg-white');
@@ -389,7 +370,7 @@ function cancelEdit(event, rowId) {
     const row = getRow(rowId);
     const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
     cells.forEach((cell, idx) => {
-        if (idx < 3) {
+        if (idx < 4) {
             cell.contentEditable = 'false';
             cell.textContent = editingData[`cell_${rowId}_${idx}`] || '';
             cell.classList.remove('border', 'border-yellow-300', 'bg-white');
@@ -440,7 +421,7 @@ function confirmSave() {
     const row = getRow(savingRowId);
     const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
     cells.forEach((cell, idx) => {
-        if (idx < 3) {
+        if (idx < 4) {
             cell.contentEditable = 'false';
             cell.classList.remove('border', 'border-yellow-300', 'bg-white');
         }
