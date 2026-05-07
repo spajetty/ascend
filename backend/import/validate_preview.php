@@ -53,6 +53,62 @@ if ($program === 'Employers Accreditation') {
     $validatedData = validateBeneficiaries($conn, $rows, $program);
 }
 
+function collectUnknownEmployers(mysqli $conn, array $rows, string $program): array {
+    $fieldGroups = [];
+
+    if ($program === 'Employers Accreditation') {
+        $fieldGroups = [
+            ['COMPANY', 'Company', 'CompanyName'],
+        ];
+    } elseif ($program === 'SPES') {
+        $fieldGroups = [
+            ['Company', 'company'],
+        ];
+    } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
+        $fieldGroups = [
+            ['Company', 'CompanyName', 'Employer'],
+        ];
+    } elseif (isWhipProjectsProgram($program)) {
+        $fieldGroups = [
+            ['Project Contractor', 'Company', 'contractor'],
+        ];
+    }
+
+    if ($fieldGroups === []) {
+        return [];
+    }
+
+    $existingEmployers = loadNormalizedEmployers($conn);
+    $unknownEmployers = [];
+
+    foreach ($rows as $row) {
+        $employerName = '';
+
+        foreach ($fieldGroups as $keys) {
+            $candidate = trim((string)rowValue($row, $keys, ''));
+            if ($candidate !== '') {
+                $employerName = $candidate;
+                break;
+            }
+        }
+
+        if ($employerName === '') {
+            continue;
+        }
+
+        $normalized = normalizeEmployerName($employerName);
+        if ($normalized === '' || isset($existingEmployers[$normalized])) {
+            continue;
+        }
+
+        if (!isset($unknownEmployers[$normalized])) {
+            $unknownEmployers[$normalized] = $employerName;
+        }
+    }
+
+    return array_values($unknownEmployers);
+}
+
 $newCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'new'));
 $invalidCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'invalid'));
 $duplicateCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'duplicate'));
@@ -60,6 +116,7 @@ $duplicateCount = count(array_filter($validatedData, fn($r) => ($r['badge_status
 echo json_encode([
     'success' => true,
     'data' => $validatedData,
+    'unknownEmployers' => collectUnknownEmployers($conn, $validatedData, $program),
     'summary' => [
         'total' => count($validatedData),
         'new' => $newCount,
