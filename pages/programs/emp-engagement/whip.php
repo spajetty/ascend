@@ -29,7 +29,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <!-- Workers Hired (Total) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">235</span>
+                    <span class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM6 20a6 6 0 0112 0v2H6v-2z"/>
@@ -42,7 +42,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <!-- Workers Hired (Male) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">165</span>
+                    <span class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -55,7 +55,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <!-- Workers Hired (Female) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">70</span>
+                    <span class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-pink-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -68,7 +68,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <!-- Infrastructure Projects -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">3</span>
+                    <span class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>

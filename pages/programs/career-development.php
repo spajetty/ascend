@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Participants -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">1,779</span>
+                    <span id="totalParticipants" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Career Dev Sessions -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span id="careerDevSessions" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-red-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- LMI Sessions -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span id="lmiSessions" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-purple-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -70,7 +70,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Schools Reached -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">1,067</span>
+                    <span id="lmiParticipants" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -98,37 +98,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-left px-4 py-3 text-green-600 font-semibold tracking-wide">TOTAL</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="cdspTableBody">
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 15, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">48</td>
-                            <td class="px-4 py-3 text-gray-600">22</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 29, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">62</td>
-                            <td class="px-4 py-3 text-gray-600">18</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">80</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">FEBRUARY 1, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">55</td>
-                            <td class="px-4 py-3 text-gray-600">30</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">85</td>
-                        </tr>
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 border-t-2 border-gray-200">
-                            <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-                            <td class="px-4 py-3 text-gray-400">—</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">165</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                            <td class="px-4 py-3">
-                                <span class="bg-green-200 text-green-800 font-bold text-xs px-3 py-1 rounded-full">235</span>
-                            </td>
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">Loading data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -154,37 +126,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-left px-4 py-3 text-orange-500 font-semibold tracking-wide">TOTAL</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="lmiTableBody">
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 15, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">48</td>
-                            <td class="px-4 py-3 text-gray-600">22</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 29, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">62</td>
-                            <td class="px-4 py-3 text-gray-600">18</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">80</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">FEBRUARY 1, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">55</td>
-                            <td class="px-4 py-3 text-gray-600">30</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">85</td>
-                        </tr>
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 border-t-2 border-gray-200">
-                            <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-                            <td class="px-4 py-3 text-gray-400">—</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">165</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                            <td class="px-4 py-3">
-                                <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">235</span>
-                            </td>
+                            <td colspan="5" class="px-6 py-8 text-center text-gray-500">Loading data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -196,5 +140,84 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     </div>
 </main>
+
+<script>
+async function loadCareerDevelopmentData() {
+    try {
+        const response = await fetch('/api/get-career-development-data.php');
+        const payload = await response.json();
+        if (!payload.success) return;
+
+        const stats = payload.stats || {};
+        document.getElementById('totalParticipants').textContent = Number(stats.totalParticipants || 0).toLocaleString();
+        document.getElementById('careerDevSessions').textContent = Number(stats.cdspSessions || 0).toLocaleString();
+        document.getElementById('lmiSessions').textContent = Number(stats.lmiSessions || 0).toLocaleString();
+        document.getElementById('lmiParticipants').textContent = Number(stats.lmiParticipants || 0).toLocaleString();
+
+        const formatDate = (value) => {
+            if (!value) return '—';
+            const d = new Date(`${value}T00:00:00`);
+            return Number.isNaN(d.getTime()) ? value : d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+        };
+
+        const renderRows = (rows, bodyId, totalColorClasses) => {
+            const tbody = document.getElementById(bodyId);
+            if (!Array.isArray(rows) || rows.length === 0) {
+                tbody.innerHTML = `<tr class="border-b border-gray-50 hover:bg-gray-50"><td colspan="5" class="px-6 py-8 text-center text-gray-500">No data found.</td></tr>`;
+                return;
+            }
+
+            const topRows = rows.slice(0, 5);
+            const maleTotal = topRows.reduce((sum, row) => sum + Number(row.male || 0), 0);
+            const femaleTotal = topRows.reduce((sum, row) => sum + Number(row.female || 0), 0);
+            const grandTotal = maleTotal + femaleTotal;
+
+            const dataRows = topRows.map((row) => `
+                <tr class="border-b border-gray-50 hover:bg-gray-50">
+                    <td class="px-6 py-3 text-gray-800 font-semibold">${formatDate(row.date)}</td>
+                    <td class="px-4 py-3 text-gray-600">${row.school || '—'}</td>
+                    <td class="px-4 py-3 text-gray-600">${row.male ?? 0}</td>
+                    <td class="px-4 py-3 text-gray-600">${row.female ?? 0}</td>
+                    <td class="px-4 py-3 text-gray-700 font-semibold">${row.total ?? 0}</td>
+                </tr>
+            `).join('');
+
+            const totalRow = `
+                <tr class="bg-gray-50 border-t-2 border-gray-200">
+                    <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+                    <td class="px-4 py-3 text-gray-400">—</td>
+                    <td class="px-4 py-3 text-gray-700 font-semibold">${maleTotal}</td>
+                    <td class="px-4 py-3 text-gray-700 font-semibold">${femaleTotal}</td>
+                    <td class="px-4 py-3"><span class="${totalColorClasses} font-bold text-xs px-3 py-1 rounded-full">${grandTotal}</span></td>
+                </tr>
+            `;
+
+            tbody.innerHTML = dataRows + totalRow;
+        };
+
+        const cdspRows = (payload.data?.cdsp || []).map((row) => ({
+            date: row.date,
+            school: row.school,
+            male: Number(row.cdsp_m || 0),
+            female: Number(row.cdsp_f || 0),
+            total: Number(row.total || 0)
+        }));
+        renderRows(cdspRows, 'cdspTableBody', 'bg-green-200 text-green-800');
+
+        const lmiRows = (payload.data?.lmi || []).map((row) => ({
+            date: row.date,
+            school: row.school,
+            male: Number(row.lmi_m || 0),
+            female: Number(row.lmi_f || 0),
+            total: Number(row.total || 0)
+        }));
+        renderRows(lmiRows, 'lmiTableBody', 'bg-orange-200 text-orange-700');
+    } catch (error) {
+        console.error('Error loading career development data:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadCareerDevelopmentData);
+</script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
