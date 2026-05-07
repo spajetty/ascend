@@ -8,7 +8,14 @@
                 <polyline points="15 18 9 12 15 6"/>
             </svg>
         </button>
-        <h1 class="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
+        <div id="topbarBreadcrumb" class="flex items-center gap-2 text-sm md:text-base font-semibold text-gray-500" style="display:none;">
+            <a href="#" class="text-gray-600 hover:text-gray-900 transition-colors" onclick="closeProfile(); return false;">Beneficiaries</a>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 18l6-6-6-6"/>
+            </svg>
+            <span class="text-gray-900">Profile</span>
+        </div>
+        <h1 id="topbarTitle" class="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
             <?= htmlspecialchars($pageHeading, ENT_QUOTES, 'UTF-8') ?>
         </h1>
     </div>
