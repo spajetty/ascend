@@ -39,7 +39,7 @@ function getRollbackEntityLabel(program) {
 
 function shouldShowEmployerResultsTab(data) {
     if (['Work Immersion and Internship Referral Program', 
-        'Government Internship Program', 'SPES', 
+        'Government Internship Program',
         'Workers Hiring for Infrastructure Projects - Beneficiaries', 
         'Workers Hiring for Infrastructure Projects — Beneficiaries'].includes(data.program || '')) {
         return false;
