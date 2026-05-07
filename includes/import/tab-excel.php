@@ -200,6 +200,8 @@
                 <li class="flex items-start gap-2"><span
                         class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Ensure data matches
                     the required fields for each section</li>
+                        <li class="flex items-start gap-2"><span
+                            class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Preferred file naming: use the format MONTHNAME_YEAR_PROGRAMNAME — e.g. JANUARY_2026_SPES.xlsx</li>
             </ul>
         </div>
     </div>
