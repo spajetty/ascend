@@ -4,6 +4,7 @@
 export const state = {
     parsedExcelData: [],
     selectedFile:    null,
+    unknownEmployers: [],
     detectedPeriod:  { month: '', year: '', confidence: 'low', source: 'none' },
     latestImportResultsData: null,
     latestUndoToken: null,
