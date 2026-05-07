@@ -407,6 +407,7 @@ export function handleFile(file) {
                 .then(result => {
                     if (result.success) {
                         state.parsedExcelData = result.data;
+                        state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
                         const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
                         const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
                         const resolvedPesoCols = resolveWiirpPesoPreviewCols(firstPreviewRowKeys);
@@ -435,6 +436,8 @@ export function handleFile(file) {
                         showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
                     } else {
                         showToast('Validation error: ' + (result.error ?? 'Unknown error'), 'error');
+                        state.parsedExcelData = [];
+                        state.unknownEmployers = [];
                         document.getElementById('dataPreview').classList.add('hidden');
                         resetPreviewPaginationState();
                     }
@@ -442,6 +445,8 @@ export function handleFile(file) {
                 .catch(err => {
                     console.error(err);
                     showToast('Validation failed: ' + (err.message ?? 'Unknown error'), 'error');
+                    state.parsedExcelData = [];
+                    state.unknownEmployers = [];
                     document.getElementById('dataPreview').classList.add('hidden');
                     resetPreviewPaginationState();
                 });

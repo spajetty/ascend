@@ -5,7 +5,7 @@
 import { showToast } from '../toast.js';
 import { state } from './excel-state.js';
 import { initImportResultsUi, showImportResultsView } from './excel-results.js';
-import { openImportConfirmModal } from './excel-modals.js';
+import { openImportConfirmModal, openUnknownEmployersModal } from './excel-modals.js';
 import { resetPreviewPaginationState } from './excel-preview.js';
 import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProgramSpecificFields } from './excel-upload.js';
 
@@ -44,6 +44,7 @@ if (cancelImportBtn) {
         document.getElementById('dataPreview').classList.add('hidden');
         state.selectedFile    = null;
         state.parsedExcelData = [];
+        state.unknownEmployers = [];
 
         const fileInput   = document.getElementById('fileInput');
         const fileInfo    = document.getElementById('fileInfo');
@@ -178,8 +179,11 @@ if (confirmImportBtn) {
         const invalidRows    = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'invalid').length;
         const skippedRows    = state.parsedExcelData.filter(r => !!r._sys_skip).length;
         const importableRows = state.parsedExcelData.length - skippedRows;
+        const unknownEmployers = Array.isArray(state.unknownEmployers)
+            ? state.unknownEmployers.map(name => String(name).trim()).filter(Boolean)
+            : [];
 
-        openImportConfirmModal({
+        const openConfirmModal = () => openImportConfirmModal({
             program,
             period:       periodLabel,
             contractPeriod: contractPeriodDisplay,
@@ -281,5 +285,23 @@ if (confirmImportBtn) {
                     btn.textContent = 'Import';
                 });
         });
+
+        if (program !== 'Employers Accreditation' && unknownEmployers.length > 0) {
+            btn.disabled = true;
+            openUnknownEmployersModal(
+                unknownEmployers,
+                () => {
+                    btn.disabled = false;
+                    openConfirmModal();
+                },
+                () => {
+                    btn.disabled = false;
+                    showToast('Import cancelled.', 'info');
+                }
+            );
+            return;
+        }
+
+        openConfirmModal();
     });
 }
