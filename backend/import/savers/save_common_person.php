@@ -5,6 +5,10 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
     $benefId = $existingBenefId ? (int)$existingBenefId : null;
 
     if (!$benefId) {
+        $firstName  = s(rowValue($row, ['First Name', 'FirstName', 'first_name', 'Firstname'], '')) ?: null;
+        $middleName = s(rowValue($row, ['Middle Name', 'MiddleName', 'middle_name', 'Middlename'], '')) ?: null;
+        $lastName   = s(rowValue($row, ['Last Name', 'LastName', 'last_name', 'Lastname', 'Surname', 'surname'], '')) ?: null;
+        $suffix     = s(rowValue($row, ['Suffix', 'suffix'], '')) ?: null;
         $sex = s(rowValue($row, ['Sex', 'sex'], ''));
         $civil = s(rowValue($row, ['Civil Status', 'CivilStatus', 'civil_status'], ''));
         // If _parsed_dob exists (from validation), use it; otherwise parse raw DOB
@@ -28,10 +32,16 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $programId = $ctx['programId'] ?? null;
         $insBenef = $conn->prepare('
             INSERT INTO beneficiaries
-                (sex, civil_status, dob, contact, email, program_id, classification, house_no, barangay, district, city)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                (first_name, middle_name, last_name, suffix,
+                 sex, civil_status, dob, contact, email, program_id, classification,
+                 house_no, barangay, district, city)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
-        $insBenef->bind_param('sssssisssss', $sex, $civil, $dob, $contact, $email, $programId, $classification, $houseNo, $barangay, $district, $city);
+        $insBenef->bind_param('sssssssssisssss',
+            $firstName, $middleName, $lastName, $suffix,
+            $sex, $civil, $dob, $contact, $email, $programId, $classification,
+            $houseNo, $barangay, $district, $city
+        );
         $insBenef->execute();
 
         $benefId = (int)$insBenef->insert_id;
