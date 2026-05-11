@@ -330,11 +330,27 @@ function findProjectIdForWhipBeneficiary(mysqli $conn, array $row, array $projec
 
 function resolveProgramId(mysqli $conn, string $programName): ?int {
     if ($programName === '') return null;
+
+    // 1. Exact match
     $stmt = $conn->prepare('SELECT program_id FROM programs WHERE name = ? LIMIT 1');
     $stmt->bind_param('s', $programName);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
-    return $row ? (int)$row['program_id'] : null;
+    if ($row) return (int)$row['program_id'];
+
+    // 2. Prefix match — strip trailing " - Beneficiaries", " — Projects", etc.
+    //    e.g. "Workers Hiring for Infrastructure Projects - Beneficiaries"
+    //         → "Workers Hiring for Infrastructure Projects"
+    $base = preg_replace('/\s*[-–—]\s*(Beneficiaries|Projects|Referral)$/u', '', $programName);
+    if ($base !== $programName && $base !== '') {
+        $stmt2 = $conn->prepare('SELECT program_id FROM programs WHERE name = ? LIMIT 1');
+        $stmt2->bind_param('s', $base);
+        $stmt2->execute();
+        $row2 = $stmt2->get_result()->fetch_assoc();
+        if ($row2) return (int)$row2['program_id'];
+    }
+
+    return null;
 }
 
 function resolveEmployer(mysqli $conn, string $name, ?int $batchId = null, array $meta = []): array {
