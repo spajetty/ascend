@@ -72,7 +72,7 @@
         <select id="sectionFilter" onchange="onSectionChange()">
             <option value="">All Sections</option>
         </select>
-        <select id="programFilter" onchange="onProgramChange()">
+        <select id="programFilter" onchange="filterTable()">
             <option value="">All Programs</option>
         </select>
         <select id="statusFilter" onchange="filterTable()">
@@ -105,8 +105,7 @@
                     <label for="pageSizeSelect" style="font-size:12.5px;color:var(--text-secondary);">Rows per page:</label>
                     <select id="pageSizeSelect" onchange="changePageSize(this.value)"
                             style="padding:5px 12px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text-primary);font-size:13px;cursor:pointer;">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
+                        <option value="10" selected>10</option>
                         <option value="15">15</option>
                         <option value="20">20</option>
                     </select>
