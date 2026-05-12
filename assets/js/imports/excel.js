@@ -45,6 +45,7 @@ if (cancelImportBtn) {
         state.selectedFile    = null;
         state.parsedExcelData = [];
         state.unknownEmployers = [];
+        state.selectedJobFairEvent = '';
 
         const fileInput   = document.getElementById('fileInput');
         const fileInfo    = document.getElementById('fileInfo');
@@ -93,6 +94,7 @@ if (confirmImportBtn) {
         const spesCategory = document.getElementById('spesCategory')?.value ?? '';
         const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
         const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+        const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
         const btn         = document.getElementById('confirmImport');
 
         const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools';
@@ -114,6 +116,11 @@ if (confirmImportBtn) {
 
         if (program === 'Government Internship Program' && !gipCategory) {
             showToast('Please select a GIP category before importing.', 'warning');
+            return;
+        }
+
+        if (program === 'Job Fair' && !jobFairEvent) {
+            showToast('Please select a Job Fair Event before importing.', 'warning');
             return;
         }
 
@@ -219,6 +226,7 @@ if (confirmImportBtn) {
                     spesCategory: program === 'SPES' ? (document.getElementById('spesCategory')?.value ?? '') : '',
                     wiirpCategory: program === 'Work Immersion and Internship Referral Program' ? wiirpCategory : '',
                     gipCategory: program === 'Government Internship Program' ? (document.getElementById('gipCategory')?.value ?? '') : '',
+                    jobFairEvent: program === 'Job Fair' ? jobFairEvent : '',
                 }),
             })
                 .then(async res => {

@@ -14,6 +14,14 @@ $rows = $input['data'];
 $wiirpCategory = trim((string)($input['wiirpCategory'] ?? ''));
 $gipCategory = trim((string)($input['gipCategory'] ?? ''));
 
+$jobFairEvent = trim((string)($input['jobFairEvent'] ?? ''));
+
+// Require a selected Job Fair event when program is Job Fair so participant checks can run
+if ($program === 'Job Fair' && $jobFairEvent === '') {
+    echo json_encode(['success' => false, 'error' => 'Please select a Job Fair event before validating.']);
+    exit;
+}
+
 // Require shared helper functions
 require_once __DIR__ . '/helpers/db_utils.php';
 require_once __DIR__ . '/helpers/formatting_utils.php';
@@ -43,7 +51,7 @@ if ($program === 'Employers Accreditation') {
 } elseif (isGipProgram($program)) {
     $validatedData = validateGip($conn, $rows, $gipCategory);
 } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
-    $validatedData = validateJobMatchingFamily($conn, $rows, $program);
+    $validatedData = validateJobMatchingFamily($conn, $rows, $program, $jobFairEvent);
 } elseif ($program === 'SPES') {
     $validatedData = validateSPES($conn, $rows, $program);
 } elseif ($program === 'Schools') {

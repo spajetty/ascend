@@ -115,9 +115,11 @@ const excelBrowseBtn = document.getElementById('excelBrowseBtn');
 
 export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
     const isGip = program === 'Government Internship Program';
+    const isJobFair = program === 'Job Fair';
     const spesCategoryWrapper = document.getElementById('spesCategoryWrapper');
     const wiirpCategoryWrapper = document.getElementById('wiirpCategoryWrapper');
     const gipCategoryWrapper = document.getElementById('gipCategoryWrapper');
+    const jobFairEventWrapper = document.getElementById('jobFairEventWrapper');
     const durationMonthsWrapper = document.getElementById('importDurationMonthsWrapper');
 
     if (spesCategoryWrapper) {
@@ -131,6 +133,13 @@ export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
     if (gipCategoryWrapper) {
         gipCategoryWrapper.classList.toggle('hidden', !isGip);
     }
+    
+    if (jobFairEventWrapper) {
+        jobFairEventWrapper.classList.toggle('hidden', !isJobFair);
+        if (isJobFair) {
+            fetchJobFairEvents();
+        }
+    }
 
     if (durationMonthsWrapper) {
         durationMonthsWrapper.classList.toggle('hidden', !isGip);
@@ -140,6 +149,84 @@ export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
         periodGrid.classList.toggle('md:grid-cols-3', isGip);
         periodGrid.classList.toggle('md:grid-cols-2', !isGip);
     }
+}
+
+export function fetchJobFairEvents() {
+    const month = document.getElementById('importMonth')?.value;
+    const year = document.getElementById('importYear')?.value;
+    const eventSelect = document.getElementById('jobFairEvent');
+    const selectedEventId = state.selectedJobFairEvent || eventSelect?.value || '';
+    
+    if (!eventSelect) return;
+    
+    if (!month || !year) {
+        eventSelect.innerHTML = '<option value="">Select month and year first...</option>';
+        eventSelect.disabled = true;
+        return;
+    }
+    
+    eventSelect.innerHTML = '<option value="">Loading events...</option>';
+    eventSelect.disabled = true;
+    
+    fetch(`../../backend/import/get_job_fair_events.php?month=${month}&year=${year}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                if (data.events.length === 0) {
+                    eventSelect.innerHTML = '<option value="">No events found for this period</option>';
+                    state.selectedJobFairEvent = '';
+                } else {
+                    eventSelect.innerHTML = '<option value="">Select event...</option>' + 
+                        data.events.map(e => `<option value="${e.jobfairevent_id}">${e.venue} (${e.date_start})</option>`).join('');
+                    eventSelect.disabled = false;
+
+                    if (selectedEventId && Array.from(eventSelect.options).some(option => option.value === selectedEventId)) {
+                        eventSelect.value = selectedEventId;
+                        state.selectedJobFairEvent = selectedEventId;
+                    }
+                }
+            } else {
+                eventSelect.innerHTML = '<option value="">Error loading events</option>';
+            }
+        })
+        .catch(err => {
+            eventSelect.innerHTML = '<option value="">Error loading events</option>';
+        });
+}
+
+function applyJobFairMismatchMode(rows, programColumnKey, program, mode) {
+    if (!mode) return;
+
+    rows.forEach((row) => {
+        const excelProgram = programColumnKey ? String(row[programColumnKey] || '').trim() : '';
+        if (mode === 'override') {
+            row._program_override = true;
+        } else if (mode === 'preview' && excelProgram && excelProgram !== program) {
+            row._program_mismatch = true;
+            row._excel_program = excelProgram;
+            row._program_override = true;
+        }
+    });
+}
+
+// Add event listeners to trigger fetch when month/year changes
+if (monthSelect) monthSelect.addEventListener('change', () => {
+    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
+});
+if (yearSelect) yearSelect.addEventListener('change', () => {
+    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
+});
+
+// Re-run validation when Job Fair Event selection changes so participant check runs
+const jobFairEventEl = document.getElementById('jobFairEvent');
+if (jobFairEventEl) {
+    jobFairEventEl.addEventListener('change', function () {
+        state.selectedJobFairEvent = this.value || '';
+        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+        if (selectedProgram === 'Job Fair' && state.selectedFile) {
+            handleFile(state.selectedFile);
+        }
+    });
 }
 
 // Show notice when WIIRP category changes to Private after a preview has been rendered
@@ -236,6 +323,15 @@ if (excelSection && excelProgram) {
 export function handleFile(file) {
     if (!file) return;
 
+    const isSameSelectedFile = state.selectedFile
+        && state.selectedFile.name === file.name
+        && state.selectedFile.size === file.size
+        && state.selectedFile.lastModified === file.lastModified;
+
+    if (!isSameSelectedFile) {
+        state.jobFairMismatchMode = '';
+    }
+
     const resetFileSelectionForRetry = () => {
         state.selectedFile = null;
         state.excelFileData = null;
@@ -311,6 +407,20 @@ export function handleFile(file) {
         }
 
         if (hasProgramMismatch) {
+            if (program === 'Job Fair' && state.jobFairMismatchMode) {
+                state.excelFileData = json;
+                state.selectedFile = file;
+                fileName.textContent = file.name;
+                fileSize.textContent = formatBytes(file.size);
+                fileInfo.classList.remove('hidden');
+                setProgramSelectorsLocked(true);
+                setUploadEnabled(false);
+
+                applyJobFairMismatchMode(json, programColumnKey, program, state.jobFairMismatchMode);
+                proceedWithValidation();
+                return;
+            }
+
             // Hard stop: show program mismatch modal
             state.excelFileData = json;
             state.selectedFile = file;
@@ -323,6 +433,7 @@ export function handleFile(file) {
             openProgramMismatchModal(program, programMismatches,
                 // Option 1: Use selected program for all rows
                 () => {
+                    state.jobFairMismatchMode = 'override';
                     json.forEach(row => {
                         row._program_override = true;
                     });
@@ -330,6 +441,7 @@ export function handleFile(file) {
                 },
                 // Option 2: Show preview with mismatches highlighted
                 () => {
+                    state.jobFairMismatchMode = 'preview';
                     json.forEach((row, idx) => {
                         const excelProgram = (String(row[programColumnKey] || '').trim());
                         if (excelProgram && excelProgram !== program) {
@@ -344,6 +456,7 @@ export function handleFile(file) {
                     showToast('Import cancelled.', 'info');
                     state.selectedFile = null;
                     state.excelFileData = null;
+                    state.jobFairMismatchMode = '';
                     fileInput.value = '';
                     fileInfo.classList.add('hidden');
                     setProgramSelectorsLocked(false);
@@ -378,19 +491,30 @@ export function handleFile(file) {
                 hideMonth: isAccreditation || isSchools,
                 hideYear: isSchools,
             });
+            if (program === 'Job Fair' && monthSelect?.value && yearSelect?.value) {
+                fetchJobFairEvents();
+            }
+
+            // Capture category values so preview validation can apply program-specific rules.
+            const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+            const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+            const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
+
+            // Require selecting an event for Job Fair uploads so participant checks run.
+            if (program === 'Job Fair' && (!jobFairEvent || jobFairEvent === '')) {
+                showToast('Please select a Job Fair event before validating.', 'warning');
+                return;
+            }
 
             // Validation request
             document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
             document.getElementById('previewBody').innerHTML  = '';
             document.getElementById('dataPreview').classList.remove('hidden');
 
-            // Capture category values so preview validation can apply program-specific rules.
-            const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
-            const gipCategory = document.getElementById('gipCategory')?.value ?? '';
             fetch('../../backend/import/validate_preview.php', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ program, section, data: json, wiirpCategory, gipCategory }),
+                body:    JSON.stringify({ program, section, data: json, wiirpCategory, gipCategory, jobFairEvent }),
             })
                 .then(async res => {
                     const raw = await res.text();

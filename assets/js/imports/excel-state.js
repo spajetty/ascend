@@ -6,6 +6,8 @@ export const state = {
     selectedFile:    null,
     unknownEmployers: [],
     detectedPeriod:  { month: '', year: '', confidence: 'low', source: 'none' },
+    selectedJobFairEvent: '',
+    jobFairMismatchMode: '',
     latestImportResultsData: null,
     latestUndoToken: null,
 };
