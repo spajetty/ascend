@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('card-total-users').textContent     = jmRegistered + ftJobseekers;
         document.getElementById('card-total-employers').textContent = jfData ? jfData.totals.employers    : '—';
         document.getElementById('card-total-vacancies').textContent = jfData ? jfData.totals.job_vacancies : '—';
-        document.getElementById('card-total-ftjs').textContent      = ftJobseekers || '—';
+        document.getElementById('card-total-ftjs').textContent = ftData ? ftJobseekers : '—';
 
         // ── Preview Tables ─────────────────────────────────────────────────────
         renderJobMatch(jmData);
