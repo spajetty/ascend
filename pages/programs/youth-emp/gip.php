@@ -25,167 +25,125 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
     <div class="px-6 md:px-8 py-2 pb-8">
 
-        <!-- ===== SUMMARY CARDS ===== -->
-        <!-- Row 1: Pipeline funnel metrics -->
+        <!-- Row 1 Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
 
-            <!-- Total Interns -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">75</span>
+                        <span id="card-participants-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">30M</span>
+                            <span id="card-participants-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">45F</span>
+                            <span id="card-participants-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-teal-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-teal-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Total Participants</span>
             </div>
 
-            <!-- Total Inquired -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">92</span>
+                        <span id="card-inquired-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">38M</span>
+                            <span id="card-inquired-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">54F</span>
+                            <span id="card-inquired-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-blue-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-blue-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Total Inquired</span>
             </div>
 
-            <!-- Total Referred -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-violet-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">75</span>
+                        <span id="card-referred-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">30M</span>
+                            <span id="card-referred-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">45F</span>
+                            <span id="card-referred-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-violet-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-violet-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 9l3 3m0 0l-3 3m3-3H8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Total Referred</span>
             </div>
 
-            <!-- Total Interviewed -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-amber-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">61</span>
+                        <span id="card-interviewed-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">25M</span>
+                            <span id="card-interviewed-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">36F</span>
+                            <span id="card-interviewed-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-amber-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-amber-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Total Interviewed</span>
             </div>
         </div>
 
-        <!-- Row 2: Acceptance outcomes -->
+        <!-- Row 2 Cards -->
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
 
-            <!-- PESO-Accepted -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">49</span>
+                        <span id="card-peso-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">19M</span>
+                            <span id="card-peso-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">30F</span>
+                            <span id="card-peso-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-orange-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-orange-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">PESO-Accepted</span>
             </div>
 
-            <!-- Privately-Accepted -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">14</span>
+                        <span id="card-private-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">6M</span>
+                            <span id="card-private-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">8F</span>
+                            <span id="card-private-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-green-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
-                    </div>
+                    <div class="bg-green-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Privately-Accepted</span>
             </div>
 
-            <!-- Not Proceeded -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">8</span>
+                        <span id="card-notp-total" class="text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span class="text-xs text-blue-500 font-medium">4M</span>
+                            <span id="card-notp-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
-                            <span class="text-xs text-pink-500 font-medium">4F</span>
+                            <span id="card-notp-f" class="text-xs text-pink-500 font-medium">—F</span>
                         </div>
                     </div>
-                    <div class="bg-red-100 p-2.5 rounded-xl">
-                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                    </div>
+                    <div class="bg-red-100 p-2.5 rounded-xl"><svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
                 </div>
                 <span class="text-xs text-gray-500">Not Proceeded</span>
             </div>
         </div>
 
-        <!-- ===== FILTER BAR ===== -->
+        <!-- Filter Bar -->
         <div class="flex items-center gap-3 mb-4 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Filter by year:</span>
-                <select class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option>2026</option>
-                    <option>2025</option>
-                    <option>2024</option>
-                </select>
+                <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
             </div>
-
-            <!-- College / SHS filter -->
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Type:</span>
                 <select id="filterType" onchange="applyFilters()"
@@ -195,19 +153,18 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     <option value="shs">SHS</option>
                 </select>
             </div>
-
-            <!-- Search school -->
             <div class="relative flex-1 max-w-sm">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                 </svg>
                 <input type="text" id="searchSchool" placeholder="Search school..."
-                    oninput="applyFilters()"
+                    oninput="handleSearch()"
                     class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
             </div>
+            <span id="loadingIndicator" class="text-xs text-gray-400 hidden">Loading…</span>
         </div>
 
-        <!-- ===== MAIN GIP TABLE ===== -->
+        <!-- Main GIP Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Government Internship Program (GIP)</h2>
@@ -222,7 +179,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">COURSE</th>
                             <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
                             <th class="px-3 py-3 text-center text-gray-500 font-medium w-20" rowspan="2">REQ. HRS.</th>
-                            <!-- Group headers -->
                             <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">INQUIRED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-violet-500 font-semibold border-l border-gray-100">REFERRED</th>
@@ -233,177 +189,26 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="px-2 py-2 text-center text-gray-400 font-semibold border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <!-- Participants -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-teal-600">T</th>
-                            <!-- Inquired -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-blue-500">T</th>
-                            <!-- Referred -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-violet-500">T</th>
-                            <!-- Interviewed -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-amber-500">T</th>
-                            <!-- PESO-Accepted -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-orange-500">T</th>
-                            <!-- Privately-Accepted -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-green-500">T</th>
-                            <!-- Not Proceeded -->
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
-                            <th class="px-2 py-2 text-center text-gray-500 font-medium">F</th>
-                            <th class="px-2 py-2 text-center font-semibold text-red-400">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-teal-600">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-blue-500">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-violet-500">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-amber-500">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-orange-500">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-green-500">T</th>
+                            <th class="px-2 py-2 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-2 py-2 text-center text-gray-500 font-medium">F</th><th class="px-2 py-2 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                        <!-- Row 1 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="davao del sur state college" data-type="college">
-                            <td class="px-3 py-3 text-gray-700 font-medium">January – March 2026</td>
-                            <td class="px-3 py-3 text-gray-700">Davao del Sur State College</td>
-                            <td class="px-3 py-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
-                            </td>
-                            <td class="px-3 py-3 text-gray-600">BSBA</td>
-                            <td class="px-3 py-3 text-gray-600">PESO Digos City Office</td>
-                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
-                            <!-- Participants -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">20</td>
-                            <!-- Inquired -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">25</td>
-                            <!-- Referred -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">20</td>
-                            <!-- Interviewed -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-600">10</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">16</td>
-                            <!-- PESO-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-3 text-center text-gray-600">8</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">13</td>
-                            <!-- Privately-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">3</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">5</td>
-                            <!-- Not Proceeded -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-3 text-center text-gray-600">2</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">3</td>
-                            <!-- Actions -->
-                            <td class="px-3 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="1">
-                                    <button onclick="toggleEditMode(1)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 1)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 1)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 1)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 2 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="holy cross of davao college" data-type="college">
-                            <td class="px-3 py-3 text-gray-700 font-medium">February – April 2026</td>
-                            <td class="px-3 py-3 text-gray-700">Holy Cross of Davao College</td>
-                            <td class="px-3 py-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
-                            </td>
-                            <td class="px-3 py-3 text-gray-600">BSIT</td>
-                            <td class="px-3 py-3 text-gray-600">DOLE Regional Office XI</td>
-                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
-                            <!-- Participants -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">25</td>
-                            <!-- Inquired -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-2 py-3 text-center text-gray-600">20</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">34</td>
-                            <!-- Referred -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-3 text-center text-gray-600">15</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">25</td>
-                            <!-- Interviewed -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">20</td>
-                            <!-- PESO-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-600">10</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">16</td>
-                            <!-- Privately-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">3</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">5</td>
-                            <!-- Not Proceeded -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">1</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">3</td>
-                            <!-- Actions -->
-                            <td class="px-3 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="2">
-                                    <button onclick="toggleEditMode(2)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 2)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 2)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 2)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="university of southeastern philippines" data-type="college">
-                            <td class="px-3 py-3 text-gray-700 font-medium">March – May 2026</td>
-                            <td class="px-3 py-3 text-gray-700">University of Southeastern Philippines</td>
-                            <td class="px-3 py-3">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>
-                            </td>
-                            <td class="px-3 py-3 text-gray-600">BSED</td>
-                            <td class="px-3 py-3 text-gray-600">PESO Provincial Office</td>
-                            <td class="px-3 py-3 text-center text-gray-700 font-medium">300</td>
-                            <!-- Participants -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-3 text-center text-gray-600">18</td><td class="px-2 py-3 text-center font-semibold text-teal-600 bg-teal-50">30</td>
-                            <!-- Inquired -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-2 py-3 text-center text-gray-600">19</td><td class="px-2 py-3 text-center font-semibold text-blue-500 bg-blue-50">33</td>
-                            <!-- Referred -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-3 text-center text-gray-600">18</td><td class="px-2 py-3 text-center font-semibold text-violet-500 bg-violet-50">30</td>
-                            <!-- Interviewed -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">11</td><td class="px-2 py-3 text-center text-gray-600">14</td><td class="px-2 py-3 text-center font-semibold text-amber-500 bg-amber-50">25</td>
-                            <!-- PESO-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-3 text-center text-gray-600">12</td><td class="px-2 py-3 text-center font-semibold text-orange-500 bg-orange-50">20</td>
-                            <!-- Privately-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-3 text-center text-gray-600">2</td><td class="px-2 py-3 text-center font-semibold text-green-500 bg-green-50">4</td>
-                            <!-- Not Proceeded -->
-                            <td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-3 text-center text-gray-600">1</td><td class="px-2 py-3 text-center font-semibold text-red-400 bg-red-50">2</td>
-                            <!-- Actions -->
-                            <td class="px-3 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="3">
-                                    <button onclick="toggleEditMode(3)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 3)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 3)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 3)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-                            <td class="px-3 py-3 text-gray-800 font-bold" colspan="5">TOTAL</td>
-                            <td class="px-3 py-3 text-center font-bold text-gray-700">—</td>
-                            <!-- Participants -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-3 text-center text-gray-700">45</td><td class="px-2 py-3 text-center font-bold text-teal-600 bg-teal-100">75</td>
-                            <!-- Inquired -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">38</td><td class="px-2 py-3 text-center text-gray-700">54</td><td class="px-2 py-3 text-center font-bold text-blue-500 bg-blue-100">92</td>
-                            <!-- Referred -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-3 text-center text-gray-700">45</td><td class="px-2 py-3 text-center font-bold text-violet-500 bg-violet-100">75</td>
-                            <!-- Interviewed -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">25</td><td class="px-2 py-3 text-center text-gray-700">36</td><td class="px-2 py-3 text-center font-bold text-amber-500 bg-amber-100">61</td>
-                            <!-- PESO-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">19</td><td class="px-2 py-3 text-center text-gray-700">30</td><td class="px-2 py-3 text-center font-bold text-orange-500 bg-orange-100">49</td>
-                            <!-- Privately-Accepted -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">6</td><td class="px-2 py-3 text-center text-gray-700">8</td><td class="px-2 py-3 text-center font-bold text-green-500 bg-green-100">14</td>
-                            <!-- Not Proceeded -->
-                            <td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">4</td><td class="px-2 py-3 text-center text-gray-700">4</td><td class="px-2 py-3 text-center font-bold text-red-400 bg-red-100">8</td>
-                            <td class="border-l border-gray-100"></td>
-                        </tr>
+                    <tbody id="tableBody">
+                        <tr><td colspan="28" class="px-4 py-8 text-center text-gray-400 text-sm">Loading data…</td></tr>
                     </tbody>
                 </table>
             </div>
-
-            <!-- Pagination -->
             <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
-                <span class="text-sm text-gray-500" id="paginationInfo">Showing 1–3 of 3 entries</span>
+                <span class="text-sm text-gray-500" id="paginationInfo"></span>
                 <div class="flex items-center gap-1">
-                    <button onclick="changePage(-1)" id="prevBtn"
-                        class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                        disabled>&#8249;</button>
+                    <button onclick="changePage(-1)" id="prevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed" disabled>&#8249;</button>
                     <div id="pageNumbers" class="flex items-center gap-1"></div>
-                    <button onclick="changePage(1)" id="nextBtn"
-                        class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">&#8250;</button>
+                    <button onclick="changePage(1)" id="nextBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">&#8250;</button>
                 </div>
             </div>
         </div>
@@ -411,18 +216,13 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </main>
 
-<!-- Backdrop -->
 <div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40"></div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
-            <div class="bg-red-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
+            <div class="bg-red-100 p-3 rounded-lg"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h3 class="text-lg font-bold text-gray-900">Delete Entry</h3>
         </div>
         <p class="text-gray-600 mb-6">Are you sure you want to delete this entry? This action cannot be undone.</p>
@@ -433,15 +233,11 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
-<!-- Save Confirmation Modal -->
+<!-- Save Modal -->
 <div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
-            <div class="bg-green-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
+            <div class="bg-green-100 p-3 rounded-lg"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h3 class="text-lg font-bold text-gray-900">Save Changes</h3>
         </div>
         <p class="text-gray-600 mb-6">Do you want to save the changes to this entry?</p>
@@ -452,197 +248,368 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
+<!-- Error Toast -->
+<div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+
 <script>
+const API_URL       = '/api/gip-api.php';
 const ROWS_PER_PAGE = 9;
-let currentPage = 1;
-let deletingRowId = null;
-let savingRowId = null;
-const editingData = {};
 
-function getAllDataRows() {
-    return Array.from(document.querySelectorAll('#gipTable tbody tr:not(.total-row)'));
+let allRows      = [];
+let currentPage  = 1;
+let selectedYear = new Date().getFullYear();
+let selectedType = '';
+let searchQuery  = '';
+let searchTimer  = null;
+let deletingId   = null;
+let savingId     = null;
+let editSnapshot = {};
+
+// ─── API ───────────────────────────────────────────────────────────────────
+async function fetchData(year, type = '', search = '') {
+    showLoading(true);
+    try {
+        const params = new URLSearchParams({ year, type, search });
+        const res    = await fetch(`${API_URL}?${params}`);
+        const json   = await res.json();
+        if (!json.success) throw new Error(json.error);
+        return json.data;
+    } catch (e) {
+        showError('Failed to load data: ' + e.message);
+        return null;
+    } finally {
+        showLoading(false);
+    }
 }
 
-function getVisibleFilteredRows() {
-    return getAllDataRows().filter(r => r.dataset.filtered !== 'true');
+async function deleteRecord(id) {
+    const res  = await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
 }
 
-function applyFilters() {
-    const query = document.getElementById('searchSchool').value.toLowerCase().trim();
-    const type  = document.getElementById('filterType').value.toLowerCase();
-
-    getAllDataRows().forEach(row => {
-        const school  = (row.dataset.school || '').toLowerCase();
-        const rowType = (row.dataset.type  || '').toLowerCase();
-
-        const matchSearch = !query || school.includes(query);
-        const matchType   = !type  || rowType === type;
-
-        row.dataset.filtered = (matchSearch && matchType) ? 'false' : 'true';
-        if (row.dataset.filtered === 'true') row.style.display = 'none';
+async function updateRecord(id, payload) {
+    const res  = await fetch(API_URL, {
+        method:  'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ gip_id: id, ...payload }),
     });
-
-    currentPage = 1;
-    renderPage();
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error);
 }
 
-function getTotalPages() {
-    return Math.max(1, Math.ceil(getVisibleFilteredRows().length / ROWS_PER_PAGE));
+// ─── Row builder ───────────────────────────────────────────────────────────
+function typeBadge(type) {
+    const t = (type || '').toLowerCase();
+    const cls = t === 'shs'
+        ? 'bg-purple-100 text-purple-700'
+        : 'bg-teal-100 text-teal-700';
+    const label = t === 'shs' ? 'SHS' : 'College';
+    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${cls}">${label}</span>`;
 }
 
-function renderPage() {
-    const rows  = getVisibleFilteredRows();
-    const total = rows.length;
-    const start = (currentPage - 1) * ROWS_PER_PAGE;
-    const end   = Math.min(start + ROWS_PER_PAGE, total);
+function mft(m, f, tc, bg) {
+    return `<td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">${+m}</td>
+            <td class="px-2 py-3 text-center text-gray-600">${+f}</td>
+            <td class="px-2 py-3 text-center font-semibold ${tc} ${bg}">${+m + +f}</td>`;
+}
 
-    getAllDataRows().forEach(r => {
-        if (r.dataset.filtered === 'true') r.style.display = 'none';
+function buildRow(r) {
+    const id = r.gip_id;
+    return `
+    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}">
+        <td class="px-3 py-3 text-gray-700 font-medium e-period">${r.contract_period}</td>
+        <td class="px-3 py-3 text-gray-700 e-school">${r.school}</td>
+        <td class="px-3 py-3 e-type">${typeBadge(r.college_or_shs)}</td>
+        <td class="px-3 py-3 text-gray-600 e-course">${r.course}</td>
+        <td class="px-3 py-3 text-gray-600 e-office">${r.office_assignment}</td>
+        <td class="px-3 py-3 text-center text-gray-700 font-medium e-hours">${r.required_hours}</td>
+        ${mft(r.part_m, r.part_f, 'text-teal-600',   'bg-teal-50')}
+        ${mft(r.inq_m,  r.inq_f,  'text-blue-500',   'bg-blue-50')}
+        ${mft(r.ref_m,  r.ref_f,  'text-violet-500', 'bg-violet-50')}
+        ${mft(r.int_m,  r.int_f,  'text-amber-500',  'bg-amber-50')}
+        ${mft(r.peso_m, r.peso_f, 'text-orange-500', 'bg-orange-50')}
+        ${mft(r.priv_m, r.priv_f, 'text-green-500',  'bg-green-50')}
+        ${mft(r.notp_m, r.notp_f, 'text-red-400',    'bg-red-50')}
+        <td class="px-3 py-3 text-center border-l border-gray-100">
+            <div class="flex items-center justify-center gap-2">
+                <button onclick="startEdit(${id})" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="promptDelete(${id})" class="delete-btn text-red-400 hover:text-red-600" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                <button onclick="promptSave(${id})" class="save-btn hidden text-green-500 hover:text-green-600" title="Save">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+                <button onclick="cancelEdit(${id})" class="cancel-btn hidden text-gray-400 hover:text-gray-600" title="Cancel">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </td>
+    </tr>`;
+}
+
+function buildTotalRow(rows) {
+    const t = {pm:0,pf:0,im:0,if_:0,rm:0,rf:0,itm:0,itf:0,esm:0,esf:0,prm:0,prf:0,nm:0,nf:0};
+    rows.forEach(r => {
+        t.pm  += +r.part_m; t.pf  += +r.part_f;
+        t.im  += +r.inq_m;  t.if_ += +r.inq_f;
+        t.rm  += +r.ref_m;  t.rf  += +r.ref_f;
+        t.itm += +r.int_m;  t.itf += +r.int_f;
+        t.esm += +r.peso_m; t.esf += +r.peso_f;
+        t.prm += +r.priv_m; t.prf += +r.priv_f;
+        t.nm  += +r.notp_m; t.nf  += +r.notp_f;
     });
-    rows.forEach((row, i) => {
-        row.style.display = (i >= start && i < end) ? '' : 'none';
-    });
+    function t3(m, f, tc, bc) {
+        return `<td class="px-2 py-3 text-center text-gray-700 border-l border-gray-100">${m}</td>
+                <td class="px-2 py-3 text-center text-gray-700">${f}</td>
+                <td class="px-2 py-3 text-center font-bold ${tc} ${bc}">${m+f}</td>`;
+    }
+    return `
+    <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+        <td class="px-3 py-3 text-gray-800 font-bold" colspan="5">TOTAL</td>
+        <td class="px-3 py-3 text-center font-bold text-gray-700">—</td>
+        ${t3(t.pm,  t.pf,  'text-teal-600',   'bg-teal-100')}
+        ${t3(t.im,  t.if_, 'text-blue-500',   'bg-blue-100')}
+        ${t3(t.rm,  t.rf,  'text-violet-500', 'bg-violet-100')}
+        ${t3(t.itm, t.itf, 'text-amber-500',  'bg-amber-100')}
+        ${t3(t.esm, t.esf, 'text-orange-500', 'bg-orange-100')}
+        ${t3(t.prm, t.prf, 'text-green-500',  'bg-green-100')}
+        ${t3(t.nm,  t.nf,  'text-red-400',    'bg-red-100')}
+        <td class="border-l border-gray-100"></td>
+    </tr>`;
+}
+
+// ─── Render ────────────────────────────────────────────────────────────────
+function renderTable() {
+    const tbody   = document.getElementById('tableBody');
+    const total   = allRows.length;
+    const totalPg = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+    currentPage   = Math.min(currentPage, totalPg);
+    const start   = (currentPage - 1) * ROWS_PER_PAGE;
+    const end     = Math.min(start + ROWS_PER_PAGE, total);
+
+    if (total === 0) {
+        tbody.innerHTML = `<tr><td colspan="28" class="px-4 py-8 text-center text-gray-400 text-sm">No data found.</td></tr>`;
+    } else {
+        tbody.innerHTML = allRows.slice(start, end).map(buildRow).join('') + buildTotalRow(allRows);
+    }
 
     document.getElementById('paginationInfo').textContent =
         total === 0 ? 'No entries found' : `Showing ${start + 1}–${end} of ${total} entries`;
-
     document.getElementById('prevBtn').disabled = currentPage <= 1;
-    document.getElementById('nextBtn').disabled = currentPage >= getTotalPages();
+    document.getElementById('nextBtn').disabled = currentPage >= totalPg;
 
     const container = document.getElementById('pageNumbers');
     container.innerHTML = '';
-    for (let p = 1; p <= getTotalPages(); p++) {
+    for (let p = 1; p <= totalPg; p++) {
         const btn = document.createElement('button');
         btn.textContent = p;
         btn.className = 'px-3 py-1.5 rounded-lg text-sm border font-medium transition-colors ' +
-            (p === currentPage
-                ? 'bg-teal-500 text-white border-teal-500'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50');
-        btn.onclick = () => { currentPage = p; renderPage(); };
+            (p === currentPage ? 'bg-teal-500 text-white border-teal-500' : 'border-gray-200 text-gray-600 hover:bg-gray-50');
+        btn.onclick = () => { currentPage = p; renderTable(); };
         container.appendChild(btn);
     }
 }
 
-function changePage(dir) {
-    currentPage = Math.max(1, Math.min(currentPage + dir, getTotalPages()));
-    renderPage();
-}
-
-function getRowByIndex(rowId) {
-    return Array.from(document.querySelectorAll('#gipTable tbody tr:not(.total-row)'))
-        .find(r => r.querySelector(`[data-row="${rowId}"]`));
-}
-
-function toggleEditMode(rowId) {
-    const row = getRowByIndex(rowId);
-    if (!row) return;
-    if (row.classList.contains('editing')) { cancelEdit(null, rowId); return; }
-
-    row.classList.add('editing', 'bg-yellow-50');
-    // Editable: all numeric cells (indices 6 to end, excluding last actions cell)
-    const allCells = Array.from(row.querySelectorAll('td'));
-    const editableCells = allCells.slice(6, -1);
-    editableCells.forEach((cell, idx) => {
-        editingData[`cell_${rowId}_${idx}`] = cell.textContent.trim();
-        cell.contentEditable = 'true';
-        cell.classList.add('border', 'border-yellow-300', 'bg-white');
-    });
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.add('hidden');
-    ab.querySelector('.delete-btn').classList.add('hidden');
-    ab.querySelector('.save-btn').classList.remove('hidden');
-    ab.querySelector('.cancel-btn').classList.remove('hidden');
-}
-
-function cancelEdit(event, rowId) {
-    const row = getRowByIndex(rowId);
-    if (!row) return;
-    const allCells = Array.from(row.querySelectorAll('td'));
-    const editableCells = allCells.slice(6, -1);
-    editableCells.forEach((cell, idx) => {
-        cell.contentEditable = 'false';
-        cell.textContent = editingData[`cell_${rowId}_${idx}`] || '';
-        cell.classList.remove('border', 'border-yellow-300', 'bg-white');
-    });
-    row.classList.remove('editing', 'bg-yellow-50');
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.remove('hidden');
-    ab.querySelector('.delete-btn').classList.remove('hidden');
-    ab.querySelector('.save-btn').classList.add('hidden');
-    ab.querySelector('.cancel-btn').classList.add('hidden');
-}
-
-function deleteRow(event, rowId) {
-    event.preventDefault();
-    deletingRowId = rowId;
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById('deleteModal').classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    document.getElementById('modalBackdrop').classList.add('hidden');
-    document.getElementById('deleteModal').classList.add('hidden');
-    deletingRowId = null;
-}
-
-function confirmDelete() {
-    const row = getRowByIndex(deletingRowId);
-    if (row) {
-        row.style.transition = 'opacity 0.3s ease-out';
-        row.style.opacity = '0';
-        setTimeout(() => {
-            row.remove();
-            closeDeleteModal();
-            if (currentPage > getTotalPages()) currentPage = getTotalPages();
-            renderPage();
-        }, 300);
+function updateCards(totals) {
+    function set(key, t) {
+        document.getElementById(`card-${key}-total`).textContent = t.m + t.f;
+        document.getElementById(`card-${key}-m`).textContent     = t.m + 'M';
+        document.getElementById(`card-${key}-f`).textContent     = t.f + 'F';
     }
+    set('participants', totals.participants);
+    set('inquired',     totals.inquired);
+    set('referred',     totals.referred);
+    set('interviewed',  totals.interviewed);
+    set('peso',         totals.peso);
+    set('private',      totals.private);
+    set('notp',         totals.not_proceeded);
 }
 
-function saveRow(event, rowId) {
-    event.preventDefault();
-    savingRowId = rowId;
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById('saveModal').classList.remove('hidden');
+function populateYearFilter(years) {
+    const sel = document.getElementById('yearFilter');
+    sel.innerHTML = years.map(y =>
+        `<option value="${y}" ${y == selectedYear ? 'selected' : ''}>${y}</option>`
+    ).join('');
 }
 
-function closeSaveModal() {
-    document.getElementById('modalBackdrop').classList.add('hidden');
-    document.getElementById('saveModal').classList.add('hidden');
-    savingRowId = null;
+// ─── Load ──────────────────────────────────────────────────────────────────
+async function load(year, type = '', search = '') {
+    const data = await fetchData(year, type, search);
+    if (!data) return;
+    allRows = data.rows;
+    currentPage = 1;
+    updateCards(data.totals);
+    populateYearFilter(data.years);
+    renderTable();
 }
 
-function confirmSave() {
-    const row = getRowByIndex(savingRowId);
-    if (row) {
-        const allCells = Array.from(row.querySelectorAll('td'));
-        const editableCells = allCells.slice(6, -1);
-        editableCells.forEach(cell => {
+// ─── Filters ───────────────────────────────────────────────────────────────
+function applyFilters() {
+    selectedType = document.getElementById('filterType').value;
+    searchQuery  = document.getElementById('searchSchool').value.trim();
+    load(selectedYear, selectedType, searchQuery);
+}
+
+function handleSearch() {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(applyFilters, 300);
+}
+
+// ─── Edit ──────────────────────────────────────────────────────────────────
+function getRowEl(id) { return document.querySelector(`tr[data-id="${id}"]`); }
+
+const EDIT_CLASSES = ['e-period','e-school','e-course','e-office','e-hours'];
+
+function startEdit(id) {
+    const row = getRowEl(id);
+    if (!row) return;
+    row.classList.add('bg-yellow-50');
+    const snap = {};
+    EDIT_CLASSES.forEach(cls => {
+        const cell = row.querySelector('.' + cls);
+        snap[cls] = cell.textContent.trim();
+        cell.contentEditable = 'true';
+        cell.classList.add('border', 'border-yellow-300', 'bg-white', 'outline-none');
+    });
+    editSnapshot[id] = snap;
+    row.querySelector('.edit-btn').classList.add('hidden');
+    row.querySelector('.delete-btn').classList.add('hidden');
+    row.querySelector('.save-btn').classList.remove('hidden');
+    row.querySelector('.cancel-btn').classList.remove('hidden');
+}
+
+function cancelEdit(id) {
+    const row = getRowEl(id);
+    if (!row) return;
+    const snap = editSnapshot[id] || {};
+    EDIT_CLASSES.forEach(cls => {
+        const cell = row.querySelector('.' + cls);
+        if (cell) {
             cell.contentEditable = 'false';
-            cell.classList.remove('border', 'border-yellow-300', 'bg-white');
+            cell.textContent = snap[cls] ?? cell.textContent;
+            cell.classList.remove('border','border-yellow-300','bg-white','outline-none');
+        }
+    });
+    row.classList.remove('bg-yellow-50');
+    row.querySelector('.edit-btn').classList.remove('hidden');
+    row.querySelector('.delete-btn').classList.remove('hidden');
+    row.querySelector('.save-btn').classList.add('hidden');
+    row.querySelector('.cancel-btn').classList.add('hidden');
+    delete editSnapshot[id];
+}
+
+function promptSave(id) { savingId = id; showModal('saveModal'); }
+
+async function confirmSave() {
+    const id  = savingId;
+    const row = getRowEl(id);
+    closeModal('saveModal');
+    if (!row || !id) return;
+
+    const payload = {
+        contract_period:   row.querySelector('.e-period').textContent.trim(),
+        school:            row.querySelector('.e-school').textContent.trim(),
+        course:            row.querySelector('.e-course').textContent.trim(),
+        office_assignment: row.querySelector('.e-office').textContent.trim(),
+        required_hours:    parseInt(row.querySelector('.e-hours').textContent.trim()) || 0,
+    };
+
+    try {
+        await updateRecord(id, payload);
+        EDIT_CLASSES.forEach(cls => {
+            const cell = row.querySelector('.' + cls);
+            if (cell) { cell.contentEditable = 'false'; cell.classList.remove('border','border-yellow-300','bg-white','outline-none'); }
         });
-        row.classList.remove('editing', 'bg-yellow-50');
-        const ab = row.querySelector('.action-buttons');
-        ab.querySelector('.edit-btn').classList.remove('hidden');
-        ab.querySelector('.delete-btn').classList.remove('hidden');
-        ab.querySelector('.save-btn').classList.add('hidden');
-        ab.querySelector('.cancel-btn').classList.add('hidden');
-        closeSaveModal();
-        row.style.transition = 'background-color 0.3s ease-out';
+        row.classList.remove('bg-yellow-50');
+        row.querySelector('.edit-btn').classList.remove('hidden');
+        row.querySelector('.delete-btn').classList.remove('hidden');
+        row.querySelector('.save-btn').classList.add('hidden');
+        row.querySelector('.cancel-btn').classList.add('hidden');
+        delete editSnapshot[id];
+
+        row.style.transition = 'background-color 0.3s';
         row.style.backgroundColor = '#dcfce7';
         setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
+
+        const record = allRows.find(r => r.gip_id == id);
+        if (record) Object.assign(record, payload);
+    } catch (e) {
+        showError('Save failed: ' + e.message);
     }
+    savingId = null;
 }
 
-document.addEventListener('click', (e) => {
-    if (e.target === document.getElementById('modalBackdrop')) {
-        closeDeleteModal(); closeSaveModal();
+// ─── Delete ────────────────────────────────────────────────────────────────
+function promptDelete(id) { deletingId = id; showModal('deleteModal'); }
+
+async function confirmDelete() {
+    const id = deletingId;
+    closeModal('deleteModal');
+    if (!id) return;
+    try {
+        await deleteRecord(id);
+        allRows = allRows.filter(r => r.gip_id != id);
+        renderTable();
+        // Rebuild totals from remaining rows and update cards
+        const t = buildRawTotals();
+        updateCards(t);
+    } catch (e) {
+        showError('Delete failed: ' + e.message);
     }
+    deletingId = null;
+}
+
+function buildRawTotals() {
+    const t = {
+        participants: {m:0,f:0}, inquired: {m:0,f:0}, referred: {m:0,f:0},
+        interviewed:  {m:0,f:0}, peso:     {m:0,f:0}, private:  {m:0,f:0},
+        not_proceeded:{m:0,f:0}
+    };
+    allRows.forEach(r => {
+        t.participants.m += +r.part_m; t.participants.f += +r.part_f;
+        t.inquired.m     += +r.inq_m;  t.inquired.f     += +r.inq_f;
+        t.referred.m     += +r.ref_m;  t.referred.f     += +r.ref_f;
+        t.interviewed.m  += +r.int_m;  t.interviewed.f  += +r.int_f;
+        t.peso.m         += +r.peso_m; t.peso.f         += +r.peso_f;
+        t.private.m      += +r.priv_m; t.private.f      += +r.priv_f;
+        t.not_proceeded.m+= +r.notp_m; t.not_proceeded.f+= +r.notp_f;
+    });
+    return t;
+}
+
+// ─── Pagination ─────────────────────────────────────────────────────────────
+function changePage(dir) {
+    const totalPg = Math.max(1, Math.ceil(allRows.length / ROWS_PER_PAGE));
+    currentPage = Math.max(1, Math.min(currentPage + dir, totalPg));
+    renderTable();
+}
+
+// ─── Modals ────────────────────────────────────────────────────────────────
+function showModal(id) { document.getElementById('modalBackdrop').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById('modalBackdrop').classList.add('hidden'); document.getElementById(id).classList.add('hidden'); }
+function closeDeleteModal() { closeModal('deleteModal'); deletingId = null; }
+function closeSaveModal()   { closeModal('saveModal');   savingId   = null; }
+document.addEventListener('click', e => { if (e.target.id === 'modalBackdrop') { closeDeleteModal(); closeSaveModal(); } });
+
+// ─── UI ────────────────────────────────────────────────────────────────────
+function showLoading(state) { document.getElementById('loadingIndicator').classList.toggle('hidden', !state); }
+function showError(msg) {
+    const t = document.getElementById('errorToast');
+    t.textContent = msg; t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 4000);
+}
+
+// ─── Year filter ───────────────────────────────────────────────────────────
+document.getElementById('yearFilter').addEventListener('change', function () {
+    selectedYear = +this.value;
+    load(selectedYear, selectedType, searchQuery);
 });
 
-// Init
-getAllDataRows().forEach(r => r.dataset.filtered = 'false');
-renderPage();
+// ─── Init ──────────────────────────────────────────────────────────────────
+load(selectedYear);
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
