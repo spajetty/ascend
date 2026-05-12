@@ -24,12 +24,13 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 
     <div class="px-6 md:px-8 py-6">
+
+        <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
 
-            <!-- Job Vacancies -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">310</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-vacancies">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -39,10 +40,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Job Vacancies</span>
             </div>
 
-            <!-- Employers -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-employers">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -52,10 +52,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Employers</span>
             </div>
 
-            <!-- Interviewed Applicants -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">242</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-interviewed">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
@@ -65,10 +64,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Interviewed Applicants</span>
             </div>
 
-            <!-- Qualified Applicants -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">195</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-qualified">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -78,10 +76,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Qualified Applicants</span>
             </div>
 
-            <!-- Successful Placements -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">161</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-placed">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
@@ -98,10 +95,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         <div class="flex items-center gap-3 mb-4">
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Filter by year:</span>
-                <select class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    <option>2026</option>
-                    <option>2025</option>
-                    <option>2024</option>
+                <select id="yearFilter"
+                        onchange="loadData()"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
                 </select>
             </div>
             <div class="relative flex-1 max-w-sm">
@@ -138,273 +134,37 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="px-2 py-2 text-center text-gray-400 font-semibold tracking-wide border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <!-- Job Vacancies -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-blue-500">T</th>
-                            <!-- Interviewed -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-cyan-500">T</th>
-                            <!-- Qualified -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-green-500">T</th>
-                            <!-- Not Qualified -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-red-400">T</th>
-                            <!-- Placed / HOTS -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-orange-400">T</th>
-                            <!-- For Further Interview -->
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium">F</th>
                             <th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                        <!-- January 2026 - Row 1 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="agro prime manpower">
-                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
-                            <td class="px-4 py-2 text-gray-700">Agro Prime Manpower...</td>
-                            <!-- Job Vacancies -->
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">30</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">25</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">55</td>
-                            <!-- Interviewed -->
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">22</td>
-                            <td class="px-3 py-2 text-center text-gray-600">18</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">40</td>
-                            <!-- Qualified -->
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td>
-                            <td class="px-3 py-2 text-center text-gray-600">15</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">33</td>
-                            <!-- Not Qualified -->
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">7</td>
-                            <!-- Placed / HOTS -->
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">14</td>
-                            <td class="px-3 py-2 text-center text-gray-600">12</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">26</td>
-                            <!-- For Further Interview -->
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
-                            <!-- Actions -->
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="1">
-                                    <button onclick="toggleEditMode(1)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                                    </button>
-                                    <button onclick="deleteRow(event, 1)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                                    </button>
-                                    <button onclick="saveRow(event, 1)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                                    </button>
-                                    <button onclick="cancelEdit(event, 1)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                                    </button>
-                                </div>
-                            </td>
+                    <tbody id="jobFairTbody">
+                        <tr>
+                            <td colspan="20" class="text-center py-8 text-gray-400 text-sm">Loading…</td>
                         </tr>
-
-                        <!-- January 2026 - Row 2 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="pacific direct placement corp">
-                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
-                            <td class="px-4 py-2 text-gray-700">Pacific Direct Placement Corp.</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">20</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">30</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">50</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">15</td>
-                            <td class="px-3 py-2 text-center text-gray-600">22</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">37</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">12</td>
-                            <td class="px-3 py-2 text-center text-gray-600">18</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">30</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td>
-                            <td class="px-3 py-2 text-center text-gray-600">4</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">7</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">10</td>
-                            <td class="px-3 py-2 text-center text-gray-600">15</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">25</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="2">
-                                    <button onclick="toggleEditMode(2)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 2)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 2)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 2)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- February 2026 - Row 3 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="mindanao build trade co">
-                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
-                            <td class="px-4 py-2 text-gray-700">Mindanao Build & Trade Co.</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">45</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">15</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">60</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">38</td>
-                            <td class="px-3 py-2 text-center text-gray-600">12</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">50</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">30</td>
-                            <td class="px-3 py-2 text-center text-gray-600">10</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">40</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">8</td>
-                            <td class="px-3 py-2 text-center text-gray-600">2</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">10</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">25</td>
-                            <td class="px-3 py-2 text-center text-gray-600">8</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">33</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">5</td>
-                            <td class="px-3 py-2 text-center text-gray-600">2</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="3">
-                                    <button onclick="toggleEditMode(3)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 3)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 3)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 3)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- February 2026 - Row 4 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="suncorp recruitment agency">
-                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
-                            <td class="px-4 py-2 text-gray-700">SunCorp Recruitment Agency</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">18</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">32</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">50</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">14</td>
-                            <td class="px-3 py-2 text-center text-gray-600">25</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">39</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">11</td>
-                            <td class="px-3 py-2 text-center text-gray-600">20</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">31</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td>
-                            <td class="px-3 py-2 text-center text-gray-600">5</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">8</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">9</td>
-                            <td class="px-3 py-2 text-center text-gray-600">17</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">26</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="4">
-                                    <button onclick="toggleEditMode(4)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 4)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 4)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 4)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- March 2026 - Row 5 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="horizon logistics services">
-                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
-                            <td class="px-4 py-2 text-gray-700">Horizon Logistics Services</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">35</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">20</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">55</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">28</td>
-                            <td class="px-3 py-2 text-center text-gray-600">16</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">44</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">22</td>
-                            <td class="px-3 py-2 text-center text-gray-600">13</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">35</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">6</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">9</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td>
-                            <td class="px-3 py-2 text-center text-gray-600">11</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">29</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td>
-                            <td class="px-3 py-2 text-center text-gray-600">2</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">6</td>
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="5">
-                                    <button onclick="toggleEditMode(5)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 5)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 5)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 5)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- March 2026 - Row 6 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-employer="blueseas overseas staffing">
-                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
-                            <td class="px-4 py-2 text-gray-700">BlueSeas Overseas Staffing</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">12</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-semibold">28</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">40</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">10</td>
-                            <td class="px-3 py-2 text-center text-gray-600">22</td>
-                            <td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">32</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">8</td>
-                            <td class="px-3 py-2 text-center text-gray-600">16</td>
-                            <td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">26</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td>
-                            <td class="px-3 py-2 text-center text-gray-600">4</td>
-                            <td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">6</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">7</td>
-                            <td class="px-3 py-2 text-center text-gray-600">15</td>
-                            <td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">22</td>
-                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">1</td>
-                            <td class="px-3 py-2 text-center text-gray-600">3</td>
-                            <td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">4</td>
-                            <td class="px-3 py-2 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="6">
-                                    <button onclick="toggleEditMode(6)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg></button>
-                                    <button onclick="deleteRow(event, 6)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-                                    <button onclick="saveRow(event, 6)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg></button>
-                                    <button onclick="cancelEdit(event, 6)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- TOTALS Row -->
-                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-                            <td class="px-4 py-2 text-gray-800 font-bold">TOTALS</td>
-                            <td class="px-4 py-2 text-gray-500 text-xs italic"></td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-bold border-l border-gray-100">160</td>
-                            <td class="px-3 py-2 text-center text-blue-500 font-bold">150</td>
-                            <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-100">310</td>
-                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">127</td>
-                            <td class="px-3 py-2 text-center text-gray-700">115</td>
-                            <td class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100">242</td>
-                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">101</td>
-                            <td class="px-3 py-2 text-center text-gray-700">94</td>
-                            <td class="px-3 py-2 text-center font-bold text-green-500 bg-green-100">195</td>
-                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">26</td>
-                            <td class="px-3 py-2 text-center text-gray-700">21</td>
-                            <td class="px-3 py-2 text-center font-bold text-red-400 bg-red-100">47</td>
-                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">83</td>
-                            <td class="px-3 py-2 text-center text-gray-700">78</td>
-                            <td class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100">161</td>
-                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">18</td>
-                            <td class="px-3 py-2 text-center text-gray-700">16</td>
-                            <td class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100">34</td>
-                            <td class="border-l border-gray-100"></td>
-                        </tr>
-
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
             <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
-                <span class="text-sm text-gray-500" id="paginationInfo">Showing 1–6 of 6 entries</span>
+                <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
                         class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
@@ -419,11 +179,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </main>
 
+<!-- Modal Backdrop -->
 <div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40 modal-backdrop"></div>
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 animate-modal">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-red-100 p-3 rounded-lg">
                 <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -442,7 +203,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <!-- Save Confirmation Modal -->
 <div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 animate-modal">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-green-100 p-3 rounded-lg">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,64 +221,87 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
+// ─── State ───────────────────────────────────────────────────────────────────
+const API_URL    = '/api/job-fair-api.php';   // adjust path to match your project layout
 const ROWS_PER_PAGE = 9;
-let currentPage = 1;
-let deletingRowId = null;
-let savingRowId = null;
-const editingData = {};
 
-function getAllDataRows() {
-    return Array.from(document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)'))
-        .filter(r => r.style.display !== 'none' || r.dataset.filtered !== 'true');
+let allRows      = [];   // raw rows from API
+let filteredRows = [];   // after search filter
+let currentPage  = 1;
+let deletingId   = null;
+let savingId     = null;
+const editingData = {};  // snapshot before edit
+
+// ─── Bootstrap ───────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => loadData());
+
+async function loadData() {
+    const year = document.getElementById('yearFilter').value || new Date().getFullYear();
+    const tbody = document.getElementById('jobFairTbody');
+    tbody.innerHTML = '<tr><td colspan="20" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>';
+
+    try {
+        const res  = await fetch(`${API_URL}?year=${year}`);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        const { rows, totals, years } = json.data;
+
+        // Populate year dropdown (keep current selection)
+        populateYears(years, parseInt(year));
+
+        // Update summary cards
+        document.getElementById('card-vacancies').textContent  = totals.job_vacancies;
+        document.getElementById('card-employers').textContent   = totals.employers;
+        document.getElementById('card-interviewed').textContent = totals.interviewed;
+        document.getElementById('card-qualified').textContent   = totals.qualified;
+        document.getElementById('card-placed').textContent      = totals.placed;
+
+        allRows      = rows;
+        filteredRows = [...allRows];
+        currentPage  = 1;
+        renderPage();
+
+    } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="20" class="text-center py-8 text-red-400 text-sm">Error: ${err.message}</td></tr>`;
+    }
 }
 
-function getVisibleFilteredRows() {
-    return Array.from(document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)'))
-        .filter(r => r.dataset.filtered !== 'true');
-}
-
-function filterTable() {
-    const query = document.getElementById('searchCompany').value.toLowerCase().trim();
-    const rows = document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)');
-    rows.forEach(row => {
-        const employer = row.dataset.employer || '';
-        const employerCell = row.querySelectorAll('td')[1];
-        const text = (employerCell ? employerCell.textContent : employer).toLowerCase();
-        if (query === '' || text.includes(query)) {
-            row.dataset.filtered = 'false';
-        } else {
-            row.dataset.filtered = 'true';
-            row.style.display = 'none';
+function populateYears(years, selectedYear) {
+    const sel = document.getElementById('yearFilter');
+    const current = sel.value;
+    sel.innerHTML = '';
+    years.forEach(y => {
+        const opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y;
+        if (y === selectedYear || (!current && y === new Date().getFullYear())) {
+            opt.selected = true;
         }
+        sel.appendChild(opt);
     });
-    currentPage = 1;
-    renderPage();
 }
 
-function getTotalPages() {
-    return Math.max(1, Math.ceil(getVisibleFilteredRows().length / ROWS_PER_PAGE));
-}
-
+// ─── Rendering ───────────────────────────────────────────────────────────────
 function renderPage() {
-    const rows = getVisibleFilteredRows();
-    const total = rows.length;
-    const totalPages = getTotalPages();
+    const tbody = document.getElementById('jobFairTbody');
+    const total = filteredRows.length;
+    const totalPages = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+    currentPage = Math.min(currentPage, totalPages);
     const start = (currentPage - 1) * ROWS_PER_PAGE;
-    const end = Math.min(start + ROWS_PER_PAGE, total);
+    const pageRows = filteredRows.slice(start, start + ROWS_PER_PAGE);
 
-    // Hide all non-filtered rows first
-    document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)').forEach(r => {
-        if (r.dataset.filtered === 'true') {
-            r.style.display = 'none';
-        }
-    });
+    tbody.innerHTML = '';
 
-    rows.forEach((row, i) => {
-        row.style.display = (i >= start && i < end) ? '' : 'none';
-    });
+    if (pageRows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="20" class="text-center py-8 text-gray-400 text-sm">No entries found.</td></tr>';
+    } else {
+        pageRows.forEach(r => tbody.appendChild(buildRow(r)));
+    }
 
+    // Pagination info
     document.getElementById('paginationInfo').textContent =
-        total === 0 ? 'No entries found' : `Showing ${start + 1}–${end} of ${total} entries`;
+        total === 0 ? 'No entries found' : `Showing ${start + 1}–${Math.min(start + ROWS_PER_PAGE, total)} of ${total} entries`;
 
     document.getElementById('prevBtn').disabled = currentPage <= 1;
     document.getElementById('nextBtn').disabled = currentPage >= totalPages;
@@ -536,30 +320,117 @@ function renderPage() {
     }
 }
 
+function buildRow(r) {
+    const id = r.jobfair_id;
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-gray-50 hover:bg-gray-50';
+    tr.dataset.id       = id;
+    tr.dataset.employer = (r.company_name || '').toLowerCase();
+
+    // Helper: styled td
+    const td = (content, cls = '') => `<td class="px-3 py-2 text-center text-gray-600 ${cls}">${content}</td>`;
+    const tdBold = (content, color, bg, borderL = false) =>
+        `<td class="px-3 py-2 text-center font-semibold ${color} ${bg} ${borderL ? 'border-l border-gray-100' : ''}">${content}</td>`;
+
+    tr.innerHTML = `
+        <td class="px-4 py-2 text-gray-700 font-medium" data-field="month">${r.month} ${r.year}</td>
+        <td class="px-4 py-2 text-gray-700" data-field="company_name">${escHtml(r.company_name)}</td>
+
+        <!-- Job Vacancies -->
+        <td class="px-3 py-2 text-center text-blue-500 font-semibold border-l border-gray-100" data-field="vacancy_male">${r.vacancy_male}</td>
+        <td class="px-3 py-2 text-center text-blue-500 font-semibold" data-field="vacancy_female">${r.vacancy_female}</td>
+        <td class="px-3 py-2 text-center font-bold text-blue-600 bg-blue-50">${r.vacancy_total}</td>
+
+        <!-- Interviewed -->
+        ${td(r.int_m,    'border-l border-gray-100')}
+        ${td(r.int_f)}
+        ${tdBold(r.int_total,    'text-cyan-500',   'bg-cyan-50')}
+
+        <!-- Qualified -->
+        ${td(r.qual_m,   'border-l border-gray-100')}
+        ${td(r.qual_f)}
+        ${tdBold(r.qual_total,   'text-green-500',  'bg-green-50')}
+
+        <!-- Not Qualified -->
+        ${td(r.nqual_m,  'border-l border-gray-100')}
+        ${td(r.nqual_f)}
+        ${tdBold(r.nqual_total,  'text-red-400',    'bg-red-50')}
+
+        <!-- Placed / HOTS -->
+        ${td(r.placed_m, 'border-l border-gray-100')}
+        ${td(r.placed_f)}
+        ${tdBold(r.placed_total, 'text-orange-400', 'bg-orange-50')}
+
+        <!-- For Further Interview -->
+        ${td(r.ffi_m,    'border-l border-gray-100')}
+        ${td(r.ffi_f)}
+        ${tdBold(r.ffi_total,    'text-purple-400', 'bg-purple-50')}
+
+        <!-- Actions -->
+        <td class="px-3 py-2 text-center border-l border-gray-100">
+            <div class="flex items-center justify-center gap-2 action-buttons">
+                <button onclick="toggleEditMode(${id})" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="deleteRow(${id})" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                <button onclick="saveRow(${id})" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+                <button onclick="cancelEdit(${id})" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </td>
+    `;
+    return tr;
+}
+
+function escHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Filter & Pagination ─────────────────────────────────────────────────────
+function filterTable() {
+    const q = document.getElementById('searchCompany').value.toLowerCase().trim();
+    filteredRows = q ? allRows.filter(r => (r.company_name || '').toLowerCase().includes(q)) : [...allRows];
+    currentPage = 1;
+    renderPage();
+}
+
 function changePage(dir) {
-    const totalPages = getTotalPages();
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / ROWS_PER_PAGE));
     currentPage = Math.max(1, Math.min(currentPage + dir, totalPages));
     renderPage();
 }
 
-function getRowByIndex(rowId) {
-    const allRows = Array.from(document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)'));
-    return allRows.find(r => r.querySelector(`[data-row="${rowId}"]`));
+// ─── Edit ────────────────────────────────────────────────────────────────────
+// Only month (text), company_name, vacancy_male, vacancy_female are editable.
+// Beneficiary-derived counts (interviewed, qualified, etc.) are read-only.
+function getRow(id) {
+    return document.querySelector(`#jobFairTbody tr[data-id="${id}"]`);
 }
 
-function toggleEditMode(rowId) {
-    const row = getRowByIndex(rowId);
+function toggleEditMode(id) {
+    const row = getRow(id);
     if (!row) return;
-    const isEditing = row.classList.contains('editing');
-    if (isEditing) { cancelEdit(null, rowId); return; }
+    if (row.classList.contains('editing')) { cancelEdit(id); return; }
 
     row.classList.add('editing', 'bg-yellow-50');
-    const cells = row.querySelectorAll('td:not(:first-child):not(:nth-child(2)):not(:last-child)');
-    cells.forEach((cell, idx) => {
-        editingData[`cell_${rowId}_${idx}`] = cell.textContent.trim();
+
+    // Make month, company_name, vacancy_male, vacancy_female editable
+    const editableFields = ['month', 'company_name', 'vacancy_male', 'vacancy_female'];
+    editableFields.forEach(field => {
+        const cell = row.querySelector(`[data-field="${field}"]`);
+        if (!cell) return;
+        editingData[`${id}_${field}`] = cell.textContent.trim();
         cell.contentEditable = 'true';
-        cell.classList.add('border', 'border-yellow-300', 'bg-white');
+        cell.classList.add('border', 'border-yellow-300', 'bg-white', 'rounded');
     });
+
     const ab = row.querySelector('.action-buttons');
     ab.querySelector('.edit-btn').classList.add('hidden');
     ab.querySelector('.delete-btn').classList.add('hidden');
@@ -567,14 +438,16 @@ function toggleEditMode(rowId) {
     ab.querySelector('.cancel-btn').classList.remove('hidden');
 }
 
-function cancelEdit(event, rowId) {
-    const row = getRowByIndex(rowId);
+function cancelEdit(id) {
+    const row = getRow(id);
     if (!row) return;
-    const cells = row.querySelectorAll('td:not(:first-child):not(:nth-child(2)):not(:last-child)');
-    cells.forEach((cell, idx) => {
+    const editableFields = ['month', 'company_name', 'vacancy_male', 'vacancy_female'];
+    editableFields.forEach(field => {
+        const cell = row.querySelector(`[data-field="${field}"]`);
+        if (!cell) return;
+        cell.textContent = editingData[`${id}_${field}`] || '';
         cell.contentEditable = 'false';
-        cell.textContent = editingData[`cell_${rowId}_${idx}`] || '';
-        cell.classList.remove('border', 'border-yellow-300', 'bg-white');
+        cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'rounded');
     });
     row.classList.remove('editing', 'bg-yellow-50');
     const ab = row.querySelector('.action-buttons');
@@ -584,74 +457,128 @@ function cancelEdit(event, rowId) {
     ab.querySelector('.cancel-btn').classList.add('hidden');
 }
 
-function deleteRow(event, rowId) {
-    event.preventDefault();
-    deletingRowId = rowId;
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById('deleteModal').classList.remove('hidden');
+function saveRow(id) {
+    savingId = id;
+    openModal('saveModal');
 }
 
+async function confirmSave() {
+    const id  = savingId;
+    const row = getRow(id);
+    if (!row) { closeSaveModal(); return; }
+
+    // Parse month/year from the month cell (e.g. "January 2026")
+    const monthCell   = row.querySelector('[data-field="month"]');
+    const monthText   = monthCell ? monthCell.textContent.trim() : '';
+    const parts       = monthText.split(' ');
+    const monthVal    = parts[0] || '';
+    const yearVal     = parseInt(parts[1]) || new Date().getFullYear();
+
+    const companyCell = row.querySelector('[data-field="company_name"]');
+    const vacMCell    = row.querySelector('[data-field="vacancy_male"]');
+    const vacFCell    = row.querySelector('[data-field="vacancy_female"]');
+
+    const payload = {
+        jobfair_id:     id,
+        month:          monthVal,
+        year:           yearVal,
+        company_name:   companyCell ? companyCell.textContent.trim() : '',
+        vacancy_male:   parseInt(vacMCell  ? vacMCell.textContent.trim()  : 0) || 0,
+        vacancy_female: parseInt(vacFCell  ? vacFCell.textContent.trim()  : 0) || 0,
+    };
+
+    try {
+        const res  = await fetch(API_URL, {
+            method:  'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        // Exit edit mode
+        cancelEdit(id);
+        closeSaveModal();
+
+        // Flash green
+        row.style.transition = 'background-color 0.3s';
+        row.style.backgroundColor = '#dcfce7';
+        setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
+
+        // Sync allRows cache
+        const idx = allRows.findIndex(r => r.jobfair_id == id);
+        if (idx !== -1) {
+            allRows[idx].month          = monthVal;
+            allRows[idx].year           = yearVal;
+            allRows[idx].company_name   = payload.company_name;
+            allRows[idx].vacancy_male   = payload.vacancy_male;
+            allRows[idx].vacancy_female = payload.vacancy_female;
+            allRows[idx].vacancy_total  = payload.vacancy_male + payload.vacancy_female;
+        }
+
+    } catch (err) {
+        alert('Save failed: ' + err.message);
+        closeSaveModal();
+    }
+}
+
+// ─── Delete ──────────────────────────────────────────────────────────────────
+function deleteRow(id) {
+    deletingId = id;
+    openModal('deleteModal');
+}
+
+async function confirmDelete() {
+    try {
+        const res  = await fetch(`${API_URL}?id=${deletingId}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        // Remove from allRows + re-render
+        allRows      = allRows.filter(r => r.jobfair_id != deletingId);
+        filteredRows = filteredRows.filter(r => r.jobfair_id != deletingId);
+
+        const row = getRow(deletingId);
+        if (row) {
+            row.style.transition = 'opacity 0.3s';
+            row.style.opacity = '0';
+            setTimeout(() => { renderPage(); }, 300);
+        } else {
+            renderPage();
+        }
+
+        closeDeleteModal();
+
+        // Refresh cards
+        loadData();
+
+    } catch (err) {
+        alert('Delete failed: ' + err.message);
+        closeDeleteModal();
+    }
+}
+
+// ─── Modals ──────────────────────────────────────────────────────────────────
+function openModal(id) {
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById(id).classList.remove('hidden');
+}
 function closeDeleteModal() {
     document.getElementById('modalBackdrop').classList.add('hidden');
     document.getElementById('deleteModal').classList.add('hidden');
-    deletingRowId = null;
+    deletingId = null;
 }
-
-function confirmDelete() {
-    const row = getRowByIndex(deletingRowId);
-    if (row) {
-        row.style.transition = 'opacity 0.3s ease-out';
-        row.style.opacity = '0';
-        setTimeout(() => { row.remove(); closeDeleteModal(); renderPage(); }, 300);
-    }
-}
-
-function saveRow(event, rowId) {
-    event.preventDefault();
-    savingRowId = rowId;
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById('saveModal').classList.remove('hidden');
-}
-
 function closeSaveModal() {
     document.getElementById('modalBackdrop').classList.add('hidden');
     document.getElementById('saveModal').classList.add('hidden');
-    savingRowId = null;
+    savingId = null;
 }
 
-function confirmSave() {
-    const row = getRowByIndex(savingRowId);
-    if (row) {
-        const cells = row.querySelectorAll('td:not(:first-child):not(:nth-child(2)):not(:last-child)');
-        cells.forEach(cell => {
-            cell.contentEditable = 'false';
-            cell.classList.remove('border', 'border-yellow-300', 'bg-white');
-        });
-        row.classList.remove('editing', 'bg-yellow-50');
-        const ab = row.querySelector('.action-buttons');
-        ab.querySelector('.edit-btn').classList.remove('hidden');
-        ab.querySelector('.delete-btn').classList.remove('hidden');
-        ab.querySelector('.save-btn').classList.add('hidden');
-        ab.querySelector('.cancel-btn').classList.add('hidden');
-        closeSaveModal();
-        row.style.transition = 'background-color 0.3s ease-out';
-        row.style.backgroundColor = '#dcfce7';
-        setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
-    }
-}
-
-document.addEventListener('click', (e) => {
+document.addEventListener('click', e => {
     if (e.target === document.getElementById('modalBackdrop')) {
         closeDeleteModal(); closeSaveModal();
     }
 });
-
-// Initialize all rows as not filtered
-document.querySelectorAll('#jobFairTable tbody tr:not(.total-row)').forEach(r => {
-    r.dataset.filtered = 'false';
-});
-
-renderPage();
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
