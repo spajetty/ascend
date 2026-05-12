@@ -108,7 +108,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                     </thead>
                     <tbody id="jobmatch-tbody">
-                        <tr><td colspan="22" class="text-center py-6 text-gray-400 text-sm">No data found.</td></tr>
+                        <tr><td colspan="22" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                     </thead>
                     <tbody id="firsttime-tbody">
-                        <tr><td colspan="24" class="text-center py-6 text-gray-400 text-sm">No data found.</td></tr>
+                        <tr><td colspan="24" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -185,7 +185,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                     </thead>
                     <tbody id="jobfair-tbody">
-                        <tr><td colspan="20" class="text-center py-6 text-gray-400 text-sm">No data found.</td></tr>
+                        <tr><td colspan="20" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -198,8 +198,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-// ─── API paths — adjust if your project layout differs ───────────────────────
-const YEAR         = new Date().getFullYear();
+// ─── API paths ────────────────────────────────────────────────────────────────
+const YEAR           = new Date().getFullYear();
 const JOB_MATCH_API  = `/api/job-match-api.php?year=${YEAR}`;
 const FIRST_TIME_API = `/api/first-time-api.php?year=${YEAR}`;
 const JOB_FAIR_API   = `/api/job-fair-api.php?year=${YEAR}`;
@@ -207,43 +207,52 @@ const JOB_FAIR_API   = `/api/job-fair-api.php?year=${YEAR}`;
 // Preview shows only the last N rows (most recent months)
 const PREVIEW_ROWS = 3;
 
-// ─── Boot ────────────────────────────────────────────────────────────────────
+// ─── Helper: clear a stuck "Loading…" tbody with an error/empty message ───────
+function clearLoading(tbodyId, colspan, msg = 'No data available.') {
+    document.getElementById(tbodyId).innerHTML =
+        `<tr><td colspan="${colspan}" class="text-center py-6 text-gray-400 text-sm">${msg}</td></tr>`;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    Promise.all([
-        fetch(JOB_MATCH_API).then(r  => r.json()),
-        fetch(FIRST_TIME_API).then(r => r.json()),
-        fetch(JOB_FAIR_API).then(r   => r.json()),
-    ]).then(([jm, ft, jf]) => {
-        const jmData = jm.success ? jm.data : null;
-        const ftData = ft.success ? ft.data : null;
-        const jfData = jf.success ? jf.data : null;
 
-        // ── Summary Cards ──────────────────────────────────────────────────
-        // Total Users  = job-match registered + first-time jobseekers
-        const jmRegistered = jmData ? jmData.totals.registered    : 0;
-        const ftJobseekers = ftData ? ftData.totals.jobseekers    : 0;
+    // Fetch all three APIs in parallel; handle each independently so one
+    // failure doesn't block the others from rendering.
+    const fetchJson = url => fetch(url).then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+    });
+
+    Promise.allSettled([
+        fetchJson(JOB_MATCH_API),
+        fetchJson(FIRST_TIME_API),
+        fetchJson(JOB_FAIR_API),
+    ]).then(([jmResult, ftResult, jfResult]) => {
+
+        // Unwrap each result — null on failure or API success=false
+        const jmData = (jmResult.status === 'fulfilled' && jmResult.value.success)
+            ? jmResult.value.data : null;
+        const ftData = (ftResult.status === 'fulfilled' && ftResult.value.success)
+            ? ftResult.value.data : null;
+        const jfData = (jfResult.status === 'fulfilled' && jfResult.value.success)
+            ? jfResult.value.data : null;
+
+        // ── Summary Cards ──────────────────────────────────────────────────────
+        const jmRegistered = jmData ? jmData.totals.registered : 0;
+        const ftJobseekers = ftData ? ftData.totals.jobseekers : 0;
         document.getElementById('card-total-users').textContent     = jmRegistered + ftJobseekers;
-
-        // Total Employers = distinct employers in job fair this year
         document.getElementById('card-total-employers').textContent = jfData ? jfData.totals.employers    : '—';
-
-        // Total Job Fair Vacancies
         document.getElementById('card-total-vacancies').textContent = jfData ? jfData.totals.job_vacancies : '—';
+        document.getElementById('card-total-ftjs').textContent      = ftJobseekers || '—';
 
-        // Total First Time Job Seekers
-        document.getElementById('card-total-ftjs').textContent      = ftJobseekers;
-
-        // ── Preview Tables ─────────────────────────────────────────────────
+        // ── Preview Tables ─────────────────────────────────────────────────────
         renderJobMatch(jmData);
         renderFirstTime(ftData);
         renderJobFair(jfData);
-
-    }).catch(err => {
-        console.error('Dashboard load error:', err);
     });
 });
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 function escHtml(s) {
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
@@ -253,26 +262,26 @@ function tTotal(v, color, bg) {
     return `<td class="px-3 py-2 text-center font-semibold ${color} ${bg}">${v}</td>`;
 }
 
-// ─── Job Matching & Referral ─────────────────────────────────────────────────
+// ─── Job Matching & Referral ──────────────────────────────────────────────────
 function renderJobMatch(data) {
     const tbody = document.getElementById('jobmatch-tbody');
     if (!data || !data.rows.length) {
-        tbody.innerHTML = '<tr><td colspan="22" class="text-center py-6 text-gray-400 text-sm">No data available.</td></tr>';
+        clearLoading('jobmatch-tbody', 22);
         return;
     }
 
-    const rows    = data.rows.slice(-PREVIEW_ROWS);
-    const totals  = data.totals;
+    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const totals = data.totals;
     let html = '';
 
     rows.forEach(r => {
-        const regT   = +r.reg_m   + +r.reg_f;
-        const refT   = +r.ref_m   + +r.ref_f;
-        const intT   = +r.int_m   + +r.int_f;
-        const qualT  = +r.qual_m  + +r.qual_f;
-        const nqT    = +r.nqual_m + +r.nqual_f;
-        const plcT   = +r.placed_m+ +r.placed_f;
-        const ffiT   = +r.ffi_m   + +r.ffi_f;
+        const regT  = +r.reg_m    + +r.reg_f;
+        const refT  = +r.ref_m    + +r.ref_f;
+        const intT  = +r.int_m    + +r.int_f;
+        const qualT = +r.qual_m   + +r.qual_f;
+        const nqT   = +r.nqual_m  + +r.nqual_f;
+        const plcT  = +r.placed_m + +r.placed_f;
+        const ffiT  = +r.ffi_m    + +r.ffi_f;
 
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
             <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)} ${r.year}</td>
@@ -286,7 +295,6 @@ function renderJobMatch(data) {
         </tr>`;
     });
 
-    // Totals row — uses full-year totals from the API
     html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
         <td class="px-4 py-2 text-gray-800 font-bold">TOTAL</td>
         <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${totals.registered}</td>
@@ -305,7 +313,7 @@ function renderJobMatch(data) {
 function renderFirstTime(data) {
     const tbody = document.getElementById('firsttime-tbody');
     if (!data || !data.rows.length) {
-        tbody.innerHTML = '<tr><td colspan="24" class="text-center py-6 text-gray-400 text-sm">No data available.</td></tr>';
+        clearLoading('firsttime-tbody', 24);
         return;
     }
 
@@ -314,12 +322,12 @@ function renderFirstTime(data) {
     let html = '';
 
     rows.forEach(r => {
-        const seekT = +r.reg_m  + +r.reg_f;
-        const intT  = +r.int_m  + +r.int_f;
-        const qualT = +r.qual_m + +r.qual_f;
-        const nqT   = +r.nqual_m+ +r.nqual_f;
-        const plcT  = +r.placed_m++r.placed_f;
-        const ffiT  = +r.ffi_m  + +r.ffi_f;
+        const seekT = +r.reg_m    + +r.reg_f;
+        const intT  = +r.int_m    + +r.int_f;
+        const qualT = +r.qual_m   + +r.qual_f;
+        const nqT   = +r.nqual_m  + +r.nqual_f;
+        const plcT  = +r.placed_m + +r.placed_f;  // FIX: was +r.placed_m++r.placed_f (broken ++ operator)
+        const ffiT  = +r.ffi_m    + +r.ffi_f;
 
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
             <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)} ${r.year}</td>
@@ -353,7 +361,7 @@ function renderFirstTime(data) {
 function renderJobFair(data) {
     const tbody = document.getElementById('jobfair-tbody');
     if (!data || !data.rows.length) {
-        tbody.innerHTML = '<tr><td colspan="20" class="text-center py-6 text-gray-400 text-sm">No data available.</td></tr>';
+        clearLoading('jobfair-tbody', 20);
         return;
     }
 
