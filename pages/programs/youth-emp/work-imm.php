@@ -33,7 +33,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">151</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">68M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">83F</span>
+                        </div>
                     </div>
                     <div class="bg-teal-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +53,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">187</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">85M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">102F</span>
+                        </div>
                     </div>
                     <div class="bg-blue-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -63,7 +73,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-violet-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">151</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">68M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">83F</span>
+                        </div>
                     </div>
                     <div class="bg-violet-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -78,7 +93,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-amber-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">126</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">56M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">70F</span>
+                        </div>
                     </div>
                     <div class="bg-amber-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -97,7 +117,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">76</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">33M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">43F</span>
+                        </div>
                     </div>
                     <div class="bg-orange-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +137,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">35</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">15M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">20F</span>
+                        </div>
                     </div>
                     <div class="bg-green-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,7 +157,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800">—</span>
+                        <span class="text-2xl font-bold text-gray-800">15</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-xs text-blue-500 font-medium">8M</span>
+                            <span class="text-gray-300 text-xs">/</span>
+                            <span class="text-xs text-pink-500 font-medium">7F</span>
+                        </div>
                     </div>
                     <div class="bg-red-100 p-2.5 rounded-xl">
                         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

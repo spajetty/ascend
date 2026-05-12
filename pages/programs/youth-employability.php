@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Youth Served -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span id="totalYouthServed" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">351</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Registered -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span id="spesParticipants" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">158</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Referred -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span id="gipInterns" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">720</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -67,10 +67,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">GIP Interns</span>
             </div>
 
-            <!-- Work Immersion -->
+            <!-- GIP Interns -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span id="workImmersionParticipants" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">184</span>
                     <div class="bg-purple-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -80,10 +80,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Work Immersion Participants</span>
             </div>
 
-            <!-- Total Hired / Placed -->
+            <!-- Work Immersion -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span id="totalHired" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">255</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -148,9 +148,59 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-2 py-1 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="spesTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="28" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-semibold">February</td>
+                            <td class="px-4 py-2 text-gray-600">HANSBURY INC.</td>
+                            <td class="px-4 py-2 text-gray-600">February 11, 2026</td>
+                            <td class="px-4 py-2 text-gray-600">May 18, 2026</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">78</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-2 text-center text-gray-600">5</td><td class="px-2 py-2 text-center font-semibold text-green-600 bg-green-50">10</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-2 text-center text-gray-600">5</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">10</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-2 py-2 text-center text-gray-600">2</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">5</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-orange-400 bg-orange-50">2</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-400 bg-purple-50">1</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-pink-400 bg-pink-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">February</td>
+                            <td class="px-4 py-2 text-gray-600">KNC GROUP OF COMP.</td>
+                            <td class="px-4 py-2 text-gray-600">February 18, 2026</td>
+                            <td class="px-4 py-2 text-gray-600">May 5, 2026</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">60</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">163</td><td class="px-2 py-2 text-center text-gray-600">335</td><td class="px-2 py-2 text-center font-semibold text-green-600 bg-green-50">498</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">20</td><td class="px-2 py-2 text-center text-gray-600">30</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">50</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">7</td><td class="px-2 py-2 text-center text-gray-600">16</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">23</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">9</td><td class="px-2 py-2 text-center text-gray-600">16</td><td class="px-2 py-2 text-center font-semibold text-orange-400 bg-orange-50">25</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-600">3</td><td class="px-2 py-2 text-center font-semibold text-purple-400 bg-purple-50">4</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">2</td><td class="px-2 py-2 text-center font-semibold text-pink-400 bg-pink-50">2</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">March</td>
+                            <td class="px-4 py-2 text-gray-600">ALFAMART TRADING</td>
+                            <td class="px-4 py-2 text-gray-600">March 9, 2026</td>
+                            <td class="px-4 py-2 text-gray-600">June 16, 2026</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">78</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">226</td><td class="px-2 py-2 text-center text-gray-600">504</td><td class="px-2 py-2 text-center font-semibold text-green-600 bg-green-50">730</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-orange-400 bg-orange-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-400 bg-purple-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-pink-400 bg-pink-50">0</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <!-- TOTAL -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">578</td><td class="px-2 py-2 text-center text-gray-700">1256</td><td class="px-2 py-2 text-center font-bold text-green-600 bg-green-100">1834</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">33</td><td class="px-2 py-2 text-center text-gray-700">88</td><td class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100">121</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">16</td><td class="px-2 py-2 text-center text-gray-700">61</td><td class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100">77</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">24</td><td class="px-2 py-2 text-center text-gray-700">61</td><td class="px-2 py-2 text-center font-bold text-orange-400 bg-orange-100">85</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">4</td><td class="px-2 py-2 text-center text-gray-700">10</td><td class="px-2 py-2 text-center font-bold text-purple-400 bg-purple-100">14</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-700">4</td><td class="px-2 py-2 text-center font-bold text-pink-400 bg-pink-100">5</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">1</td><td class="px-2 py-2 text-center font-bold text-red-400 bg-red-100">1</td>
                         </tr>
                     </tbody>
                 </table>
@@ -214,9 +264,84 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-2 py-1 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="gipTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="27" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-semibold">January – March 2026</td>
+                            <td class="px-4 py-2 text-gray-600">Davao del Sur State College</td>
+                            <td class="px-4 py-2"><span class="bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-full">College</span></td>
+                            <td class="px-4 py-2 text-gray-600">BSBA</td>
+                            <td class="px-4 py-2 text-gray-600">PESO Digos City Office</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">20</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-2 text-center text-gray-600">8</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">13</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">February – April 2026</td>
+                            <td class="px-4 py-2 text-gray-600">Holy Cross of Davao College</td>
+                            <td class="px-4 py-2"><span class="bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-full">College</span></td>
+                            <td class="px-4 py-2 text-gray-600">BSIT</td>
+                            <td class="px-4 py-2 text-gray-600">DOLE Regional Office XI</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">25</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-2 text-center text-gray-600">10</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">16</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">March – May 2026</td>
+                            <td class="px-4 py-2 text-gray-600">University of Southeastern Philippines</td>
+                            <td class="px-4 py-2"><span class="bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-full">College</span></td>
+                            <td class="px-4 py-2 text-gray-600">BSED</td>
+                            <td class="px-4 py-2 text-gray-600">PESO Provincial Office</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">300</td>
+                            <!-- Participants -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-2 text-center text-gray-600">18</td><td class="px-2 py-2 text-center font-semibold text-teal-600 bg-teal-50">30</td>
+                            <!-- Inquired -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">0</td>
+                            <!-- Referred -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">0</td>
+                            <!-- Interviewed -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">0</td>
+                            <!-- PESO-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">20</td>
+                            <!-- Private-Accepted -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">0</td>
+                            <!-- Not Proceeded -->
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-600">0</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">0</td>
+                        </tr>
+                        <!-- TOTAL -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
+                            <td class="px-4 py-2 font-bold text-gray-700">—</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">30</td><td class="px-2 py-2 text-center text-gray-700">45</td><td class="px-2 py-2 text-center font-bold text-teal-600 bg-teal-100">75</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-purple-500 bg-purple-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">19</td><td class="px-2 py-2 text-center text-gray-700">30</td><td class="px-2 py-2 text-center font-bold text-pink-500 bg-pink-100">49</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-green-500 bg-green-100">0</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">0</td><td class="px-2 py-2 text-center text-gray-700">0</td><td class="px-2 py-2 text-center font-bold text-red-400 bg-red-100">0</td>
                         </tr>
                     </tbody>
                 </table>
@@ -259,9 +384,63 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-red-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="workImmersionTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="27" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-semibold">January</td>
+                            <td class="px-4 py-2 text-gray-600">Digos City National High School</td>
+                            <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">SHS</span></td>
+                            <td class="px-4 py-2 text-gray-600">STEM</td>
+                            <td class="px-4 py-2 text-gray-600">PESO Digos City Office</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">240</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-orange-500 bg-orange-50">25</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-2 py-2 text-center text-gray-600">18</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">30</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">25</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">20</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-2 py-2 text-center text-gray-600">8</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">13</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-2 text-center text-gray-600">3</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">5</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-600">1</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">2</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">January</td>
+                            <td class="px-4 py-2 text-gray-600">Holy Cross of Davao College</td>
+                            <td class="px-4 py-2"><span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">College</span></td>
+                            <td class="px-4 py-2 text-gray-600">BSBA</td>
+                            <td class="px-4 py-2 text-gray-600">DOLE Regional Office XI</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">320</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-orange-500 bg-orange-50">20</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">25</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">20</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-2 py-2 text-center text-gray-600">10</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">16</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">4</td><td class="px-2 py-2 text-center text-gray-600">6</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">10</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-600">3</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">4</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-2 py-2 text-center text-gray-600">1</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">2</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-semibold">March</td>
+                            <td class="px-4 py-2 text-gray-600">University of Southeastern Philippines</td>
+                            <td class="px-4 py-2"><span class="bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">College</span></td>
+                            <td class="px-4 py-2 text-gray-600">BSIT</td>
+                            <td class="px-4 py-2 text-gray-600">PESO Davao City</td>
+                            <td class="px-4 py-2 font-semibold text-gray-700">320</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-orange-500 bg-orange-50">30</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">22</td><td class="px-2 py-2 text-center text-gray-600">15</td><td class="px-2 py-2 text-center font-semibold text-blue-500 bg-blue-50">37</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-2 py-2 text-center text-gray-600">12</td><td class="px-2 py-2 text-center font-semibold text-teal-500 bg-teal-50">30</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">15</td><td class="px-2 py-2 text-center text-gray-600">10</td><td class="px-2 py-2 text-center font-semibold text-purple-500 bg-purple-50">25</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-600">5</td><td class="px-2 py-2 text-center font-semibold text-pink-500 bg-pink-50">13</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-2 py-2 text-center text-gray-600">8</td><td class="px-2 py-2 text-center font-semibold text-green-500 bg-green-50">11</td>
+                            <td class="px-2 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-2 py-2 text-center text-gray-600">2</td><td class="px-2 py-2 text-center font-semibold text-red-400 bg-red-50">4</td>
+                        </tr>
+                        <!-- TOTAL -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
+                            <td class="px-4 py-2 font-bold text-gray-700">—</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-2 py-2 text-center text-gray-700">83</td><td class="px-2 py-2 text-center font-bold text-orange-500 bg-orange-100">151</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">85</td><td class="px-2 py-2 text-center text-gray-700">102</td><td class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100">187</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-2 py-2 text-center text-gray-700">83</td><td class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100">151</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">56</td><td class="px-2 py-2 text-center text-gray-700">70</td><td class="px-2 py-2 text-center font-bold text-purple-500 bg-purple-100">126</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">33</td><td class="px-2 py-2 text-center text-gray-700">43</td><td class="px-2 py-2 text-center font-bold text-pink-500 bg-pink-100">76</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">15</td><td class="px-2 py-2 text-center text-gray-700">20</td><td class="px-2 py-2 text-center font-bold text-green-500 bg-green-100">35</td>
+                            <td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">8</td><td class="px-2 py-2 text-center text-gray-700">7</td><td class="px-2 py-2 text-center font-bold text-red-400 bg-red-100">15</td>
                         </tr>
                     </tbody>
                 </table>
@@ -273,80 +452,5 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     </div>
 </main>
-
-<script>
-async function loadYouthEmployabilityData() {
-    try {
-        // Load summary stats
-        const statsRes = await fetch('/api/get-youth-employability-stats.php');
-        const statsData = await statsRes.json();
-        if (statsData.success) {
-            document.getElementById('totalYouthServed').textContent = statsData.data.totalYouthServed;
-            document.getElementById('spesParticipants').textContent = statsData.data.spesParticipants;
-            document.getElementById('gipInterns').textContent = statsData.data.gipInterns;
-            document.getElementById('workImmersionParticipants').textContent = statsData.data.workImmersionParticipants;
-            document.getElementById('totalHired').textContent = statsData.data.totalHired;
-        }
-
-        // Load SPES data
-        const spesRes = await fetch('/api/get-spes-data.php');
-        const spesData = await spesRes.json();
-        if (spesData.success && spesData.data.length > 0) {
-            const tbody = document.getElementById('spesTableBody');
-            tbody.innerHTML = spesData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-semibold">${row.month_reported}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.employer}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.start_of_contract}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.end_of_contract}</td>
-                    <td class="px-4 py-2 font-semibold text-gray-700">${row.days}</td>
-                    <td colspan="23" class="px-4 py-2 text-center text-gray-500 text-xs">Additional data columns - customize as needed</td>
-                </tr>
-            `).join('');
-        }
-
-        // Load GIP data
-        const gipRes = await fetch('/api/get-gip-data.php');
-        const gipData = await gipRes.json();
-        if (gipData.success && gipData.data.length > 0) {
-            const tbody = document.getElementById('gipTableBody');
-            tbody.innerHTML = gipData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-semibold">${row.contract_period}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.school}</td>
-                    <td class="px-4 py-2"><span class="bg-teal-100 text-teal-700 text-xs font-semibold px-2 py-0.5 rounded-full">${row.college_or_shs}</span></td>
-                    <td class="px-4 py-2 text-gray-600">${row.course}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.office_assignment}</td>
-                    <td class="px-4 py-2 font-semibold text-gray-700">${row.required_hours}</td>
-                    <td colspan="21" class="px-4 py-2 text-center text-gray-500 text-xs">Additional data columns - customize as needed</td>
-                </tr>
-            `).join('');
-        }
-
-        // Load Work Immersion data
-        const wiRes = await fetch('/api/get-work-immersion-data.php');
-        const wiData = await wiRes.json();
-        if (wiData.success && wiData.data.length > 0) {
-            const tbody = document.getElementById('workImmersionTableBody');
-            tbody.innerHTML = wiData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-semibold">${row.contract_period}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.school}</td>
-                    <td class="px-4 py-2"><span class="bg-amber-100 text-amber-700 text-xs font-semibold px-2 py-0.5 rounded-full">${row.education_level}</span></td>
-                    <td class="px-4 py-2 text-gray-600">${row.course}</td>
-                    <td class="px-4 py-2 text-gray-600">${row.office_assignment}</td>
-                    <td class="px-4 py-2 font-semibold text-gray-700">${row.required_hours}</td>
-                    <td colspan="21" class="px-4 py-2 text-center text-gray-500 text-xs">Additional data columns - customize as needed</td>
-                </tr>
-            `).join('');
-        }
-    } catch (error) {
-        console.error('Error loading data:', error);
-    }
-}
-
-// Load data when page is ready
-document.addEventListener('DOMContentLoaded', loadYouthEmployabilityData);
-</script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>

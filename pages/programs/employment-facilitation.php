@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Users -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span id="totalUsers" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">351</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Employers -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span id="totalEmployers" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">158</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
@@ -58,7 +58,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Job Fair Vacancies -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-yellow-400">
                 <div class="flex items-center justify-between">
-                    <span id="totalJobFairVacancies" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">720</span>
                     <div class="bg-yellow-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -71,7 +71,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total First Time Job Seekers -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span id="firstTimeJobSeekers" class="text-2xl font-bold text-gray-800">—</span>
+                    <span class="text-2xl font-bold text-gray-800">184</span>
                     <div class="bg-purple-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -132,9 +132,47 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="jobMatchingTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="21" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">45</td><td class="px-3 py-2 text-center text-gray-600">62</td><td class="px-3 py-2 text-center font-semibold text-teal-600 bg-teal-50">107</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">30</td><td class="px-3 py-2 text-center text-gray-600">41</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">71</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">25</td><td class="px-3 py-2 text-center text-gray-600">35</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">60</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">20</td><td class="px-3 py-2 text-center text-gray-600">28</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">48</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-3 py-2 text-center text-gray-600">7</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">12</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-600">25</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">43</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">52</td><td class="px-3 py-2 text-center text-gray-600">58</td><td class="px-3 py-2 text-center font-semibold text-teal-600 bg-teal-50">110</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">35</td><td class="px-3 py-2 text-center text-gray-600">38</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">73</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">30</td><td class="px-3 py-2 text-center text-gray-600">32</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">62</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">24</td><td class="px-3 py-2 text-center text-gray-600">26</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">50</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-3 py-2 text-center text-gray-600">6</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">12</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">22</td><td class="px-3 py-2 text-center text-gray-600">24</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">46</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">2</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">4</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">60</td><td class="px-3 py-2 text-center text-gray-600">74</td><td class="px-3 py-2 text-center font-semibold text-teal-600 bg-teal-50">134</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">42</td><td class="px-3 py-2 text-center text-gray-600">50</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">92</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">36</td><td class="px-3 py-2 text-center text-gray-600">44</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">80</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">30</td><td class="px-3 py-2 text-center text-gray-600">36</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">66</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-3 py-2 text-center text-gray-600">8</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">14</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">28</td><td class="px-3 py-2 text-center text-gray-600">33</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">61</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
+                        </tr>
+                        <!-- TOTAL Row -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold">TOTAL</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">157</td><td class="px-3 py-2 text-center text-gray-700">194</td><td class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100">351</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">107</td><td class="px-3 py-2 text-center text-gray-700">129</td><td class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100">236</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">91</td><td class="px-3 py-2 text-center text-gray-700">111</td><td class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100">202</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">74</td><td class="px-3 py-2 text-center text-gray-700">90</td><td class="px-3 py-2 text-center font-bold text-green-500 bg-green-100">164</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">17</td><td class="px-3 py-2 text-center text-gray-700">21</td><td class="px-3 py-2 text-center font-bold text-red-400 bg-red-100">38</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">68</td><td class="px-3 py-2 text-center text-gray-700">82</td><td class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100">150</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">6</td><td class="px-3 py-2 text-center text-gray-700">8</td><td class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100">14</td>
                         </tr>
                     </tbody>
                 </table>
@@ -185,9 +223,47 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="firstTimeTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="21" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">24</td><td class="px-3 py-2 text-center text-gray-600">38</td><td class="px-3 py-2 text-center font-semibold text-pink-500 bg-pink-50">62</td>
+                            <td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50 border-l border-gray-100">87</td><td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50">112</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">20</td><td class="px-3 py-2 text-center text-gray-600">32</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">52</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">16</td><td class="px-3 py-2 text-center text-gray-600">26</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">42</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td><td class="px-3 py-2 text-center text-gray-600">6</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">10</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">13</td><td class="px-3 py-2 text-center text-gray-600">22</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">35</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-3 py-2 text-center text-gray-600">4</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-600">29</td><td class="px-3 py-2 text-center font-semibold text-pink-500 bg-pink-50">47</td>
+                            <td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50 border-l border-gray-100">95</td><td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50">134</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">15</td><td class="px-3 py-2 text-center text-gray-600">24</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">39</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-3 py-2 text-center text-gray-600">19</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">31</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-3 py-2 text-center text-gray-600">5</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">8</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-3 py-2 text-center text-gray-600">16</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">26</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">31</td><td class="px-3 py-2 text-center text-gray-600">44</td><td class="px-3 py-2 text-center font-semibold text-pink-500 bg-pink-50">75</td>
+                            <td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50 border-l border-gray-100">103</td><td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50">148</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">26</td><td class="px-3 py-2 text-center text-gray-600">38</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">64</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">21</td><td class="px-3 py-2 text-center text-gray-600">31</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">52</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-3 py-2 text-center text-gray-600">7</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">12</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-600">27</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">45</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-3 py-2 text-center text-gray-600">4</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
+                        </tr>
+                        <!-- TOTAL Row -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold">TOTAL</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">73</td><td class="px-3 py-2 text-center text-gray-700">111</td><td class="px-3 py-2 text-center font-bold text-pink-500 bg-pink-100">184</td>
+                            <td class="px-3 py-2 text-center font-bold text-teal-500 bg-teal-100 border-l border-gray-100">285</td><td class="px-3 py-2 text-center font-bold text-teal-500 bg-teal-100">394</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">61</td><td class="px-3 py-2 text-center text-gray-700">94</td><td class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100">155</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">49</td><td class="px-3 py-2 text-center text-gray-700">76</td><td class="px-3 py-2 text-center font-bold text-green-500 bg-green-100">125</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">12</td><td class="px-3 py-2 text-center text-gray-700">18</td><td class="px-3 py-2 text-center font-bold text-red-400 bg-red-100">30</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">41</td><td class="px-3 py-2 text-center text-gray-700">65</td><td class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100">106</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">8</td><td class="px-3 py-2 text-center text-gray-700">11</td><td class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100">19</td>
                         </tr>
                     </tbody>
                 </table>
@@ -236,9 +312,76 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
-                    <tbody id="jobFairTableBody">
+                    <tbody>
                         <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td colspan="20" class="px-4 py-8 text-center text-gray-500">Loading data...</td>
+                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">Agro Prime Manpower...</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">30</td><td class="px-3 py-2 text-center text-blue-500">25</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">55</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">22</td><td class="px-3 py-2 text-center text-gray-600">18</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">40</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-600">15</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">33</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">7</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-3 py-2 text-center text-gray-600">12</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">26</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">January 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">Pacific Direct Placement Corp.</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">20</td><td class="px-3 py-2 text-center text-blue-500">30</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">50</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">15</td><td class="px-3 py-2 text-center text-gray-600">22</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">37</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">12</td><td class="px-3 py-2 text-center text-gray-600">18</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">30</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-3 py-2 text-center text-gray-600">4</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">7</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-3 py-2 text-center text-gray-600">15</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">25</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">Mindanao Build & Trade Co.</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">45</td><td class="px-3 py-2 text-center text-blue-500">15</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">60</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">38</td><td class="px-3 py-2 text-center text-gray-600">12</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">50</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">30</td><td class="px-3 py-2 text-center text-gray-600">10</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">40</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-3 py-2 text-center text-gray-600">2</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">10</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">25</td><td class="px-3 py-2 text-center text-gray-600">8</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">33</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">5</td><td class="px-3 py-2 text-center text-gray-600">2</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">7</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">February 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">SunCorp Recruitment Agency</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-blue-500">32</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">50</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">14</td><td class="px-3 py-2 text-center text-gray-600">25</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">39</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">11</td><td class="px-3 py-2 text-center text-gray-600">20</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">31</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">3</td><td class="px-3 py-2 text-center text-gray-600">5</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">8</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">9</td><td class="px-3 py-2 text-center text-gray-600">17</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">26</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">5</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">Horizon Logistics Services</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">35</td><td class="px-3 py-2 text-center text-blue-500">20</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">55</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">28</td><td class="px-3 py-2 text-center text-gray-600">16</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">44</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">22</td><td class="px-3 py-2 text-center text-gray-600">13</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">35</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">6</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">9</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-600">11</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">29</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">4</td><td class="px-3 py-2 text-center text-gray-600">2</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">6</td>
+                        </tr>
+                        <tr class="border-b border-gray-50 hover:bg-gray-50">
+                            <td class="px-4 py-2 text-gray-700 font-medium">March 2026</td>
+                            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">BlueSeas Overseas Staffing</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">12</td><td class="px-3 py-2 text-center text-blue-500">28</td><td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">40</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">10</td><td class="px-3 py-2 text-center text-gray-600">22</td><td class="px-3 py-2 text-center font-semibold text-cyan-500 bg-cyan-50">32</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">8</td><td class="px-3 py-2 text-center text-gray-600">16</td><td class="px-3 py-2 text-center font-semibold text-green-500 bg-green-50">26</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">2</td><td class="px-3 py-2 text-center text-gray-600">4</td><td class="px-3 py-2 text-center font-semibold text-red-400 bg-red-50">6</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">7</td><td class="px-3 py-2 text-center text-gray-600">15</td><td class="px-3 py-2 text-center font-semibold text-orange-400 bg-orange-50">22</td>
+                            <td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">1</td><td class="px-3 py-2 text-center text-gray-600">3</td><td class="px-3 py-2 text-center font-semibold text-purple-400 bg-purple-50">4</td>
+                        </tr>
+                        <!-- TOTALS Row -->
+                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+                            <td class="px-4 py-2 text-gray-800 font-bold" colspan="2">TOTALS</td>
+                            <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">160</td><td class="px-3 py-2 text-center text-blue-500">150</td><td class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100">310</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">127</td><td class="px-3 py-2 text-center text-gray-700">115</td><td class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100">242</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">101</td><td class="px-3 py-2 text-center text-gray-700">94</td><td class="px-3 py-2 text-center font-bold text-green-500 bg-green-100">195</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">26</td><td class="px-3 py-2 text-center text-gray-700">21</td><td class="px-3 py-2 text-center font-bold text-red-400 bg-red-100">47</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">83</td><td class="px-3 py-2 text-center text-gray-700">78</td><td class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100">161</td>
+                            <td class="px-3 py-2 text-center text-gray-700 border-l border-gray-100">18</td><td class="px-3 py-2 text-center text-gray-700">16</td><td class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100">34</td>
                         </tr>
                     </tbody>
                 </table>
@@ -250,84 +393,5 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     </div>
 </main>
-
-<script>
-async function loadEmploymentFacilitationData() {
-    try {
-        const formatMonthYear = (month, year) => {
-            const parts = [month, year].filter(Boolean);
-            return parts.length ? parts.join(' ') : '—';
-        };
-        const dash = '<td class="px-3 py-2 text-center text-gray-400 border-l border-gray-100">—</td>';
-
-        // Load summary stats
-        const statsRes = await fetch('/api/get-employment-facilitation-stats.php');
-        const statsData = await statsRes.json();
-        if (statsData.success) {
-            document.getElementById('totalUsers').textContent = statsData.data.totalUsers;
-            document.getElementById('totalEmployers').textContent = statsData.data.totalEmployers;
-            document.getElementById('totalJobFairVacancies').textContent = statsData.data.totalJobFairVacancies;
-            document.getElementById('firstTimeJobSeekers').textContent = statsData.data.firstTimeJobSeekers;
-        }
-
-        // Load Job Matching data
-        const jobMatchRes = await fetch('/api/get-job-matching-data.php');
-        const jobMatchData = await jobMatchRes.json();
-        if (jobMatchData.success && jobMatchData.data.length > 0) {
-            const tbody = document.getElementById('jobMatchingTableBody');
-            tbody.innerHTML = jobMatchData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-medium">${row.month} ${row.year}</td>
-                    ${Array.from({ length: 20 }).map(() => dash).join('')}
-                </tr>
-            `).join('');
-        } else {
-            document.getElementById('jobMatchingTableBody').innerHTML = `<tr class="border-b border-gray-50 hover:bg-gray-50"><td colspan="21" class="px-4 py-8 text-center text-gray-500">No data found.</td></tr>`;
-        }
-
-        const firstTimeRes = await fetch('/api/get-first-time-jobseek-data.php');
-        const firstTimeData = await firstTimeRes.json();
-        const firstTimeBody = document.getElementById('firstTimeTableBody');
-        if (firstTimeData.success && firstTimeData.data.length > 0) {
-            firstTimeBody.innerHTML = firstTimeData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-medium">${formatMonthYear(row.month, row.year)}</td>
-                    <td class="px-3 py-2 text-center text-gray-400 border-l border-gray-100">—</td>
-                    <td class="px-3 py-2 text-center text-gray-400">—</td>
-                    <td class="px-3 py-2 text-center font-semibold text-pink-500 bg-pink-50">${row.jobseek ?? 0}</td>
-                    <td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50 border-l border-gray-100">${row.occ_permit ?? 0}</td>
-                    <td class="px-3 py-2 text-center font-semibold text-teal-500 bg-teal-50">${row.health_card ?? 0}</td>
-                    ${Array.from({ length: 15 }).map(() => '<td class="px-3 py-2 text-center text-gray-400 border-l border-gray-100">—</td>').join('')}
-                </tr>
-            `).join('');
-        } else {
-            firstTimeBody.innerHTML = `<tr class="border-b border-gray-50 hover:bg-gray-50"><td colspan="21" class="px-4 py-8 text-center text-gray-500">No data found.</td></tr>`;
-        }
-
-        const jobFairRes = await fetch('/api/get-job-fair-data.php');
-        const jobFairData = await jobFairRes.json();
-        const jobFairBody = document.getElementById('jobFairTableBody');
-        if (jobFairData.success && jobFairData.data.length > 0) {
-            jobFairBody.innerHTML = jobFairData.data.map(row => `
-                <tr class="border-b border-gray-50 hover:bg-gray-50">
-                    <td class="px-4 py-2 text-gray-700 font-medium">${formatMonthYear(row.month, row.year)}</td>
-                    <td class="px-4 py-2 text-gray-600 border-l border-gray-100">${row.company_name || '—'}</td>
-                    <td class="px-3 py-2 text-center text-blue-500 border-l border-gray-100">${row.vacancy_male ?? 0}</td>
-                    <td class="px-3 py-2 text-center text-blue-500">${row.vacancy_female ?? 0}</td>
-                    <td class="px-3 py-2 text-center font-semibold text-blue-500 bg-blue-50">${row.total_vacancies ?? 0}</td>
-                    ${Array.from({ length: 15 }).map(() => '<td class="px-3 py-2 text-center text-gray-400 border-l border-gray-100">—</td>').join('')}
-                </tr>
-            `).join('');
-        } else {
-            jobFairBody.innerHTML = `<tr class="border-b border-gray-50 hover:bg-gray-50"><td colspan="20" class="px-4 py-8 text-center text-gray-500">No data found.</td></tr>`;
-        }
-    } catch (error) {
-        console.error('Error loading data:', error);
-    }
-}
-
-// Load data when page is ready
-document.addEventListener('DOMContentLoaded', loadEmploymentFacilitationData);
-</script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
