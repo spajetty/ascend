@@ -16,7 +16,7 @@
             </div>
             <div>
                 <div class="stat-label">Total Beneficiaries</div>
-                <div class="stat-value">40,689</div>
+                <div class="stat-value" id="statTotal">0</div>
             </div>
         </div>
         <div class="stat-card">
@@ -29,7 +29,7 @@
             </div>
             <div>
                 <div class="stat-label">Hired</div>
-                <div class="stat-value">4,689</div>
+                <div class="stat-value" id="statHired">0</div>
             </div>
         </div>
         <div class="stat-card">
@@ -41,7 +41,7 @@
             </div>
             <div>
                 <div class="stat-label">Referred</div>
-                <div class="stat-value">50,752</div>
+                <div class="stat-value" id="statReferred">0</div>
             </div>
         </div>
         <div class="stat-card">
@@ -54,7 +54,7 @@
             </div>
             <div>
                 <div class="stat-label">Registered</div>
-                <div class="stat-value">689</div>
+                <div class="stat-value" id="statRegistered">0</div>
             </div>
         </div>
     </div>
