@@ -3,6 +3,37 @@
 function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, array &$state): ?int {
     $existingBenefId = $row['_sys_benef_id'] ?? null;
     $benefId = $existingBenefId ? (int)$existingBenefId : null;
+    $program = (string)($ctx['program'] ?? '');
+
+    $buildJobFairIdentityKey = static function (array $inputRow): string {
+        $email = strtolower(trim((string)rowValue($inputRow, ['Email', 'email'], '')));
+        if ($email !== '') {
+            return 'email:' . $email;
+        }
+
+        $contact = preg_replace('/\D+/', '', trim((string)rowValue($inputRow, ['Contact', 'contact'], '')));
+        if ($contact !== '') {
+            return 'contact:' . $contact;
+        }
+
+        $fname = strtolower(trim((string)rowValue($inputRow, ['First Name', 'FirstName', 'first_name', 'Firstname'], '')));
+        $lname = strtolower(trim((string)rowValue($inputRow, ['Last Name', 'LastName', 'last_name', 'Lastname', 'Surname', 'surname'], '')));
+        $dob = '';
+        if (!empty($inputRow['_parsed_dob'])) {
+            $dob = (string)$inputRow['_parsed_dob'];
+        } else {
+            $dob = trim((string)rowValue($inputRow, ['DOB', 'Birthday'], ''));
+        }
+
+        return 'name:' . $fname . '|' . $lname . '|' . strtolower($dob);
+    };
+
+    if ($program === 'Job Fair') {
+        $jobFairKey = $buildJobFairIdentityKey($row);
+        if ($jobFairKey !== '' && isset($state['jobFairBeneficiaryMap'][$jobFairKey])) {
+            return (int)$state['jobFairBeneficiaryMap'][$jobFairKey];
+        }
+    }
 
     if (!$benefId) {
         $firstName  = s(rowValue($row, ['First Name', 'FirstName', 'first_name', 'Firstname'], '')) ?: null;
@@ -47,6 +78,19 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $benefId = (int)$insBenef->insert_id;
         if ($benefId > 0) {
             $state['insertedBenefIds'][] = $benefId;
+            if ($program === 'Job Fair') {
+                $jobFairKey = $buildJobFairIdentityKey($row);
+                if ($jobFairKey !== '') {
+                    $state['jobFairBeneficiaryMap'][$jobFairKey] = $benefId;
+                }
+            }
+        }
+    }
+
+    if ($benefId > 0 && $program === 'Job Fair') {
+        $jobFairKey = $buildJobFairIdentityKey($row);
+        if ($jobFairKey !== '') {
+            $state['jobFairBeneficiaryMap'][$jobFairKey] = $benefId;
         }
     }
 
