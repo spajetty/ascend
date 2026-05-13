@@ -95,21 +95,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span id="tableTotal" class="text-sm font-semibold text-orange-500 bg-orange-100 px-3 py-1 rounded-full">— Total</span>
             </div>
 
-            <!-- Loading State -->
-            <div id="loadingState" class="flex items-center justify-center py-16 text-gray-400 gap-3">
-                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-                </svg>
-                <span class="text-sm">Loading data…</span>
-            </div>
-
-            <!-- Empty State -->
-            <div id="emptyState" class="hidden flex-col items-center justify-center py-16 text-gray-400 gap-2">
-                <span class="text-sm">No entries for this year.</span>
-            </div>
-
-            <div class="overflow-x-auto" id="tableWrapper">
+            <div class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -121,7 +107,19 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody"></tbody>
+                    <tbody id="tableBody">
+                        <tr id="loadingRow">
+                            <td colspan="6" class="text-center py-16 text-gray-400">
+                                <div class="flex items-center justify-center gap-3">
+                                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                                    </svg>
+                                    <span class="text-sm">Loading data…</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
 
@@ -223,8 +221,18 @@ async function loadData() {
 }
 
 function setLoading(state) {
-    document.getElementById('loadingState').classList.toggle('hidden', !state);
-    document.getElementById('tableWrapper').classList.toggle('hidden', state);
+    if (state) {
+        document.getElementById('tableBody').innerHTML = `
+            <tr><td colspan="6" class="text-center py-16 text-gray-400">
+                <div class="flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                    </svg>
+                    <span class="text-sm">Loading data…</span>
+                </div>
+            </td></tr>`;
+    }
 }
 
 // ─── Cards ────────────────────────────────────────────────────────────────────
@@ -239,18 +247,12 @@ function updateCards(t) {
 // ─── Table Render ─────────────────────────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('tableBody');
-    const empty = document.getElementById('emptyState');
 
     if (!allRows.length) {
-        tbody.innerHTML = '';
-        empty.classList.remove('hidden');
-        empty.classList.add('flex');
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-400 text-sm">No entries for this year.</td></tr>`;
         updatePagination(0);
         return;
     }
-
-    empty.classList.add('hidden');
-    empty.classList.remove('flex');
 
     const total  = allRows.length;
     const start  = (currentPage - 1) * ROWS_PER_PAGE;
