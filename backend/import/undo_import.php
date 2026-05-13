@@ -72,6 +72,7 @@ $conn->begin_transaction();
 try {
     $deletedFirstJobSeek = deleteByIds($conn, 'firstJobSeek', 'jobseek_id', (array)($payload['first_job_seek_ids'] ?? []));
     $deletedJobFair = deleteByIds($conn, 'jobFair', 'jobfair_id', (array)($payload['jobfair_ids'] ?? []));
+    $deletedActivityHistory = deleteByIds($conn, 'beneficiary_activity_history', 'history_id', (array)($payload['activity_history_ids'] ?? []));
     $deletedSPESEmployment = deleteByIds($conn, 'spes_employment', 'employment_id', (array)($payload['spes_employment_ids'] ?? []));
 
     $deletedSPES = deleteByIds($conn, 'spes', 'spes_id', (array)($payload['spes_ids'] ?? []));
@@ -254,6 +255,7 @@ try {
         'deleted' => [
             'first_job_seek' => $deletedFirstJobSeek,
             'jobfair' => $deletedJobFair,
+            'activity_history' => $deletedActivityHistory,
             'spes_employment' => $deletedSPESEmployment,
             'spes' => $deletedSPES,
             'schools' => $deletedSchools,
