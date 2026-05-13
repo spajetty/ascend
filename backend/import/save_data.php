@@ -25,6 +25,7 @@ $sourceFileName = trim((string)($input['fileName'] ?? ''));
 $spesCategoryRaw = trim((string)($input['spesCategory'] ?? ''));
 $wiirpCategoryRaw = trim((string)($input['wiirpCategory'] ?? ''));
 $gipCategoryRaw = trim((string)($input['gipCategory'] ?? ''));
+$jobFairEventRaw = trim((string)($input['jobFairEvent'] ?? ''));
 
 // Shared helpers
 require_once __DIR__ . '/helpers/db_utils.php';
@@ -39,6 +40,7 @@ require_once __DIR__ . '/savers/save_whip_beneficiaries.php';
 require_once __DIR__ . '/savers/save_wiirp.php';
 require_once __DIR__ . '/savers/save_gip.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
+require_once __DIR__ . '/savers/save_job_fair.php';
 require_once __DIR__ . '/savers/save_spes.php';
 require_once __DIR__ . '/savers/save_schools.php';
 
@@ -51,9 +53,11 @@ $undoToken = null;
 
 $state = [
     'insertedBenefIds' => [],
+    'jobFairBeneficiaryMap' => [],
     'insertedDocIds' => [],
     'insertedJobMatchIds' => [],
     'insertedJobFairIds' => [],
+    'insertedActivityHistoryIds' => [],
     'insertedFirstJobSeekIds' => [],
     'insertedWhipIds' => [],
     'insertedWhipTable' => null,
@@ -116,6 +120,7 @@ try {
         'spesCategory' => $spesCategoryRaw,
         'wiirpCategory' => $wiirpCategoryRaw,
         'gipCategory' => $gipCategoryRaw,
+        'jobFairEvent' => $jobFairEventRaw,
     ];
 
     foreach ($rows as $row) {
@@ -182,7 +187,9 @@ try {
 
         if (isWhipBeneficiariesProgram($program)) {
             $result = saveWhipBeneficiariesRow($conn, $row, $benefId, $ctx, $state);
-        } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
+        } elseif ($program === 'Job Fair') {
+            $result = saveJobFairRow($conn, $row, $benefId, $ctx, $state);
+        } elseif (in_array($program, ['Job Matching and Referral', 'First Time Jobseeker'], true)) {
             $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
         } elseif ($program === 'SPES') {
             // Pass category through row for SPES
@@ -206,6 +213,7 @@ try {
         !empty($state['insertedDocIds']) ||
         !empty($state['insertedJobMatchIds']) ||
         !empty($state['insertedJobFairIds']) ||
+        !empty($state['insertedActivityHistoryIds']) ||
         !empty($state['insertedFirstJobSeekIds']) ||
         !empty($state['insertedWhipIds']) ||
         !empty($state['insertedWiirpIds']) ||
@@ -239,6 +247,7 @@ try {
             'docs_ids' => array_values(array_unique(array_map('intval', $state['insertedDocIds']))),
             'jobmatch_ids' => array_values(array_unique(array_map('intval', $state['insertedJobMatchIds']))),
             'jobfair_ids' => array_values(array_unique(array_map('intval', $state['insertedJobFairIds']))),
+            'activity_history_ids' => array_values(array_unique(array_map('intval', $state['insertedActivityHistoryIds']))),
             'first_job_seek_ids' => array_values(array_unique(array_map('intval', $state['insertedFirstJobSeekIds']))),
             'whip_ids' => array_values(array_unique(array_map('intval', $state['insertedWhipIds']))),
             'whip_table' => $state['insertedWhipTable'],
