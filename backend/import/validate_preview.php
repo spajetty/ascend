@@ -34,6 +34,7 @@ require_once __DIR__ . '/validators/validate_whip_beneficiaries.php';
 require_once __DIR__ . '/validators/validate_wiirp.php';
 require_once __DIR__ . '/validators/validate_gip.php';
 require_once __DIR__ . '/validators/validate_job_matching.php';
+require_once __DIR__ . '/validators/validate_job_fair.php';
 require_once __DIR__ . '/validators/validate_spes.php';
 require_once __DIR__ . '/validators/validate_schools.php';
 require_once __DIR__ . '/validators/validate_beneficiaries.php';
@@ -50,7 +51,9 @@ if ($program === 'Employers Accreditation') {
     $validatedData = validateWiirp($conn, $rows, $wiirpCategory);
 } elseif (isGipProgram($program)) {
     $validatedData = validateGip($conn, $rows, $gipCategory);
-} elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
+} elseif ($program === 'Job Fair') {
+    $validatedData = validateJobFair($conn, $rows, $jobFairEvent);
+} elseif (in_array($program, ['Job Matching and Referral', 'First Time Jobseeker'], true)) {
     $validatedData = validateJobMatchingFamily($conn, $rows, $program, $jobFairEvent);
 } elseif ($program === 'SPES') {
     $validatedData = validateSPES($conn, $rows, $program);
@@ -72,7 +75,7 @@ function collectUnknownEmployers(mysqli $conn, array $rows, string $program): ar
         $fieldGroups = [
             ['Company', 'company'],
         ];
-    } elseif (in_array($program, ['Job Matching and Referral', 'Job Fair', 'First Time Jobseeker'], true)) {
+    } elseif (in_array($program, ['Job Matching and Referral', 'First Time Jobseeker'], true)) {
         $fieldGroups = [
             ['Company', 'CompanyName', 'Employer'],
         ];
@@ -120,6 +123,11 @@ function collectUnknownEmployers(mysqli $conn, array $rows, string $program): ar
 $newCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'new'));
 $invalidCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'invalid'));
 $duplicateCount = count(array_filter($validatedData, fn($r) => ($r['badge_status'] ?? '') === 'duplicate'));
+
+foreach ($validatedData as $index => &$row) {
+    $row['_sys_row_index'] = $index;
+}
+unset($row);
 
 echo json_encode([
     'success' => true,

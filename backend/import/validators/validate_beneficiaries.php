@@ -75,7 +75,9 @@ function validateBeneficiaries(mysqli $conn, array $rows, string $program): arra
 
         $excelDupKey = buildExcelDuplicateKey($fname, $lname, $dob);
         if ($excelDupKey !== null) {
-            if (isset($seenExcelRows[$excelDupKey])) {
+            // For Job Fair, we don't mark simple name+dob duplicates at the beneficiary
+            // validation stage — Job Fair duplicates depend on company+position+event.
+            if (isset($seenExcelRows[$excelDupKey]) && ($program !== 'Job Fair')) {
                 $previewRow['status_message'] = 'Duplicate in uploaded file';
                 $previewRow['badge_status'] = 'duplicate';
                 $previewRow['_sys_skip'] = true;
