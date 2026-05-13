@@ -28,10 +28,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
-            <!-- Career Dev. Sessions -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span id="cardSessions" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -41,10 +40,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Career Dev. Sessions</span>
             </div>
 
-            <!-- Career Dev. Participants (Total) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">712</span>
+                    <span id="cardTotal" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -54,10 +52,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Career Dev. Participants (Total)</span>
             </div>
 
-            <!-- Career Dev. Participants (Male) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">165</span>
+                    <span id="cardMale" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -67,10 +64,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Career Dev. Participants (Male)</span>
             </div>
 
-            <!-- Career Dev. Participants (Female) -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">547</span>
+                    <span id="cardFemale" class="text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-pink-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -86,14 +82,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         <div class="flex items-center gap-3 mb-4 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Filter by year:</span>
-                <select class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option>2026</option>
-                    <option>2025</option>
-                    <option>2024</option>
+                <select id="yearSelect"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
                 </select>
             </div>
-
-            <!-- Search school -->
             <div class="relative flex-1 max-w-sm">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
@@ -108,7 +100,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
             <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <h2 class="font-bold text-gray-800 text-base">Career Development Support Program</h2>
-                <span class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">712 Total</span>
+                <span id="tableTotal" class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">— Total</span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
@@ -122,135 +114,25 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                        <!-- Row 1 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
-                            <td class="px-4 py-3 text-gray-700 font-medium">January 15, 2026</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">48</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">22</td>
-                            <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100">70</td>
-                            <td class="px-4 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="1">
-                                    <button onclick="toggleEditMode(1)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="deleteRow(event, 1)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="saveRow(event, 1)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="cancelEdit(event, 1)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
+                    <tbody id="tableBody">
+                        <tr id="loadingRow">
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td>
                         </tr>
-
-                        <!-- Row 2 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
-                            <td class="px-4 py-3 text-gray-700 font-medium">January 29, 2026</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">62</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">18</td>
-                            <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100">80</td>
-                            <td class="px-4 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="2">
-                                    <button onclick="toggleEditMode(2)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="deleteRow(event, 2)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="saveRow(event, 2)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="cancelEdit(event, 2)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- Row 3 -->
-                        <tr class="border-b border-gray-50 hover:bg-gray-50" data-school="school name">
-                            <td class="px-4 py-3 text-gray-700 font-medium">February 1, 2026</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">School Name</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">55</td>
-                            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">30</td>
-                            <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100">85</td>
-                            <td class="px-4 py-3 text-center border-l border-gray-100">
-                                <div class="flex items-center justify-center gap-2 action-buttons" data-row="3">
-                                    <button onclick="toggleEditMode(3)" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="deleteRow(event, 3)" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="saveRow(event, 3)" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                                        </svg>
-                                    </button>
-                                    <button onclick="cancelEdit(event, 3)" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-                            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-                            <td class="px-4 py-3 border-l border-gray-100"></td>
-                            <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">165</td>
-                            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">547</td>
-                            <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">712</td>
-                            <td class="border-l border-gray-100"></td>
-                        </tr>
-
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
             <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
-                <span class="text-sm text-gray-500" id="paginationInfo">Showing 1–3 of 3 entries</span>
+                <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
                         class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                        disabled>
-                        &lsaquo;
-                    </button>
+                        disabled>&lsaquo;</button>
                     <div id="pageNumbers" class="flex items-center gap-1"></div>
                     <button onclick="changePage(1)" id="nextBtn"
-                        class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed">
-                        &rsaquo;
-                    </button>
+                        class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        disabled>&rsaquo;</button>
                 </div>
             </div>
         </div>
@@ -258,6 +140,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </main>
 
+<!-- Modal Backdrop -->
 <div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40 modal-backdrop"></div>
 
 <!-- Delete Confirmation Modal -->
@@ -299,98 +182,185 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
+const API_URL = '/api/cdsp-api.php';
 const ROWS_PER_PAGE = 9;
-let currentPage = 1;
-let deletingRowId = null;
-let savingRowId = null;
-const editingData = {};
 
-function getAllDataRows() {
-    return Array.from(document.querySelectorAll('tbody tr:not(.total-row)'));
+let allRows      = [];   // raw data from API
+let filteredRows = [];   // after search filter
+let currentPage  = 1;
+let deletingId   = null;
+let savingId     = null;
+let editingData  = {};   // backup before edit
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+function fmt(dateStr) {
+    if (!dateStr) return '—';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-function getVisibleFilteredRows() {
-    return getAllDataRows().filter(r => r.dataset.filtered !== 'true');
+function num(n) {
+    return Number(n).toLocaleString();
 }
 
+// ─── Load data from API ───────────────────────────────────────────────────────
+async function loadData(year) {
+    document.getElementById('loadingRow').style.display = '';
+    document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
+
+    try {
+        const res  = await fetch(`${API_URL}?year=${year}`);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        const { rows, totals, years } = json.data;
+
+        // Populate year dropdown (only on first load)
+        const sel = document.getElementById('yearSelect');
+        if (sel.options.length === 0) {
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if (y === year) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        // Update cards
+        document.getElementById('cardSessions').textContent = num(totals.sessions);
+        document.getElementById('cardTotal').textContent    = num(totals.total);
+        document.getElementById('cardMale').textContent     = num(totals.total_m);
+        document.getElementById('cardFemale').textContent   = num(totals.total_f);
+        document.getElementById('tableTotal').textContent   = num(totals.total) + ' Total';
+
+        allRows = rows;
+        document.getElementById('searchSchool').value = '';
+        applyFilters();
+
+    } catch (err) {
+        document.getElementById('loadingRow').innerHTML =
+            `<td colspan="6" class="px-4 py-8 text-center text-red-500 text-sm">Error: ${err.message}</td>`;
+    }
+}
+
+// ─── Filter + Render ──────────────────────────────────────────────────────────
 function applyFilters() {
     const query = document.getElementById('searchSchool').value.toLowerCase().trim();
-
-    getAllDataRows().forEach(row => {
-        const school = (row.dataset.school || '').toLowerCase();
-        const matchSearch = !query || school.includes(query);
-
-        row.dataset.filtered = matchSearch ? 'false' : 'true';
-        if (row.dataset.filtered === 'true') row.style.display = 'none';
-    });
-
+    filteredRows = allRows.filter(r =>
+        !query || (r.school || '').toLowerCase().includes(query)
+    );
     currentPage = 1;
     renderPage();
 }
 
-function getTotalPages() {
-    return Math.max(1, Math.ceil(getVisibleFilteredRows().length / ROWS_PER_PAGE));
-}
-
 function renderPage() {
-    const rows = getVisibleFilteredRows();
-    const total = rows.length;
-    const totalPages = getTotalPages();
-    const start = (currentPage - 1) * ROWS_PER_PAGE;
-    const end = Math.min(start + ROWS_PER_PAGE, total);
+    const tbody  = document.getElementById('tableBody');
+    const total  = filteredRows.length;
+    const pages  = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+    const start  = (currentPage - 1) * ROWS_PER_PAGE;
+    const end    = Math.min(start + ROWS_PER_PAGE, total);
+    const slice  = filteredRows.slice(start, end);
 
-    getAllDataRows().forEach(r => {
-        if (r.dataset.filtered === 'true') r.style.display = 'none';
-    });
-    rows.forEach((row, i) => {
-        row.style.display = (i >= start && i < end) ? '' : 'none';
-    });
+    // Clear all but loading row
+    Array.from(tbody.querySelectorAll('tr:not(#loadingRow)')).forEach(r => r.remove());
+    document.getElementById('loadingRow').style.display = 'none';
 
+    if (slice.length === 0) {
+        tbody.insertAdjacentHTML('beforeend',
+            `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">No entries found.</td></tr>`);
+    } else {
+        slice.forEach(row => tbody.insertAdjacentHTML('beforeend', buildRow(row)));
+    }
+
+    // Total row
+    const totM = filteredRows.reduce((s, r) => s + Number(r.cdsp_m), 0);
+    const totF = filteredRows.reduce((s, r) => s + Number(r.cdsp_f), 0);
+    tbody.insertAdjacentHTML('beforeend', `
+        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
+            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
+            <td class="px-4 py-3 border-l border-gray-100"></td>
+            <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${num(totM)}</td>
+            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${num(totF)}</td>
+            <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${num(totM + totF)}</td>
+            <td class="border-l border-gray-100"></td>
+        </tr>
+    `);
+
+    // Pagination info
     document.getElementById('paginationInfo').textContent =
         total === 0 ? 'No entries found' : `Showing ${start + 1}–${end} of ${total} entries`;
-
     document.getElementById('prevBtn').disabled = currentPage <= 1;
-    document.getElementById('nextBtn').disabled = currentPage >= getTotalPages();
+    document.getElementById('nextBtn').disabled = currentPage >= pages;
 
     const container = document.getElementById('pageNumbers');
     container.innerHTML = '';
-    for (let p = 1; p <= getTotalPages(); p++) {
+    for (let p = 1; p <= pages; p++) {
         const btn = document.createElement('button');
         btn.textContent = p;
         btn.className = `px-3 py-1.5 rounded-lg text-sm border font-medium transition-colors ` +
-            (p === currentPage
-                ? 'bg-teal-500 text-white border-teal-500'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50');
+            (p === currentPage ? 'bg-teal-500 text-white border-teal-500' : 'border-gray-200 text-gray-600 hover:bg-gray-50');
         btn.onclick = () => { currentPage = p; renderPage(); };
         container.appendChild(btn);
     }
 }
 
-function changePage(dir) {
-    const totalPages = getTotalPages();
-    currentPage = Math.max(1, Math.min(currentPage + dir, totalPages));
-    renderPage();
+function buildRow(r) {
+    const id    = r.cdsp_id;
+    const total = Number(r.cdsp_m) + Number(r.cdsp_f);
+    return `
+    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}" data-school="${(r.school || '').toLowerCase()}">
+        <td class="px-4 py-3 text-gray-700 font-medium date-cell">${fmt(r.date)}</td>
+        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">${r.school || '—'}</td>
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">${num(r.cdsp_m)}</td>
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">${num(r.cdsp_f)}</td>
+        <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100 total-cell">${num(total)}</td>
+        <td class="px-4 py-3 text-center border-l border-gray-100">
+            <div class="flex items-center justify-center gap-2 action-buttons">
+                <button onclick="toggleEditMode('${id}')" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </button>
+                <button onclick="deleteRow('${id}')" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </button>
+                <button onclick="saveRow('${id}')" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </button>
+                <button onclick="cancelEdit('${id}')" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        </td>
+    </tr>`;
 }
 
-function getRow(rowId) {
-    return getAllDataRows()[rowId - 1];
+function getRowEl(id) {
+    return document.querySelector(`tr[data-id="${id}"]`);
 }
 
-function toggleEditMode(rowId) {
-    const row = getRow(rowId);
-    const isEditing = row.classList.contains('editing');
-    if (isEditing) { cancelEdit(null, rowId); return; }
+// ─── Edit ─────────────────────────────────────────────────────────────────────
+function toggleEditMode(id) {
+    const row = getRowEl(id);
+    if (!row) return;
+    if (row.classList.contains('editing')) { cancelEdit(id); return; }
 
     row.classList.add('editing', 'bg-yellow-50');
-    // editable: school(0), male(1), female(2), total(3)
-    const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
-    cells.forEach((cell, idx) => {
-        if (idx < 4) {
-            editingData[`cell_${rowId}_${idx}`] = cell.textContent.trim();
-            cell.contentEditable = 'true';
-            cell.classList.add('border', 'border-yellow-300', 'bg-white');
-        }
+
+    // Store originals
+    const rec = allRows.find(r => String(r.cdsp_id) === String(id));
+    editingData[id] = { date: rec.date, school: rec.school, cdsp_m: rec.cdsp_m, cdsp_f: rec.cdsp_f };
+
+    // Make date cell editable as input[date]
+    const dateCell = row.querySelector('.date-cell');
+    dateCell.innerHTML = `<input type="date" value="${rec.date}" class="border border-yellow-300 rounded px-2 py-1 text-xs w-36 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400" id="edit-date-${id}">`;
+
+    // school, male, female editable
+    ['school-cell', 'male-cell', 'female-cell'].forEach(cls => {
+        const cell = row.querySelector('.' + cls);
+        cell.contentEditable = 'true';
+        cell.classList.add('border', 'border-yellow-300', 'bg-white');
     });
+
     const ab = row.querySelector('.action-buttons');
     ab.querySelector('.edit-btn').classList.add('hidden');
     ab.querySelector('.delete-btn').classList.add('hidden');
@@ -398,15 +368,22 @@ function toggleEditMode(rowId) {
     ab.querySelector('.cancel-btn').classList.remove('hidden');
 }
 
-function cancelEdit(event, rowId) {
-    const row = getRow(rowId);
-    const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
-    cells.forEach((cell, idx) => {
-        if (idx < 4) {
-            cell.contentEditable = 'false';
-            cell.textContent = editingData[`cell_${rowId}_${idx}`] || '';
-            cell.classList.remove('border', 'border-yellow-300', 'bg-white');
-        }
+function cancelEdit(id) {
+    const row = getRowEl(id);
+    if (!row) return;
+    const backup = editingData[id];
+    if (backup) {
+        const total = Number(backup.cdsp_m) + Number(backup.cdsp_f);
+        row.querySelector('.date-cell').innerHTML   = fmt(backup.date);
+        row.querySelector('.school-cell').textContent = backup.school || '—';
+        row.querySelector('.male-cell').textContent   = num(backup.cdsp_m);
+        row.querySelector('.female-cell').textContent = num(backup.cdsp_f);
+        row.querySelector('.total-cell').textContent  = num(total);
+    }
+    ['school-cell', 'male-cell', 'female-cell'].forEach(cls => {
+        const cell = row.querySelector('.' + cls);
+        cell.contentEditable = 'false';
+        cell.classList.remove('border', 'border-yellow-300', 'bg-white');
     });
     row.classList.remove('editing', 'bg-yellow-50');
     const ab = row.querySelector('.action-buttons');
@@ -414,31 +391,11 @@ function cancelEdit(event, rowId) {
     ab.querySelector('.delete-btn').classList.remove('hidden');
     ab.querySelector('.save-btn').classList.add('hidden');
     ab.querySelector('.cancel-btn').classList.add('hidden');
+    delete editingData[id];
 }
 
-function deleteRow(event, rowId) {
-    event.preventDefault();
-    deletingRowId = rowId;
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById('deleteModal').classList.remove('hidden');
-}
-
-function closeDeleteModal() {
-    document.getElementById('modalBackdrop').classList.add('hidden');
-    document.getElementById('deleteModal').classList.add('hidden');
-    deletingRowId = null;
-}
-
-function confirmDelete() {
-    const row = getRow(deletingRowId);
-    row.style.transition = 'opacity 0.3s ease-out';
-    row.style.opacity = '0';
-    setTimeout(() => { row.remove(); closeDeleteModal(); renderPage(); }, 300);
-}
-
-function saveRow(event, rowId) {
-    event.preventDefault();
-    savingRowId = rowId;
+function saveRow(id) {
+    savingId = id;
     document.getElementById('modalBackdrop').classList.remove('hidden');
     document.getElementById('saveModal').classList.remove('hidden');
 }
@@ -446,38 +403,117 @@ function saveRow(event, rowId) {
 function closeSaveModal() {
     document.getElementById('modalBackdrop').classList.add('hidden');
     document.getElementById('saveModal').classList.add('hidden');
-    savingRowId = null;
+    savingId = null;
 }
 
-function confirmSave() {
-    const row = getRow(savingRowId);
-    const cells = row.querySelectorAll('td:not(:first-child):not(:last-child)');
-    cells.forEach((cell, idx) => {
-        if (idx < 4) {
+async function confirmSave() {
+    const id  = savingId;
+    const row = getRowEl(id);
+    closeSaveModal();
+    if (!row) return;
+
+    const newDate   = document.getElementById(`edit-date-${id}`)?.value || editingData[id]?.date;
+    const newSchool = row.querySelector('.school-cell').textContent.trim();
+    const newMale   = parseInt(row.querySelector('.male-cell').textContent.replace(/,/g, ''), 10) || 0;
+    const newFemale = parseInt(row.querySelector('.female-cell').textContent.replace(/,/g, ''), 10) || 0;
+
+    try {
+        const res  = await fetch(API_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cdsp_id: id, date: newDate, school: newSchool, cdsp_m: newMale, cdsp_f: newFemale })
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        // Update local data
+        const rec = allRows.find(r => String(r.cdsp_id) === String(id));
+        if (rec) { rec.date = newDate; rec.school = newSchool; rec.cdsp_m = newMale; rec.cdsp_f = newFemale; rec.total = newMale + newFemale; }
+
+        // Re-render cells
+        const total = newMale + newFemale;
+        row.querySelector('.date-cell').innerHTML   = fmt(newDate);
+        row.querySelector('.school-cell').textContent = newSchool;
+        row.querySelector('.male-cell').textContent   = num(newMale);
+        row.querySelector('.female-cell').textContent = num(newFemale);
+        row.querySelector('.total-cell').textContent  = num(total);
+
+        ['school-cell', 'male-cell', 'female-cell'].forEach(cls => {
+            const cell = row.querySelector('.' + cls);
             cell.contentEditable = 'false';
             cell.classList.remove('border', 'border-yellow-300', 'bg-white');
-        }
-    });
-    row.classList.remove('editing', 'bg-yellow-50');
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.remove('hidden');
-    ab.querySelector('.delete-btn').classList.remove('hidden');
-    ab.querySelector('.save-btn').classList.add('hidden');
-    ab.querySelector('.cancel-btn').classList.add('hidden');
-    closeSaveModal();
-    row.style.transition = 'background-color 0.3s ease-out';
-    row.style.backgroundColor = '#dcfce7';
-    setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
+        });
+        row.classList.remove('editing', 'bg-yellow-50');
+        const ab = row.querySelector('.action-buttons');
+        ab.querySelector('.edit-btn').classList.remove('hidden');
+        ab.querySelector('.delete-btn').classList.remove('hidden');
+        ab.querySelector('.save-btn').classList.add('hidden');
+        ab.querySelector('.cancel-btn').classList.add('hidden');
+        delete editingData[id];
+
+        row.style.transition = 'background-color 0.3s ease-out';
+        row.style.backgroundColor = '#dcfce7';
+        setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
+
+    } catch (err) {
+        alert('Save failed: ' + err.message);
+    }
 }
 
+// ─── Delete ───────────────────────────────────────────────────────────────────
+function deleteRow(id) {
+    deletingId = id;
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
+    deletingId = null;
+}
+
+async function confirmDelete() {
+    const id  = deletingId;
+    const row = getRowEl(id);
+    closeDeleteModal();
+    if (!row) return;
+
+    try {
+        const res  = await fetch(`${API_URL}?id=${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        // Remove from local data and re-render
+        allRows = allRows.filter(r => String(r.cdsp_id) !== String(id));
+        applyFilters();
+
+    } catch (err) {
+        alert('Delete failed: ' + err.message);
+    }
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+function changePage(dir) {
+    const pages = Math.max(1, Math.ceil(filteredRows.length / ROWS_PER_PAGE));
+    currentPage = Math.max(1, Math.min(currentPage + dir, pages));
+    renderPage();
+}
+
+// ─── Backdrop click ───────────────────────────────────────────────────────────
 document.addEventListener('click', (e) => {
     if (e.target === document.getElementById('modalBackdrop')) {
         closeDeleteModal(); closeSaveModal();
     }
 });
 
-getAllDataRows().forEach(r => r.dataset.filtered = 'false');
-renderPage();
+// ─── Year change ──────────────────────────────────────────────────────────────
+document.getElementById('yearSelect').addEventListener('change', function () {
+    loadData(parseInt(this.value));
+});
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+loadData(new Date().getFullYear());
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>

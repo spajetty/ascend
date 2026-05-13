@@ -31,7 +31,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Participants -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">1,779</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-total-participants">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -44,7 +44,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Career Dev Sessions -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-cdsp-sessions">—</span>
                     <div class="bg-red-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -57,7 +57,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- LMI Sessions -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">6</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-lmi-sessions">—</span>
                     <div class="bg-purple-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -67,10 +67,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">LMI Orientations</span>
             </div>
 
-            <!-- Total Schools Reached -->
+            <!-- LMI Participants -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800">1,067</span>
+                    <span class="text-2xl font-bold text-gray-800" id="card-lmi-participants">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -82,7 +82,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
         </div>
 
-        <!-- Career Development Support Program Table -->
+        <!-- Career Development Support Program Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
             <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Career Development Support Program</h2>
@@ -98,38 +98,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-left px-4 py-3 text-green-600 font-semibold tracking-wide">TOTAL</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 15, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">48</td>
-                            <td class="px-4 py-3 text-gray-600">22</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 29, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">62</td>
-                            <td class="px-4 py-3 text-gray-600">18</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">80</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">FEBRUARY 1, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL NAME</td>
-                            <td class="px-4 py-3 text-gray-600">55</td>
-                            <td class="px-4 py-3 text-gray-600">30</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">85</td>
-                        </tr>
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 border-t-2 border-gray-200">
-                            <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-                            <td class="px-4 py-3 text-gray-400">—</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">165</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                            <td class="px-4 py-3">
-                                <span class="bg-green-200 text-green-800 font-bold text-xs px-3 py-1 rounded-full">235</span>
-                            </td>
-                        </tr>
+                    <tbody id="cdsp-tbody">
+                        <tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -138,7 +108,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
         </div>
 
-        <!-- LMI Orientation Table -->
+        <!-- LMI Orientation Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
             <div class="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">LMI Orientation</h2>
@@ -154,38 +124,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-left px-4 py-3 text-orange-500 font-semibold tracking-wide">TOTAL</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 15, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">48</td>
-                            <td class="px-4 py-3 text-gray-600">22</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">JANUARY 29, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">62</td>
-                            <td class="px-4 py-3 text-gray-600">18</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">80</td>
-                        </tr>
-                        <tr class="border-b border-gray-50 hover:bg-gray-50">
-                            <td class="px-6 py-3 text-gray-800 font-semibold">FEBRUARY 1, 2026</td>
-                            <td class="px-4 py-3 text-gray-600">SCHOOL / EVENT NAME</td>
-                            <td class="px-4 py-3 text-gray-600">55</td>
-                            <td class="px-4 py-3 text-gray-600">30</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">85</td>
-                        </tr>
-                        <!-- TOTAL Row -->
-                        <tr class="bg-gray-50 border-t-2 border-gray-200">
-                            <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-                            <td class="px-4 py-3 text-gray-400">—</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">165</td>
-                            <td class="px-4 py-3 text-gray-700 font-semibold">70</td>
-                            <td class="px-4 py-3">
-                                <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">235</span>
-                            </td>
-                        </tr>
+                    <tbody id="lmi-tbody">
+                        <tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -196,5 +136,130 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     </div>
 </main>
+
+<script>
+// ─── API paths ────────────────────────────────────────────────────────────────
+const YEAR     = new Date().getFullYear();
+const CDSP_API = `/api/cdsp-api.php?year=${YEAR}`;
+const LMI_API  = `/api/lmi-api.php?year=${YEAR}`;
+
+// Preview shows only the last N rows
+const PREVIEW_ROWS = 3;
+
+// ─── Helper: clear a stuck "Loading…" tbody ───────────────────────────────────
+function clearLoading(tbodyId, colspan, msg = 'No data available.') {
+    document.getElementById(tbodyId).innerHTML =
+        `<tr><td colspan="${colspan}" class="text-center py-6 text-gray-400 text-sm">${msg}</td></tr>`;
+}
+
+// ─── Boot ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+
+    const fetchJson = url => fetch(url).then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+    });
+
+    Promise.allSettled([
+        fetchJson(CDSP_API),
+        fetchJson(LMI_API),
+    ]).then(([cdspResult, lmiResult]) => {
+
+        const cdspData = (cdspResult.status === 'fulfilled' && cdspResult.value.success)
+            ? cdspResult.value.data : null;
+        const lmiData  = (lmiResult.status  === 'fulfilled' && lmiResult.value.success)
+            ? lmiResult.value.data  : null;
+
+        // ── Summary Cards ──────────────────────────────────────────────────────
+        const cdspTotal = cdspData ? cdspData.totals.total    : 0;
+        const lmiTotal  = lmiData  ? lmiData.totals.total     : 0;
+
+        document.getElementById('card-total-participants').textContent = cdspTotal + lmiTotal;
+        document.getElementById('card-cdsp-sessions').textContent      = cdspData ? cdspData.totals.sessions : '—';
+        document.getElementById('card-lmi-sessions').textContent       = lmiData  ? lmiData.totals.sessions  : '—';
+        document.getElementById('card-lmi-participants').textContent   = lmiData  ? lmiTotal                 : '—';
+
+        // ── Preview Tables ─────────────────────────────────────────────────────
+        renderCdsp(cdspData);
+        renderLmi(lmiData);
+    });
+});
+
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+function escHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    const dt = new Date(d);
+    if (isNaN(dt)) return escHtml(d);
+    return dt.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase();
+}
+
+// ─── CDSP ─────────────────────────────────────────────────────────────────────
+function renderCdsp(data) {
+    const tbody = document.getElementById('cdsp-tbody');
+    if (!data || !data.rows.length) { clearLoading('cdsp-tbody', 5); return; }
+
+    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const totals = data.totals;
+    let html = '';
+
+    rows.forEach(r => {
+        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.school)}</td>
+            <td class="px-4 py-3 text-gray-600">${r.cdsp_m ?? 0}</td>
+            <td class="px-4 py-3 text-gray-600">${r.cdsp_f ?? 0}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold">${r.total ?? 0}</td>
+        </tr>`;
+    });
+
+    html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
+        <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.total_m}</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.total_f}</td>
+        <td class="px-4 py-3">
+            <span class="bg-green-200 text-green-800 font-bold text-xs px-3 py-1 rounded-full">${totals.total}</span>
+        </td>
+    </tr>`;
+
+    tbody.innerHTML = html;
+}
+
+// ─── LMI ──────────────────────────────────────────────────────────────────────
+function renderLmi(data) {
+    const tbody = document.getElementById('lmi-tbody');
+    if (!data || !data.rows.length) { clearLoading('lmi-tbody', 5); return; }
+
+    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const totals = data.totals;
+    let html = '';
+
+    rows.forEach(r => {
+        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.school)}</td>
+            <td class="px-4 py-3 text-gray-600">${r.lmi_m ?? 0}</td>
+            <td class="px-4 py-3 text-gray-600">${r.lmi_f ?? 0}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold">${r.total ?? 0}</td>
+        </tr>`;
+    });
+
+    html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
+        <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.total_m}</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.total_f}</td>
+        <td class="px-4 py-3">
+            <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totals.total}</span>
+        </td>
+    </tr>`;
+
+    tbody.innerHTML = html;
+}
+</script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
