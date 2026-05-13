@@ -1,5 +1,14 @@
 import { importStatusStyles, classificationColors } from './config.js';
 
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 
 export function formatBytes(bytes) {
     if (bytes < 1024) return bytes + ' B';
@@ -26,7 +35,9 @@ const SKIP_FIELDS = new Set([
     '_sys_is_existing', '_sys_user_id', '_sys_benef_id',
     '_sys_skip', '_parsed_dob', '_parsed_start_date',
     '_program_override', '_program_mismatch', '_excel_program',
+    '_sys_row_index', '_sys_original_company',
     'is_new', 'duplicate', 'type',
+    'suggested_company_name', 'suggested_company_id', 'suggested_company_similarity',
 ]);
 
 // Columns always shown last in a fixed order
@@ -138,7 +149,13 @@ export function previewTableRows(rows, allowedCols = null) {
                 <span>${style.label}</span>
               </span>`
             : importStatusPill(r.badge_status, r.status_message);
-        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${statusPill}</td>`;
+        const suggestionButton = (badgeStatus === 'invalid' && r.suggested_company_name)
+            ? `<button type="button" class="mt-2 inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 hover:bg-emerald-100 transition-colors" data-accept-company-suggestion="1" data-preview-row-index="${escapeHtml(r._sys_row_index ?? '')}" title="Use the suggested company and revalidate this preview">
+                <span>Accept suggestion</span>
+                <span class="font-medium text-emerald-900">${escapeHtml(r.suggested_company_name)}</span>
+            </button>`
+            : '';
+        const statusCell = `<td class="px-4 py-3 whitespace-nowrap">${statusPill}${suggestionButton ? `<div class="mt-2">${suggestionButton}</div>` : ''}</td>`;
 
         return `<tr class="${rowCls}">${dataCells}${pinnedCells}${statusCell}</tr>`;
     }).join('');
