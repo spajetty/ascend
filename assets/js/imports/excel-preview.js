@@ -2,6 +2,7 @@
 
 import { previewTableRows, previewTableHeaders } from './common.js';
 import { state } from './excel-state.js';
+import { showToast } from '../toast.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PREVIEW_PAGE_SIZE = 25;
@@ -13,6 +14,7 @@ const MONTHS = [
 // ─── Pagination state ─────────────────────────────────────────────────────────
 let previewAllRows      = [];
 let previewRequiredCols = [];
+let previewExtraCols     = [];
 let previewCurrentPage  = 1;
 
 // Month / year selectors (shared with period detection)
@@ -71,6 +73,7 @@ function buildPageButtonMarkup(page, currentPage) {
 export function resetPreviewPaginationState() {
     previewAllRows      = [];
     previewRequiredCols = [];
+    previewExtraCols    = [];
     previewCurrentPage  = 1;
 
     const pagination = document.getElementById('previewPagination');
@@ -133,6 +136,97 @@ export function renderPreviewPage(page = 1) {
             const page = Number(btn.getAttribute('data-preview-page'));
             if (Number.isFinite(page)) renderPreviewPage(page);
         });
+    });
+}
+
+export async function revalidateCurrentPreview() {
+    const program = document.getElementById('excelProgram')?.value ?? '';
+    if (!program || !state.parsedExcelData.length) return;
+
+    const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+    const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+    const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
+
+    const res = await fetch('../../backend/import/validate_preview.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            program,
+            data: state.parsedExcelData,
+            wiirpCategory,
+            gipCategory,
+            jobFairEvent,
+        }),
+    });
+
+    const raw = await res.text();
+    let result;
+    try {
+        result = JSON.parse(raw);
+    } catch {
+        const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+        throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+    }
+    if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+
+    state.parsedExcelData = result.data;
+    state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
+    showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
+}
+
+async function acceptCompanySuggestion(rowIndex) {
+    const index = Number(rowIndex);
+    if (!Number.isFinite(index) || index < 0 || index >= state.parsedExcelData.length) return;
+
+    const row = state.parsedExcelData[index];
+    const suggestion = String(row?.suggested_company_name ?? '').trim();
+    if (!suggestion) return;
+
+    const companyKeys = ['Company', 'CompanyName', 'Employer'];
+    const originalCompany = row._sys_original_company ?? companyKeys.map(key => row[key]).find(value => String(value ?? '').trim()) ?? '';
+    row._sys_original_company = originalCompany;
+
+    let updated = false;
+    for (const key of companyKeys) {
+        if (Object.prototype.hasOwnProperty.call(row, key) || key === 'Company') {
+            row[key] = suggestion;
+            updated = true;
+        }
+    }
+    if (!updated) {
+        row.Company = suggestion;
+    }
+
+    row.badge_status = 'new';
+    row.status_message = 'Accepted company suggestion. Revalidating...';
+    row._sys_skip = false;
+
+    try {
+        showToast(`Accepted suggestion: ${suggestion}. Revalidating rows...`, 'info');
+        await revalidateCurrentPreview();
+        showToast('Suggestion applied and rows revalidated.', 'success');
+    } catch (err) {
+        if (originalCompany) {
+            for (const key of companyKeys) {
+                if (Object.prototype.hasOwnProperty.call(row, key) || key === 'Company') {
+                    row[key] = originalCompany;
+                }
+            }
+        }
+        row.badge_status = 'invalid';
+        row.status_message = row.status_message || 'Company suggestion could not be applied.';
+        showToast('Could not revalidate after applying the suggestion: ' + (err?.message ?? 'Unknown error'), 'error');
+    }
+}
+
+const previewContainer = document.getElementById('dataPreview');
+if (previewContainer) {
+    previewContainer.addEventListener('click', event => {
+        const button = event.target.closest('[data-accept-company-suggestion]');
+        if (!button) return;
+        event.preventDefault();
+        const rowIndex = button.getAttribute('data-preview-row-index');
+        acceptCompanySuggestion(rowIndex);
     });
 }
 
@@ -316,6 +410,7 @@ export function showExcelPreview(rows, summary, requiredCols, extraCols) {
 
     previewAllRows      = rows;
     previewRequiredCols = Array.isArray(requiredCols) ? requiredCols : [];
+    previewExtraCols    = Array.isArray(extraCols) ? extraCols : [];
     renderPreviewPage(1);
 
     // Guard: disable Import button when nothing is importable

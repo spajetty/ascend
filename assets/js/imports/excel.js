@@ -6,7 +6,7 @@ import { showToast } from '../toast.js';
 import { state } from './excel-state.js';
 import { initImportResultsUi, showImportResultsView } from './excel-results.js';
 import { openImportConfirmModal, openUnknownEmployersModal } from './excel-modals.js';
-import { resetPreviewPaginationState } from './excel-preview.js';
+import { resetPreviewPaginationState, revalidateCurrentPreview } from './excel-preview.js';
 import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProgramSpecificFields } from './excel-upload.js';
 
 // Side-effect imports — these modules wire their own DOM event listeners on load.
@@ -78,7 +78,7 @@ if (cancelImportBtn) {
 // ─── Confirm & run import ─────────────────────────────────────────────────────
 const confirmImportBtn = document.getElementById('confirmImport');
 if (confirmImportBtn) {
-    confirmImportBtn.addEventListener('click', () => {
+    confirmImportBtn.addEventListener('click', async () => {
         const getSelectedLabel = (selectId) => {
             const el = document.getElementById(selectId);
             if (!el) return '';
@@ -182,6 +182,17 @@ if (confirmImportBtn) {
             }
         }
 
+        // Ensure latest server-side validation is applied for Job Fair before final checks
+        if (program === 'Job Fair') {
+            try {
+                await revalidateCurrentPreview();
+            } catch (err) {
+                console.error('Revalidation failed before import confirm', err);
+                showToast('Could not revalidate Job Fair rows before import: ' + (err?.message ?? 'Unknown error'), 'error');
+                return;
+            }
+        }
+
         const duplicateRows  = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'duplicate').length;
         const invalidRows    = state.parsedExcelData.filter(r => (r.badge_status ?? '').toLowerCase() === 'invalid').length;
         const skippedRows    = state.parsedExcelData.filter(r => !!r._sys_skip).length;
@@ -189,6 +200,23 @@ if (confirmImportBtn) {
         const unknownEmployers = Array.isArray(state.unknownEmployers)
             ? state.unknownEmployers.map(name => String(name).trim()).filter(Boolean)
             : [];
+
+        if (program === 'Job Fair') {
+            const unresolvedCompanyRows = state.parsedExcelData.filter(r => {
+                if ((r.badge_status ?? '').toLowerCase() !== 'invalid') return false;
+                const msg = String(r.status_message ?? '').toLowerCase();
+                const hasSuggestion = String(r.suggested_company_name ?? '').trim() !== '';
+                return hasSuggestion
+                    || msg.includes('did you mean')
+                    || msg.includes('not a participant')
+                    || msg.includes('company');
+            });
+
+            if (unresolvedCompanyRows.length > 0) {
+                showToast('Cannot import Job Fair rows with unresolved invalid companies. Accept a suggestion or fix the company name first.', 'error');
+                return;
+            }
+        }
 
         const openConfirmModal = () => openImportConfirmModal({
             program,
