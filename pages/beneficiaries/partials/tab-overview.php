@@ -1,0 +1,96 @@
+<div id="tab-overview" class="tab-panel active">
+    <div class="overview-grid">
+
+        <!-- Personal Information -->
+        <div class="info-card">
+            <h4>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                </svg>
+                Personal Information
+            </h4>
+            <div class="info-row">
+                <div class="info-item"><label>Full Name</label><span id="pFullName">Rosa Cruz</span></div>
+                <div class="info-item"><label>Gender</label><span id="pGender">Female</span></div>
+                <div class="info-item"><label>Date of Birth</label><span id="pDob">January 14, 2002</span></div>
+                <div class="info-item"><label>Civil Status</label><span id="pCivil">Single</span></div>
+                <div class="info-item full-row"><label>Address</label><span id="pAddress">741 Ash Street, Fairview, Metro Manila</span></div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="side-col">
+            <div class="info-card">
+                <h4>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                        <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Contact Information
+                </h4>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div class="contact-email">
+                        <label style="font-size:11.5px;color:var(--text-muted);">Email</label>
+                        <a href="mailto:rose.cruz@email.com" id="pEmail">rose.cruz@email.com</a>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Phone</label>
+                        <div style="font-size:13.5px;font-weight:500;" id="pPhone">09261234567</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card">
+                <h4>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 11H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-5"/>
+                        <polyline points="12 2 12 15"/>
+                        <polyline points="8 11 12 15 16 11"/>
+                    </svg>
+                    Case Notes
+                </h4>
+                <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Notes</label>
+                <p id="pNotes" style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0;background:var(--bg);padding:10px;border-radius:7px;">
+                    Still not hired after multiple visits.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Education & Skills -->
+    <div class="info-card" style="margin-top:14px;">
+        <h4>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+            </svg>
+            Education &amp; Skills
+        </h4>
+        <div style="margin-bottom:10px;">
+            <label style="font-size:11.5px;color:var(--text-muted);">Highest Educational Attainment</label>
+            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pEducation">High School Graduate</div>
+        </div>
+        <div id="pSkills"></div>
+    </div>
+
+    <!-- Employment Status -->
+    <div class="info-card" style="margin-top:14px;">
+        <h4>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="7" width="20" height="14" rx="2"/>
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            </svg>
+            Employment Status
+        </h4>
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody id="pEmployment"></tbody>
+        </table>
+    </div>
+</div>

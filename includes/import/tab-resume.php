@@ -2,11 +2,45 @@
 <div id="tab-resume" class="tab-content hidden space-y-5">
 
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <h2 class="text-base font-bold text-gray-800 mb-4">Import Resume Files</h2>
+        <h2 class="text-base font-bold text-gray-800 mb-1">Import Resume Files</h2>
+        <p class="text-sm text-gray-400 mb-5">Select a section and program before uploading your resumes.</p>
 
-        <!-- Drop Zone -->
+        <!-- ── Inline Section / Program selectors ── -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 pb-6 mb-6 border-b border-gray-100">
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+                    Section <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                    <select id="resumeSection"
+                        class="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition">
+                        <option value="">Select a section…</option>
+                        <option value="employment_facilitation">Employment Facilitation</option>
+                        <option value="employers_engagement">Employers Engagement</option>
+                        <option value="youth_employability">Youth Employability</option>
+                        <option value="career_development">Career Development</option>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">
+                    Program <span class="text-red-400">*</span>
+                </label>
+                <div class="relative">
+                    <select id="resumeProgram"
+                        class="w-full appearance-none bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled>
+                        <option value="">Select a section first…</option>
+                    </select>
+                    <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Drop Zone (disabled until program selected) -->
         <div id="resumeDropZone"
-            class="border-2 border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 cursor-pointer hover:border-red-400 hover:bg-red-50/20 transition-all duration-200"
+            class="border-2 border-dashed border-gray-200 rounded-2xl p-12 flex flex-col items-center justify-center gap-4 transition-all duration-200 opacity-40 pointer-events-none select-none"
             onclick="document.getElementById('resumeInput').click()">
 
             <svg class="w-14 h-14 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -20,9 +54,10 @@
                 <p class="text-sm text-gray-400 mt-1">Upload PDF or Word documents containing applicant resumes</p>
             </div>
 
-            <button type="button"
+            <button type="button" id="resumeBrowseBtn"
                 onclick="event.stopPropagation(); document.getElementById('resumeInput').click();"
-                class="mt-2 px-8 py-3 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+                class="mt-2 px-8 py-3 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors"
+                disabled>
                 Browse File
             </button>
 
@@ -49,7 +84,7 @@
         </div>
     </div>
 
-    <!-- Resume Data Preview (hidden until modal confirmed) -->
+    <!-- Resume Data Preview (hidden until files selected) -->
     <div id="resumePreview" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <div class="flex items-start justify-between mb-4">
             <div>
@@ -73,7 +108,7 @@
                 <thead>
                     <tr class="border-b border-gray-100">
                         <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Name</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Gender</th>
+                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Sex</th>
                         <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Section</th>
                         <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Program</th>
                         <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>

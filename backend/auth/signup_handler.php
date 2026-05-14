@@ -29,8 +29,10 @@ if (contactExists($contact, $conn)) {
     exit;
 }
 
+// Hash password
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
+// Insert user
 $stmt = $conn->prepare("
     INSERT INTO users (fname, lname, middle_initial, contact, email, password, is_verified)
     VALUES (?, ?, ?, ?, ?, ?, 0)
