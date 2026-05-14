@@ -30,8 +30,7 @@
             </div>
         </div>
         <div class="profile-dates">
-            <span>📅 Applied <strong id="profApplied">May 28, 2025</strong></span>
-            <span>🕐 Last Visit: <strong id="profLastVisit">January 8, 2026</strong></span>
+            <span>🕐 Last PESO Visit: <strong id="profLastVisit">—</strong></span>
         </div>
 
         <!-- Tabs -->
