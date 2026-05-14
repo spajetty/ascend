@@ -88,26 +88,19 @@ try {
             p.program_id,
             s.name      AS section_name,
             s.section_id,
-            -- Latest emphistory record (status + date)
             (
-                SELECT eh.classification
-                FROM   emphistory eh
-                WHERE  eh.benef_id = b.benef_id
-                ORDER  BY eh.date_of_record DESC, eh.created_at DESC
-                LIMIT  1
-            ) AS latest_emp_status,
-            (
-                SELECT DATE_FORMAT(eh.date_of_record, '%b %d, %Y')
-                FROM   emphistory eh
-                WHERE  eh.benef_id = b.benef_id
-                ORDER  BY eh.date_of_record DESC, eh.created_at DESC
-                LIMIT  1
+                SELECT bav.date_of_record
+                FROM beneficiary_activity_history bav
+                WHERE bav.benef_id = b.benef_id
+                  AND bav.classification = 'PESO_VISIT'
+                ORDER BY bav.date_of_record DESC, bav.created_at DESC, bav.history_id DESC
+                LIMIT 1
             ) AS last_visit,
-            -- Visit count (number of emphistory records)
             (
                 SELECT COUNT(*)
-                FROM   emphistory eh
-                WHERE  eh.benef_id = b.benef_id
+                FROM beneficiary_activity_history bav
+                WHERE bav.benef_id = b.benef_id
+                  AND bav.classification = 'PESO_VISIT'
             ) AS visit_count
         FROM beneficiaries b
         LEFT JOIN programs p ON p.program_id = b.program_id
@@ -139,20 +132,17 @@ try {
         // Calculate age from DOB
         $row['age'] = null;
         if ($row['dob']) {
-            $diff        = (new DateTime())->diff(new DateTime($row['dob']));
-            $row['age']  = $diff->y;
+            $row['age'] = (new DateTime())->diff(new DateTime($row['dob']))->y;
         }
-
-        // Formatted dates
-        $row['applied_formatted'] = $row['created_at']
-            ? (new DateTime($row['created_at']))->format('F j, Y')
-            : '—';
 
         $row['dob_formatted'] = $row['dob']
             ? (new DateTime($row['dob']))->format('F j, Y')
             : '—';
 
-        // Ordinal visit label
+        $row['last_visit'] = $row['last_visit']
+            ? (new DateTime($row['last_visit']))->format('F j, Y')
+            : '—';
+
         $vc = (int)($row['visit_count'] ?? 0);
         $row['visit_label'] = $vc > 0 ? ordinalLabel($vc) : '—';
 
@@ -163,16 +153,10 @@ try {
     // ── Stats: count by classification ──────────────────────────────────────
     $statsSql  = "
         SELECT
-            COUNT(*)                                                           AS total,
-            SUM(LOWER(classification) LIKE '%hired%'
-             OR LOWER(classification) LIKE '%placed%'
-             OR LOWER(classification) LIKE '%hots%')                          AS hired,
-            SUM(LOWER(classification) LIKE '%refer%')                         AS referred,
-            SUM(LOWER(classification) LIKE '%register%'
-             OR LOWER(classification) LIKE '%issued%'
-             OR LOWER(classification) LIKE '%inquir%'
-             OR classification IS NULL
-             OR classification = '')                                           AS registered
+            COUNT(*) AS total,
+            SUM(LOWER(classification) LIKE '%hired%' OR LOWER(classification) LIKE '%placed%' OR LOWER(classification) LIKE '%hots%') AS hired,
+            SUM(LOWER(classification) LIKE '%refer%') AS referred,
+            SUM(LOWER(classification) LIKE '%register%' OR LOWER(classification) LIKE '%issued%' OR LOWER(classification) LIKE '%inquir%' OR classification IS NULL OR classification = '') AS registered
         FROM beneficiaries
     ";
     $statsRow = $conn->query($statsSql)->fetch_assoc();
