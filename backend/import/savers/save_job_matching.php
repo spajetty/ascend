@@ -86,12 +86,12 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
             }
 
             $userId = isset($ctx['userId']) && is_numeric($ctx['userId']) ? (int)$ctx['userId'] : (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0);
-            $notes = 'Attended job fair. ' . $eventLabel;
             $createdAt = date('Y-m-d H:i:s');
 
-            $historyIns = $conn->prepare('INSERT INTO beneficiary_activity_history (user_id, benef_id, classification, date_of_record, notes, created_at, company_id, position, jobfairevent_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            // notes column removed from schema — omit it when inserting activity history
+            $historyIns = $conn->prepare('INSERT INTO beneficiary_activity_history (user_id, benef_id, classification, date_of_record, created_at, company_id, position, jobfairevent_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
             $classification = 'JOB_FAIR_PARTICIPATION';
-            $historyIns->bind_param('iissssisi', $userId, $benefId, $classification, $eventDate, $notes, $createdAt, $companyId, $position, $jobFairEventId);
+            $historyIns->bind_param('iisssisi', $userId, $benefId, $classification, $eventDate, $createdAt, $companyId, $position, $jobFairEventId);
             $historyIns->execute();
             $historyInserted = (int)$historyIns->insert_id;
         }
