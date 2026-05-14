@@ -71,3 +71,7 @@ export function showToast(message, type = 'info', duration = 4000) {
         }, duration);
     }
 };
+
+if (typeof window !== 'undefined') {
+    window.showToast = showToast;
+}
