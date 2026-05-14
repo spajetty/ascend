@@ -5,59 +5,13 @@
             <div class="timeline-filters">
                 <button class="tf-btn active" onclick="filterTimeline('all',this)">All</button>
                 <button class="tf-btn" onclick="filterTimeline('visit',this)">Visits</button>
-                <button class="tf-btn" onclick="filterTimeline('jobfair',this)">Job Fairs</button>
                 <button class="tf-btn" onclick="filterTimeline('referral',this)">Referrals</button>
-                <button class="tf-btn" onclick="filterTimeline('outcome',this)">Outcomes</button>
+                <button class="tf-btn" onclick="filterTimeline('jobfair',this)">Job Fair Participation</button>
             </div>
         </div>
         <div class="timeline-list" id="timelineList">
-            <div class="tl-item" data-type="visit">
-                <div class="tl-icon tl-icon-blue">🚶</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-visit">3rd PESO Visit</span>
-                    <p>Follow-up consultation. Applicant still seeking placement.</p>
-                </div>
-                <div class="tl-date">May 28, 2025</div>
-            </div>
-            <div class="tl-item" data-type="outcome">
-                <div class="tl-icon tl-icon-orange">🏆</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-outcome">Job Fair Outcome</span>
-                    <p>Career counselor advised to expand job search to adjacent fields.</p>
-                </div>
-                <div class="tl-date">May 28, 2025</div>
-            </div>
-            <div class="tl-item" data-type="jobfair">
-                <div class="tl-icon tl-icon-green">📋</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-jobfair">Job Fair Participation</span>
-                    <p>Attended job fair. Applicant submitted applications to 3 employers.</p>
-                </div>
-                <div class="tl-date">May 28, 2025</div>
-            </div>
-            <div class="tl-item" data-type="referral">
-                <div class="tl-icon tl-icon-purple">↗</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-referral">Referral</span>
-                    <p>Referred to SM Supermalls for store associate position. Application is being processed.</p>
-                </div>
-                <div class="tl-date">May 26, 2025</div>
-            </div>
-            <div class="tl-item" data-type="visit">
-                <div class="tl-icon tl-icon-blue">🚶</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-visit">2nd PESO Visit</span>
-                    <p>Follow-up consultation. Career counselor advised to expand job search to adjacent fields.</p>
-                </div>
-                <div class="tl-date">May 28, 2025</div>
-            </div>
-            <div class="tl-item" data-type="referral">
-                <div class="tl-icon tl-icon-purple">↗</div>
-                <div class="tl-body" style="flex:1;">
-                    <span class="tl-type-tag tag-referral">Referral</span>
-                    <p>Initial referral to Jollibee Foods Corporation. No feedback received from employer.</p>
-                </div>
-                <div class="tl-date">May 20, 2025</div>
+            <div class="tl-empty" id="timelineEmpty" style="padding:18px 16px;color:var(--text-muted);background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);text-align:center;">
+                Select a beneficiary to load their timeline.
             </div>
         </div>
     </div>
