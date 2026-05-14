@@ -54,7 +54,6 @@ function mapRow(b) {
     // ── Profile header ───────────────────────────────────────────────────
     avatar:      makeAvatar(b),
     age:         b.age != null ? b.age + ' years old' : '—',
-    applied:     b.applied_formatted || '—',
     lastVisit:   b.last_visit  || '—',
     visit:       b.visit_label || '—',
 
