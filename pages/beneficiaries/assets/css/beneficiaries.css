@@ -7,6 +7,7 @@
   --text-secondary: #6b7280;
   --text-muted: #9ca3af;
   --blue: #3b82f6;
+  --primary: #3b82f6;
   --blue-light: #eff6ff;
   --blue-mid: #dbeafe;
   --green: #10b981;
@@ -301,6 +302,9 @@ tbody td { padding: 14px 16px; font-size: 13.5px; color: var(--text-primary); ve
 .emp-table tr:last-child td { border-bottom: none; }
 
 /* ─── Timeline ──────────────────────────────────────────── */
+.timeline-panel {
+  position: relative;
+}
 .timeline-filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
 .tf-btn {
   padding: 5px 13px; border-radius: 20px; font-size: 12px;
@@ -427,10 +431,10 @@ tbody td { padding: 14px 16px; font-size: 13.5px; color: var(--text-primary); ve
 
 /* ─── Drive Modal ───────────────────────────────────────── */
 #driveModalOverlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,.38); z-index: 1000;
-  align-items: flex-start; justify-content: center;
-  padding-top: 60px;
+  display: none; position: fixed; top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,.38); z-index: 9999;
+  align-items: center; justify-content: center;
 }
 #driveModal {
   background: #fff; border-radius: 16px;
@@ -521,3 +525,105 @@ tr.empty-row:hover { background: transparent !important; }
   font-weight: 500;
   color: var(--text-secondary);
 }
+
+/* Timeline action buttons */
+.btn-log-visit, .btn-add-referral {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.15s;
+}
+.btn-log-visit {
+  background: var(--primary);
+    color: #fff;
+}
+.btn-add-referral {
+    background: transparent;
+  color: var(--primary);
+  border: 1.5px solid var(--primary);
+}
+.btn-log-visit:hover, .btn-add-referral:hover { opacity: 0.85; }
+
+/* Timeline Modals */
+.timeline-modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.18);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  box-sizing: border-box;
+}
+.modal-box {
+    background: var(--card);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    overflow: hidden;
+}
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+}
+.modal-header h3 { margin: 0; font-size: 15px; font-weight: 700; }
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-muted);
+}
+.modal-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+.modal-field { display: flex; flex-direction: column; gap: 5px; }
+.modal-field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.modal-field input, .modal-field select, .modal-field textarea {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    background: var(--bg);
+    color: var(--text);
+    width: 100%;
+    box-sizing: border-box;
+}
+.modal-field textarea { resize: vertical; }
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+}
+.btn-cancel {
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: transparent;
+    font-size: 13px;
+    cursor: pointer;
+    color: var(--text);
+}
+.btn-confirm {
+    padding: 7px 16px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--primary);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-confirm:hover { opacity: 0.88; }
