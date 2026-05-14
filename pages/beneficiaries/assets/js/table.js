@@ -205,12 +205,45 @@ function renderPagination(totalPages) {
     return;
   }
 
+  function buildPageList(total, current) {
+    if (total <= 7) {
+      return Array.from({ length: total }, (_, index) => index + 1);
+    }
+
+    const pages = [1];
+
+    if (current <= 4) {
+      for (let page = 2; page <= Math.min(4, total - 1); page++) {
+        pages.push(page);
+      }
+      if (total > 5) pages.push('...');
+      pages.push(total - 1, total);
+      return pages;
+    }
+
+    if (current >= total - 3) {
+      pages.push('...');
+      for (let page = Math.max(2, total - 3); page <= total; page++) {
+        pages.push(page);
+      }
+      return pages;
+    }
+
+    pages.push('...', current - 1, current, current + 1, '...', total - 1, total);
+    return pages;
+  }
+
   const btns = [];
   btns.push(`<button class="page-btn" ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">&#8249;</button>`);
 
-  for (let p = 1; p <= totalPages; p++) {
-    btns.push(`<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`);
-  }
+  buildPageList(totalPages, currentPage).forEach(page => {
+    if (page === '...') {
+      btns.push('<span class="page-ellipsis" aria-hidden="true">...</span>');
+      return;
+    }
+
+    btns.push(`<button class="page-btn ${page === currentPage ? 'active' : ''}" onclick="goToPage(${page})">${page}</button>`);
+  });
 
   btns.push(`<button class="page-btn" ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">&#8250;</button>`);
 
