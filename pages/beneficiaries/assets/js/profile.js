@@ -2,6 +2,31 @@
  * Handles opening/closing the profile detail view and tab switching.
  */
 
+/** Calculate age from date of birth. */
+function calculateAge(dob) {
+  if (!dob) return '—';
+  const birthDate = new Date(dob);
+  if (isNaN(birthDate.getTime())) return '—';
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age >= 0 ? `${age} years old` : '—';
+}
+
+/** Format date to YYYY-MM-DD for HTML date inputs. */
+function formatDateForInput(dateStr) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 /** Populate and animate the profile view for a given beneficiary id. */
 async function openProfile(benefId) {
   const b = beneficiaries.find(x => String(x.benef_id ?? x.id) === String(benefId));
@@ -11,11 +36,12 @@ async function openProfile(benefId) {
 
   window.currentBeneficiaryId = b.benef_id;
   window.currentBeneficiaryName = b.name;
+  window.currentBeneficiary = b;  // Store full object for edit modals
 
   // ── Header ──
   document.getElementById('profAvatar').textContent    = b.avatar;
   document.getElementById('profName').textContent      = b.name;
-  document.getElementById('profAge').textContent       = b.age;
+  document.getElementById('profAge').textContent       = calculateAge(b.dob);
   document.getElementById('profProgram').textContent   = `${b.program} • ${b.section}`;
   document.getElementById('profLastVisit').textContent = safeText(b.lastVisit);
   document.getElementById('profVisit').textContent     = safeText(b.visit);
@@ -44,8 +70,469 @@ async function openProfile(benefId) {
   document.getElementById('pPhone').textContent     = b.phone;
   // Notes column removed from database; leave overview notes empty
   document.getElementById('pNotes').textContent     = '';
-  document.getElementById('pEducation').textContent = b.education;
-  document.getElementById('pSkills').innerHTML      = b.skills.map(s => `<span class="skill-tag">${s}</span>`).join('');
+  // Education & Skills are shown for most programs. For Job Fair, Job Matching,
+  // First Time Job Seeker, WHIP, SPES, and WIIRP,
+  // hide the education card and show program-specific overview content instead.
+  const educationCard = document.getElementById('educationCard');
+  const jobFairCard = document.getElementById('jobFairCard');
+  const firstTimeJobSeekerCard = document.getElementById('firstTimeJobSeekerCard');
+  const whipCard = document.getElementById('whipCard');
+  const wiirpCard = document.getElementById('wiirpCard');
+  const wiirpAssignmentCard = document.getElementById('wiirpAssignmentCard');
+  const spesStudentCard = document.getElementById('spesStudentCard');
+  const spesEmploymentCard = document.getElementById('spesEmploymentCard');
+  const gipCard = document.getElementById('gipCard');
+  const programName = (b.program || '').trim();
+  const hideEducationCard = [
+    'Job Fair',
+    'Job Matching and Referral',
+    'First Time Jobseeker',
+    'Workers Hiring for Infrastructure Projects',
+    'SPES',
+    'Work Immersion and Internship Referral Program',
+    'Government Internship Program',
+  ].includes(programName);
+
+  if (programName === 'Job Fair') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'block';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'none';
+    if (whipCard) whipCard.style.display = 'none';
+    if (wiirpCard) wiirpCard.style.display = 'none';
+
+    const eventsEl = document.getElementById('pJobFairEvents');
+    
+    if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+
+    fetch(`../../backend/beneficiaries/get_jobfair.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (!eventsEl) return;
+        if (j && j.success && Array.isArray(j.records) && j.records.length) {
+          eventsEl.innerHTML = j.records.map(r => `
+            <tr>
+              <td>${r.job_fair_type || '—'}</td>
+              <td style="font-weight:500;">${r.venue || '—'}</td>
+              <td>${r.date_start ? (r.date_start + (r.date_end ? ` — ${r.date_end}` : '')) : '—'}</td>
+              <td style="color:var(--text-secondary);font-size:12.5px;">${r.position || '—'}</td>
+            </tr>
+          `).join('');
+        } else {
+          eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>`;
+        }
+      }).catch(err => {
+        if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+      });
+  } else {
+    if (jobFairCard) jobFairCard.style.display = 'none';
+  }
+
+  if (programName === 'First Time Jobseeker') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'none';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'block';
+    if (whipCard) whipCard.style.display = 'none';
+
+    const issuanceEl = document.getElementById('pFirstTimeJobSeekerIssuance');
+    if (issuanceEl) issuanceEl.innerHTML = `<tr><td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+
+    fetch(`../../backend/beneficiaries/get_first_time_jobseeker.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (!issuanceEl) return;
+
+        const rows = Array.isArray(j?.records) ? j.records : [];
+        if (j && j.success && rows.length) {
+          const latest = rows[0];
+          const renderStatus = (value) => Number(value) === 1
+            ? '<span class="badge badge-hired">Issued</span>'
+            : '<span class="badge badge-registered">Not issued</span>';
+
+          issuanceEl.innerHTML = `
+            <tr>
+              <td style="font-weight:500;">${renderStatus(latest.occ_permit)}</td>
+              <td style="font-weight:500;">${renderStatus(latest.health_card)}</td>
+            </tr>
+          `;
+        } else {
+          issuanceEl.innerHTML = `<tr><td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance records.</td></tr>`;
+        }
+      })
+      .catch(() => {
+        if (issuanceEl) {
+          issuanceEl.innerHTML = `<tr><td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        }
+      });
+  } else if (firstTimeJobSeekerCard) {
+    firstTimeJobSeekerCard.style.display = 'none';
+  }
+
+  if (programName === 'Work Immersion and Internship Referral Program') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'none';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'none';
+    if (whipCard) whipCard.style.display = 'none';
+    if (wiirpCard) wiirpCard.style.display = 'block';
+    if (wiirpAssignmentCard) wiirpAssignmentCard.style.display = 'none';
+    if (spesStudentCard) spesStudentCard.style.display = 'none';
+    if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
+
+    const wiirpFields = {
+      contract_period: 'pWiirpContractPeriod',
+      school: 'pWiirpSchool',
+      course: 'pWiirpCourse',
+      required_hours: 'pWiirpRequiredHours',
+      inquiry_type: 'pWiirpInquiryType',
+      preferred_org_type: 'pWiirpPreferredOrgType',
+      preferred_industry: 'pWiirpPreferredIndustry',
+      is_willing_outside: 'pWiirpWillingOutside',
+      internship_sched: 'pWiirpInternshipSched',
+      start: 'pWiirpStartDate',
+      year_level: 'pWiirpYearLevel',
+      type: 'pWiirpType',
+    };
+
+    Object.values(wiirpFields).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Loading…';
+    });
+
+    fetch(`../../backend/beneficiaries/get_wiirp.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        const record = j && j.success ? j.record : null;
+        const assignments = Array.isArray(j?.assignments) ? j.assignments : [];
+        const setText = (id, value) => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = value ?? '—';
+        };
+        const formatBool = (value) => Number(value) === 1 ? 'Yes' : 'No';
+        const formatWiirpType = (value) => {
+          const normalized = String(value || '').trim().toLowerCase();
+          if (normalized === 'inquiry') return 'Inquiry';
+          if (normalized === 'peso-assigned') return 'PESO Assigned';
+          if (normalized === 'private') return 'Private';
+          return value || '—';
+        };
+        const formatDate = (value) => {
+          if (!value) return '—';
+          const date = new Date(value);
+          return isNaN(date.getTime())
+            ? String(value)
+            : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+        };
+
+        setText('pWiirpContractPeriod', record?.contract_period || '—');
+        setText('pWiirpSchool', record?.school || '—');
+        setText('pWiirpCourse', record?.course || '—');
+        setText('pWiirpRequiredHours', record?.required_hours != null ? String(record.required_hours) : '—');
+        setText('pWiirpInquiryType', record?.inquiry_type || '—');
+        setText('pWiirpPreferredOrgType', record?.preferred_org_type || '—');
+        setText('pWiirpPreferredIndustry', record?.preferred_industry || '—');
+        setText('pWiirpWillingOutside', record ? formatBool(record.is_willing_outside) : '—');
+        setText('pWiirpInternshipSched', record?.internship_sched || '—');
+        setText('pWiirpStartDate', record ? formatDate(record.start) : '—');
+        setText('pWiirpYearLevel', record?.year_level || '—');
+        setText('pWiirpType', formatWiirpType(record?.type));
+
+        const showAssignment = record && ['peso-assigned', 'private'].includes(String(record.type || '').trim().toLowerCase());
+        const showEndorsements = record && String(record.type || '').trim().toLowerCase() === 'private';
+        const assignmentCard = document.getElementById('wiirpAssignmentCard');
+        const assignmentsEl = document.getElementById('pWiirpAssignments');
+        const endorsement1Header = document.getElementById('wiirpEndorsement1Header');
+        const endorsement2Header = document.getElementById('wiirpEndorsement2Header');
+
+        if (assignmentCard) assignmentCard.style.display = showAssignment ? 'block' : 'none';
+
+        if (assignmentsEl) {
+          if (showAssignment && assignments.length) {
+            const latest = assignments[0];
+            if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
+            if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
+
+            assignmentsEl.innerHTML = `
+              <tr>
+                <td>${formatDate(latest.start_date)}</td>
+                <td>${formatDate(latest.end_date)}</td>
+                <td>${latest.required_hours != null ? String(latest.required_hours) : '—'}</td>
+                <td style="font-weight:500;">${latest.office_assignment || '—'}</td>
+                ${showEndorsements ? `<td>${latest.endorsement_1 || '—'}</td><td>${latest.endorsement_2 || '—'}</td>` : ''}
+              </tr>
+            `;
+          } else if (showAssignment) {
+            if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
+            if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
+            assignmentsEl.innerHTML = `<tr><td colspan="${showEndorsements ? 6 : 4}" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
+          } else {
+            assignmentsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
+          }
+        }
+      })
+      .catch(() => {
+        Object.values(wiirpFields).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = 'Error loading records.';
+        });
+
+        const assignmentsEl = document.getElementById('pWiirpAssignments');
+        if (assignmentsEl) {
+          assignmentsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        }
+      });
+  } else if (wiirpCard) {
+    wiirpCard.style.display = 'none';
+    if (wiirpAssignmentCard) wiirpAssignmentCard.style.display = 'none';
+  }
+
+  if (programName === 'Workers Hiring for Infrastructure Projects') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'none';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'none';
+    if (whipCard) whipCard.style.display = 'block';
+    if (wiirpCard) wiirpCard.style.display = 'none';
+
+    const whipEl = document.getElementById('pWhipProjects');
+    if (whipEl) whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+
+    fetch(`../../backend/beneficiaries/get_whip.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (!whipEl) return;
+
+        const rows = Array.isArray(j?.records) ? j.records : [];
+        if (j && j.success && rows.length) {
+          const formatDate = (value) => {
+            if (!value) return '—';
+            const date = new Date(value);
+            return isNaN(date.getTime())
+              ? String(value)
+              : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          };
+          const formatBudget = (value) => {
+            const amount = Number(value);
+            return Number.isFinite(amount)
+              ? `₱${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+              : '—';
+          };
+
+          whipEl.innerHTML = rows.map(r => `
+            <tr>
+              <td style="font-weight:500;">${r.position || '—'}</td>
+              <td>${formatDate(r.date_hired)}</td>
+              <td style="font-weight:500;">${r.contractor || '—'}</td>
+              <td>${r.project_title || '—'}</td>
+              <td>${r.duration || '—'}</td>
+              <td>${formatBudget(r.budget)}</td>
+            </tr>
+          `).join('');
+        } else {
+          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>`;
+        }
+      })
+      .catch(() => {
+        if (whipEl) {
+          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        }
+      });
+  } else if (whipCard) {
+    whipCard.style.display = 'none';
+  }
+
+  if (programName === 'SPES') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'none';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'none';
+    if (whipCard) whipCard.style.display = 'none';
+    if (spesStudentCard) spesStudentCard.style.display = 'block';
+    if (spesEmploymentCard) spesEmploymentCard.style.display = 'block';
+
+    // Fetch SPES student info
+    fetch(`../../backend/beneficiaries/get_spes.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.success && j.record) {
+          const r = j.record;
+          const formatType = (val) => {
+            if (val === 'student') return 'Student';
+            if (val === 'osy') return 'Out-of-School Youth';
+            return String(val || '—');
+          };
+
+          if (document.getElementById('pSpesStudentType')) {
+            document.getElementById('pSpesStudentType').textContent = formatType(r.student_type);
+          }
+          if (document.getElementById('pSpesHighestEduc')) {
+            document.getElementById('pSpesHighestEduc').textContent = r.highest_educ || '—';
+          }
+          if (document.getElementById('pSpesCourse')) {
+            document.getElementById('pSpesCourse').textContent = r.course || '—';
+          }
+          if (document.getElementById('pSpesSchool')) {
+            document.getElementById('pSpesSchool').textContent = r.school || '—';
+          }
+        }
+      })
+      .catch(() => {
+        // Silent fail on student info
+      });
+
+    // Fetch SPES employment records
+    const empEl = document.getElementById('pSpesEmployment');
+    if (empEl) empEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+
+    fetch(`../../backend/beneficiaries/get_spes_employment.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (!empEl) return;
+
+        const rows = Array.isArray(j?.records) ? j.records : [];
+        if (j && j.success && rows.length) {
+          const formatDate = (value) => {
+            if (!value) return '—';
+            const date = new Date(value);
+            return isNaN(date.getTime())
+              ? String(value)
+              : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+          };
+
+          empEl.innerHTML = rows.map(r => `
+            <tr>
+              <td style="font-weight:500;">${r.company_name || '—'}</td>
+              <td>${r.store_assignment || '—'}</td>
+              <td>${formatDate(r.start_of_contract)}</td>
+              <td>${formatDate(r.end_of_contract)}</td>
+              <td>${r.days || '—'}</td>
+              <td><span class="badge badge-registered">${r.category || '—'}</span></td>
+            </tr>
+          `).join('');
+        } else {
+          empEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>`;
+        }
+      })
+      .catch(() => {
+        if (empEl) {
+          empEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        }
+      });
+  } else {
+    if (spesStudentCard) spesStudentCard.style.display = 'none';
+    if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
+  }
+
+  if (programName === 'Government Internship Program') {
+    if (educationCard) educationCard.style.display = 'none';
+    if (jobFairCard) jobFairCard.style.display = 'none';
+    if (firstTimeJobSeekerCard) firstTimeJobSeekerCard.style.display = 'none';
+    if (whipCard) whipCard.style.display = 'none';
+    if (spesStudentCard) spesStudentCard.style.display = 'none';
+    if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
+    if (wiirpCard) wiirpCard.style.display = 'none';
+    if (gipCard) gipCard.style.display = 'block';
+
+    const gipFields = {
+      pGipContractPeriod: 'pGipContractPeriod',
+      pGipSchool: 'pGipSchool',
+      pGipCourse: 'pGipCourse',
+      pGipRequiredHours: 'pGipRequiredHours',
+      pGipCollegeOrShs: 'pGipCollegeOrShs',
+      pGipPreferredOrgType: 'pGipPreferredOrgType',
+      pGipPreferredIndustry: 'pGipPreferredIndustry',
+      pGipWillingOutside: 'pGipWillingOutside',
+      pGipOfficeAssignment: 'pGipOfficeAssignment',
+      pGipType: 'pGipType'
+    };
+
+    // Clear all fields initially
+    Object.values(gipFields).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = 'Loading…';
+    });
+
+    fetch(`../../backend/beneficiaries/get_gip.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.success && j.record) {
+          const r = j.record;
+
+          const formatDate = (value) => {
+            if (!value) return '—';
+            const date = new Date(value);
+            return isNaN(date.getTime())
+              ? String(value)
+              : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+          };
+
+          const formatBool = (value) => {
+            return Number(value) === 1 ? 'Yes' : 'No';
+          };
+
+          const formatType = (value) => {
+            if (value === 'DOLE') return 'DOLE';
+            if (value === 'LGU') return 'LGU';
+            return String(value || '—');
+          };
+
+          const formatEdLevel = (value) => {
+            if (value === 'college') return 'College';
+            if (value === 'shs') return 'Senior High School';
+            return String(value || '—');
+          };
+
+          if (document.getElementById('pGipContractPeriod')) {
+            document.getElementById('pGipContractPeriod').textContent = r.contract_period || '—';
+          }
+          if (document.getElementById('pGipSchool')) {
+            document.getElementById('pGipSchool').textContent = r.school || '—';
+          }
+          if (document.getElementById('pGipCourse')) {
+            document.getElementById('pGipCourse').textContent = r.course || '—';
+          }
+          if (document.getElementById('pGipRequiredHours')) {
+            document.getElementById('pGipRequiredHours').textContent = r.required_hours != null ? String(r.required_hours) : '—';
+          }
+          if (document.getElementById('pGipCollegeOrShs')) {
+            document.getElementById('pGipCollegeOrShs').textContent = formatEdLevel(r.college_or_shs);
+          }
+          if (document.getElementById('pGipPreferredOrgType')) {
+            document.getElementById('pGipPreferredOrgType').textContent = r.preferred_org_type || '—';
+          }
+          if (document.getElementById('pGipPreferredIndustry')) {
+            document.getElementById('pGipPreferredIndustry').textContent = r.preferred_industry || '—';
+          }
+          if (document.getElementById('pGipWillingOutside')) {
+            document.getElementById('pGipWillingOutside').textContent = formatBool(r.is_willing_outside);
+          }
+          if (document.getElementById('pGipOfficeAssignment')) {
+            document.getElementById('pGipOfficeAssignment').textContent = r.office_assignment || '—';
+          }
+          if (document.getElementById('pGipType')) {
+            document.getElementById('pGipType').textContent = formatType(r.type);
+          }
+        } else {
+          Object.values(gipFields).forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = 'No GIP records.';
+          });
+        }
+      })
+      .catch(() => {
+        Object.values(gipFields).forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = 'Error loading records.';
+        });
+      });
+  } else if (gipCard) {
+    gipCard.style.display = 'none';
+  }
+
+  if (educationCard) {
+    educationCard.style.display = hideEducationCard ? 'none' : '';
+  }
+
+  if (!hideEducationCard) {
+    document.getElementById('pEducation').textContent = b.education;
+    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${s}</span>`).join('');
+  }
 
   // ── Employment: show spinner then lazy-load from API ──
   const empEl = document.getElementById('pEmployment');
@@ -149,3 +636,358 @@ function switchTab(name, btn) {
     window.loadBeneficiaryDocuments(window.currentBeneficiaryId, window.currentBeneficiaryName || '');
   }
 }
+
+// ── Edit Modal Handlers ──────────────────────────────────────────────────────
+
+function _toggleEditModal(modalId, display) {
+  const modal = document.getElementById(modalId);
+  if (!modal) return;
+  modal.style.display = display;
+}
+
+function _showEditToast(message, type) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(message, type);
+    return;
+  }
+  if (type === 'error') console.error(message);
+  else console.log(message);
+}
+
+// ── Personal Information ─────────────────────────────────────────────────────
+function openEditPersonalModal() {
+  const b = window.currentBeneficiary;
+  if (!b) return;
+  document.getElementById('editPersonalName').value = b.name || '';
+  document.getElementById('editPersonalDob').value = formatDateForInput(b.dob);
+  document.getElementById('editPersonalGender').value = b.gender || '';
+  document.getElementById('editPersonalCivil').value = b.civil || '';
+  // Prefill address fields. Prefer discrete DB columns; fall back to parsing `b.address` if needed.
+  const houseEl = document.getElementById('editPersonalHouse');
+  const brgyEl = document.getElementById('editPersonalBarangay');
+  const distEl = document.getElementById('editPersonalDistrict');
+  const cityEl = document.getElementById('editPersonalCity');
+
+  const hasDiscrete = (b.house_no && String(b.house_no).trim()) || (b.barangay && String(b.barangay).trim()) || (b.city && String(b.city).trim()) || (b.district && String(b.district).trim());
+  if (hasDiscrete) {
+    if (houseEl) houseEl.value = b.house_no || '';
+    if (brgyEl) brgyEl.value = b.barangay || '';
+    if (distEl) distEl.value = b.district || '';
+    if (cityEl) cityEl.value = b.city || '';
+  } else if (b.address) {
+    // Try to split a combined address into components by commas
+    const parts = String(b.address).split(',').map(p => p.trim()).filter(Boolean);
+    // Typical formats: "House#, Street, Barangay, City" or "House#, Street, Barangay, District, City"
+    if (parts.length >= 4) {
+      if (houseEl) houseEl.value = parts.slice(0, parts.length - 3).join(', ');
+      if (brgyEl) brgyEl.value = parts[parts.length - 3] || '';
+      if (distEl) distEl.value = parts[parts.length - 2] || '';
+      if (cityEl) cityEl.value = parts[parts.length - 1] || '';
+    } else if (parts.length === 3) {
+      if (houseEl) houseEl.value = parts[0] || '';
+      if (brgyEl) brgyEl.value = parts[1] || '';
+      if (cityEl) cityEl.value = parts[2] || '';
+      if (distEl) distEl.value = '';
+    } else if (parts.length === 2) {
+      if (houseEl) houseEl.value = parts[0] || '';
+      if (cityEl) cityEl.value = parts[1] || '';
+      if (brgyEl) brgyEl.value = '';
+      if (distEl) distEl.value = '';
+    } else {
+      if (houseEl) houseEl.value = b.address || '';
+      if (brgyEl) brgyEl.value = '';
+      if (distEl) distEl.value = '';
+      if (cityEl) cityEl.value = '';
+    }
+  } else {
+    if (houseEl) houseEl.value = '';
+    if (brgyEl) brgyEl.value = '';
+    if (distEl) distEl.value = '';
+    if (cityEl) cityEl.value = '';
+  }
+  _toggleEditModal('modalEditPersonal', 'flex');
+}
+
+function closeEditPersonalModal() {
+  _toggleEditModal('modalEditPersonal', 'none');
+}
+
+function submitEditPersonal() {
+  const id = window.currentBeneficiaryId;
+  if (!id) { _showEditToast('No beneficiary selected.', 'error'); return; }
+
+  const fullName = document.getElementById('editPersonalName').value.trim();
+  const dob = document.getElementById('editPersonalDob').value || null;
+  const sex = document.getElementById('editPersonalGender').value || null;
+  const civil = document.getElementById('editPersonalCivil').value || null;
+  const house_no = document.getElementById('editPersonalHouse').value.trim() || null;
+  const barangay = document.getElementById('editPersonalBarangay').value.trim() || null;
+  const district = document.getElementById('editPersonalDistrict').value.trim() || null;
+  const city = document.getElementById('editPersonalCity').value.trim() || null;
+
+  // Validate all required fields
+  if (!fullName) {
+    _showEditToast('Full name is required.', 'error');
+    return;
+  }
+  if (!dob) {
+    _showEditToast('Date of birth is required.', 'error');
+    return;
+  }
+  if (!sex) {
+    _showEditToast('Gender is required.', 'error');
+    return;
+  }
+  if (!civil) {
+    _showEditToast('Civil status is required.', 'error');
+    return;
+  }
+  if (!house_no) {
+    _showEditToast('House number/street is required.', 'error');
+    return;
+  }
+  if (!barangay) {
+    _showEditToast('Barangay is required.', 'error');
+    return;
+  }
+  if (!district) {
+    _showEditToast('District is required.', 'error');
+    return;
+  }
+  if (!city) {
+    _showEditToast('City/municipality is required.', 'error');
+    return;
+  }
+
+  // Validate DOB format and is not in future
+  const dobDate = new Date(dob);
+  if (isNaN(dobDate.getTime())) {
+    _showEditToast('Invalid date of birth.', 'error');
+    return;
+  }
+  if (dobDate > new Date()) {
+    _showEditToast('Date of birth cannot be in the future.', 'error');
+    return;
+  }
+
+  // Simple name parsing: first, middle, last
+  const parts = fullName.split(/\s+/).filter(Boolean);
+  const first = parts.length ? parts[0] : '';
+  const last = parts.length > 1 ? parts[parts.length - 1] : '';
+  const middle = parts.length > 2 ? parts.slice(1, -1).join(' ') : '';
+
+  fetch(`../../backend/beneficiaries/update_personal.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+      benef_id: id,
+      first_name: first,
+      middle_name: middle,
+      last_name: last,
+      suffix: '',
+      dob: dob,
+      sex: sex,
+      civil_status: civil,
+      house_no: house_no,
+      barangay: barangay,
+      district: district,
+      city: city
+    })
+  })
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      // update local object and UI
+      const b = window.currentBeneficiary || {};
+      b.name = fullName || b.name;
+      b.dob = dob || b.dob;
+      b.gender = sex || b.gender;
+      b.civil = civil || b.civil;
+      b.house_no = house_no || b.house_no;
+      b.barangay = barangay || b.barangay;
+      b.district = district || b.district;
+      b.city = city || b.city;
+
+      // Build a display address
+      const addrParts = [];
+      if (b.house_no) addrParts.push(b.house_no);
+      if (b.barangay) addrParts.push(b.barangay);
+      if (b.district) addrParts.push(b.district);
+      if (b.city) addrParts.push(b.city);
+      b.address = addrParts.join(', ');
+
+      document.getElementById('pFullName').textContent = b.name;
+      document.getElementById('profName').textContent = b.name;
+      document.getElementById('profAge').textContent = calculateAge(b.dob);
+      document.getElementById('pDob').textContent = dob ? new Date(dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : (b.dob || '—');
+      document.getElementById('pGender').textContent = b.gender || '—';
+      document.getElementById('pCivil').textContent = b.civil || '—';
+      document.getElementById('pAddress').textContent = b.address || '—';
+
+      _showEditToast('Personal information saved.', 'success');
+      closeEditPersonalModal();
+    } else {
+      _showEditToast(j.message || 'Failed to save personal information.', 'error');
+    }
+  }).catch(err => {
+    console.error('[profile.js] submitEditPersonal error', err);
+    _showEditToast('Failed to save personal information.', 'error');
+  });
+}
+
+// ── Contact Information ──────────────────────────────────────────────────────
+// ── Validators ──────────────────────────────────────────────────────────────
+function validateEmail(email) {
+  if (!email) return { valid: false, message: 'Email is required.' };
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return { valid: false, message: 'Invalid email format.' };
+  }
+  return { valid: true };
+}
+
+function validatePhone(phone) {
+  if (!phone) return { valid: false, message: 'Phone number is required.' };
+  const phoneRegex = /^(\+?63|0)?9\d{9}$/;
+  const cleanPhone = phone.replace(/[-\s]/g, '');
+  if (!phoneRegex.test(cleanPhone)) {
+    return { valid: false, message: 'Invalid phone number. Use format 09XXXXXXXXX or +639XXXXXXXXX.' };
+  }
+  return { valid: true };
+}
+
+// ── Contact Edit ─────────────────────────────────────────────────────────────
+function openEditContactModal() {
+  const b = window.currentBeneficiary;
+  if (!b) return;
+  document.getElementById('editContactEmail').value = b.emailAddr || '';
+  document.getElementById('editContactPhone').value = b.phone || '';
+  _toggleEditModal('modalEditContact', 'flex');
+}
+
+function closeEditContactModal() {
+  _toggleEditModal('modalEditContact', 'none');
+}
+
+function submitEditContact() {
+  const id = window.currentBeneficiaryId;
+  if (!id) { _showEditToast('No beneficiary selected.', 'error'); return; }
+
+  const email = document.getElementById('editContactEmail').value.trim();
+  const phone = document.getElementById('editContactPhone').value.trim();
+
+  // Validate email
+  const emailValidation = validateEmail(email);
+  if (!emailValidation.valid) {
+    _showEditToast(emailValidation.message, 'error');
+    return;
+  }
+
+  // Validate phone
+  const phoneValidation = validatePhone(phone);
+  if (!phoneValidation.valid) {
+    _showEditToast(phoneValidation.message, 'error');
+    return;
+  }
+
+  fetch(`../../backend/beneficiaries/update_contact.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ benef_id: id, contact: phone, email })
+  })
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      const b = window.currentBeneficiary || {};
+      b.emailAddr = email || b.emailAddr;
+      b.phone = phone || b.phone;
+
+      const emailEl = document.getElementById('pEmail');
+      if (emailEl) {
+        emailEl.textContent = b.emailAddr || '—';
+        emailEl.href = `mailto:${b.emailAddr || ''}`;
+      }
+
+      const phoneEl = document.getElementById('pPhone');
+      if (phoneEl) phoneEl.textContent = b.phone || '—';
+
+      _showEditToast('Contact information saved.', 'success');
+      closeEditContactModal();
+    } else {
+      _showEditToast(j.message || 'Failed to save contact information.', 'error');
+    }
+  }).catch(err => {
+    console.error('[profile.js] submitEditContact error', err);
+    _showEditToast('Failed to save contact information.', 'error');
+  });
+}
+
+// ── Case Notes ───────────────────────────────────────────────────────────────
+function openEditNotesModal() {
+  const notesEl = document.getElementById('pNotes');
+  const notesText = notesEl ? notesEl.textContent.trim() : '';
+  document.getElementById('editNotesText').value = notesText;
+  _toggleEditModal('modalEditNotes', 'flex');
+}
+
+function closeEditNotesModal() {
+  _toggleEditModal('modalEditNotes', 'none');
+}
+
+function submitEditNotes() {
+  _showEditToast('Case notes saved.', 'success');
+  closeEditNotesModal();
+}
+
+// ── Education & Skills ───────────────────────────────────────────────────────
+function openEditEducationModal() {
+  const b = window.currentBeneficiary;
+  if (!b) return;
+  document.getElementById('editEducationLevel').value = b.education || '';
+  document.getElementById('editEducationSkills').value = (b.skills || []).join(', ');
+  _toggleEditModal('modalEditEducation', 'flex');
+}
+
+function closeEditEducationModal() {
+  _toggleEditModal('modalEditEducation', 'none');
+}
+
+function submitEditEducation() {
+  _showEditToast('Education & skills saved.', 'success');
+  closeEditEducationModal();
+}
+
+// ── Employment ───────────────────────────────────────────────────────────────
+function openEditEmploymentModal() {
+  document.getElementById('editEmploymentCompany').value = '';
+  document.getElementById('editEmploymentStatus').value = '';
+  document.getElementById('editEmploymentDate').value = new Date().toISOString().slice(0, 10);
+  document.getElementById('editEmploymentNotes').value = '';
+  _toggleEditModal('modalEditEmployment', 'flex');
+}
+
+function closeEditEmploymentModal() {
+  _toggleEditModal('modalEditEmployment', 'none');
+}
+
+function submitEditEmployment() {
+  _showEditToast('Employment record added.', 'success');
+  closeEditEmploymentModal();
+}
+
+// Make functions global
+window.openEditPersonalModal = openEditPersonalModal;
+window.closeEditPersonalModal = closeEditPersonalModal;
+window.submitEditPersonal = submitEditPersonal;
+window.openEditContactModal = openEditContactModal;
+window.closeEditContactModal = closeEditContactModal;
+window.submitEditContact = submitEditContact;
+window.openEditNotesModal = openEditNotesModal;
+window.closeEditNotesModal = closeEditNotesModal;
+window.submitEditNotes = submitEditNotes;
+window.openEditEducationModal = openEditEducationModal;
+window.closeEditEducationModal = closeEditEducationModal;
+window.submitEditEducation = submitEditEducation;
+window.openEditEmploymentModal = openEditEmploymentModal;
+window.closeEditEmploymentModal = closeEditEmploymentModal;
+window.submitEditEmployment = submitEditEmployment;
