@@ -25,6 +25,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
 <?php require_once __DIR__ . '/partials/drive-modal.php'; ?>
 <?php require_once __DIR__ . '/partials/timeline-modals.php'; ?>
+<?php require_once __DIR__ . '/partials/edit-modals.php'; ?>
 
 <script src="assets/js/data.js"></script>
 <script src="assets/js/table.js"></script>
