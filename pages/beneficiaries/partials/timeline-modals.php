@@ -69,3 +69,21 @@
         </div>
     </div>
 </div>
+
+<!-- ── Delete Timeline Item Modal ── -->
+<div id="modalDeleteTimelineItem" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Timeline Record</h3>
+            <button class="modal-close" onclick="closeDeleteTimelineModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this timeline record?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteTimelineModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteTimelineItem()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
