@@ -26,7 +26,6 @@
                     <div class="vnum" id="profVisit">3rd</div>
                     <div class="vlbl">Visit</div>
                 </div>
-                <button class="edit-btn">Edit Profile</button>
             </div>
         </div>
         <div class="profile-dates">
