@@ -365,3 +365,107 @@ window.openInlineDriveForm = openInlineDriveForm;
 window.closeInlineDriveForm = closeInlineDriveForm;
 window.submitInlineDriveLink = submitInlineDriveLink;
 window.loadBeneficiaryDocuments = loadBeneficiaryDocuments;
+
+// ─── Edit Drive Link Modal ────────────────────────────────
+
+function _showEditDriveToast(message, type) {
+  if (typeof window.showToast === 'function') {
+    window.showToast(message, type);
+    return;
+  }
+  if (type === 'error') console.error(message);
+  else console.log(message);
+}
+
+function openEditDriveModal() {
+  const doc = _getDocActionsTarget();
+  if (!doc) {
+    _showEditDriveToast('No document selected.', 'warning');
+    return;
+  }
+
+  document.getElementById('editDriveFileName').value = doc.name || '';
+  document.getElementById('editDriveLink').value = doc.url || '';
+  
+  const modal = document.getElementById('modalEditDrive');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => { document.getElementById('editDriveFileName').focus(); }, 100);
+  }
+}
+
+function closeEditDriveModal() {
+  const modal = document.getElementById('modalEditDrive');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function submitEditDrive() {
+  if (!_requireInput('editDriveLink')) return;
+
+  const doc = _getDocActionsTarget();
+  if (!doc) {
+    _showEditDriveToast('No document selected.', 'error');
+    closeEditDriveModal();
+    return;
+  }
+
+  const url = document.getElementById('editDriveLink').value.trim();
+
+  // Validate URL
+  if (!url) {
+    _showEditDriveToast('Google Drive link is required.', 'error');
+    return;
+  }
+
+  // Post to backend to update database
+  const benef_id = window.currentBeneficiaryId;
+  if (!benef_id) {
+    _showEditDriveToast('No beneficiary selected.', 'error');
+    return;
+  }
+
+  fetch(`../../backend/beneficiaries/update_document.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: benef_id,
+      field: doc.field,
+      doc_url: url
+    })
+  })
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      // Update the document object
+      doc.url = url;
+
+      // Update the DOM
+      const item = document.querySelector(`.doc-item[data-doc-index="${currentDocumentIndex}"]`);
+      if (item) {
+        item.dataset.docUrl = url;
+      }
+
+      // Update the details panel
+      const driveUrlEl = document.querySelector('.drive-url span');
+      const openBtn = document.querySelector('.open-drive-btn');
+
+      if (driveUrlEl) driveUrlEl.textContent = url;
+      if (openBtn) openBtn.onclick = () => _openCurrentDoc(doc);
+
+      _showEditDriveToast('Google Drive link updated.', 'success');
+      closeEditDriveModal();
+    } else {
+      _showEditDriveToast(j.message || 'Failed to update Google Drive link.', 'error');
+    }
+  })
+  .catch(err => {
+    console.error('[documents.js] submitEditDrive error', err);
+    _showEditDriveToast('Failed to update Google Drive link.', 'error');
+  });
+}
+
+window.openEditDriveModal = openEditDriveModal;
+window.closeEditDriveModal = closeEditDriveModal;
+window.submitEditDrive = submitEditDrive;
