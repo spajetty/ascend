@@ -30,13 +30,18 @@ function _renderTimelineItems(items) {
   }
 
   list.innerHTML = items.map(item => `
-    <div class="tl-item" data-type="${item.type}">
+    <div class="tl-item" data-type="${item.type}" data-history-id="${item.id || ''}">
       <div class="tl-icon tl-icon-${item.color}">${item.icon}</div>
       <div class="tl-body" style="flex:1;">
         <span class="tl-type-tag tag-${item.type}">${item.title}</span>
         <p>${item.description}</p>
       </div>
       <div class="tl-date">${item.date}</div>
+      <button class="tl-delete-btn" onclick="deleteTimelineItem('${item.id || ''}')" title="Delete this record" style="padding:6px 8px;display:flex;align-items:center;gap:4px;background:transparent;border:none;cursor:pointer;color:var(--text-muted);transition:color 0.2s;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>
+        </svg>
+      </button>
     </div>
   `).join('');
 
@@ -60,7 +65,26 @@ async function loadBeneficiaryTimeline(benefId) {
       return;
     }
 
-    _renderTimelineItems(Array.isArray(json.timeline) ? json.timeline : []);
+    const timelineItems = Array.isArray(json.timeline) ? json.timeline : [];
+    _renderTimelineItems(timelineItems);
+    
+    // Update visit badge based on the latest timeline data
+    if (timelineItems.length > 0) {
+      const pesoCounts = timelineItems
+        .filter(item => item.classification === 'PESO_VISIT')
+        .map(item => item.raw?.visit_number || 0);
+      
+      if (pesoCounts.length > 0) {
+        const maxVisit = Math.max(...pesoCounts);
+        const visitEl = document.getElementById('profVisit');
+        if (visitEl && maxVisit > 0) {
+          // Format ordinal suffix (1st, 2nd, 3rd, 4th, etc.)
+          const suffixes = ['th', 'st', 'nd', 'rd'];
+          const suffix = suffixes[maxVisit % 10 === 1 && maxVisit % 100 !== 11 ? 1 : maxVisit % 10 === 2 && maxVisit % 100 !== 12 ? 2 : maxVisit % 10 === 3 && maxVisit % 100 !== 13 ? 3 : 0];
+          visitEl.textContent = maxVisit + suffix;
+        }
+      }
+    }
   } catch (err) {
     console.error('[timeline.js] Failed to load beneficiary timeline:', err);
     _setTimelineEmpty('Unable to load timeline.');
@@ -263,6 +287,106 @@ function submitAddReferral() {
     });
 }
 
+// ── Delete Timeline Item ──────────────────────────────────
+
+let pendingDeleteHistoryId = null;
+
+function deleteTimelineItem(historyId) {
+  if (!historyId) {
+    _showTimelineToast('Unable to delete this record.', 'error');
+    return;
+  }
+
+  pendingDeleteHistoryId = historyId;
+  const modal = document.getElementById('modalDeleteTimelineItem');
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeDeleteTimelineModal() {
+  const modal = document.getElementById('modalDeleteTimelineItem');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  pendingDeleteHistoryId = null;
+}
+
+function confirmDeleteTimelineItem() {
+  const historyId = pendingDeleteHistoryId;
+  if (!historyId) {
+    _showTimelineToast('Unable to delete this record.', 'error');
+    closeDeleteTimelineModal();
+    return;
+  }
+
+  const benef_id = window.currentBeneficiaryId;
+  if (!benef_id) {
+    _showTimelineToast('No beneficiary selected.', 'error');
+    closeDeleteTimelineModal();
+    return;
+  }
+
+  const item = document.querySelector(`.tl-item[data-history-id="${historyId}"]`);
+  if (item) {
+    item.style.opacity = '0.5';
+    item.style.pointerEvents = 'none';
+  }
+
+  // Call backend to delete
+  fetch(`../../backend/beneficiaries/delete_activity.php`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: benef_id,
+      history_id: historyId
+    })
+  })
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      // Remove from DOM
+      if (item) {
+        setTimeout(() => {
+          item.remove();
+          
+          // Check if timeline is now empty
+          const list = document.getElementById('timelineList');
+          const items = list ? list.querySelectorAll('.tl-item') : [];
+          if (items.length === 0) {
+            _setTimelineEmpty('No timeline records found for this beneficiary.');
+          }
+        }, 300);
+      }
+      
+      // Reload timeline to update visit count and other data
+      if (typeof window.loadBeneficiaryTimeline === 'function') {
+        window.loadBeneficiaryTimeline(benef_id);
+      }
+      
+      _showTimelineToast('Timeline record deleted successfully.', 'success');
+    } else {
+      // Restore item if deletion failed
+      if (item) {
+        item.style.opacity = '1';
+        item.style.pointerEvents = 'auto';
+      }
+      _showTimelineToast(j.message || 'Failed to delete timeline record.', 'error');
+    }
+    closeDeleteTimelineModal();
+  })
+  .catch(err => {
+    console.error('[timeline.js] confirmDeleteTimelineItem error', err);
+    // Restore item if deletion failed
+    if (item) {
+      item.style.opacity = '1';
+      item.style.pointerEvents = 'auto';
+    }
+    _showTimelineToast('Failed to delete timeline record.', 'error');
+    closeDeleteTimelineModal();
+  });
+}
+
 window.filterTimeline = filterTimeline;
 window.loadBeneficiaryTimeline = loadBeneficiaryTimeline;
 window.openLogVisitModal = openLogVisitModal;
@@ -271,3 +395,6 @@ window.openAddReferralModal = openAddReferralModal;
 window.closeAddReferralModal = closeAddReferralModal;
 window.submitLogVisit = submitLogVisit;
 window.submitAddReferral = submitAddReferral;
+window.deleteTimelineItem = deleteTimelineItem;
+window.closeDeleteTimelineModal = closeDeleteTimelineModal;
+window.confirmDeleteTimelineItem = confirmDeleteTimelineItem;
