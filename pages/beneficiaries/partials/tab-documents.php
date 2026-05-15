@@ -47,7 +47,14 @@
             </div>
             <div class="detail-row"><span>File Type</span><span id="detailType">—</span></div>
             <div class="drive-link-section">
-                <label>Google Drive Link</label>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <label style="margin:0;">Google Drive Link</label>
+                    <button class="edit-btn-icon" onclick="openEditDriveModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                        </svg>
+                    </button>
+                </div>
                 <div class="drive-url">🔗 <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">—</span></div>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button class="open-drive-btn" type="button">Open in Drive</button>
