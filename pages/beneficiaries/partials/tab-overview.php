@@ -126,6 +126,314 @@
         </table>
     </div>
 
+    <!-- First Time Job Seeker issuance status (hidden by default) -->
+    <div id="firstTimeJobSeekerCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7h16v10H4z"/>
+                    <path d="M8 11h8"/>
+                </svg>
+                Issuance Status
+            </h4>
+        </div>
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th>Occupational Permit</th>
+                    <th>Health Card</th>
+                </tr>
+            </thead>
+            <tbody id="pFirstTimeJobSeekerIssuance">
+                <tr>
+                    <td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance records.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- WHIP project assignment (hidden by default) -->
+    <div id="whipCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7h18v10H3z"/>
+                    <path d="M7 7v10"/>
+                    <path d="M17 7v10"/>
+                </svg>
+                Project Assignment
+            </h4>
+        </div>
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th>Date Hired</th>
+                    <th>Company</th>
+                    <th>Project</th>
+                    <th>Duration</th>
+                    <th>Budget</th>
+                </tr>
+            </thead>
+            <tbody id="pWhipProjects">
+                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- WIIRP info (hidden by default) -->
+    <div id="wiirpCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                WIIRP Information
+            </h4>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">
+            <div class="info-card" style="margin:0;padding:12px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Academic Details</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Contract Period</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpContractPeriod">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">School</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpSchool">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpCourse">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Year Level</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpYearLevel">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Required Hours</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpRequiredHours">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin:0;padding:12px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Preferences</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Inquiry Category</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpInquiryType">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Organization</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredOrgType">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Industry</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredIndustry">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Willing Outside Area</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpWillingOutside">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Internship Schedule</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpInternshipSched">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin:0;padding:12px;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Placement Summary</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Start Date</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpStartDate">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Placement Type</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpType">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- WIIRP assignment details (hidden by default) -->
+    <div id="wiirpAssignmentCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                </svg>
+                Assignment Details
+            </h4>
+        </div>
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Required Hours</th>
+                    <th>Office Assignment</th>
+                    <th id="wiirpEndorsement1Header">Endorsement 1</th>
+                    <th id="wiirpEndorsement2Header">Endorsement 2</th>
+                </tr>
+            </thead>
+            <tbody id="pWiirpAssignments">
+                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SPES student info (hidden by default) -->
+    <div id="spesStudentCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                Student Information
+            </h4>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
+                <label style="font-size:11.5px;color:var(--text-muted);">Student Type</label>
+                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pSpesStudentType">—</div>
+            </div>
+            <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
+                <label style="font-size:11.5px;color:var(--text-muted);">Highest Educational Attainment</label>
+                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pSpesHighestEduc">—</div>
+            </div>
+            <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
+                <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
+                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pSpesCourse">—</div>
+            </div>
+            <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
+                <label style="font-size:11.5px;color:var(--text-muted);">School</label>
+                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pSpesSchool">—</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPES employment (hidden by default) -->
+    <div id="spesEmploymentCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2"/>
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                </svg>
+                OJT Employment
+            </h4>
+        </div>
+        <table class="emp-table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Store Assignment</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Days</th>
+                    <th>Category</th>
+                </tr>
+            </thead>
+            <tbody id="pSpesEmployment">
+                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- GIP (Government Internship Program) (hidden by default) -->
+    <div id="gipCard" class="info-card" style="margin-top:14px;display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <h4 style="margin:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                </svg>
+                Government Internship Program
+            </h4>
+        </div>
+        <div style="display:flex;gap:12px;">
+            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Academic Details</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Contract Period</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipContractPeriod">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">School</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipSchool">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCourse">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Required Hours</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipRequiredHours">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Education Level</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCollegeOrShs">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Preferences</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Organization</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipPreferredOrgType">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Industry</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipPreferredIndustry">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Willing Outside Area</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipWillingOutside">—</div>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">Placement</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Office Assignment</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipOfficeAssignment">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Placement Type</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipType">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Employment Status -->
     <div class="info-card" style="margin-top:14px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
