@@ -46,6 +46,24 @@ async function openProfile(benefId) {
   document.getElementById('profLastVisit').textContent = safeText(b.lastVisit);
   document.getElementById('profVisit').textContent     = safeText(b.visit);
 
+  // Show visit badge and dates only if there's at least one PESO visit record
+  const visitBadgeContainer = document.getElementById('visitBadgeContainer');
+  const profileDatesContainer = document.getElementById('profileDatesContainer');
+  
+  // Fetch visit count from activity history
+  fetch(`../../backend/beneficiaries/get_visit_count.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+    .then(r => r.json())
+    .then(j => {
+      const hasVisit = j && j.success && j.count > 0;
+      if (visitBadgeContainer) visitBadgeContainer.style.display = hasVisit ? 'flex' : 'none';
+      if (profileDatesContainer) profileDatesContainer.style.display = hasVisit ? '' : 'none';
+    })
+    .catch(() => {
+      // If fetch fails, hide the elements
+      if (visitBadgeContainer) visitBadgeContainer.style.display = 'none';
+      if (profileDatesContainer) profileDatesContainer.style.display = 'none';
+    });
+
   // Status badge — normalise to title case for the lookup
   const statusNorm = (b.status || '').trim();
   const statusKey  = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1).toLowerCase();
