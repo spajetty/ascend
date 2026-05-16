@@ -6,13 +6,15 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                 <h4 style="margin:0;">
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
                     </svg>
                     Personal Information
                 </h4>
-                <button class="edit-btn-icon" onclick="openEditPersonalModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                <button class="edit-btn-icon" onclick="openEditPersonalModal()"
+                    style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                        <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                     </svg>
                 </button>
             </div>
@@ -21,7 +23,8 @@
                 <div class="info-item"><label>Gender</label><span id="pGender">Female</span></div>
                 <div class="info-item"><label>Date of Birth</label><span id="pDob">January 14, 2002</span></div>
                 <div class="info-item"><label>Civil Status</label><span id="pCivil">Single</span></div>
-                <div class="info-item full-row"><label>Address</label><span id="pAddress">741 Ash Street, Fairview, Metro Manila</span></div>
+                <div class="info-item full-row"><label>Address</label><span id="pAddress">741 Ash Street, Fairview,
+                        Metro Manila</span></div>
             </div>
         </div>
 
@@ -30,15 +33,18 @@
             <div class="info-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                     <h4 style="margin:0;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                            <polyline points="22,6 12,13 2,6"/>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                            <polyline points="22,6 12,13 2,6" />
                         </svg>
                         Contact Information
                     </h4>
-                    <button class="edit-btn-icon" onclick="openEditContactModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <button class="edit-btn-icon" onclick="openEditContactModal()"
+                        style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                         </svg>
                     </button>
                 </div>
@@ -56,21 +62,25 @@
             <div class="info-card">
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
                     <h4 style="margin:0;">
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 11H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-5"/>
-                            <polyline points="12 2 12 15"/>
-                            <polyline points="8 11 12 15 16 11"/>
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M9 11H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-5" />
+                            <polyline points="12 2 12 15" />
+                            <polyline points="8 11 12 15 16 11" />
                         </svg>
                         Case Notes
                     </h4>
-                    <button class="edit-btn-icon" onclick="openEditNotesModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <button class="edit-btn-icon" onclick="openEditNotesModal()"
+                        style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                         </svg>
                     </button>
                 </div>
                 <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Notes</label>
-                <p id="pNotes" style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0;background:var(--bg);padding:10px;border-radius:7px;">
+                <p id="pNotes"
+                    style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0;background:var(--bg);padding:10px;border-radius:7px;">
                     Still not hired after multiple visits.
                 </p>
             </div>
@@ -82,14 +92,15 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
                 Education &amp; Skills
             </h4>
-            <button class="edit-btn-icon" onclick="openEditEducationModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openEditEducationModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                 </svg>
             </button>
         </div>
@@ -99,14 +110,14 @@
         </div>
         <div id="pSkills"></div>
     </div>
-    
+
     <!-- Job Fair events (hidden by default; shown when program === 'Job Fair') -->
     <div id="jobFairCard" class="info-card" style="margin-top:14px;display:none;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 7h18v10H3z"/>
-                    <path d="M3 12h18"/>
+                    <path d="M3 7h18v10H3z" />
+                    <path d="M3 12h18" />
                 </svg>
                 Job Fair Events
             </h4>
@@ -121,7 +132,10 @@
                 </tr>
             </thead>
             <tbody id="pJobFairEvents">
-                <tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>
+                <tr>
+                    <td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -131,14 +145,15 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 7h16v10H4z"/>
-                    <path d="M8 11h8"/>
+                    <path d="M4 7h16v10H4z" />
+                    <path d="M8 11h8" />
                 </svg>
                 Issuance Status
             </h4>
-            <button class="edit-btn-icon" onclick="openEditIssuanceModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openEditIssuanceModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                 </svg>
             </button>
         </div>
@@ -151,7 +166,8 @@
             </thead>
             <tbody id="pFirstTimeJobSeekerIssuance">
                 <tr>
-                    <td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance records.</td>
+                    <td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance records.
+                    </td>
                 </tr>
             </tbody>
         </table>
@@ -162,9 +178,9 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 7h18v10H3z"/>
-                    <path d="M7 7v10"/>
-                    <path d="M17 7v10"/>
+                    <path d="M3 7h18v10H3z" />
+                    <path d="M7 7v10" />
+                    <path d="M17 7v10" />
                 </svg>
                 Project Assignment
             </h4>
@@ -181,7 +197,10 @@
                 </tr>
             </thead>
             <tbody id="pWhipProjects">
-                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>
+                <tr>
+                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
+                    </td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -191,14 +210,15 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
                 WIIRP Information
             </h4>
-            <button class="edit-btn-icon" onclick="openEditWiirpModal('record')" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openEditWiirpModal('record')"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                 </svg>
             </button>
         </div>
@@ -243,11 +263,13 @@
                     </div>
                     <div>
                         <label style="font-size:11.5px;color:var(--text-muted);">Preferred Organization</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredOrgType">—</div>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredOrgType">—
+                        </div>
                     </div>
                     <div>
                         <label style="font-size:11.5px;color:var(--text-muted);">Preferred Industry</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredIndustry">—</div>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pWiirpPreferredIndustry">—
+                        </div>
                     </div>
                     <div>
                         <label style="font-size:11.5px;color:var(--text-muted);">Willing Outside Area</label>
@@ -283,16 +305,11 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                    <rect x="2" y="7" width="20" height="14" rx="2" />
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                 </svg>
                 Assignment Details
             </h4>
-            <button class="edit-btn-icon" onclick="openEditWiirpModal('assignment')" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
-                </svg>
-            </button>
         </div>
         <table class="emp-table">
             <thead>
@@ -306,7 +323,10 @@
                 </tr>
             </thead>
             <tbody id="pWiirpAssignments">
-                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>
+                <tr>
+                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment
+                        records.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -316,12 +336,16 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
                 Student Information
             </h4>
-            <button class="btn-cancel" style="padding:7px 12px;font-size:12px;" onclick="openEditSpesModal()">Edit</button>
+            <button class="btn-cancel" style="padding:7px 12px;font-size:12px;" onclick="openEditSpesModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
+                </svg>
+            </button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
             <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
@@ -348,8 +372,8 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                    <rect x="2" y="7" width="20" height="14" rx="2" />
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                 </svg>
                 OJT Employment
             </h4>
@@ -366,7 +390,9 @@
                 </tr>
             </thead>
             <tbody id="pSpesEmployment">
-                <tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>
+                <tr>
+                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -376,14 +402,15 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
-                    <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+                    <path d="M6 12v5c3 3 9 3 12 0v-5" />
                 </svg>
                 Government Internship Program
             </h4>
-            <button class="edit-btn-icon" onclick="openEditGipModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openEditGipModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
                 </svg>
             </button>
         </div>
@@ -460,14 +487,15 @@
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <h4 style="margin:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <rect x="2" y="7" width="20" height="14" rx="2"/>
-                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+                    <rect x="2" y="7" width="20" height="14" rx="2" />
+                    <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
                 </svg>
                 Employment Status
             </h4>
-            <button class="edit-btn-icon" onclick="openAddEmploymentModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;">
+            <button class="edit-btn-icon" onclick="openAddEmploymentModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M5 12h14"/>
+                    <path d="M12 5v14M5 12h14" />
                 </svg>
                 Add
             </button>
