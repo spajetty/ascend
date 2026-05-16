@@ -10,7 +10,6 @@ export const programsBySection = {
         'Job Fair'
     ],
     employers_engagement: [
-        'Employers Accreditation',
         'Workers Hiring for Infrastructure Projects'
     ],
     youth_employability: [
