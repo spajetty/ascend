@@ -136,6 +136,11 @@
                 </svg>
                 Issuance Status
             </h4>
+            <button class="edit-btn-icon" onclick="openEditIssuanceModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                </svg>
+            </button>
         </div>
         <table class="emp-table">
             <thead>
@@ -191,6 +196,11 @@
                 </svg>
                 WIIRP Information
             </h4>
+            <button class="edit-btn-icon" onclick="openEditWiirpModal('record')" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                </svg>
+            </button>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;">
             <div class="info-card" style="margin:0;padding:12px;">
@@ -278,6 +288,11 @@
                 </svg>
                 Assignment Details
             </h4>
+            <button class="edit-btn-icon" onclick="openEditWiirpModal('assignment')" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                </svg>
+            </button>
         </div>
         <table class="emp-table">
             <thead>
@@ -306,6 +321,7 @@
                 </svg>
                 Student Information
             </h4>
+            <button class="btn-cancel" style="padding:7px 12px;font-size:12px;" onclick="openEditSpesModal()">Edit</button>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;">
             <div style="flex:1 1 calc(50% - 5px);min-width:180px;">
@@ -365,6 +381,11 @@
                 </svg>
                 Government Internship Program
             </h4>
+            <button class="edit-btn-icon" onclick="openEditGipModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                </svg>
+            </button>
         </div>
         <div style="display:flex;gap:12px;">
             <div class="info-card" style="margin:0;padding:12px;flex:1;">
@@ -444,10 +465,11 @@
                 </svg>
                 Employment Status
             </h4>
-            <button class="edit-btn-icon" onclick="openEditEmploymentModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openAddEmploymentModal()" style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3"/>
+                    <path d="M12 5v14M5 12h14"/>
                 </svg>
+                Add
             </button>
         </div>
         <table class="emp-table">
@@ -457,6 +479,7 @@
                     <th>Status</th>
                     <th>Date</th>
                     <th>Note</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pEmployment"></tbody>

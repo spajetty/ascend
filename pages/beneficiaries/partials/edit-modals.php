@@ -132,17 +132,323 @@
     </div>
 </div>
 
+<!-- ── Edit SPES Student Information Modal ── -->
+<div id="modalEditSpes" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:720px;">
+        <div class="modal-header">
+            <h3>Edit SPES Student Information</h3>
+            <button class="modal-close" onclick="closeEditSpesModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="editSpesId" value="">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Student Type</label>
+                    <select id="editSpesStudentType">
+                        <option value="student">Student</option>
+                        <option value="osy">OSY</option>
+                    </select>
+                </div>
+                <div class="modal-field">
+                    <label>Highest Educational Attainment</label>
+                    <input type="text" id="editSpesHighestEduc" placeholder="Highest educational attainment">
+                </div>
+                <div class="modal-field">
+                    <label>Course</label>
+                    <input type="text" id="editSpesCourse" placeholder="Course">
+                </div>
+                <div class="modal-field">
+                    <label>School</label>
+                    <input type="text" id="editSpesSchool" placeholder="School">
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditSpesModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditSpes()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit Government Internship Program Modal ── -->
+<div id="modalEditGip" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:860px;">
+        <div class="modal-header">
+            <h3>Edit Government Internship Program</h3>
+            <button class="modal-close" onclick="closeEditGipModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="editGipId" value="">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Academic Details</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Contract Period</label>
+                            <input type="text" id="editGipContractPeriod" placeholder="e.g. June 2026 to November 2026">
+                        </div>
+                        <div class="modal-field">
+                            <label>School</label>
+                            <input type="text" id="editGipSchool" placeholder="School name">
+                        </div>
+                        <div class="modal-field">
+                            <label>Course</label>
+                            <input type="text" id="editGipCourse" placeholder="Course">
+                        </div>
+                        <div class="modal-field">
+                            <label>Required Hours</label>
+                            <input type="number" id="editGipRequiredHours" min="0" step="1" placeholder="Required hours">
+                        </div>
+                        <div class="modal-field">
+                            <label>Education Level</label>
+                            <select id="editGipCollegeOrShs">
+                                <option value="">— Select —</option>
+                                <option value="college">College</option>
+                                <option value="shs">Senior High School</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Preferences</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Preferred Organization</label>
+                            <input type="text" id="editGipPreferredOrgType" placeholder="Preferred organization type">
+                        </div>
+                        <div class="modal-field">
+                            <label>Preferred Industry</label>
+                            <input type="text" id="editGipPreferredIndustry" placeholder="Preferred industry">
+                        </div>
+                        <div class="modal-field">
+                            <label>Willing Outside Area</label>
+                            <select id="editGipWillingOutside">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Placement</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Office Assignment</label>
+                            <input type="text" id="editGipOfficeAssignment" placeholder="Office assignment">
+                        </div>
+                        <div class="modal-field">
+                            <label>Placement Type</label>
+                            <select id="editGipType">
+                                <option value="">— Select —</option>
+                                <option value="DOLE">DOLE</option>
+                                <option value="LGU">LGU</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditGipModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditGip()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit WIIRP Modal ── -->
+<div id="modalEditWiirp" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:980px;">
+        <div class="modal-header">
+            <h3>Edit WIIRP Information</h3>
+            <button class="modal-close" onclick="closeEditWiirpModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
+            <input type="hidden" id="editWiirpWorkImmersionId" value="">
+            <input type="hidden" id="editWiirpAssignmentId" value="">
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;">
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Academic Details</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Contract Period</label>
+                            <input type="text" id="editWiirpContractPeriod" placeholder="Contract period">
+                        </div>
+                        <div class="modal-field">
+                            <label>School</label>
+                            <input type="text" id="editWiirpSchool" placeholder="School">
+                        </div>
+                        <div class="modal-field">
+                            <label>Course</label>
+                            <input type="text" id="editWiirpCourse" placeholder="Course">
+                        </div>
+                        <div class="modal-field">
+                            <label>Required Hours</label>
+                            <input type="number" id="editWiirpRequiredHours" min="0" step="1" placeholder="Required hours">
+                        </div>
+                        <div class="modal-field">
+                            <label>Year Level</label>
+                            <input type="text" id="editWiirpYearLevel" placeholder="Year level">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Preferences</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Inquiry Type</label>
+                            <input type="text" id="editWiirpInquiryType" placeholder="Inquiry type">
+                        </div>
+                        <div class="modal-field">
+                            <label>Preferred Organization</label>
+                            <input type="text" id="editWiirpPreferredOrgType" placeholder="Preferred organization">
+                        </div>
+                        <div class="modal-field">
+                            <label>Preferred Industry</label>
+                            <input type="text" id="editWiirpPreferredIndustry" placeholder="Preferred industry">
+                        </div>
+                        <div class="modal-field">
+                            <label>Willing Outside Area</label>
+                            <select id="editWiirpWillingOutside">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                        <div class="modal-field">
+                            <label>Internship Schedule</label>
+                            <input type="text" id="editWiirpInternshipSched" placeholder="Internship schedule">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-card" style="margin:0;padding:12px;">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                        <strong style="font-size:13px;">Placement Summary</strong>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                        <div class="modal-field">
+                            <label>Start Date</label>
+                            <input type="date" id="editWiirpStartDate">
+                        </div>
+                        <div class="modal-field">
+                            <label>Placement Type</label>
+                            <p id="displayWiirpType" class="readonly-field">—</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditWiirpModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditWiirp()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit Issuance Status Modal (First Time Jobseeker) ── -->
+<div id="modalEditIssuance" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:520px;">
+        <div class="modal-header">
+            <h3>Edit Issuance Status</h3>
+            <button class="modal-close" onclick="closeEditIssuanceModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editIssuanceJobseekId" value="">
+            <div class="modal-field">
+                <label>Occupational Permit</label>
+                <select id="editIssuanceOccPermit">
+                    <option value="0">Not issued</option>
+                    <option value="1">Issued</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Health Card</label>
+                <select id="editIssuanceHealthCard">
+                    <option value="0">Not issued</option>
+                    <option value="1">Issued</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditIssuanceModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitUpdateIssuance()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add Employment Status Modal ── -->
+<div id="modalAddEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Add Employment Record</h3>
+            <button class="modal-close" onclick="closeAddEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-field">
+                <label>Company</label>
+                <select id="addEmploymentCompany" style="width:100%;">
+                    <option value="">Loading companies…</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Status</label>
+                <select id="addEmploymentStatus">
+                    <option value="">— Select —</option>
+                    <option value="Currently Employed">Currently Employed</option>
+                    <option value="Previously Employed">Previously Employed</option>
+                    <option value="Unemployed">Unemployed</option>
+                    <option value="Self-Employed">Self-Employed</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Date</label>
+                <input type="date" id="addEmploymentDate">
+            </div>
+            <div class="modal-field">
+                <label>Notes <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+                <textarea id="addEmploymentNotes" rows="3" placeholder="Employment details..."></textarea>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeAddEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitAddEmployment()">Add Record</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Edit Employment Status Modal ── -->
 <div id="modalEditEmployment" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box">
         <div class="modal-header">
-            <h3>Add Employment Record</h3>
+            <h3>Edit Employment Record</h3>
             <button class="modal-close" onclick="closeEditEmploymentModal()">✕</button>
         </div>
         <div class="modal-body">
             <div class="modal-field">
                 <label>Company</label>
-                <input type="text" id="editEmploymentCompany" placeholder="Company name">
+                <select id="editEmploymentCompany" style="width:100%;">
+                    <option value="">Loading companies…</option>
+                </select>
             </div>
             <div class="modal-field">
                 <label>Status</label>
@@ -165,7 +471,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeEditEmploymentModal()">Cancel</button>
-            <button class="btn-confirm" onclick="submitEditEmployment()">Add Record</button>
+            <button class="btn-confirm" onclick="submitUpdateEmployment()">Update Record</button>
         </div>
     </div>
 </div>
@@ -190,6 +496,101 @@
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeEditDriveModal()">Cancel</button>
             <button class="btn-confirm" onclick="submitEditDrive()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete Employment Record Modal ── -->
+<div id="modalDeleteEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Employment Record</h3>
+            <button class="modal-close" onclick="closeDeleteEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this employment record?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteEmploymentRecord()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Bulk Delete Beneficiaries Modal ── -->
+<div id="modalBulkDelete" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:440px;">
+        <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="width:34px;height:34px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                </span>
+                <h3 style="color:#b91c1c;">Delete Beneficiaries</h3>
+            </div>
+            <button class="modal-close" onclick="closeBulkDeleteModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="margin:0;color:var(--text-secondary);line-height:1.6;">
+                You are about to permanently delete
+                <strong id="bulkDeleteCount" style="color:var(--text-primary);">0</strong>
+                beneficiar<span id="bulkDeleteWord">ies</span>.
+            </p>
+            <p style="margin:10px 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone. All associated records will be removed.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeBulkDeleteModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmBulkDelete()" style="background:#ef4444;color:#fff;">
+                Delete Selected
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Bulk Update Classification Modal ── -->
+<div id="modalBulkClassify" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <span style="width:34px;height:34px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                </span>
+                <h3>Update Classification</h3>
+            </div>
+            <button class="modal-close" onclick="closeBulkClassifyModal()">✕</button>
+        </div>
+        <div class="modal-body" style="gap:12px;">
+
+            <!-- Summary rows -->
+            <div class="bulk-classify-info">
+                <div class="bulk-info-row">
+                    <span class="bulk-info-label">Applying to</span>
+                    <span class="bulk-info-value"><strong id="bulkClassifyCount">0</strong> beneficiaries</span>
+                </div>
+                <div class="bulk-info-row" id="bulkClassifyProgramRow">
+                    <span class="bulk-info-label">Program</span>
+                    <span class="bulk-info-value" id="bulkClassifyProgramName" style="font-weight:600;color:var(--text-primary);">—</span>
+                </div>
+            </div>
+
+            <!-- Mixed-program warning (shown only for Case 2) -->
+            <div id="bulkClassifyWarning" class="bulk-classify-warning" style="display:none;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span id="bulkClassifyWarningText"></span>
+            </div>
+
+            <!-- Status field (hidden when mixed programs) -->
+            <div class="modal-field" id="bulkClassifyStatusField">
+                <label>New Status</label>
+                <select id="bulkClassifyStatus">
+                    <option value="">— Select status —</option>
+                </select>
+            </div>
+
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeBulkClassifyModal()">Cancel</button>
+            <button class="btn-confirm" id="bulkClassifySubmitBtn" onclick="confirmBulkClassify()">Apply to All</button>
         </div>
     </div>
 </div>
