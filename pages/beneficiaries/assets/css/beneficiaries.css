@@ -299,7 +299,7 @@ tbody td { padding: 14px 16px; font-size: 13.5px; color: var(--text-primary); ve
 .timeline-panel {
   position: relative;
 }
-.timeline-filters { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+.timeline-filters { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .tf-btn {
   padding: 5px 13px; border-radius: 20px; font-size: 12px;
   border: 1px solid var(--border); background: var(--card);
