@@ -124,10 +124,15 @@ async function fetchEmploymentHistory(benefId) {
     if (!json.success) return [];
 
     return (json.employment || []).map(e => ({
-      co:   e.company_name  || '—',
-      st:   e.status        || '—',
-      dt:   e.date_formatted || '—',
-      note: e.notes         || '',
+      id:             e.history_id      || 0,
+      company_id:     e.company_id      || 0,
+      co:             e.company_name    || '—',
+      status:         e.status          || '—',
+      st:             e.status          || '—',
+      date_of_record:  e.date_of_record  || '',
+      dt:             e.date_formatted  || '—',
+      notes:          e.notes           || '',
+      note:           e.notes           || '',
     }));
   } catch {
     return [];
