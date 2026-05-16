@@ -514,7 +514,15 @@ export function handleFile(file) {
             fetch('../../backend/import/validate_preview.php', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body:    JSON.stringify({ program, section, data: json, wiirpCategory, gipCategory, jobFairEvent }),
+                body:    JSON.stringify({
+                    program,
+                    section,
+                    data: json,
+                    wiirpCategory,
+                    gipCategory,
+                    jobFairEvent,
+                    importYear: yearSelect?.value ?? '',
+                }),
             })
                 .then(async res => {
                     const raw = await res.text();

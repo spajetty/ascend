@@ -13,6 +13,7 @@ $program = trim((string)$input['program']);
 $rows = $input['data'];
 $wiirpCategory = trim((string)($input['wiirpCategory'] ?? ''));
 $gipCategory = trim((string)($input['gipCategory'] ?? ''));
+$importYear = trim((string)($input['importYear'] ?? ''));
 
 $jobFairEvent = trim((string)($input['jobFairEvent'] ?? ''));
 
@@ -42,7 +43,7 @@ require_once __DIR__ . '/validators/validate_beneficiaries.php';
 $validatedData = [];
 
 if ($program === 'Employers Accreditation') {
-    $validatedData = validateEmployersAccreditation($conn, $rows);
+    $validatedData = validateEmployersAccreditation($conn, $rows, $importYear);
 } elseif (isWhipProjectsProgram($program)) {
     $validatedData = validateWhipProjects($conn, $rows);
 } elseif (isWhipBeneficiariesProgram($program)) {

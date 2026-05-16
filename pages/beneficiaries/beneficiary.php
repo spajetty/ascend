@@ -24,11 +24,14 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <?php require_once __DIR__ . '/partials/drive-modal.php'; ?>
+<?php require_once __DIR__ . '/partials/timeline-modals.php'; ?>
+<?php require_once __DIR__ . '/partials/edit-modals.php'; ?>
 
 <script src="assets/js/data.js"></script>
 <script src="assets/js/table.js"></script>
 <script src="assets/js/profile.js"></script>
 <script src="assets/js/documents.js"></script>
+<script type="module" src="../../assets/js/toast.js"></script>
 <script src="assets/js/timeline.js"></script>
 <script src="assets/js/init.js"></script>
 

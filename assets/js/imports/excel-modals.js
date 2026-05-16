@@ -219,10 +219,6 @@ export function ensureUnknownEmployersModal() {
             </div>
         </div>`;
     document.body.appendChild(modal);
-
-    const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
-    modal.querySelector('#unknownEmployersBackdrop')?.addEventListener('click', closeModal);
-    modal.querySelector('#unknownEmployersCancel')?.addEventListener('click', closeModal);
     return modal;
 }
 
@@ -249,8 +245,18 @@ export function openUnknownEmployersModal(employers, onProceed, onCancel) {
 
     const closeModal = () => { modal.classList.add('hidden'); modal.classList.remove('flex'); };
 
+    // Dismiss = cancel: re-enable the Import button via onCancel
+    const dismiss = () => {
+        closeModal();
+        setTimeout(() => onCancel?.(), 80);
+    };
+
+    // Wire backdrop click to dismiss (calls onCancel so btn.disabled is reset)
+    const backdrop = modal.querySelector('#unknownEmployersBackdrop');
+    if (backdrop) backdrop.onclick = dismiss;
+
     const proceedBtn = modal.querySelector('#unknownEmployersProceed');
-    const cancelBtn = modal.querySelector('#unknownEmployersCancel');
+    const cancelBtn  = modal.querySelector('#unknownEmployersCancel');
 
     if (proceedBtn) {
         proceedBtn.onclick = () => {
@@ -260,10 +266,7 @@ export function openUnknownEmployersModal(employers, onProceed, onCancel) {
     }
 
     if (cancelBtn) {
-        cancelBtn.onclick = () => {
-            closeModal();
-            setTimeout(() => onCancel?.(), 80);
-        };
+        cancelBtn.onclick = dismiss;
     }
 
     modal.classList.remove('hidden');

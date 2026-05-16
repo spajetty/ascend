@@ -80,12 +80,39 @@
         </select>
     </div>
 
+    <!-- Bulk Action Bar -->
+    <div id="bulkActionBar" class="bulk-action-bar" style="display:none;">
+        <div class="bulk-action-left">
+            <span id="bulkCount" class="bulk-count">0 selected</span>
+            <button class="bulk-clear-btn" onclick="clearSelection(); renderTable();" title="Clear selection">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                Clear
+            </button>
+        </div>
+        <div class="bulk-action-right">
+            <button class="bulk-btn bulk-btn-classify" onclick="openBulkClassifyModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Update Classification
+            </button>
+            <button class="bulk-btn bulk-btn-delete" onclick="openBulkDeleteModal()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                Delete
+            </button>
+        </div>
+    </div>
+
     <!-- Table -->
     <div class="table-card">
         <div class="table-wrap">
             <table id="beneficiariesTable">
                 <thead>
                     <tr>
+                        <th class="th-check">
+                            <label class="check-wrap">
+                                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                                <span class="checkmark"></span>
+                            </label>
+                        </th>
                         <th>Name</th>
                         <th>Gender</th>
                         <th>Section</th>

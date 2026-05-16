@@ -20,18 +20,16 @@
                     <span id="profAge">24 years old</span>
                 </div>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;">
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;display:none;" id="visitBadgeContainer">
                 <div class="visit-badge">
                     <div class="visit-notif">1</div>
                     <div class="vnum" id="profVisit">3rd</div>
                     <div class="vlbl">Visit</div>
                 </div>
-                <button class="edit-btn">Edit Profile</button>
             </div>
         </div>
-        <div class="profile-dates">
-            <span>📅 Applied <strong id="profApplied">May 28, 2025</strong></span>
-            <span>🕐 Last Visit: <strong id="profLastVisit">January 8, 2026</strong></span>
+        <div class="profile-dates" id="profileDatesContainer" style="display:none;">
+            <span>🕐 Last PESO Visit: <strong id="profLastVisit">—</strong></span>
         </div>
 
         <!-- Tabs -->
