@@ -15,7 +15,7 @@ export const programs = {
     youth_employability:
         [
             'SPES',
-            'Schools',
+            //'Schools',
             //'4Ps Beneficiaries',
             //'PWD',
             'Government Internship Program',
