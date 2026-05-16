@@ -17,6 +17,7 @@ try {
     $empSql = "
         SELECT
             eh.history_id,
+            eh.company_id,
             eh.classification  AS status,
             eh.date_of_record,
             DATE_FORMAT(eh.date_of_record, '%b %d, %Y') AS date_formatted,
