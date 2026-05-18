@@ -834,6 +834,67 @@ document.getElementById('yearSelect').addEventListener('change', function () {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 loadData(new Date().getFullYear());
+
+async function searchSchools(query) {
+
+    const resultsBox = document.getElementById('schoolResults');
+
+    if (!query.trim()) {
+        resultsBox.classList.add('hidden');
+        return;
+    }
+
+    const res = await fetch(`/api/show-schools.php?q=${encodeURIComponent(query)}`);
+    const json = await res.json();
+
+    resultsBox.innerHTML = '';
+
+    if (json.data.length > 0) {
+
+        json.data.forEach(school => {
+
+            resultsBox.innerHTML += `
+                <button type="button"
+                    onclick="selectSchool('${school.school_id}', '${school.school_name}')"
+                    class="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+
+                    ${school.school_name}
+                </button>
+            `;
+        });
+
+    } else {
+
+        resultsBox.innerHTML = `
+            <div class="p-4 text-sm text-gray-500">
+                No schools found.
+            </div>
+
+            <button type="button"
+                onclick="openSchoolModal()"
+                class="w-full text-left px-4 py-3 text-teal-600 hover:bg-teal-50 font-medium">
+
+                + Add this school
+            </button>
+        `;
+    }
+
+    resultsBox.classList.remove('hidden');
+}
+
+document.getElementById('schoolSearch')
+.addEventListener('input', function () {
+    searchSchools(this.value);
+});
+
+function selectSchool(id, name) {
+
+    document.getElementById('schoolSearch').value = name;
+    document.getElementById('selectedSchoolId').value = id;
+
+    document.getElementById('schoolResults')
+        .classList.add('hidden');
+}
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
