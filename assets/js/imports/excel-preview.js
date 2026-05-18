@@ -436,5 +436,11 @@ export function showExcelPreview(rows, summary, requiredCols, extraCols) {
 
     const preview = document.getElementById('dataPreview');
     preview.classList.remove('hidden');
-    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const scrollTarget = periodPanel || preview;
+    if (scrollTarget) {
+        const topOffset = 100;
+        const targetTop = window.scrollY + scrollTarget.getBoundingClientRect().top - topOffset;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }
 }
