@@ -106,12 +106,16 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-40">DATE</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">SCHOOL / INSTITUTION</th>
-                            <th class="px-4 py-3 text-center text-cyan-500 font-semibold border-l border-gray-100">MALE</th>
-                            <th class="px-4 py-3 text-center text-pink-500 font-semibold border-l border-gray-100">FEMALE</th>
-                            <th class="px-4 py-3 text-center text-teal-600 font-semibold border-l border-gray-100">TOTAL</th>
-                            <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">DATE CONDUCTED</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">SCHOOL</th>
+                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">DISTRICT</th>
+                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">GRADE LEVEL</th>
+                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">GRADES OFFERED</th>
+                            <th class="text-center px-4 py-3 border-l text-cyan-500">MALE</th>
+                            <th class="text-center px-4 py-3 border-l text-pink-500">FEMALE</th>
+                            <th class="text-center px-4 py-3 border-l text-teal-600">TOTAL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">APPROVAL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
