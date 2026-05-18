@@ -9,10 +9,10 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-0 md:w-auto">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/career-development.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,111 +23,127 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-4 md:px-8 py-6 space-y-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardSessions" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardSessions" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Career Dev. Sessions</span>
+                <span class="text-xs text-gray-500 leading-tight">Career Dev. Sessions</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardTotal" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardTotal" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Career Dev. Participants (Total)</span>
+                <span class="text-xs text-gray-500 leading-tight">Career Dev. Participants (Total)</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardMale" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardMale" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Career Dev. Participants (Male)</span>
+                <span class="text-xs text-gray-500 leading-tight">Career Dev. Participants (Male)</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardFemale" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardFemale" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-pink-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Career Dev. Participants (Female)</span>
+                <span class="text-xs text-gray-500 leading-tight">Career Dev. Participants (Female)</span>
             </div>
 
         </div>
 
         <!-- Filter -->
-        <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="flex flex-col gap-2 mb-4">
+            <!-- Row 1: Year filter -->
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filter by year:</span>
+                <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
                 <select id="yearSelect"
-                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5">
                 </select>
             </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchSchool" placeholder="Search school..."
-                    oninput="applyFilters()"
-                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+
+            <!-- Row 2: Search + Add Entry always on same line -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input type="text"
+                        id="searchSchool"
+                        placeholder="Search school..."
+                        oninput="applyFilters()"
+                        class="w-full pl-4 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg"/>
+                </div>
+
+                <button onclick="openAddModal()"
+                    class="shrink-0 inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Add Entry
+                </button>
             </div>
+
         </div>
 
         <!-- Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="font-bold text-gray-800 text-base">Career Development Support Program</h2>
-                <span id="tableTotal" class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full">— Total</span>
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Career Development Support Program</h2>
+                <span id="tableTotal" class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full shrink-0">— Total</span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs">
+
+            <!-- Scrollable table wrapper — scroll is scoped here, not the whole page -->
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                <table class="w-full text-xs min-w-[700px]">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">DATE CONDUCTED</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">SCHOOL</th>
-                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">DISTRICT</th>
-                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">GRADE LEVEL</th>
-                            <th class="text-center px-4 py-3 border-l text-gray-500 font-semibold border-gray-100">GRADES OFFERED</th>
-                            <th class="text-center px-4 py-3 border-l text-cyan-500">MALE</th>
-                            <th class="text-center px-4 py-3 border-l text-pink-500">FEMALE</th>
-                            <th class="text-center px-4 py-3 border-l text-teal-600">TOTAL</th>
-                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">APPROVAL</th>
-                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">ACTIONS</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold whitespace-nowrap">DATE CONDUCTED</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">SCHOOL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden md:table-cell">DISTRICT</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">GRADE LEVEL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden lg:table-cell">GRADES OFFERED</th>
+                            <th class="text-center px-4 py-3 text-cyan-500 font-semibold border-l border-gray-100 whitespace-nowrap">MALE</th>
+                            <th class="text-center px-4 py-3 text-pink-500 font-semibold border-l border-gray-100 whitespace-nowrap">FEMALE</th>
+                            <th class="text-center px-4 py-3 text-teal-600 font-semibold border-l border-gray-100 whitespace-nowrap">TOTAL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden sm:table-cell">APPROVAL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr id="loadingRow">
-                            <td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td>
+                            <td colspan="10" class="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
                 <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
@@ -145,7 +161,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </main>
 
 <!-- Modal Backdrop -->
-<div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40 modal-backdrop"></div>
+<div id="modalBackdrop"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-40">
+</div>
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
