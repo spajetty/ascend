@@ -131,10 +131,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden md:table-cell">DISTRICT</th>
                             <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">GRADE LEVEL</th>
                             <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden lg:table-cell">GRADES OFFERED</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden sm:table-cell">APPROVAL</th>
                             <th class="text-center px-4 py-3 text-cyan-500 font-semibold border-l border-gray-100 whitespace-nowrap">MALE</th>
                             <th class="text-center px-4 py-3 text-pink-500 font-semibold border-l border-gray-100 whitespace-nowrap">FEMALE</th>
                             <th class="text-center px-4 py-3 text-teal-600 font-semibold border-l border-gray-100 whitespace-nowrap">TOTAL</th>
-                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden sm:table-cell">APPROVAL</th>
                             <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">ACTIONS</th>
                         </tr>
                     </thead>
@@ -466,7 +466,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
-const API_URL = '/api/cdsp-api.php';
+const API_URL = '/backend/career-dev/show-cdsp.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];   // raw data from API
@@ -484,7 +484,7 @@ function fmt(dateStr) {
 }
 
 function num(n) {
-    return Number(n).toLocaleString();
+    return Number(n || 0).toLocaleString();
 }
 
 // ─── Load data from API ───────────────────────────────────────────────────────
@@ -558,17 +558,55 @@ function renderPage() {
     }
 
     // Total row
-    const totM = filteredRows.reduce((s, r) => s + Number(r.participants_male), 0);
-    const totF = filteredRows.reduce((s, r) => s + Number(r.participants_female), 0);
+    const totM = filteredRows.reduce(
+        (s, r) => s + (Number(r.participants_male) || 0),
+        0
+    );
+
+    const totF = filteredRows.reduce(
+        (s, r) => s + (Number(r.participants_female) || 0),
+        0
+    );
     tbody.insertAdjacentHTML('beforeend', `
-        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-            <td class="px-4 py-3 border-l border-gray-100"></td>
-            <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${num(totM)}</td>
-            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${num(totF)}</td>
-            <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${num(totM + totF)}</td>
-            <td class="border-l border-gray-100"></td>
-        </tr>
+    <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
+
+        <td class="px-4 py-3 text-gray-800 font-bold">
+            TOTAL
+        </td>
+
+        <td class="px-4 py-3 border-l border-gray-100"></td>
+
+        <!-- DISTRICT (hidden md) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden md:table-cell"></td>
+
+        <!-- GRADE LEVEL -->
+        <td class="px-4 py-3 border-l border-gray-100"></td>
+
+        <!-- GRADES OFFERED (hidden lg) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden lg:table-cell"></td>
+
+        <!-- APPROVAL (hidden sm) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden sm:table-cell"></td>
+
+        <!-- MALE -->
+        <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">
+            ${num(totM)}
+        </td>
+
+        <!-- FEMALE -->
+        <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">
+            ${num(totF)}
+        </td>
+
+        <!-- TOTAL -->
+        <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">
+            ${num(totM + totF)}
+        </td>
+
+        <!-- ACTIONS -->
+        <td class="border-l border-gray-100"></td>
+
+    </tr>
     `);
 
     // Pagination info
@@ -590,31 +628,89 @@ function renderPage() {
 }
 
 function buildRow(r) {
-    const id    = r.cdsp_id;
-    const total = Number(r.participants_male) + Number(r.participants_female);
+    const id = r.cdsp_id;
+
+    const total =
+        Number(r.participants_male ?? 0) +
+        Number(r.participants_female ?? 0);
+
     return `
-    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}" data-school="${(r.school_name || '').toLowerCase()}">
-        <td class="px-4 py-3 text-gray-700 font-medium date-cell">${fmt(r.date_of_conduct)}</td>
-        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">${r.school_name || '—'}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">${num(r.participants_male)}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">${num(r.participants_female)}</td>
-        <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100 total-cell">${num(total)}</td>
+    <tr class="border-b border-gray-50 hover:bg-gray-50"
+        data-id="${id}"
+        data-school="${(r.school_name || '').toLowerCase()}">
+
+        <td class="px-4 py-3 text-gray-700 font-medium date-cell">
+            ${fmt(r.date_of_conduct)}
+        </td>
+
+        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">
+            ${r.school_name || '—'}
+        </td>
+
+        <!-- DISTRICT -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 hidden md:table-cell">
+            ${r.congressional_district ?? '—'}
+        </td>
+
+        <!-- GRADE LEVEL (from careerdev table) -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">
+            ${r.grade_level ?? '—'}
+        </td>
+
+        <!-- GRADES OFFERED (from schools table) -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 hidden lg:table-cell">
+            ${r.grades_offered ?? '—'}
+        </td>
+
+        <!-- APPROVAL -->
+        <td class="px-4 py-3 text-center border-l border-gray-100 hidden sm:table-cell">
+            ${r.approval_letter == 1
+                ? `<span class="text-green-600 font-semibold">✔ Yes</span>`
+                : `<span class="text-gray-400">No</span>`}
+        </td>
+
+        <!-- MALE -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">
+            ${num(r.participants_male)}
+        </td>
+
+        <!-- FEMALE -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">
+            ${num(r.participants_female)}
+        </td>
+
+        <!-- TOTAL -->
+        <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100 total-cell">
+            ${num(total)}
+        </td>
+
+        <!-- ACTIONS -->
         <td class="px-4 py-3 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2 action-buttons">
-                <button onclick="toggleEditMode('${id}')" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+
+                <button onclick="toggleEditMode('${id}')"
+                    class="text-yellow-500 hover:text-yellow-600 edit-btn">
+                    ✏️
                 </button>
-                <button onclick="deleteRow('${id}')" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+
+                <button onclick="deleteRow('${id}')"
+                    class="text-red-400 hover:text-red-600 delete-btn">
+                    🗑️
                 </button>
-                <button onclick="saveRow('${id}')" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+
+                <button onclick="saveRow('${id}')"
+                    class="text-green-500 hover:text-green-600 save-btn hidden">
+                    ✔
                 </button>
-                <button onclick="cancelEdit('${id}')" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+
+                <button onclick="cancelEdit('${id}')"
+                    class="text-gray-400 hover:text-gray-600 cancel-btn hidden">
+                    ✖
                 </button>
+
             </div>
         </td>
+
     </tr>`;
 }
 
@@ -842,7 +938,7 @@ async function searchSchools(query) {
         return;
     }
 
-    const res = await fetch(`/api/show-schools.php?q=${encodeURIComponent(query)}`);
+    const res = await fetch(`/backend/career-dev/show-schools.php?q=${encodeURIComponent(query)}`);
     const json = await res.json();
 
     resultsBox.innerHTML = '';
@@ -936,7 +1032,7 @@ document.getElementById('addForm')
 
     const start = Date.now();
 
-    const res = await fetch('/api/submit-cdsp.php', {
+    const res = await fetch('/backend/career-dev/submit-cdsp.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -966,6 +1062,7 @@ document.getElementById('addForm')
         );
     }
 });
+
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
