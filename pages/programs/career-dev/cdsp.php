@@ -532,7 +532,7 @@ async function loadData(year) {
 function applyFilters() {
     const query = document.getElementById('searchSchool').value.toLowerCase().trim();
     filteredRows = allRows.filter(r =>
-        !query || (r.school || '').toLowerCase().includes(query)
+        !query || (r.school_name || '').toLowerCase().includes(query)
     );
     currentPage = 1;
     renderPage();
@@ -558,8 +558,8 @@ function renderPage() {
     }
 
     // Total row
-    const totM = filteredRows.reduce((s, r) => s + Number(r.cdsp_m), 0);
-    const totF = filteredRows.reduce((s, r) => s + Number(r.cdsp_f), 0);
+    const totM = filteredRows.reduce((s, r) => s + Number(r.participants_male), 0);
+    const totF = filteredRows.reduce((s, r) => s + Number(r.participants_female), 0);
     tbody.insertAdjacentHTML('beforeend', `
         <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
             <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
@@ -591,13 +591,13 @@ function renderPage() {
 
 function buildRow(r) {
     const id    = r.cdsp_id;
-    const total = Number(r.cdsp_m) + Number(r.cdsp_f);
+    const total = Number(r.participants_male) + Number(r.participants_female);
     return `
-    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}" data-school="${(r.school || '').toLowerCase()}">
-        <td class="px-4 py-3 text-gray-700 font-medium date-cell">${fmt(r.date)}</td>
-        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">${r.school || '—'}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">${num(r.cdsp_m)}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">${num(r.cdsp_f)}</td>
+    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}" data-school="${(r.school_name || '').toLowerCase()}">
+        <td class="px-4 py-3 text-gray-700 font-medium date-cell">${fmt(r.date_of_conduct)}</td>
+        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">${r.school_name || '—'}</td>
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">${num(r.participants_male)}</td>
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">${num(r.participants_female)}</td>
         <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100 total-cell">${num(total)}</td>
         <td class="px-4 py-3 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2 action-buttons">
@@ -632,11 +632,10 @@ function toggleEditMode(id) {
 
     // Store originals
     const rec = allRows.find(r => String(r.cdsp_id) === String(id));
-    editingData[id] = { date: rec.date, school: rec.school, cdsp_m: rec.cdsp_m, cdsp_f: rec.cdsp_f };
+    editingData[id] = { date: rec.date_of_conduct, school: rec.school_name, cdsp_m: rec.participants_male, cdsp_f: rec.participants_female };
 
-    // Make date cell editable as input[date]
     const dateCell = row.querySelector('.date-cell');
-    dateCell.innerHTML = `<input type="date" value="${rec.date}" class="border border-yellow-300 rounded px-2 py-1 text-xs w-36 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400" id="edit-date-${id}">`;
+    dateCell.innerHTML = `<input type="date" value="${rec.date_of_conduct}" class="border border-yellow-300 rounded px-2 py-1 text-xs w-36 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400" id="edit-date-${id}">`;
 
     // school, male, female editable
     ['school-cell', 'male-cell', 'female-cell'].forEach(cls => {
@@ -705,14 +704,13 @@ async function confirmSave() {
         const res  = await fetch(API_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cdsp_id: id, date: newDate, school: newSchool, cdsp_m: newMale, cdsp_f: newFemale })
-        });
+            body: JSON.stringify({ cdsp_id: id, date_of_conduct: newDate, school_name: newSchool, participants_male: newMale, participants_female: newFemale })        });
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
         // Update local data
         const rec = allRows.find(r => String(r.cdsp_id) === String(id));
-        if (rec) { rec.date = newDate; rec.school = newSchool; rec.cdsp_m = newMale; rec.cdsp_f = newFemale; rec.total = newMale + newFemale; }
+        if (rec) { rec.date_of_conduct = newDate; rec.school_name = newSchool; rec.participants_male = newMale; rec.participants_female = newFemale; rec.total = newMale + newFemale; }
 
         // Re-render cells
         const total = newMale + newFemale;
