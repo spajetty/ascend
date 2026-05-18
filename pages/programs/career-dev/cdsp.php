@@ -1054,6 +1054,11 @@ document.getElementById('addForm')
     btn.innerHTML = 'Submit Entry';
 
     if (json.success) {
+        document.getElementById('addForm').reset();
+        document.getElementById('selectedSchoolId').value = '';
+        document.getElementById('schoolSearch').value = '';
+        document.getElementById('schoolResults').innerHTML = '';
+        document.getElementById('schoolResults').classList.add('hidden');
 
         closeAddModal();
 
@@ -1108,17 +1113,20 @@ document.getElementById('schoolForm').addEventListener('submit', async function(
     btn.innerHTML = 'Save School';
 
     if (json.success) {
+        document.getElementById('schoolForm').reset();
 
         closeSchoolModal();
 
-        // optional: refresh school search if input is open
         const input = document.getElementById('schoolSearch');
+        const results = document.getElementById('schoolResults');
+
+        input.value = '';
+        results.innerHTML = '';
+        results.classList.add('hidden');
+
         if (input.value.trim()) {
             searchSchools(input.value);
         }
-
-    } else {
-        alert(json.error || 'Failed to save school');
     }
 });
 
