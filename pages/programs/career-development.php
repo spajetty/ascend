@@ -140,8 +140,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script>
 // ─── API paths ────────────────────────────────────────────────────────────────
 const YEAR     = new Date().getFullYear();
-const CDSP_API = `/api/cdsp-api.php?year=${YEAR}`;
-const LMI_API  = `/api/lmi-api.php?year=${YEAR}`;
+const CDSP_API = `/backend/career-dev/show-cdsp.php?year=${YEAR}`;
+const LMI_API  = `/backend/career-dev/show-lmi.php?year=${YEAR}`;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;

@@ -1063,6 +1063,65 @@ document.getElementById('addForm')
     }
 });
 
+document.getElementById('schoolForm').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const btn = document.getElementById('submitSchoolBtn');
+    btn.disabled = true;
+
+    btn.innerHTML = `
+        <span class="inline-flex items-center gap-2">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10"
+                    stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            Saving...
+        </span>
+    `;
+
+    const formData = Object.fromEntries(
+        new FormData(this).entries()
+    );
+
+    const start = Date.now();
+
+    const res = await fetch('/backend/career-dev/submit-school.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 2000) {
+        await new Promise(r => setTimeout(r, 2000 - elapsed));
+    }
+
+    const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Save School';
+
+    if (json.success) {
+
+        closeSchoolModal();
+
+        // optional: refresh school search if input is open
+        const input = document.getElementById('schoolSearch');
+        if (input.value.trim()) {
+            searchSchools(input.value);
+        }
+
+    } else {
+        alert(json.error || 'Failed to save school');
+    }
+});
+
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
