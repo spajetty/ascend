@@ -9,6 +9,10 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
+<style>
+    body.modal-open { overflow: hidden; }
+</style>
+
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-0 md:w-auto">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
@@ -200,6 +204,264 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <button onclick="closeSaveModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
             <button onclick="confirmSave()" class="flex-1 px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600">Save</button>
         </div>
+    </div>
+</div>
+
+<!-- ADD ENTRY MODAL -->
+<div id="addModal"
+    class="fixed inset-0 hidden z-50 items-center justify-center px-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-modal">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50">
+
+            <div>
+                <h2 class="text-base font-bold text-gray-800">
+                    Add Career Development Entry
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Create a new CDSP record
+                </p>
+            </div>
+
+            <button onclick="closeAddModal()"
+                class="w-8 h-8 rounded-xl hover:bg-white/70 flex items-center justify-center text-gray-500 transition">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <form id="addForm"
+            class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+
+            <!-- DATE + GRADE -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Date Conducted
+                    </label>
+
+                    <input type="date"
+                        name="date_of_conduct"
+                        required
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Grade Level
+                    </label>
+
+                    <input type="text"
+                        name="grade_level"
+                        placeholder="Example: Grade 12"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+            </div>
+
+            <!-- SCHOOL -->
+            <div class="relative">
+
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                    School / Institution
+                </label>
+
+                <input type="text"
+                    id="schoolSearch"
+                    autocomplete="off"
+                    placeholder="Search school..."
+                    class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+
+                <input type="hidden"
+                    id="selectedSchoolId"
+                    name="school_id">
+
+                <!-- RESULTS -->
+                <div id="schoolResults"
+                    class="absolute z-50 hidden mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                </div>
+
+            </div>
+
+            <!-- PARTICIPANTS -->
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-cyan-600 mb-1.5">
+                        Male Participants
+                    </label>
+
+                    <input type="number"
+                        name="participants_male"
+                        min="0"
+                        value="0"
+                        class="w-full text-sm border border-cyan-100 bg-cyan-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-pink-600 mb-1.5">
+                        Female Participants
+                    </label>
+
+                    <input type="number"
+                        name="participants_female"
+                        min="0"
+                        value="0"
+                        class="w-full text-sm border border-pink-100 bg-pink-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-pink-300">
+                </div>
+
+            </div>
+
+            <!-- APPROVAL -->
+            <label class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3 cursor-pointer">
+
+                <input type="checkbox"
+                    name="approval_letter"
+                    value="1"
+                    class="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-400">
+
+                <div>
+                    <p class="text-sm font-medium text-gray-700">
+                        Approval Letter Submitted
+                    </p>
+
+                    <p class="text-xs text-gray-500">
+                        Mark if documentation is complete
+                    </p>
+                </div>
+
+            </label>
+
+            <!-- FOOTER -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+
+                <button type="button"
+                    onclick="closeAddModal()"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+
+                    Cancel
+                </button>
+
+                <button type="submit"
+                    id="submitCdspBtn"
+                    class="px-5 py-2.5 text-sm font-medium bg-teal-500 hover:bg-teal-600 text-white rounded-xl transition">
+
+                    Submit Entry
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- SCHOOL MODAL -->
+<div id="schoolModal"
+    class="fixed inset-0 hidden z-[60] items-center justify-center px-4">
+
+    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-modal">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-cyan-50 to-teal-50">
+
+            <div>
+                <h2 class="text-base font-bold text-gray-800">
+                    Add School
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Create a new school record
+                </p>
+            </div>
+
+            <button onclick="closeSchoolModal()"
+                class="w-8 h-8 rounded-xl hover:bg-white/70 flex items-center justify-center text-gray-500 transition">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <form id="schoolForm"
+            class="p-6 space-y-5">
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                    School Name
+                </label>
+
+                <input type="text"
+                    name="school_name"
+                    required
+                    placeholder="Enter school name"
+                    class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Congressional District
+                    </label>
+
+                    <input type="number"
+                        name="congressional_district"
+                        placeholder="Example: 2"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Grades Offered
+                    </label>
+
+                    <input type="text"
+                        name="grades_offered"
+                        placeholder="K-12"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+
+                <button type="button"
+                    onclick="closeSchoolModal()"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+
+                    Cancel
+                </button>
+
+                <button type="submit"
+                    id="submitSchoolBtn"
+                    class="px-5 py-2.5 text-sm font-medium bg-teal-500 hover:bg-teal-600 text-white rounded-xl transition">
+
+                    Save School
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
 </div>
 
@@ -515,6 +777,42 @@ async function confirmDelete() {
     }
 }
 
+function openAddModal() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+    document.body.classList.add('modal-open');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    const modal = document.getElementById('addModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeAddModal() {
+    document.body.style.paddingRight = '';
+    document.body.classList.remove('modal-open');
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    const modal = document.getElementById('addModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function openSchoolModal() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+    document.body.classList.add('modal-open');
+    const modal = document.getElementById('schoolModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeSchoolModal() {
+    document.body.style.paddingRight = '';
+    document.body.classList.remove('modal-open');
+    const modal = document.getElementById('schoolModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
 // ─── Pagination ───────────────────────────────────────────────────────────────
 function changePage(dir) {
     const pages = Math.max(1, Math.ceil(filteredRows.length / ROWS_PER_PAGE));
@@ -525,7 +823,7 @@ function changePage(dir) {
 // ─── Backdrop click ───────────────────────────────────────────────────────────
 document.addEventListener('click', (e) => {
     if (e.target === document.getElementById('modalBackdrop')) {
-        closeDeleteModal(); closeSaveModal();
+        closeDeleteModal(); closeSaveModal(); closeAddModal(); closeSchoolModal();
     }
 });
 
