@@ -895,6 +895,79 @@ function selectSchool(id, name) {
     document.getElementById('schoolResults')
         .classList.add('hidden');
 }
+
+document.getElementById('addForm')
+.addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const btn = document.getElementById('submitCdspBtn');
+
+    btn.disabled = true;
+
+    btn.innerHTML = `
+        <span class="inline-flex items-center gap-2">
+            <svg class="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24">
+
+                <circle class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4">
+                </circle>
+
+                <path class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z">
+                </path>
+            </svg>
+
+            Submitting...
+        </span>
+    `;
+
+    const formData = Object.fromEntries(
+        new FormData(this).entries()
+    );
+
+    formData.approval_letter =
+        formData.approval_letter ? 1 : 0;
+
+    const start = Date.now();
+
+    const res = await fetch('/api/submit-cdsp.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 2000) {
+        await new Promise(r =>
+            setTimeout(r, 2000 - elapsed)
+        );
+    }
+
+    const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Entry';
+
+    if (json.success) {
+
+        closeAddModal();
+
+        loadData(
+            parseInt(document.getElementById('yearSelect').value)
+        );
+    }
+});
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
