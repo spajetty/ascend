@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../includes/auth-check.php';
-require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '../../includes/auth-check.php';
+require_once __DIR__ . '../../vendor/autoload.php';
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -51,15 +51,15 @@ if ($method === 'GET') {
     $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
 
     // Available years for dropdown
-    $res   = $conn->query("SELECT DISTINCT YEAR(date) AS yr FROM careerdev ORDER BY yr DESC");
+    $res   = $conn->query("SELECT DISTINCT YEAR(date) AS yr FROM lmi ORDER BY yr DESC");
     $years = [];
     while ($row = $res->fetch_assoc()) $years[] = (int) $row['yr'];
     if (!in_array($year, $years, true)) { $years[] = $year; rsort($years); }
 
     // All rows for the selected year, ordered by date
     $stmt = $conn->prepare("
-        SELECT cdsp_id, date, school, cdsp_m, cdsp_f, (cdsp_m + cdsp_f) AS total
-        FROM careerdev
+        SELECT lmi_id, date, school, lmi_m, lmi_f, (lmi_m + lmi_f) AS total
+        FROM lmi
         WHERE YEAR(date) = ?
         ORDER BY date ASC
     ");
@@ -79,24 +79,24 @@ if ($method === 'GET') {
         'total'    => 0,
     ];
     foreach ($rows as $r) {
-        $totals['total_m'] += (int) $r['cdsp_m'];
-        $totals['total_f'] += (int) $r['cdsp_f'];
+        $totals['total_m'] += (int) $r['lmi_m'];
+        $totals['total_f'] += (int) $r['lmi_f'];
         $totals['total']   += (int) $r['total'];
     }
 
     json_ok(['rows' => $rows, 'totals' => $totals, 'years' => $years]);
 }
 
-// ─── PUT (edit a careerdev row) ───────────────────────────────────────────────
+// ─── PUT (edit an lmi row) ────────────────────────────────────────────────────
 if ($method === 'PUT') {
     global $conn;
 
     $body = json_decode(file_get_contents('php://input'), true);
-    $id   = isset($body['cdsp_id']) ? (int) $body['cdsp_id'] : 0;
-    if (!$id) json_error('Missing cdsp_id');
+    $id   = isset($body['lmi_id']) ? (int) $body['lmi_id'] : 0;
+    if (!$id) json_error('Missing lmi_id');
 
-    $allowed   = ['date', 'school', 'cdsp_m', 'cdsp_f'];
-    $intFields = ['cdsp_m', 'cdsp_f'];
+    $allowed   = ['date', 'school', 'lmi_m', 'lmi_f'];
+    $intFields = ['lmi_m', 'lmi_f'];
     $sets = []; $types = ''; $values = [];
 
     foreach ($allowed as $col) {
@@ -112,7 +112,7 @@ if ($method === 'PUT') {
     $types   .= 'i';
     $values[] = $id;
 
-    $stmt = $conn->prepare("UPDATE careerdev SET " . implode(', ', $sets) . " WHERE cdsp_id = ?");
+    $stmt = $conn->prepare("UPDATE lmi SET " . implode(', ', $sets) . " WHERE lmi_id = ?");
     if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
     $stmt->bind_param($types, ...$values);
     $stmt->execute();
@@ -129,7 +129,7 @@ if ($method === 'DELETE') {
     $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
     if (!$id) json_error('Missing id');
 
-    $stmt = $conn->prepare("DELETE FROM careerdev WHERE cdsp_id = ?");
+    $stmt = $conn->prepare("DELETE FROM lmi WHERE lmi_id = ?");
     if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
     $stmt->bind_param('i', $id);
     $stmt->execute();
