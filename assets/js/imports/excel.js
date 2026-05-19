@@ -6,7 +6,7 @@ import { showToast } from '../toast.js';
 import { state } from './excel-state.js';
 import { initImportResultsUi, showImportResultsView } from './excel-results.js';
 import { openImportConfirmModal, openUnknownEmployersModal } from './excel-modals.js';
-import { resetPreviewPaginationState, revalidateCurrentPreview, isUnresolvedJobFairCompanyRow } from './excel-preview.js';
+import { resetPreviewPaginationState, revalidateCurrentPreview, getJobFairCompanyImportBlockMessage } from './excel-preview.js';
 import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProgramSpecificFields } from './excel-upload.js';
 
 // Side-effect imports — these modules wire their own DOM event listeners on load.
@@ -97,8 +97,8 @@ if (confirmImportBtn) {
         const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
         const btn         = document.getElementById('confirmImport');
 
-        const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools';
-        const needsGlobalYear = program !== 'Schools';
+        const needsGlobalMonth = program !== 'Employers Accreditation' && program !== 'Schools' && program !== 'Job Fair';
+        const needsGlobalYear = program !== 'Schools' && program !== 'Job Fair';
         if ((needsGlobalMonth && !importMonth) || (needsGlobalYear && !importYear)) {
             showToast(needsGlobalMonth ? 'Please confirm Month and Year before importing.' : 'Please confirm Year before importing.', 'warning');
             return;
@@ -164,7 +164,9 @@ if (confirmImportBtn) {
 
         const periodLabel = program === 'Schools'
             ? 'Not required'
-            : `${importMonth} ${importYear}`.trim();
+            : program === 'Job Fair' && !importMonth && !importYear
+                ? (document.getElementById('jfSelectSearch')?.value?.trim() || 'From selected event')
+                : `${importMonth} ${importYear}`.trim();
 
         // Compute contract period for GIP
         let contractPeriodDisplay = '';
@@ -202,13 +204,9 @@ if (confirmImportBtn) {
             : [];
 
         if (program === 'Job Fair') {
-            const unresolvedCompanyRows = state.parsedExcelData.filter(isUnresolvedJobFairCompanyRow);
-
-            if (unresolvedCompanyRows.length > 0) {
-                showToast(
-                    `Cannot import: ${unresolvedCompanyRows.length} row(s) still have unresolved company names. Accept each suggestion or fix the company name, then try again.`,
-                    'error'
-                );
+            const companyBlockMessage = getJobFairCompanyImportBlockMessage(state.parsedExcelData);
+            if (companyBlockMessage) {
+                showToast(companyBlockMessage, 'error');
                 return;
             }
         }

@@ -93,6 +93,31 @@ try {
     $needsBatch = in_array($program, $batchTrackedPrograms, true) && tableExists($conn, 'import_batches');
 
     if ($needsBatch) {
+        if ($program === 'Job Fair' && ($importMonthRaw === '' || $importYearRaw === '')) {
+            $eventId = (int)$jobFairEventRaw;
+            if ($eventId <= 0) {
+                throw new RuntimeException('Please select a Job Fair event before importing.');
+            }
+            $eventStmt = $conn->prepare('SELECT date_start FROM job_fair_events WHERE jobfairevent_id = ? LIMIT 1');
+            $eventStmt->bind_param('i', $eventId);
+            $eventStmt->execute();
+            $eventRow = $eventStmt->get_result()->fetch_assoc();
+            $eventStmt->close();
+            if (!$eventRow || trim((string)($eventRow['date_start'] ?? '')) === '') {
+                throw new RuntimeException('Selected Job Fair event has no event date.');
+            }
+            $eventTs = strtotime((string)$eventRow['date_start']);
+            if ($eventTs === false) {
+                throw new RuntimeException('Invalid date on selected Job Fair event.');
+            }
+            if ($importMonthRaw === '') {
+                $importMonthRaw = date('F', $eventTs);
+            }
+            if ($importYearRaw === '') {
+                $importYearRaw = date('Y', $eventTs);
+            }
+        }
+
         $monthInt = monthToInt($importMonthRaw);
         if ($monthInt === null) {
             throw new RuntimeException('Invalid import month. Please select a valid month.');

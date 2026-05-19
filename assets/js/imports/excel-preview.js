@@ -174,17 +174,40 @@ export async function revalidateCurrentPreview() {
     showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
 }
 
+export function hasJobFairCompanySuggestion(row) {
+    if ((row?.badge_status ?? '').toLowerCase() !== 'invalid') return false;
+
+    if (String(row?.suggested_company_name ?? '').trim() !== '') return true;
+
+    return String(row?.status_message ?? '').toLowerCase().includes('did you mean');
+}
+
 export function isUnresolvedJobFairCompanyRow(row) {
     if ((row?.badge_status ?? '').toLowerCase() !== 'invalid') return false;
 
-    const hasSuggestion = String(row?.suggested_company_name ?? '').trim() !== '';
-    if (hasSuggestion) return true;
+    if (hasJobFairCompanySuggestion(row)) return true;
 
     const msg = String(row?.status_message ?? '').toLowerCase();
-    return msg.includes('did you mean')
-        || msg.includes('not a participant')
+    return msg.includes('not a participant')
         || msg.includes('missing company')
         || (msg.includes('company') && msg.includes('not found'));
+}
+
+export function getJobFairCompanyImportBlockMessage(rows) {
+    const unresolved = rows.filter(isUnresolvedJobFairCompanyRow);
+    const count = unresolved.length;
+    if (count === 0) return null;
+
+    const suggestionCount = unresolved.filter(hasJobFairCompanySuggestion).length;
+    const hardInvalidCount = count - suggestionCount;
+
+    if (suggestionCount === count) {
+        return `Cannot import: ${count} row(s) need confirmation. Review and accept each suggestion to proceed.`;
+    }
+    if (hardInvalidCount === count) {
+        return `Cannot import: ${count} row(s) have unrecognized companies. Fix your file and re-upload.`;
+    }
+    return `Cannot import: ${count} row(s) have unresolved companies. Accept each suggestion or fix in your file, then re-upload.`;
 }
 
 async function acceptCompanySuggestion(rowIndex) {

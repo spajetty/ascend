@@ -683,25 +683,28 @@ export function handleFile(file) {
             setProgramSelectorsLocked(true);
             setUploadEnabled(false);
 
-            // Period detection
-            const byName    = detectPeriodFromFilename(file.name);
-            const byContent = detectPeriodFromRows(json);
-            state.detectedPeriod = byName.confidence === 'high' ? byName : {
-                ...byContent,
-                month:      byName.month || byContent.month,
-                year:       byName.year  || byContent.year,
-                confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
-                source:     byName.month || byName.year ? 'filename' : 'content',
-            };
-            const isAccreditation = program === 'Employers Accreditation';
-            const isSchools = program === 'Schools';
-            applyDetectedPeriod(state.detectedPeriod, {
-                hideMonth: isAccreditation || isSchools,
-                hideYear: isSchools,
-            });
+            // Period detection — only on first load of this file, not when re-validating
+            // after the user changes month/year or selects a job fair event.
+            if (!isSameSelectedFile) {
+                const byName    = detectPeriodFromFilename(file.name);
+                const byContent = detectPeriodFromRows(json);
+                state.detectedPeriod = byName.confidence === 'high' ? byName : {
+                    ...byContent,
+                    month:      byName.month || byContent.month,
+                    year:       byName.year  || byContent.year,
+                    confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
+                    source:     byName.month || byName.year ? 'filename' : 'content',
+                };
+                const isAccreditation = program === 'Employers Accreditation';
+                const isSchools = program === 'Schools';
+                applyDetectedPeriod(state.detectedPeriod, {
+                    hideMonth: isAccreditation || isSchools,
+                    hideYear: isSchools,
+                });
 
-            if (program === 'Job Fair' && monthSelect?.value && yearSelect?.value) {
-                fetchJobFairEvents();
+                if (program === 'Job Fair' && monthSelect?.value && yearSelect?.value) {
+                    fetchJobFairEvents();
+                }
             }
 
             // Capture category values so preview validation can apply program-specific rules.
