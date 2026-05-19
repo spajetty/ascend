@@ -174,6 +174,19 @@ export async function revalidateCurrentPreview() {
     showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
 }
 
+export function isUnresolvedJobFairCompanyRow(row) {
+    if ((row?.badge_status ?? '').toLowerCase() !== 'invalid') return false;
+
+    const hasSuggestion = String(row?.suggested_company_name ?? '').trim() !== '';
+    if (hasSuggestion) return true;
+
+    const msg = String(row?.status_message ?? '').toLowerCase();
+    return msg.includes('did you mean')
+        || msg.includes('not a participant')
+        || msg.includes('missing company')
+        || (msg.includes('company') && msg.includes('not found'));
+}
+
 async function acceptCompanySuggestion(rowIndex) {
     const index = Number(rowIndex);
     if (!Number.isFinite(index) || index < 0 || index >= state.parsedExcelData.length) return;
@@ -197,6 +210,10 @@ async function acceptCompanySuggestion(rowIndex) {
         row.Company = suggestion;
     }
 
+    delete row.suggested_company_name;
+    delete row.suggested_company_id;
+    delete row.suggested_company_similarity;
+
     row.badge_status = 'new';
     row.status_message = 'Accepted company suggestion. Revalidating...';
     row._sys_skip = false;
@@ -204,6 +221,25 @@ async function acceptCompanySuggestion(rowIndex) {
     try {
         showToast(`Accepted suggestion: ${suggestion}. Revalidating rows...`, 'info');
         await revalidateCurrentPreview();
+
+        const refreshedRow = state.parsedExcelData[index];
+        if (refreshedRow && isUnresolvedJobFairCompanyRow(refreshedRow)) {
+            showToast(
+                `Company was updated to "${suggestion}" but this row is still invalid. Check the status message or try another company name.`,
+                'warning'
+            );
+            return;
+        }
+
+        const remaining = state.parsedExcelData.filter(isUnresolvedJobFairCompanyRow).length;
+        if (remaining > 0) {
+            showToast(
+                `Suggestion applied. ${remaining} row(s) still have unresolved company names — accept suggestions or fix them before importing.`,
+                'warning'
+            );
+            return;
+        }
+
         showToast('Suggestion applied and rows revalidated.', 'success');
     } catch (err) {
         if (originalCompany) {
@@ -371,9 +407,13 @@ export function applyDetectedPeriod(period, { hideMonth = false, hideYear = fals
         if (period.month && monthSelect) monthSelect.value = period.month;
         if (period.year)  yearSelect.value = period.year;
 
-        periodSuggestionText.textContent = (period.month && period.year)
-            ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
-            : 'Could not confidently detect period. Please select month and year before import.';
+        if (state.program !== 'Job Fair') {
+            periodSuggestionText.textContent = (period.month && period.year)
+                ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
+                : 'Could not confidently detect period. Please select month and year before import.';
+        } else {
+            periodSuggestionText.textContent = '';
+        }
     }
 }
 

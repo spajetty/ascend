@@ -10,4 +10,5 @@ export const state = {
     jobFairMismatchMode: '',
     latestImportResultsData: null,
     latestUndoToken: null,
+    currentEventParticipants: [],  // participants for the currently selected job fair event
 };
