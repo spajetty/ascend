@@ -466,7 +466,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
-const API_URL = '/backend/career-dev/show-cdsp.php';
+const API_URL = '/backend/career-dev/cdsp/show-cdsp.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];   // raw data from API
@@ -1032,7 +1032,7 @@ document.getElementById('addForm')
 
     const start = Date.now();
 
-    const res = await fetch('/backend/career-dev/submit-cdsp.php', {
+    const res = await fetch('/backend/career-dev/cdsp/submit-cdsp.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

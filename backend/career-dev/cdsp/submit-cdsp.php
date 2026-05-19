@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../../includes/auth-check.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../includes/auth-check.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
 header('Content-Type: application/json');
 
@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../api/');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../api/');
 $dotenv->load();
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
