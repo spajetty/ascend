@@ -1033,7 +1033,7 @@ document.getElementById('addForm')
 
     const start = Date.now();
 
-    const res = await fetch('/backend/career-dev/submit-lmi.php', {
+    const res = await fetch('/backend/career-dev/lmi/submit-lmi.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
