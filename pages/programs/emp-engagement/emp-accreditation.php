@@ -107,6 +107,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <select id="filterEstType" onchange="applyFilters()"
                     class="shrink-0 text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white">
                     <option value="">All Establishment Types</option>
+                    <option value="corporation">Corporation</option>
                     <option value="manpower">Manpower</option>
                     <option value="direct">Direct</option>
                     <option value="direct (overseas)">Direct (Overseas)</option>
@@ -323,6 +324,10 @@ function estTypeBadge(type) {
         return `<span class="text-gray-400">—</span>`;
     }
 
+    if (t.includes('corporation')) {
+        return `<span class="font-medium text-purple-500">Corporation</span>`;
+    }
+
     if (t.includes('manpower')) {
         return `<span class="font-medium text-blue-500">Manpower</span>`;
     }
@@ -455,7 +460,7 @@ function toggleEditMode(id) {
     // Est type select
     const estCell = row.querySelector('.esttype-cell');
     if (estCell) {
-        const types = ['Manpower','Direct','Direct (Overseas)'];
+        const types = ['Corporation','Manpower','Direct','Direct (Overseas)'];
         const typeOpts = types.map(t =>
             `<option value="${t}" ${rec.est_type === t ? 'selected' : ''}>${t}</option>`
         ).join('');
