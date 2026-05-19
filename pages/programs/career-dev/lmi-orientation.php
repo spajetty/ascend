@@ -9,10 +9,14 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    body.modal-open { overflow: hidden; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-0 md:w-auto">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/career-development.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,107 +27,127 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-4 md:px-8 py-6 space-y-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardSessions" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardSessions" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">LMI Orientations</span>
+                <span class="text-xs text-gray-500 leading-tight">LMI Orientations</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardTotal" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardTotal" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">LMI Participants (Total)</span>
+                <span class="text-xs text-gray-500 leading-tight">LMI Participants (Total)</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardMale" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardMale" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">LMI Participants (Male)</span>
+                <span class="text-xs text-gray-500 leading-tight">LMI Participants (Male)</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span id="cardFemale" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="cardFemale" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-pink-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">LMI Participants (Female)</span>
+                <span class="text-xs text-gray-500 leading-tight">LMI Participants (Female)</span>
             </div>
 
         </div>
 
         <!-- Filter -->
-        <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="flex flex-col gap-2 mb-4">
+            <!-- Row 1: Year filter -->
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filter by year:</span>
+                <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
                 <select id="yearSelect"
-                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5">
                 </select>
             </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchSchool" placeholder="Search school / event..."
-                    oninput="applyFilters()"
-                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+
+            <!-- Row 2: Search + Add Entry always on same line -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input type="text"
+                        id="searchSchool"
+                        placeholder="Search school..."
+                        oninput="applyFilters()"
+                        class="w-full pl-4 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg"/>
+                </div>
+
+                <button onclick="openAddModal()"
+                    class="shrink-0 inline-flex items-center gap-2 bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium px-4 py-2 rounded-xl transition-all whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Add Entry
+                </button>
             </div>
+
         </div>
 
         <!-- Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="font-bold text-gray-800 text-base">LMI Orientation</h2>
-                <span id="tableTotal" class="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full">— Total</span>
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">LMI Orientation</h2>
+                <span id="tableTotal" class="text-sm font-semibold text-teal-600 bg-teal-100 px-3 py-1 rounded-full shrink-0">— Total</span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs">
+
+            <!-- Scrollable table wrapper — scroll is scoped here, not the whole page -->
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                <table class="w-full text-xs min-w-[700px]">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-40">DATE</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100">SCHOOL / INSTITUTION / EVENT</th>
-                            <th class="px-4 py-3 text-center text-cyan-500 font-semibold border-l border-gray-100">MALE</th>
-                            <th class="px-4 py-3 text-center text-pink-500 font-semibold border-l border-gray-100">FEMALE</th>
-                            <th class="px-4 py-3 text-center text-blue-600 font-semibold border-l border-gray-100">TOTAL</th>
-                            <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold whitespace-nowrap">DATE CONDUCTED</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">SCHOOL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden md:table-cell">DISTRICT</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">GRADE LEVEL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden lg:table-cell">GRADES OFFERED</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap hidden sm:table-cell">APPROVAL</th>
+                            <th class="text-center px-4 py-3 text-cyan-500 font-semibold border-l border-gray-100 whitespace-nowrap">MALE</th>
+                            <th class="text-center px-4 py-3 text-pink-500 font-semibold border-l border-gray-100 whitespace-nowrap">FEMALE</th>
+                            <th class="text-center px-4 py-3 text-teal-600 font-semibold border-l border-gray-100 whitespace-nowrap">TOTAL</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-semibold border-l border-gray-100 whitespace-nowrap">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr id="loadingRow">
-                            <td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td>
+                            <td colspan="10" class="px-4 py-8 text-center text-gray-400 text-sm">Loading...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
                 <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
@@ -141,7 +165,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </main>
 
 <!-- Modal Backdrop -->
-<div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40 modal-backdrop"></div>
+<div id="modalBackdrop"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-40">
+</div>
 
 <!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
@@ -181,18 +207,276 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
+<!-- ADD ENTRY MODAL -->
+<div id="addModal"
+    class="fixed inset-0 hidden z-50 items-center justify-center px-4">
+
+    <div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden animate-modal">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-teal-50 to-cyan-50">
+
+            <div>
+                <h2 class="text-base font-bold text-gray-800">
+                    Add LMI Orientation Entry
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Create a new LMI record
+                </p>
+            </div>
+
+            <button onclick="closeAddModal()"
+                class="w-8 h-8 rounded-xl hover:bg-white/70 flex items-center justify-center text-gray-500 transition">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <form id="addForm"
+            class="p-6 space-y-5 max-h-[80vh] overflow-y-auto">
+
+            <!-- DATE + GRADE -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Date Conducted
+                    </label>
+
+                    <input type="date"
+                        name="date_of_conduct"
+                        required
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Grade Level
+                    </label>
+
+                    <input type="text"
+                        name="grade_level"
+                        placeholder="Example: Grade 12"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+            </div>
+
+            <!-- SCHOOL -->
+            <div class="relative">
+
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                    School / Institution
+                </label>
+
+                <input type="text"
+                    id="schoolSearch"
+                    autocomplete="off"
+                    placeholder="Search school..."
+                    class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+
+                <input type="hidden"
+                    id="selectedSchoolId"
+                    name="school_id">
+
+                <!-- RESULTS -->
+                <div id="schoolResults"
+                    class="absolute z-50 hidden mt-2 w-full bg-white border border-gray-100 rounded-2xl shadow-2xl overflow-hidden max-h-60 overflow-y-auto">
+                </div>
+
+            </div>
+
+            <!-- PARTICIPANTS -->
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-cyan-600 mb-1.5">
+                        Male Participants
+                    </label>
+
+                    <input type="number"
+                        name="participants_male"
+                        min="0"
+                        value="0"
+                        class="w-full text-sm border border-cyan-100 bg-cyan-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-cyan-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-pink-600 mb-1.5">
+                        Female Participants
+                    </label>
+
+                    <input type="number"
+                        name="participants_female"
+                        min="0"
+                        value="0"
+                        class="w-full text-sm border border-pink-100 bg-pink-50 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-pink-300">
+                </div>
+
+            </div>
+
+            <!-- APPROVAL -->
+            <label class="flex items-center gap-3 bg-gray-50 rounded-2xl px-4 py-3 cursor-pointer">
+
+                <input type="checkbox"
+                    name="approval_letter"
+                    value="1"
+                    class="w-4 h-4 rounded border-gray-300 text-teal-500 focus:ring-teal-400">
+
+                <div>
+                    <p class="text-sm font-medium text-gray-700">
+                        Approval Letter Submitted
+                    </p>
+
+                    <p class="text-xs text-gray-500">
+                        Mark if documentation is complete
+                    </p>
+                </div>
+
+            </label>
+
+            <!-- FOOTER -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+
+                <button type="button"
+                    onclick="closeAddModal()"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+
+                    Cancel
+                </button>
+
+                <button type="submit"
+                    id="submitLmiBtn"
+                    class="px-5 py-2.5 text-sm font-medium bg-teal-500 hover:bg-teal-600 text-white rounded-xl transition">
+
+                    Submit Entry
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<!-- SCHOOL MODAL -->
+<div id="schoolModal"
+    class="fixed inset-0 hidden z-[60] items-center justify-center px-4">
+
+    <div class="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-modal">
+
+        <!-- HEADER -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-cyan-50 to-teal-50">
+
+            <div>
+                <h2 class="text-base font-bold text-gray-800">
+                    Add School
+                </h2>
+
+                <p class="text-xs text-gray-500 mt-0.5">
+                    Create a new school record
+                </p>
+            </div>
+
+            <button onclick="closeSchoolModal()"
+                class="w-8 h-8 rounded-xl hover:bg-white/70 flex items-center justify-center text-gray-500 transition">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+
+            </button>
+        </div>
+
+        <!-- BODY -->
+        <form id="schoolForm"
+            class="p-6 space-y-5">
+
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                    School Name
+                </label>
+
+                <input type="text"
+                    name="school_name"
+                    required
+                    placeholder="Enter school name"
+                    class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Congressional District
+                    </label>
+
+                    <input type="number"
+                        name="congressional_district"
+                        placeholder="Example: 2"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1.5">
+                        Grades Offered
+                    </label>
+
+                    <input type="text"
+                        name="grades_offered"
+                        placeholder="K-12"
+                        class="w-full text-sm border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="flex items-center justify-end gap-3 pt-2">
+
+                <button type="button"
+                    onclick="closeSchoolModal()"
+                    class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition">
+
+                    Cancel
+                </button>
+
+                <button type="submit"
+                    id="submitSchoolBtn"
+                    class="px-5 py-2.5 text-sm font-medium bg-teal-500 hover:bg-teal-600 text-white rounded-xl transition">
+
+                    Save School
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
 <script>
-const API_URL = '/api/lmi-api.php';
+const API_URL = '/backend/career-dev/lmi/show-lmi.php';
 const ROWS_PER_PAGE = 9;
 
-let allRows      = [];
-let filteredRows = [];
+let allRows      = [];   // raw data from API
+let filteredRows = [];   // after search filter
 let currentPage  = 1;
 let deletingId   = null;
 let savingId     = null;
-let editingData  = {};
+let editingData  = {};   // backup before edit
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function fmt(dateStr) {
     if (!dateStr) return '—';
     const d = new Date(dateStr + 'T00:00:00');
@@ -200,13 +484,13 @@ function fmt(dateStr) {
 }
 
 function num(n) {
-    return Number(n).toLocaleString();
+    return Number(n || 0).toLocaleString();
 }
 
 // ─── Load data from API ───────────────────────────────────────────────────────
 async function loadData(year) {
     document.getElementById('loadingRow').style.display = '';
-    Array.from(document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)')).forEach(r => r.remove());
+    document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
         const res  = await fetch(`${API_URL}?year=${year}`);
@@ -240,7 +524,7 @@ async function loadData(year) {
 
     } catch (err) {
         document.getElementById('loadingRow').innerHTML =
-            `<td colspan="6" class="px-4 py-8 text-center text-red-500 text-sm">Error: ${err.message}</td>`;
+            `<td colspan="10" class="px-4 py-8 text-center text-red-500 text-sm">Error: ${err.message}</td>`;
     }
 }
 
@@ -248,46 +532,84 @@ async function loadData(year) {
 function applyFilters() {
     const query = document.getElementById('searchSchool').value.toLowerCase().trim();
     filteredRows = allRows.filter(r =>
-        !query || (r.school || '').toLowerCase().includes(query)
+        !query || (r.school_name || '').toLowerCase().includes(query)
     );
     currentPage = 1;
     renderPage();
 }
 
 function renderPage() {
-    const tbody = document.getElementById('tableBody');
-    const total = filteredRows.length;
-    const pages = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
-    const start = (currentPage - 1) * ROWS_PER_PAGE;
-    const end   = Math.min(start + ROWS_PER_PAGE, total);
-    const slice = filteredRows.slice(start, end);
+    const tbody  = document.getElementById('tableBody');
+    const total  = filteredRows.length;
+    const pages  = Math.max(1, Math.ceil(total / ROWS_PER_PAGE));
+    const start  = (currentPage - 1) * ROWS_PER_PAGE;
+    const end    = Math.min(start + ROWS_PER_PAGE, total);
+    const slice  = filteredRows.slice(start, end);
 
-    // Clear existing rows except loading row
+    // Clear all but loading row
     Array.from(tbody.querySelectorAll('tr:not(#loadingRow)')).forEach(r => r.remove());
     document.getElementById('loadingRow').style.display = 'none';
 
     if (slice.length === 0) {
         tbody.insertAdjacentHTML('beforeend',
-            `<tr><td colspan="6" class="px-4 py-8 text-center text-gray-400 text-sm">No entries found.</td></tr>`);
+            `<tr><td colspan="10" class="px-4 py-8 text-center text-gray-400 text-sm">No entries found.</td></tr>`);
     } else {
         slice.forEach(row => tbody.insertAdjacentHTML('beforeend', buildRow(row)));
     }
 
     // Total row
-    const totM = filteredRows.reduce((s, r) => s + Number(r.lmi_m), 0);
-    const totF = filteredRows.reduce((s, r) => s + Number(r.lmi_f), 0);
+    const totM = filteredRows.reduce(
+        (s, r) => s + (Number(r.participants_male) || 0),
+        0
+    );
+
+    const totF = filteredRows.reduce(
+        (s, r) => s + (Number(r.participants_female) || 0),
+        0
+    );
     tbody.insertAdjacentHTML('beforeend', `
-        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-            <td class="px-4 py-3 border-l border-gray-100"></td>
-            <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${num(totM)}</td>
-            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${num(totF)}</td>
-            <td class="px-4 py-3 text-center font-bold text-blue-600 bg-blue-100 border-l border-gray-100">${num(totM + totF)}</td>
-            <td class="border-l border-gray-100"></td>
-        </tr>
+    <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
+
+        <td class="px-4 py-3 text-gray-800 font-bold">
+            TOTAL
+        </td>
+
+        <td class="px-4 py-3 border-l border-gray-100"></td>
+
+        <!-- DISTRICT (hidden md) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden md:table-cell"></td>
+
+        <!-- GRADE LEVEL -->
+        <td class="px-4 py-3 border-l border-gray-100"></td>
+
+        <!-- GRADES OFFERED (hidden lg) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden lg:table-cell"></td>
+
+        <!-- APPROVAL (hidden sm) -->
+        <td class="px-4 py-3 border-l border-gray-100 hidden sm:table-cell"></td>
+
+        <!-- MALE -->
+        <td class="px-4 py-3 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">
+            ${num(totM)}
+        </td>
+
+        <!-- FEMALE -->
+        <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">
+            ${num(totF)}
+        </td>
+
+        <!-- TOTAL -->
+        <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">
+            ${num(totM + totF)}
+        </td>
+
+        <!-- ACTIONS -->
+        <td class="border-l border-gray-100"></td>
+
+    </tr>
     `);
 
-    // Pagination
+    // Pagination info
     document.getElementById('paginationInfo').textContent =
         total === 0 ? 'No entries found' : `Showing ${start + 1}–${end} of ${total} entries`;
     document.getElementById('prevBtn').disabled = currentPage <= 1;
@@ -306,31 +628,89 @@ function renderPage() {
 }
 
 function buildRow(r) {
-    const id    = r.lmi_id;
-    const total = Number(r.lmi_m) + Number(r.lmi_f);
+    const id = r.lmi_id;
+
+    const total =
+        Number(r.participants_male ?? 0) +
+        Number(r.participants_female ?? 0);
+
     return `
-    <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}" data-school="${(r.school || '').toLowerCase()}">
-        <td class="px-4 py-3 text-gray-700 font-medium date-cell">${fmt(r.date)}</td>
-        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">${r.school || '—'}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">${num(r.lmi_m)}</td>
-        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">${num(r.lmi_f)}</td>
-        <td class="px-4 py-3 text-center font-semibold text-blue-600 bg-blue-50 border-l border-gray-100 total-cell">${num(total)}</td>
+    <tr class="border-b border-gray-50 hover:bg-gray-50"
+        data-id="${id}"
+        data-school="${(r.school_name || '').toLowerCase()}">
+
+        <td class="px-4 py-3 text-gray-700 font-medium date-cell">
+            ${fmt(r.date_of_conduct)}
+        </td>
+
+        <td class="px-4 py-3 text-gray-600 border-l border-gray-100 school-cell">
+            ${r.school_name || '—'}
+        </td>
+
+        <!-- DISTRICT -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 hidden md:table-cell">
+            ${r.congressional_district ?? '—'}
+        </td>
+
+        <!-- GRADE LEVEL (from lmi table) -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100">
+            ${r.grade_level ?? '—'}
+        </td>
+
+        <!-- GRADES OFFERED (from schools table) -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 hidden lg:table-cell">
+            ${r.grades_offered ?? '—'}
+        </td>
+
+        <!-- APPROVAL -->
+        <td class="px-4 py-3 text-center border-l border-gray-100 hidden sm:table-cell">
+            ${r.approval_letter == 1
+                ? `<span class="text-green-600 font-semibold">✔ Yes</span>`
+                : `<span class="text-gray-400">No</span>`}
+        </td>
+
+        <!-- MALE -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 male-cell">
+            ${num(r.participants_male)}
+        </td>
+
+        <!-- FEMALE -->
+        <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 female-cell">
+            ${num(r.participants_female)}
+        </td>
+
+        <!-- TOTAL -->
+        <td class="px-4 py-3 text-center font-semibold text-teal-600 bg-teal-50 border-l border-gray-100 total-cell">
+            ${num(total)}
+        </td>
+
+        <!-- ACTIONS -->
         <td class="px-4 py-3 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2 action-buttons">
-                <button onclick="toggleEditMode('${id}')" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+
+                <button onclick="toggleEditMode('${id}')"
+                    class="text-yellow-500 hover:text-yellow-600 edit-btn">
+                    ✏️
                 </button>
-                <button onclick="deleteRow('${id}')" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+
+                <button onclick="deleteRow('${id}')"
+                    class="text-red-400 hover:text-red-600 delete-btn">
+                    🗑️
                 </button>
-                <button onclick="saveRow('${id}')" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+
+                <button onclick="saveRow('${id}')"
+                    class="text-green-500 hover:text-green-600 save-btn hidden">
+                    ✔
                 </button>
-                <button onclick="cancelEdit('${id}')" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+
+                <button onclick="cancelEdit('${id}')"
+                    class="text-gray-400 hover:text-gray-600 cancel-btn hidden">
+                    ✖
                 </button>
+
             </div>
         </td>
+
     </tr>`;
 }
 
@@ -346,15 +726,14 @@ function toggleEditMode(id) {
 
     row.classList.add('editing', 'bg-yellow-50');
 
+    // Store originals
     const rec = allRows.find(r => String(r.lmi_id) === String(id));
-    editingData[id] = { date: rec.date, school: rec.school, lmi_m: rec.lmi_m, lmi_f: rec.lmi_f };
+    editingData[id] = { date: rec.date_of_conduct, school: rec.school_name, lmi_m: rec.participants_male, lmi_f: rec.participants_female };
 
-    // Date cell → input[date]
-    row.querySelector('.date-cell').innerHTML =
-        `<input type="date" value="${rec.date}" id="edit-date-${id}"
-            class="border border-yellow-300 rounded px-2 py-1 text-xs w-36 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400">`;
+    const dateCell = row.querySelector('.date-cell');
+    dateCell.innerHTML = `<input type="date" value="${rec.date_of_conduct}" class="border border-yellow-300 rounded px-2 py-1 text-xs w-36 bg-white focus:outline-none focus:ring-1 focus:ring-teal-400" id="edit-date-${id}">`;
 
-    // School, male, female → contentEditable
+    // school, male, female editable
     ['school-cell', 'male-cell', 'female-cell'].forEach(cls => {
         const cell = row.querySelector('.' + cls);
         cell.contentEditable = 'true';
@@ -374,7 +753,7 @@ function cancelEdit(id) {
     const backup = editingData[id];
     if (backup) {
         const total = Number(backup.lmi_m) + Number(backup.lmi_f);
-        row.querySelector('.date-cell').innerHTML    = fmt(backup.date);
+        row.querySelector('.date-cell').innerHTML   = fmt(backup.date);
         row.querySelector('.school-cell').textContent = backup.school || '—';
         row.querySelector('.male-cell').textContent   = num(backup.lmi_m);
         row.querySelector('.female-cell').textContent = num(backup.lmi_f);
@@ -421,24 +800,18 @@ async function confirmSave() {
         const res  = await fetch(API_URL, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lmi_id: id, date: newDate, school: newSchool, lmi_m: newMale, lmi_f: newFemale })
+            body: JSON.stringify({ lmi_id: id, date_of_conduct: newDate, school_name: newSchool, participants_male: newMale, participants_female: newFemale })
         });
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
         // Update local data
         const rec = allRows.find(r => String(r.lmi_id) === String(id));
-        if (rec) {
-            rec.date  = newDate;
-            rec.school = newSchool;
-            rec.lmi_m  = newMale;
-            rec.lmi_f  = newFemale;
-            rec.total  = newMale + newFemale;
-        }
+        if (rec) { rec.date_of_conduct = newDate; rec.school_name = newSchool; rec.participants_male = newMale; rec.participants_female = newFemale; rec.total = newMale + newFemale; }
 
         // Re-render cells
         const total = newMale + newFemale;
-        row.querySelector('.date-cell').innerHTML    = fmt(newDate);
+        row.querySelector('.date-cell').innerHTML   = fmt(newDate);
         row.querySelector('.school-cell').textContent = newSchool;
         row.querySelector('.male-cell').textContent   = num(newMale);
         row.querySelector('.female-cell').textContent = num(newFemale);
@@ -490,12 +863,49 @@ async function confirmDelete() {
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
+        // Remove from local data and re-render
         allRows = allRows.filter(r => String(r.lmi_id) !== String(id));
         applyFilters();
 
     } catch (err) {
         alert('Delete failed: ' + err.message);
     }
+}
+
+function openAddModal() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+    document.body.classList.add('modal-open');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    const modal = document.getElementById('addModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeAddModal() {
+    document.body.style.paddingRight = '';
+    document.body.classList.remove('modal-open');
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    const modal = document.getElementById('addModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function openSchoolModal() {
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.paddingRight = scrollbarWidth + 'px';
+    document.body.classList.add('modal-open');
+    const modal = document.getElementById('schoolModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeSchoolModal() {
+    document.body.style.paddingRight = '';
+    document.body.classList.remove('modal-open');
+    const modal = document.getElementById('schoolModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
 }
 
 // ─── Pagination ───────────────────────────────────────────────────────────────
@@ -508,7 +918,7 @@ function changePage(dir) {
 // ─── Backdrop click ───────────────────────────────────────────────────────────
 document.addEventListener('click', (e) => {
     if (e.target === document.getElementById('modalBackdrop')) {
-        closeDeleteModal(); closeSaveModal();
+        closeDeleteModal(); closeSaveModal(); closeAddModal(); closeSchoolModal();
     }
 });
 
@@ -519,6 +929,208 @@ document.getElementById('yearSelect').addEventListener('change', function () {
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 loadData(new Date().getFullYear());
+
+async function searchSchools(query) {
+
+    const resultsBox = document.getElementById('schoolResults');
+
+    if (!query.trim()) {
+        resultsBox.classList.add('hidden');
+        return;
+    }
+
+    const res = await fetch(`/backend/career-dev/show-schools.php?q=${encodeURIComponent(query)}`);
+    const json = await res.json();
+
+    resultsBox.innerHTML = '';
+
+    if (json.data.length > 0) {
+
+        json.data.forEach(school => {
+
+            resultsBox.innerHTML += `
+                <button type="button"
+                    onclick="selectSchool('${school.school_id}', '${school.school_name}')"
+                    class="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100">
+
+                    ${school.school_name}
+                </button>
+            `;
+        });
+
+    } else {
+
+        resultsBox.innerHTML = `
+            <div class="p-4 text-sm text-gray-500">
+                No schools found.
+            </div>
+
+            <button type="button"
+                onclick="openSchoolModal()"
+                class="w-full text-left px-4 py-3 text-teal-600 hover:bg-teal-50 font-medium">
+
+                + Add this school
+            </button>
+        `;
+    }
+
+    resultsBox.classList.remove('hidden');
+}
+
+document.getElementById('schoolSearch')
+.addEventListener('input', function () {
+    searchSchools(this.value);
+});
+
+function selectSchool(id, name) {
+
+    document.getElementById('schoolSearch').value = name;
+    document.getElementById('selectedSchoolId').value = id;
+
+    document.getElementById('schoolResults')
+        .classList.add('hidden');
+}
+
+document.getElementById('addForm')
+.addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const btn = document.getElementById('submitLmiBtn');
+
+    btn.disabled = true;
+
+    btn.innerHTML = `
+        <span class="inline-flex items-center gap-2">
+            <svg class="animate-spin w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24">
+
+                <circle class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4">
+                </circle>
+
+                <path class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z">
+                </path>
+            </svg>
+
+            Submitting...
+        </span>
+    `;
+
+    const formData = Object.fromEntries(
+        new FormData(this).entries()
+    );
+
+    formData.approval_letter =
+        formData.approval_letter ? 1 : 0;
+
+    const start = Date.now();
+
+    const res = await fetch('/backend/career-dev/submit-lmi.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 2000) {
+        await new Promise(r =>
+            setTimeout(r, 2000 - elapsed)
+        );
+    }
+
+    const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Submit Entry';
+
+    if (json.success) {
+        document.getElementById('addForm').reset();
+        document.getElementById('selectedSchoolId').value = '';
+        document.getElementById('schoolSearch').value = '';
+        document.getElementById('schoolResults').innerHTML = '';
+        document.getElementById('schoolResults').classList.add('hidden');
+
+        closeAddModal();
+
+        loadData(
+            parseInt(document.getElementById('yearSelect').value)
+        );
+    }
+});
+
+document.getElementById('schoolForm').addEventListener('submit', async function(e) {
+
+    e.preventDefault();
+
+    const btn = document.getElementById('submitSchoolBtn');
+    btn.disabled = true;
+
+    btn.innerHTML = `
+        <span class="inline-flex items-center gap-2">
+            <svg class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10"
+                    stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+            Saving...
+        </span>
+    `;
+
+    const formData = Object.fromEntries(
+        new FormData(this).entries()
+    );
+
+    const start = Date.now();
+
+    const res = await fetch('/backend/career-dev/submit-school.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    });
+
+    const elapsed = Date.now() - start;
+
+    if (elapsed < 2000) {
+        await new Promise(r => setTimeout(r, 2000 - elapsed));
+    }
+
+    const json = await res.json();
+
+    btn.disabled = false;
+    btn.innerHTML = 'Save School';
+
+    if (json.success) {
+        document.getElementById('schoolForm').reset();
+
+        closeSchoolModal();
+
+        const input = document.getElementById('schoolSearch');
+        const results = document.getElementById('schoolResults');
+
+        input.value = '';
+        results.innerHTML = '';
+        results.classList.add('hidden');
+
+        if (input.value.trim()) {
+            searchSchools(input.value);
+        }
+    }
+});
+
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>
