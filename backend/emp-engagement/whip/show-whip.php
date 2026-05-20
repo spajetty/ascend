@@ -1,172 +1,263 @@
 <?php
+
 require_once __DIR__ . '/../../../includes/auth-check.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
+
+header('Content-Type: application/json');
 
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../api/');
 $dotenv->load();
 
-$host = $_ENV['DB_HOST'] ?? 'localhost';
-$user = $_ENV['DB_USER'] ?? 'root';
-$pass = $_ENV['DB_PASS'] ?? '';
-$db   = $_ENV['DB_NAME'] ?? null;
-
-if (!$db) {
-    echo json_encode(['success' => false, 'error' => 'Missing DB_NAME in .env']);
-    exit;
-}
-
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-$conn = new mysqli($host, $user, $pass, $db);
+
+$conn = new mysqli(
+    $_ENV['DB_HOST'],
+    $_ENV['DB_USER'],
+    $_ENV['DB_PASS'],
+    $_ENV['DB_NAME']
+);
 
 if ($conn->connect_error) {
-    echo json_encode(['success' => false, 'error' => 'DB connection failed: ' . $conn->connect_error]);
+    echo json_encode([
+        'success' => false,
+        'error'   => $conn->connect_error
+    ]);
     exit;
 }
 
-set_error_handler(function (int $errno, string $errstr) {
-    if (!headers_sent()) header('Content-Type: application/json');
-    echo json_encode(['success' => false, 'error' => "PHP Error ($errno): $errstr"]);
+set_error_handler(function ($errno, $errstr) {
+    if (!headers_sent()) {
+        header('Content-Type: application/json');
+    }
+    echo json_encode([
+        'success' => false,
+        'error'   => "PHP Error ($errno): $errstr"
+    ]);
     exit;
 });
 
-header('Content-Type: application/json');
+// ─────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────
 
-$method = $_SERVER['REQUEST_METHOD'];
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-function json_error(string $msg, int $code = 400): void {
+function json_error(string $msg, int $code = 400): void
+{
     http_response_code($code);
     echo json_encode(['success' => false, 'error' => $msg]);
     exit;
 }
 
-function json_ok(mixed $data = null): void {
+function json_ok($data = null): void
+{
     echo json_encode(['success' => true, 'data' => $data]);
     exit;
 }
 
-// ─── GET ?year=2026 ──────────────────────────────────────────────────────────
-if ($method === 'GET') {
-    $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
+$method = $_SERVER['REQUEST_METHOD'];
 
-    // Available years for the dropdown
-    $res   = $conn->query("SELECT DISTINCT year FROM whip ORDER BY year DESC");
-    $years = [];
-    while ($row = $res->fetch_assoc()) {
-        $years[] = (int) $row['year'];
-    }
-    if (!in_array($year, $years, true)) {
-        $years[] = $year;
-        rsort($years);
-    }
+try {
 
-    $stmt = $conn->prepare("
-        SELECT whip_id, month, year, male, female, (male + female) AS total, project_name, created_at
-        FROM whip
-        WHERE year = ?
-        ORDER BY FIELD(month,
-            'January','February','March','April','May','June',
-            'July','August','September','October','November','December')
-    ");
-    if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
+    // ─────────────────────────────────────────
+    // GET
+    // ─────────────────────────────────────────
 
-    $stmt->bind_param('i', $year);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    if ($method === 'GET') {
 
-    $rows = [];
-    while ($row = $result->fetch_assoc()) {
-        $rows[] = $row;
-    }
-    $stmt->close();
+        $requestedYear = isset($_GET['year'])
+            ? (int) $_GET['year']
+            : null;
 
-    // Summary totals for the cards
-    $totals = ['total' => 0, 'male' => 0, 'female' => 0, 'projects' => 0];
-    foreach ($rows as $r) {
-        $totals['male']     += (int) $r['male'];
-        $totals['female']   += (int) $r['female'];
-        $totals['total']    += (int) $r['total'];
-        $totals['projects'] += 1;
-    }
+        // AVAILABLE YEARS — derived from date_hired
+        $years = [];
 
-    json_ok(['rows' => $rows, 'totals' => $totals, 'years' => $years]);
-}
+        $yearRes = $conn->query("
+            SELECT DISTINCT YEAR(date_hired) AS yr
+            FROM whip
+            WHERE date_hired IS NOT NULL
+            ORDER BY yr DESC
+        ");
 
-// ─── POST (add a new whip row) ───────────────────────────────────────────────
-if ($method === 'POST') {
-    $body = json_decode(file_get_contents('php://input'), true);
-
-    $month        = trim($body['month']        ?? '');
-    $year         = isset($body['year'])        ? (int) $body['year']   : 0;
-    $male         = isset($body['male'])        ? (int) $body['male']   : 0;
-    $female       = isset($body['female'])      ? (int) $body['female'] : 0;
-    $project_name = trim($body['project_name'] ?? '');
-
-    if (!$month || !$year) json_error('Month and year are required');
-
-    $stmt = $conn->prepare("
-        INSERT INTO whip (month, year, male, female, project_name)
-        VALUES (?, ?, ?, ?, ?)
-    ");
-    if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
-
-    $stmt->bind_param('siiis', $month, $year, $male, $female, $project_name);
-    $stmt->execute();
-    $newId = $conn->insert_id;
-    $stmt->close();
-
-    json_ok(['whip_id' => $newId]);
-}
-
-// ─── PUT (edit an existing whip row) ────────────────────────────────────────
-if ($method === 'PUT') {
-    $body = json_decode(file_get_contents('php://input'), true);
-    $id   = isset($body['whip_id']) ? (int) $body['whip_id'] : 0;
-    if (!$id) json_error('Missing whip_id');
-
-    $allowed = ['month' => 's', 'year' => 'i', 'male' => 'i', 'female' => 'i', 'project_name' => 's'];
-    $sets    = [];
-    $types   = '';
-    $values  = [];
-
-    foreach ($allowed as $col => $type) {
-        if (array_key_exists($col, $body)) {
-            $sets[]   = "$col = ?";
-            $types   .= $type;
-            $values[] = ($type === 'i') ? (int) $body[$col] : trim($body[$col]);
+        while ($row = $yearRes->fetch_assoc()) {
+            $years[] = (int) $row['yr'];
         }
+
+        // Use requested year only if it exists in database
+        // otherwise fallback to latest available year
+        $year = $requestedYear && in_array($requestedYear, $years, true)
+            ? $requestedYear
+            : ($years[0] ?? (int) date('Y'));
+
+        // FETCH WHIP ENTRIES
+        // Join beneficiaries for name/sex/city and projects for project details
+        $stmt = $conn->prepare("
+            SELECT
+                w.whip_id,
+                w.benef_id,
+                w.project_id,
+                w.batch_id,
+                w.position,
+                w.date_hired,
+                w.created_at,
+
+                b.first_name,
+                b.middle_name,
+                b.last_name,
+                b.suffix,
+                b.sex,
+                b.city,
+                b.barangay,
+                b.district,
+                b.classification,
+
+                p.project_title,
+                p.nature_of_project,
+                p.duration,
+                p.budget,
+                p.fund_source,
+                p.persons_from_locality,
+                p.skills_required,
+                p.skills_deficiencies,
+                p.contractor,
+                p.is_legitimate_contractor,
+                p.filled,
+                p.unfilled
+
+            FROM whip w
+
+            LEFT JOIN beneficiaries b
+                ON w.benef_id = b.benef_id
+
+            LEFT JOIN projects p
+                ON w.project_id = p.project_id
+
+            WHERE YEAR(w.date_hired) = ?
+
+            ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC
+        ");
+
+        $stmt->bind_param("i", $year);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+
+        $rows        = [];
+        $maleCount   = 0;
+        $femaleCount = 0;
+        $projectSet  = [];
+
+        while ($row = $result->fetch_assoc()) {
+
+            // Cast numeric fields
+            $row['budget']                  = $row['budget'] !== null ? (float) $row['budget'] : null;
+            $row['persons_from_locality'] = isset($row['persons_from_locality'])
+                ? (int)$row['persons_from_locality']
+                : 0;
+
+            $row['is_legitimate_contractor'] = isset($row['is_legitimate_contractor'])
+                ? (bool)$row['is_legitimate_contractor']
+                : false;
+
+            $row['filled'] = isset($row['filled'])
+                ? (int)$row['filled']
+                : 0;
+
+            $row['unfilled'] = isset($row['unfilled'])
+                ? (int)$row['unfilled']
+                : 0;
+
+            $sex = strtolower($row['sex'] ?? '');
+            if ($sex === 'male')   $maleCount++;
+            if ($sex === 'female') $femaleCount++;
+
+            if (!empty($row['project_id'])) {
+                $projectSet[$row['project_id']] = true;
+            }
+
+            $rows[] = $row;
+        }
+
+        $defaultYear = !empty($years)
+            ? max($years)
+            : (int) date('Y');
+
+        json_ok([
+            'rows'         => $rows,
+            'years'        => $years,
+            'default_year' => $defaultYear,
+            'totals' => [
+                'total'    => $maleCount + $femaleCount,
+                'male'     => $maleCount,
+                'female'   => $femaleCount,
+                'projects' => count($projectSet),
+            ]
+        ]);
     }
 
-    if (empty($sets)) json_error('Nothing to update');
+    // ─────────────────────────────────────────
+    // PUT  — update position and/or date_hired
+    // ─────────────────────────────────────────
 
-    $types   .= 'i';
-    $values[] = $id;
+    if ($method === 'PUT') {
 
-    $stmt = $conn->prepare("UPDATE whip SET " . implode(', ', $sets) . " WHERE whip_id = ?");
-    if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
+        $body = json_decode(file_get_contents('php://input'), true);
 
-    $stmt->bind_param($types, ...$values);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
+        $whip_id = isset($body['whip_id']) ? (int) $body['whip_id'] : 0;
+        if (!$whip_id) json_error('Missing whip_id');
 
-    json_ok(['updated' => $affected]);
+        $position   = isset($body['position'])   ? trim($body['position'])   : null;
+        $date_hired = isset($body['date_hired'])  ? trim($body['date_hired']) : null;
+
+        // Validate date format if provided
+        if ($date_hired && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_hired)) {
+            json_error('Invalid date_hired format. Use YYYY-MM-DD.');
+        }
+
+        $stmt = $conn->prepare("
+            UPDATE whip
+            SET
+                position   = ?,
+                date_hired = ?
+            WHERE whip_id = ?
+        ");
+
+        $stmt->bind_param(
+            "ssi",
+            $position,
+            $date_hired,
+            $whip_id
+        );
+
+        $stmt->execute();
+
+        json_ok(['updated' => $stmt->affected_rows]);
+    }
+
+    // ─────────────────────────────────────────
+    // DELETE
+    // ─────────────────────────────────────────
+
+    if ($method === 'DELETE') {
+
+        $whip_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        if (!$whip_id) json_error('Missing id');
+
+        $stmt = $conn->prepare("
+            DELETE FROM whip
+            WHERE whip_id = ?
+        ");
+
+        $stmt->bind_param("i", $whip_id);
+        $stmt->execute();
+
+        json_ok(['deleted' => $stmt->affected_rows]);
+    }
+
+    json_error('Method not allowed', 405);
+
+} catch (Exception $e) {
+
+    echo json_encode([
+        'success' => false,
+        'error'   => $e->getMessage()
+    ]);
 }
-
-// ─── DELETE ?id=5 ────────────────────────────────────────────────────────────
-if ($method === 'DELETE') {
-    $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-    if (!$id) json_error('Missing id');
-
-    $stmt = $conn->prepare("DELETE FROM whip WHERE whip_id = ?");
-    if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
-
-    $stmt->bind_param('i', $id);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
-
-    json_ok(['deleted' => $affected]);
-}
-
-json_error('Method not allowed', 405);
