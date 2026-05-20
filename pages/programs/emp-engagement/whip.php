@@ -100,10 +100,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="text-left px-4 py-3 text-gray-500 font-medium w-36">MONTH</th>
+                            <th class="px-4 py-3 text-center text-gray-500 font-semibold border-l border-gray-100">PROJECT NAME</th>
                             <th class="px-4 py-3 text-center text-teal-600 font-semibold border-l border-gray-100">MALE</th>
                             <th class="px-4 py-3 text-center text-pink-500 font-semibold border-l border-gray-100">FEMALE</th>
                             <th class="px-4 py-3 text-center text-orange-500 font-semibold border-l border-gray-100">TOTAL</th>
-                            <th class="px-4 py-3 text-center text-gray-500 font-semibold border-l border-gray-100">PROJECT NAME</th>
                             <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>

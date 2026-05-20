@@ -127,10 +127,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="text-left px-6 py-3 text-gray-500 font-semibold tracking-wide">MONTH</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">PROJECT NAME</th>
                             <th class="text-left px-4 py-3 text-teal-600 font-semibold tracking-wide border-l border-gray-100">MALE</th>
                             <th class="text-left px-4 py-3 text-pink-500 font-semibold tracking-wide border-l border-gray-100">FEMALE</th>
                             <th class="text-left px-4 py-3 text-orange-500 font-semibold tracking-wide border-l border-gray-100">TOTAL</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">PROJECT NAME</th>
                         </tr>
                     </thead>
                     <tbody id="whip-tbody">
@@ -259,10 +259,10 @@ function renderWhip(data) {
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
             <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()} ${r.year}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_name || '—')}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.male}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.female}</td>
             <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${r.total}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_name || '—')}</td>
         </tr>`;
     });
 
