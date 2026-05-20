@@ -174,23 +174,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
                 </select>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Type:</span>
-                <select id="filterType" onchange="applyFilters()"
-                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option value="">All</option>
-                    <option value="college">College</option>
-                    <option value="shs">SHS</option>
-                </select>
-            </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchSchool" placeholder="Search school..."
-                    oninput="applyFilters()"
-                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
-            </div>
         </div>
 
         <!-- ===== MAIN TABLE ===== -->
@@ -202,12 +185,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <table class="w-full text-xs" id="wiTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">CONTRACT PERIOD</th>
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-28" rowspan="2">YEAR LEVEL</th>
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-24" rowspan="2">COURSE</th>
-                            <th class="text-left px-3 py-3 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
-                            <th class="px-3 py-3 text-center text-gray-500 font-medium w-20" rowspan="2">REQ. HRS.</th>
+                            <th class="text-left px-3 py-3 text-gray-500 font-medium w-36" rowspan="2">PERIOD</th>
                             <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">INQUIRED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-violet-500 font-semibold border-l border-gray-100">REFERRED</th>
@@ -228,7 +206,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         </tr>
                     </thead>
                     <tbody id="wiTbody">
-                        <tr><td colspan="28" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>
+                        <tr><td colspan="22" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -258,11 +236,13 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-red-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
             </div>
             <h3 class="text-lg font-bold text-gray-900">Delete Entry</h3>
         </div>
-        <p class="text-gray-600 mb-6">Are you sure you want to delete this entry? This action cannot be undone.</p>
+        <p class="text-gray-600 mb-6">Are you sure you want to delete this batch entry? This action cannot be undone.</p>
         <div class="flex gap-3">
             <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
             <button onclick="confirmDelete()" class="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600">Delete</button>
@@ -270,41 +250,22 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
-<!-- Save Modal -->
-<div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="bg-green-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">Save Changes</h3>
-        </div>
-        <p class="text-gray-600 mb-6">Do you want to save the changes to this entry?</p>
-        <div class="flex gap-3">
-            <button onclick="closeSaveModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
-            <button onclick="confirmSave()" class="flex-1 px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600">Save</button>
-        </div>
-    </div>
-</div>
-
 <script>
-const API_URL      = '/api/work-imm-api.php';
-const ROWS_PER_PAGE = 9;
+const API_URL       = '/backend/youth-employ/show-work-imm.php';
+const ROWS_PER_PAGE = 12;
 
 let allRows      = [];
 let filteredRows = [];
 let currentPage  = 1;
 let deletingId   = null;
-let savingId     = null;
-const editingData = {};
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => loadData());
 
 async function loadData() {
-    const year = document.getElementById('yearFilter').value || new Date().getFullYear();
+    const year  = document.getElementById('yearFilter').value || new Date().getFullYear();
     const tbody = document.getElementById('wiTbody');
-    tbody.innerHTML = '<tr><td colspan="28" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="22" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>';
 
     try {
         const res  = await fetch(`${API_URL}?year=${year}`);
@@ -319,15 +280,16 @@ async function loadData() {
         allRows      = rows;
         filteredRows = [...allRows];
         currentPage  = 1;
-        applyFilters();
+        renderPage();
 
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="28" class="text-center py-8 text-red-400 text-sm">Error: ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="22" class="text-center py-8 text-red-400 text-sm">Error: ${err.message}</td></tr>`;
     }
 }
 
 function populateYears(years, selected) {
     const sel = document.getElementById('yearFilter');
+    const prev = sel.value;
     sel.innerHTML = '';
     years.forEach(y => {
         const opt = document.createElement('option');
@@ -355,64 +317,35 @@ function escHtml(s) {
 }
 
 function buildRow(r) {
-    const id = r.work_immersion_id;
+    const id = r.wiirp_id;
 
-    // Education level badge
-    const isCollege = (r.education_level || '').toLowerCase().includes('college');
-    const isSHS     = (r.education_level || '').toLowerCase().includes('shs') ||
-                      (r.education_level || '').toLowerCase().includes('senior');
-    const badge = isCollege
-        ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-700">College</span>`
-        : isSHS
-        ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-700">SHS</span>`
-        : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">${escHtml(r.education_level)}</span>`;
-
-    const typeKey = isCollege ? 'college' : isSHS ? 'shs' : (r.education_level || '').toLowerCase();
-
-    // td helpers
     const td  = v => `<td class="px-2 py-3 text-center text-gray-600">${v}</td>`;
     const tdL = v => `<td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">${v}</td>`;
     const tdT = (v, color, bg) => `<td class="px-2 py-3 text-center font-semibold ${color} ${bg}">${v}</td>`;
 
-    const actionBtns = `
-        <td class="px-3 py-3 text-center border-l border-gray-100">
-            <div class="flex items-center justify-center gap-2 action-buttons">
-                <button onclick="toggleEditMode(${id})" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                </button>
-                <button onclick="deleteRow(${id})" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
-                <button onclick="saveRow(${id})" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                </button>
-                <button onclick="cancelEdit(${id})" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-        </td>`;
-
     const tr = document.createElement('tr');
-    tr.className = 'border-b border-gray-50 hover:bg-gray-50';
-    tr.dataset.id     = id;
-    tr.dataset.school = (r.school || '').toLowerCase();
-    tr.dataset.type   = typeKey;
+    tr.className   = 'border-b border-gray-50 hover:bg-gray-50';
+    tr.dataset.id  = id;
 
     tr.innerHTML = `
-        <td class="px-3 py-3 text-gray-700 font-medium" data-field="contract_period">${escHtml(r.contract_period)}</td>
-        <td class="px-3 py-3 text-gray-700" data-field="school">${escHtml(r.school)}</td>
-        <td class="px-3 py-3" data-field="education_level">${badge}</td>
-        <td class="px-3 py-3 text-gray-600" data-field="course">${escHtml(r.course)}</td>
-        <td class="px-3 py-3 text-gray-600" data-field="office_assignment">${escHtml(r.office_assignment)}</td>
-        <td class="px-3 py-3 text-center text-gray-700 font-medium" data-field="required_hours">${r.required_hours}</td>
-        ${tdL(r.part_m)}${td(r.part_f)}${tdT(r.part_total,  'text-teal-600',   'bg-teal-50')}
-        ${tdL(r.inq_m)}${td(r.inq_f)}${tdT(r.inq_total,    'text-blue-500',   'bg-blue-50')}
-        ${tdL(r.ref_m)}${td(r.ref_f)}${tdT(r.ref_total,    'text-violet-500', 'bg-violet-50')}
-        ${tdL(r.int_m)}${td(r.int_f)}${tdT(r.int_total,    'text-amber-500',  'bg-amber-50')}
-        ${tdL(r.peso_m)}${td(r.peso_f)}${tdT(r.peso_total, 'text-orange-500', 'bg-orange-50')}
-        ${tdL(r.priv_m)}${td(r.priv_f)}${tdT(r.priv_total, 'text-green-500',  'bg-green-50')}
-        ${tdL(r.notpr_m)}${td(r.notpr_f)}${tdT(r.notpr_total,'text-red-400',  'bg-red-50')}
-        ${actionBtns}
+        <td class="px-3 py-3 text-gray-700 font-medium whitespace-nowrap">${escHtml(r.period)}</td>
+        ${tdL(r.part_m)}${td(r.part_f)}${tdT(r.part_total,   'text-teal-600',   'bg-teal-50')}
+        ${tdL(r.inq_m)}${td(r.inq_f)}${tdT(r.inq_total,     'text-blue-500',   'bg-blue-50')}
+        ${tdL(r.ref_m)}${td(r.ref_f)}${tdT(r.ref_total,     'text-violet-500', 'bg-violet-50')}
+        ${tdL(r.int_m)}${td(r.int_f)}${tdT(r.int_total,     'text-amber-500',  'bg-amber-50')}
+        ${tdL(r.peso_m)}${td(r.peso_f)}${tdT(r.peso_total,  'text-orange-500', 'bg-orange-50')}
+        ${tdL(r.priv_m)}${td(r.priv_f)}${tdT(r.priv_total,  'text-green-500',  'bg-green-50')}
+        ${tdL(r.notpr_m)}${td(r.notpr_f)}${tdT(r.notpr_total,'text-red-400',   'bg-red-50')}
+        <td class="px-3 py-3 text-center border-l border-gray-100">
+            <div class="flex items-center justify-center gap-2">
+                <button onclick="deleteRow(${id})" class="text-red-400 hover:text-red-600" title="Delete batch">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+            </div>
+        </td>
     `;
     return tr;
 }
@@ -422,38 +355,17 @@ function buildTotalsRow(rows) {
     const td  = (v, color, bg, borderL = false) =>
         `<td class="px-2 py-3 text-center font-bold ${color} ${bg} ${borderL ? 'border-l border-gray-100' : ''}">${v}</td>`;
 
-    return `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-        <td class="px-3 py-3 text-gray-800 font-bold" colspan="5">TOTAL</td>
-        <td class="px-3 py-3 text-center font-bold text-gray-700">—</td>
-        ${td(sum('part_m'), 'text-gray-700','', true)}${td(sum('part_f'),'text-gray-700','')}${td(sum('part_total'),'text-teal-600','bg-teal-100')}
-        ${td(sum('inq_m'),  'text-gray-700','', true)}${td(sum('inq_f'), 'text-gray-700','')}${td(sum('inq_total'), 'text-blue-500','bg-blue-100')}
-        ${td(sum('ref_m'),  'text-gray-700','', true)}${td(sum('ref_f'), 'text-gray-700','')}${td(sum('ref_total'), 'text-violet-500','bg-violet-100')}
-        ${td(sum('int_m'),  'text-gray-700','', true)}${td(sum('int_f'), 'text-gray-700','')}${td(sum('int_total'), 'text-amber-500','bg-amber-100')}
-        ${td(sum('peso_m'), 'text-gray-700','', true)}${td(sum('peso_f'),'text-gray-700','')}${td(sum('peso_total'),'text-orange-500','bg-orange-100')}
-        ${td(sum('priv_m'), 'text-gray-700','', true)}${td(sum('priv_f'),'text-gray-700','')}${td(sum('priv_total'),'text-green-500','bg-green-100')}
-        ${td(sum('notpr_m'),'text-gray-700','', true)}${td(sum('notpr_f'),'text-gray-700','')}${td(sum('notpr_total'),'text-red-400','bg-red-100')}
+    return `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+        <td class="px-3 py-3 text-gray-800 font-bold">TOTAL</td>
+        ${td(sum('part_m'),  'text-gray-700', '', true)}${td(sum('part_f'),  'text-gray-700', '')}${td(sum('part_total'),  'text-teal-600',   'bg-teal-100')}
+        ${td(sum('inq_m'),   'text-gray-700', '', true)}${td(sum('inq_f'),   'text-gray-700', '')}${td(sum('inq_total'),   'text-blue-500',   'bg-blue-100')}
+        ${td(sum('ref_m'),   'text-gray-700', '', true)}${td(sum('ref_f'),   'text-gray-700', '')}${td(sum('ref_total'),   'text-violet-500', 'bg-violet-100')}
+        ${td(sum('int_m'),   'text-gray-700', '', true)}${td(sum('int_f'),   'text-gray-700', '')}${td(sum('int_total'),   'text-amber-500',  'bg-amber-100')}
+        ${td(sum('peso_m'),  'text-gray-700', '', true)}${td(sum('peso_f'),  'text-gray-700', '')}${td(sum('peso_total'),  'text-orange-500', 'bg-orange-100')}
+        ${td(sum('priv_m'),  'text-gray-700', '', true)}${td(sum('priv_f'),  'text-gray-700', '')}${td(sum('priv_total'),  'text-green-500',  'bg-green-100')}
+        ${td(sum('notpr_m'), 'text-gray-700', '', true)}${td(sum('notpr_f'), 'text-gray-700', '')}${td(sum('notpr_total'), 'text-red-400',    'bg-red-100')}
         <td class="border-l border-gray-100"></td>
     </tr>`;
-}
-
-// ─── Filter & Pagination ──────────────────────────────────────────────────────
-function applyFilters() {
-    const query = (document.getElementById('searchSchool').value || '').toLowerCase().trim();
-    const type  = (document.getElementById('filterType').value || '').toLowerCase();
-
-    filteredRows = allRows.filter(r => {
-        const school   = (r.school || '').toLowerCase();
-        const eduLevel = (r.education_level || '').toLowerCase();
-        const typeKey  = eduLevel.includes('college') ? 'college'
-                       : (eduLevel.includes('shs') || eduLevel.includes('senior')) ? 'shs'
-                       : eduLevel;
-        const matchSearch = !query || school.includes(query);
-        const matchType   = !type  || typeKey === type;
-        return matchSearch && matchType;
-    });
-
-    currentPage = 1;
-    renderPage();
 }
 
 function renderPage() {
@@ -467,7 +379,7 @@ function renderPage() {
     tbody.innerHTML = '';
 
     if (total === 0) {
-        tbody.innerHTML = '<tr><td colspan="28" class="text-center py-8 text-gray-400 text-sm">No entries found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="22" class="text-center py-8 text-gray-400 text-sm">No entries found for this year.</td></tr>';
     } else {
         pageRows.forEach(r => tbody.appendChild(buildRow(r)));
         tbody.insertAdjacentHTML('beforeend', buildTotalsRow(filteredRows));
@@ -497,123 +409,11 @@ function changePage(dir) {
     renderPage();
 }
 
-// ─── Edit ─────────────────────────────────────────────────────────────────────
-// Editable: contract_period, school, education_level (text), course,
-//           office_assignment, required_hours
-// Read-only: all M/F/T count columns (come from apply_benef)
-function getRow(id) {
-    return document.querySelector(`#wiTbody tr[data-id="${id}"]`);
-}
-
-function toggleEditMode(id) {
-    const row = getRow(id);
-    if (!row || row.classList.contains('editing')) { cancelEdit(id); return; }
-
-    row.classList.add('editing', 'bg-yellow-50');
-
-    const editableFields = ['contract_period', 'school', 'education_level', 'course', 'office_assignment', 'required_hours'];
-    editableFields.forEach(field => {
-        const cell = row.querySelector(`[data-field="${field}"]`);
-        if (!cell) return;
-        // For education_level the cell shows a badge — swap to plain text for editing
-        if (field === 'education_level') {
-            editingData[`${id}_${field}_html`] = cell.innerHTML;
-            const txt = allRows.find(r => r.work_immersion_id == id)?.education_level || '';
-            cell.innerHTML = txt;
-        } else {
-            editingData[`${id}_${field}`] = cell.textContent.trim();
-        }
-        cell.contentEditable = 'true';
-        cell.classList.add('border', 'border-yellow-300', 'bg-white', 'rounded');
-    });
-
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.add('hidden');
-    ab.querySelector('.delete-btn').classList.add('hidden');
-    ab.querySelector('.save-btn').classList.remove('hidden');
-    ab.querySelector('.cancel-btn').classList.remove('hidden');
-}
-
-function cancelEdit(id) {
-    const row = getRow(id);
-    if (!row) return;
-
-    const editableFields = ['contract_period', 'school', 'education_level', 'course', 'office_assignment', 'required_hours'];
-    editableFields.forEach(field => {
-        const cell = row.querySelector(`[data-field="${field}"]`);
-        if (!cell) return;
-        if (field === 'education_level' && editingData[`${id}_${field}_html`]) {
-            cell.innerHTML = editingData[`${id}_${field}_html`];
-        } else {
-            cell.textContent = editingData[`${id}_${field}`] || '';
-        }
-        cell.contentEditable = 'false';
-        cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'rounded');
-    });
-
-    row.classList.remove('editing', 'bg-yellow-50');
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.remove('hidden');
-    ab.querySelector('.delete-btn').classList.remove('hidden');
-    ab.querySelector('.save-btn').classList.add('hidden');
-    ab.querySelector('.cancel-btn').classList.add('hidden');
-}
-
-function saveRow(id) {
-    savingId = id;
-    openModal('saveModal');
-}
-
-async function confirmSave() {
-    const id  = savingId;
-    const row = getRow(id);
-    if (!row) { closeSaveModal(); return; }
-
-    const get = field => {
-        const cell = row.querySelector(`[data-field="${field}"]`);
-        return cell ? cell.textContent.trim() : '';
-    };
-
-    const payload = {
-        work_immersion_id: id,
-        contract_period:   get('contract_period'),
-        school:            get('school'),
-        education_level:   get('education_level'),
-        course:            get('course'),
-        office_assignment: get('office_assignment'),
-        required_hours:    parseInt(get('required_hours')) || 0,
-    };
-
-    try {
-        const res  = await fetch(API_URL, {
-            method:  'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload),
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-
-        // Update cache
-        const idx = allRows.findIndex(r => r.work_immersion_id == id);
-        if (idx !== -1) Object.assign(allRows[idx], payload);
-
-        cancelEdit(id);
-        closeSaveModal();
-
-        row.style.transition = 'background-color 0.3s';
-        row.style.backgroundColor = '#dcfce7';
-        setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
-
-    } catch (err) {
-        alert('Save failed: ' + err.message);
-        closeSaveModal();
-    }
-}
-
 // ─── Delete ───────────────────────────────────────────────────────────────────
 function deleteRow(id) {
     deletingId = id;
-    openModal('deleteModal');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('deleteModal').classList.remove('hidden');
 }
 
 async function confirmDelete() {
@@ -622,44 +422,41 @@ async function confirmDelete() {
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        allRows      = allRows.filter(r => r.work_immersion_id != deletingId);
-        filteredRows = filteredRows.filter(r => r.work_immersion_id != deletingId);
-
-        const row = getRow(deletingId);
-        if (row) {
-            row.style.transition = 'opacity 0.3s';
-            row.style.opacity = '0';
-            setTimeout(() => renderPage(), 300);
-        } else {
-            renderPage();
-        }
+        allRows      = allRows.filter(r => r.wiirp_id != deletingId);
+        filteredRows = filteredRows.filter(r => r.wiirp_id != deletingId);
 
         closeDeleteModal();
+        renderPage();
+
+        // Refresh cards after deletion
+        const totals = {
+            part_m: 0, part_f: 0, part_total: 0,
+            inq_m: 0,  inq_f: 0,  inq_total: 0,
+            ref_m: 0,  ref_f: 0,  ref_total: 0,
+            int_m: 0,  int_f: 0,  int_total: 0,
+            peso_m: 0, peso_f: 0, peso_total: 0,
+            priv_m: 0, priv_f: 0, priv_total: 0,
+            notpr_m: 0,notpr_f: 0,notpr_total: 0,
+        };
+        allRows.forEach(r => {
+            Object.keys(totals).forEach(k => { totals[k] += parseInt(r[k]) || 0; });
+        });
+        updateCards(totals);
+
     } catch (err) {
         alert('Delete failed: ' + err.message);
         closeDeleteModal();
     }
 }
 
-// ─── Modals ───────────────────────────────────────────────────────────────────
-function openModal(id) {
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById(id).classList.remove('hidden');
-}
 function closeDeleteModal() {
     document.getElementById('modalBackdrop').classList.add('hidden');
     document.getElementById('deleteModal').classList.add('hidden');
     deletingId = null;
 }
-function closeSaveModal() {
-    document.getElementById('modalBackdrop').classList.add('hidden');
-    document.getElementById('saveModal').classList.add('hidden');
-    savingId = null;
-}
+
 document.addEventListener('click', e => {
-    if (e.target === document.getElementById('modalBackdrop')) {
-        closeDeleteModal(); closeSaveModal();
-    }
+    if (e.target === document.getElementById('modalBackdrop')) closeDeleteModal();
 });
 </script>
 
