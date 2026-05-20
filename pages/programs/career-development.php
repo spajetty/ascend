@@ -140,8 +140,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script>
 // ─── API paths ────────────────────────────────────────────────────────────────
 const YEAR     = new Date().getFullYear();
-const CDSP_API = `/backend/career-dev/show-cdsp.php?year=${YEAR}`;
-const LMI_API  = `/backend/career-dev/show-lmi.php?year=${YEAR}`;
+const CDSP_API = `/backend/career-dev/cdsp/show-cdsp.php?year=${YEAR}`;
+const LMI_API  = `/backend/career-dev/lmi/show-lmi.php?year=${YEAR}`;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
@@ -208,10 +208,10 @@ function renderCdsp(data) {
 
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date)}</td>
-            <td class="px-4 py-3 text-gray-600">${escHtml(r.school)}</td>
-            <td class="px-4 py-3 text-gray-600">${r.cdsp_m ?? 0}</td>
-            <td class="px-4 py-3 text-gray-600">${r.cdsp_f ?? 0}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date_of_conduct)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.school_name)}</td>
+            <td class="px-4 py-3 text-gray-600">${r.participants_male ?? 0}</td>
+            <td class="px-4 py-3 text-gray-600">${r.participants_female ?? 0}</td>
             <td class="px-4 py-3 text-gray-700 font-semibold">${r.total ?? 0}</td>
         </tr>`;
     });
@@ -240,10 +240,10 @@ function renderLmi(data) {
 
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date)}</td>
-            <td class="px-4 py-3 text-gray-600">${escHtml(r.school)}</td>
-            <td class="px-4 py-3 text-gray-600">${r.lmi_m ?? 0}</td>
-            <td class="px-4 py-3 text-gray-600">${r.lmi_f ?? 0}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold">${fmtDate(r.date_of_conduct)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.school_name)}</td>
+            <td class="px-4 py-3 text-gray-600">${r.participants_male ?? 0}</td>
+            <td class="px-4 py-3 text-gray-600">${r.participants_female ?? 0}</td>
             <td class="px-4 py-3 text-gray-700 font-semibold">${r.total ?? 0}</td>
         </tr>`;
     });
