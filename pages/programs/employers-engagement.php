@@ -44,14 +44,14 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- New vs Renewed -->
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
-                    <div class="flex items-end gap-2">
+                    <div class="flex flex-wrap items-end gap-x-2 gap-y-0.5">
                         <span class="text-2xl font-bold text-gray-800" id="card-new">—</span>
                         <span class="text-xs text-gray-400 mb-1">New</span>
                         <span class="text-lg font-bold text-gray-300 mb-0.5">/</span>
                         <span class="text-2xl font-bold text-gray-800" id="card-renew">—</span>
                         <span class="text-xs text-gray-400 mb-1">Renew</span>
                     </div>
-                    <div class="bg-red-100 p-2 rounded-lg">
+                    <div class="bg-red-100 p-2 rounded-lg shrink-0">
                         <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                         </svg>
@@ -90,20 +90,19 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
         <!-- Employers Accreditation Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Employers Accreditation</h2>
-                <span class="text-xs text-gray-500 font-medium" id="accred-subtitle"></span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="text-left px-6 py-3 text-gray-500 font-semibold tracking-wide">MONTH</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">ACCREDITATION</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">COMPANY</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">ESTABLISHMENT TYPE</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">INDUSTRY</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">CITY/MUNICIPALITY</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">ACCREDITATION</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">COMPANY</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">ESTABLISHMENT TYPE</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">INDUSTRY</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">CITY/MUNICIPALITY</th>
                         </tr>
                     </thead>
                     <tbody id="accred-tbody">
@@ -118,19 +117,18 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
         <!-- WHIP Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Workers Hiring for Infrastructure Projects</h2>
-                <span class="text-sm font-semibold text-orange-500" id="whip-subtitle"></span>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="text-left px-6 py-3 text-gray-500 font-semibold tracking-wide">MONTH</th>
-                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide border-l border-gray-100">PROJECT NAME</th>
-                            <th class="text-left px-4 py-3 text-teal-600 font-semibold tracking-wide border-l border-gray-100">MALE</th>
-                            <th class="text-left px-4 py-3 text-pink-500 font-semibold tracking-wide border-l border-gray-100">FEMALE</th>
-                            <th class="text-left px-4 py-3 text-orange-500 font-semibold tracking-wide border-l border-gray-100">TOTAL</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-semibold tracking-wide">PROJECT NAME</th>
+                            <th class="text-left px-4 py-3 text-teal-600 font-semibold tracking-wide">MALE</th>
+                            <th class="text-left px-4 py-3 text-pink-500 font-semibold tracking-wide">FEMALE</th>
+                            <th class="text-left px-4 py-3 text-orange-500 font-semibold tracking-wide">TOTAL</th>
                         </tr>
                     </thead>
                     <tbody id="whip-tbody">
@@ -147,39 +145,23 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-const YEAR         = new Date().getFullYear();
-const ACCRED_API   = `/backend/emp-engagement/emp-accred/show-employers.php?year=${YEAR}`;
-const WHIP_API     = `/backend/emp-engagement/whip/show-whip.php?year=all`;
+// ─── API paths ────────────────────────────────────────────────────────────────
+const YEAR       = new Date().getFullYear();
+const ACCRED_API = `/backend/emp-engagement/emp-accred/show-employers.php?year=${YEAR}`;
+const WHIP_API   = `/backend/emp-engagement/whip/show-whip.php?year=all`;
+
+// Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
 
+// ─── Helper: clear a stuck "Loading…" tbody ───────────────────────────────────
 function clearLoading(tbodyId, colspan, msg = 'No data available.') {
     document.getElementById(tbodyId).innerHTML =
         `<tr><td colspan="${colspan}" class="text-center py-6 text-gray-400 text-sm">${msg}</td></tr>`;
 }
 
-function escHtml(s) {
-    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function computeRowGender(rows) {
-    return rows.map(r => {
-        const sex = (r.sex || '').toLowerCase();
-
-        const date = r.date_hired ? new Date(r.date_hired) : null;
-
-        return {
-            ...r,
-            month: date ? date.toLocaleString('default', { month: 'short' }) : '—',
-            year: date ? date.getFullYear() : '—',
-            male: sex === 'male' ? 1 : 0,
-            female: sex === 'female' ? 1 : 0,
-            total: 1
-        };
-    });
-}
-
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+
     const fetchJson = url => fetch(url).then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -208,23 +190,41 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+function escHtml(s) {
+    return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function fmtMonth(dateStr) {
+    if (!dateStr) return '—';
+    const dt = new Date(dateStr);
+    if (isNaN(dt)) return '—';
+    return dt.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+        + ' ' + dt.getFullYear();
+}
+
+function computeRowGender(rows) {
+    return rows.map(r => {
+        const sex  = (r.sex || '').toLowerCase();
+        const date = r.date_hired ? new Date(r.date_hired) : null;
+        return {
+            ...r,
+            month:  date ? date.toLocaleString('en-US', { month: 'short' }) : '—',
+            year:   date ? date.getFullYear() : '—',
+            male:   sex === 'male'   ? 1 : 0,
+            female: sex === 'female' ? 1 : 0,
+            total:  1,
+        };
+    });
+}
+
 // ─── Employers Accreditation ──────────────────────────────────────────────────
 function renderAccreditation(data) {
     const tbody = document.getElementById('accred-tbody');
+    if (!data || !data.rows.length) { clearLoading('accred-tbody', 6); return; }
 
-    if (!data || !data.rows.length) {
-        clearLoading('accred-tbody', 6);
-        return;
-    }
-
-    const rows = computeRowGender(data.rows).slice(-PREVIEW_ROWS);
+    const rows   = data.rows.slice(-PREVIEW_ROWS);
     const totals = data.totals;
-
-    // Update subtitle with new/renew counts for the current year
-    document.getElementById('accred-subtitle').innerHTML =
-        `<span class="text-green-600 font-semibold">${totals.new} New</span>`  +
-        `<span class="mx-1">·</span>` +
-        `<span class="text-orange-500 font-semibold">${totals.renewed} Renew</span>`;
 
     const estTypeColor = {
         'Manpower':          'text-green-600',
@@ -239,15 +239,27 @@ function renderAccreditation(data) {
     let html = '';
     rows.forEach(r => {
         const estColor = estTypeColor[r.est_type] ?? 'text-gray-600';
+        const mo = fmtMonth(r.date_hired);
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 border-l border-gray-100">${accredBadge(r.accreditation)}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.company_name)}</td>
-            <td class="px-4 py-3 ${estColor} font-medium border-l border-gray-100">${escHtml(r.est_type)}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.industry)}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.city)}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold">${mo}</td>
+            <td class="px-4 py-3">${accredBadge(r.accreditation)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.company_name)}</td>
+            <td class="px-4 py-3 ${estColor} font-medium">${escHtml(r.est_type)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.industry)}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.city)}</td>
         </tr>`;
     });
+
+    html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
+        <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3">
+            <span class="bg-green-200 text-green-800 font-bold text-xs px-3 py-1 rounded-full">${totals.total}</span>
+        </td>
+    </tr>`;
 
     tbody.innerHTML = html;
 }
@@ -255,19 +267,12 @@ function renderAccreditation(data) {
 // ─── WHIP ─────────────────────────────────────────────────────────────────────
 function renderWhip(data) {
     const tbody = document.getElementById('whip-tbody');
+    if (!data || !data.rows.length) { clearLoading('whip-tbody', 5); return; }
 
-    if (!data || !data.rows.length) {
-        clearLoading('whip-tbody', 5);
-        return;
-    }
-
-    const rows = computeRowGender(data.rows).slice(-PREVIEW_ROWS);
-    const totals = data.totals;
-
-    document.getElementById('whip-subtitle').textContent = `${totals.total} Total`;
-
-    // Running totals for the TOTAL row (full dataset, not just preview)
     const allRows = computeRowGender(data.rows);
+    const rows    = allRows.slice(-PREVIEW_ROWS);
+    const totals  = data.totals;
+
     const totM = allRows.reduce((s, r) => s + +r.male,   0);
     const totF = allRows.reduce((s, r) => s + +r.female, 0);
     const totT = totM + totF;
@@ -275,20 +280,20 @@ function renderWhip(data) {
     let html = '';
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_title || '—')}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.male}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.female}</td>
-            <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${r.total}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.project_title || '—')}</td>
+            <td class="px-4 py-3 text-gray-600">${r.male}</td>
+            <td class="px-4 py-3 text-gray-600">${r.female}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold">${r.total}</td>
         </tr>`;
     });
 
     html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
         <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">—</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totM}</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totF}</td>
-        <td class="px-4 py-3 border-l border-gray-100">
+        <td class="px-4 py-3 text-gray-400">—</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totM}</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totF}</td>
+        <td class="px-4 py-3">
             <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totT}</span>
         </td>
     </tr>`;
