@@ -202,7 +202,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
 
 <script>
-const API_URL    = '/api/first-time-api.php';
+const API_URL = '/backend/emp-facilitation/show-first-time.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];

@@ -219,7 +219,8 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
 
 <script>
-const API_URL       = '/api/spes-api.php';
+// API points to the correct backend file
+const API_URL       = '/backend/youth-employ/show-spes.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];
@@ -283,17 +284,17 @@ function buildRow(r) {
     return `
     <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}">
         <td class="px-3 py-2 text-gray-700 font-medium editable-month">${r.month_reported}</td>
-        <td class="px-3 py-2 text-gray-700 editable-employer">${r.employer}</td>
+        <td class="px-3 py-2 text-gray-700 editable-employer">${r.employer ?? '—'}</td>
         <td class="px-3 py-2 text-gray-600 editable-start">${fmt(r.start_of_contract)}</td>
         <td class="px-3 py-2 text-gray-600 editable-end">${fmt(r.end_of_contract)}</td>
-        <td class="px-3 py-2 text-center text-gray-700 font-medium editable-days">${r.days}</td>
-        ${mft(r.reg_m,      r.reg_f,      'text-teal-600',   'bg-teal-50')}
-        ${mft(r.ref_m,      r.ref_f,      'text-blue-500',   'bg-blue-50')}
-        ${mft(r.placed_m,   r.placed_f,   'text-green-500',  'bg-green-50')}
-        ${mft(r.vac_m,      r.vac_f,      'text-orange-400', 'bg-orange-50')}
-        ${mft(r.spes_baby_m,r.spes_baby_f,'text-pink-500',   'bg-pink-50')}
-        ${mft(r.fourps_m,   r.fourps_f,   'text-purple-500', 'bg-purple-50')}
-        ${mft(r.pwd_m,      r.pwd_f,      'text-cyan-500',   'bg-cyan-50')}
+        <td class="px-3 py-2 text-center text-gray-700 font-medium editable-days">${r.days ?? '—'}</td>
+        ${mft(r.reg_m,       r.reg_f,       'text-teal-600',   'bg-teal-50')}
+        ${mft(r.ref_m,       r.ref_f,       'text-blue-500',   'bg-blue-50')}
+        ${mft(r.placed_m,    r.placed_f,    'text-green-500',  'bg-green-50')}
+        ${mft(r.vac_m,       r.vac_f,       'text-orange-400', 'bg-orange-50')}
+        ${mft(r.spes_baby_m, r.spes_baby_f, 'text-pink-500',   'bg-pink-50')}
+        ${mft(r.fourps_m,    r.fourps_f,    'text-purple-500', 'bg-purple-50')}
+        ${mft(r.pwd_m,       r.pwd_f,       'text-cyan-500',   'bg-cyan-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2">
                 <button onclick="startEdit(${id})" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
@@ -317,13 +318,13 @@ function buildTotalRow(rows) {
     const t = { reg_m:0,reg_f:0,ref_m:0,ref_f:0,placed_m:0,placed_f:0,
                 vac_m:0,vac_f:0,baby_m:0,baby_f:0,fps_m:0,fps_f:0,pwd_m:0,pwd_f:0 };
     rows.forEach(r => {
-        t.reg_m    += +r.reg_m;    t.reg_f    += +r.reg_f;
-        t.ref_m    += +r.ref_m;    t.ref_f    += +r.ref_f;
-        t.placed_m += +r.placed_m; t.placed_f += +r.placed_f;
-        t.vac_m    += +r.vac_m;    t.vac_f    += +r.vac_f;
-        t.baby_m   += +r.spes_baby_m; t.baby_f += +r.spes_baby_f;
-        t.fps_m    += +r.fourps_m; t.fps_f    += +r.fourps_f;
-        t.pwd_m    += +r.pwd_m;    t.pwd_f    += +r.pwd_f;
+        t.reg_m    += +r.reg_m;       t.reg_f    += +r.reg_f;
+        t.ref_m    += +r.ref_m;       t.ref_f    += +r.ref_f;
+        t.placed_m += +r.placed_m;    t.placed_f += +r.placed_f;
+        t.vac_m    += +r.vac_m;       t.vac_f    += +r.vac_f;
+        t.baby_m   += +r.spes_baby_m; t.baby_f   += +r.spes_baby_f;
+        t.fps_m    += +r.fourps_m;    t.fps_f    += +r.fourps_f;
+        t.pwd_m    += +r.pwd_m;       t.pwd_f    += +r.pwd_f;
     });
     function t3(m, f, tc, bc) {
         return `<td class="px-2 py-2 text-center text-gray-700 border-l border-gray-100">${m}</td>
@@ -442,7 +443,7 @@ async function load(year, search = '') {
     document.getElementById('summaryBody').innerHTML = buildSummaryBody(data.summary);
 }
 
-// ─── Search (debounced — sends to API) ─────────────────────────────────────
+// ─── Search (debounced) ────────────────────────────────────────────────────
 function handleSearch() {
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
@@ -458,7 +459,6 @@ function startEdit(id) {
     const row = getRowEl(id);
     if (!row) return;
     row.classList.add('bg-yellow-50');
-    // Editable: month, employer, start, end, days (first 5 cells)
     const editCells = ['editable-month','editable-employer','editable-start','editable-end','editable-days'];
     const snap = {};
     editCells.forEach(cls => {

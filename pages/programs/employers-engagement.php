@@ -223,7 +223,7 @@ function renderAccreditation(data) {
     const tbody = document.getElementById('accred-tbody');
     if (!data || !data.rows.length) { clearLoading('accred-tbody', 6); return; }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const rows   = data.rows.slice(0, PREVIEW_ROWS);
     const totals = data.totals;
 
     const estTypeColor = {
@@ -267,6 +267,8 @@ function renderAccreditation(data) {
 }
 
 // ─── WHIP ─────────────────────────────────────────────────────────────────────
+// The WHIP API now returns individual worker rows (one row per hired worker).
+// For the summary preview we show PREVIEW_ROWS workers with name, sex, project.
 function renderWhip(data) {
     const tbody = document.getElementById('whip-tbody');
     if (!data || !data.rows.length) { clearLoading('whip-tbody', 5); return; }

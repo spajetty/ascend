@@ -191,7 +191,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 // ─── Config ────────────────────────────────────────────────────────────────
-const API_URL = '/api/job-match-api.php';
+const API_URL = '/backend/emp-facilitation/show-job-match.php';
 const ROWS_PER_PAGE = 9;
 
 // ─── State ─────────────────────────────────────────────────────────────────
@@ -277,7 +277,7 @@ function buildRow(r, idx) {
 
     return `
     <tr class="border-b border-gray-50 hover:bg-gray-50 data-row" data-id="${id}" data-idx="${idx}">
-        <td class="px-4 py-2 text-gray-700 font-medium">${r.month} ${r.year}</td>
+        <td class="px-4 py-2 text-gray-700 font-medium">${r.month}</td>
         ${total3(nm.reg_m,   nm.reg_f,   'text-teal-600',   'bg-teal-50')}
         ${total3(nm.ref_m,   nm.ref_f,   'text-blue-500',   'bg-blue-50')}
         ${total3(nm.int_m,   nm.int_f,   'text-cyan-500',   'bg-cyan-50')}

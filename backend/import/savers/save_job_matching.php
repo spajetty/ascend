@@ -102,21 +102,21 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         return 'saved';
     }
 
-    if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstJobSeek')) {
-        $occPermit = toBoolInt(rowValue($row, ['Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
-        $healthCard = toBoolInt(rowValue($row, ['Health Card', 'health_card'], 0));
+     if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstJobSeek')) {
+         $occPermit = toBoolInt(rowValue($row, ['Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
+         $healthCard = toBoolInt(rowValue($row, ['Health Card', 'health_card'], 0));
 
-        if (tableHasColumn($conn, 'firstJobSeek', 'company_id')) {
-            $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
-            $ins->bind_param('iiii', $benefId, $companyId, $occPermit, $healthCard);
-        } else {
-            $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, occ_permit, health_card) VALUES (?, ?, ?)');
-            $ins->bind_param('iii', $benefId, $occPermit, $healthCard);
-        }
-        $ins->execute();
-        $state['insertedFirstJobSeekIds'][] = (int)$ins->insert_id;
-        return 'saved';
-    }
+         if (tableHasColumn($conn, 'firstJobSeek', 'company_id')) {
+             $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, occ_permit, health_card, batch_id) VALUES (?, ?, ?, ?, ?)');
+             $ins->bind_param('iiiii', $benefId, $companyId, $occPermit, $healthCard, $batchId);
+         } else {
+             $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, occ_permit, health_card, batch_id) VALUES (?, ?, ?, ?)');
+             $ins->bind_param('iiii', $benefId, $occPermit, $healthCard, $batchId);
+         }
+         $ins->execute();
+         $state['insertedFirstJobSeekIds'][] = (int)$ins->insert_id;
+         return 'saved';
+     }
 
     return 'saved';
 }

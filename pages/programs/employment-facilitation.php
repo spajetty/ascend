@@ -37,7 +37,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Total Users</span>
+                <span class="text-xs text-gray-500">Total Registered (Job Match + FTJS)</span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
@@ -50,7 +50,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Total Employers</span>
+                <span class="text-xs text-gray-500">Total Employers (Job Fair)</span>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-yellow-400">
@@ -166,9 +166,13 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100">
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium w-28" rowspan="2">MONTH</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium w-40 border-l border-gray-100" rowspan="2">PARTICIPATING EMPLOYER</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium w-24" rowspan="2">MONTH</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium w-20" rowspan="2">TYPE</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium w-44" rowspan="2">DATE</th>
+                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">PARTICIPATING EMPLOYER</th>
                             <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold tracking-wide border-l border-gray-100">JOB VACANCIES</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold tracking-wide border-l border-gray-100">REGISTERED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-indigo-500 font-semibold tracking-wide border-l border-gray-100">REFERRED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
@@ -177,6 +181,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-blue-500">T</th>
+                            <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-teal-600">T</th>
+                            <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-indigo-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-cyan-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-green-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-red-400">T</th>
@@ -185,7 +191,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                     </thead>
                     <tbody id="jobfair-tbody">
-                        <tr><td colspan="20" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
+                        <tr><td colspan="28" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -200,9 +206,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script>
 // ─── API paths ────────────────────────────────────────────────────────────────
 const YEAR           = new Date().getFullYear();
-const JOB_MATCH_API  = `/api/job-match-api.php?year=${YEAR}`;
-const FIRST_TIME_API = `/api/first-time-api.php?year=${YEAR}`;
-const JOB_FAIR_API   = `/api/job-fair-api.php?year=${YEAR}`;
+const JOB_MATCH_API  = `/backend/emp-facilitation/show-job-match.php?year=${YEAR}`;
+const FIRST_TIME_API = `/backend/emp-facilitation/show-first-time.php?year=${YEAR}`;
+const JOB_FAIR_API   = `/backend/emp-facilitation/show-job-fair.php?year=${YEAR}`;
 
 // Preview shows only the last N rows (most recent months)
 const PREVIEW_ROWS = 3;
@@ -216,8 +222,6 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
 
-    // Fetch all three APIs in parallel; handle each independently so one
-    // failure doesn't block the others from rendering.
     const fetchJson = url => fetch(url).then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -240,10 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Summary Cards ──────────────────────────────────────────────────────
         const jmRegistered = jmData ? jmData.totals.registered : 0;
         const ftJobseekers = ftData ? ftData.totals.jobseekers : 0;
-        document.getElementById('card-total-users').textContent     = jmRegistered + ftJobseekers;
-        document.getElementById('card-total-employers').textContent = jfData ? jfData.totals.employers    : '—';
-        document.getElementById('card-total-vacancies').textContent = jfData ? jfData.totals.job_vacancies : '—';
-        document.getElementById('card-total-ftjs').textContent = ftData ? ftJobseekers : '—';
+        document.getElementById('card-total-users').textContent      = jmRegistered + ftJobseekers;
+        document.getElementById('card-total-employers').textContent  = jfData ? jfData.totals.employers     : '—';
+        document.getElementById('card-total-vacancies').textContent  = jfData ? jfData.totals.job_vacancies : '—';
+        document.getElementById('card-total-ftjs').textContent       = ftData ? ftJobseekers                : '—';
 
         // ── Preview Tables ─────────────────────────────────────────────────────
         renderJobMatch(jmData);
@@ -284,7 +288,7 @@ function renderJobMatch(data) {
         const ffiT  = +r.ffi_m    + +r.ffi_f;
 
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)} ${r.year}</td>
+            <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)}</td>
             ${tL(r.reg_m)}${t(r.reg_f)}${tTotal(regT,'text-teal-600','bg-teal-50')}
             ${tL(r.ref_m)}${t(r.ref_f)}${tTotal(refT,'text-blue-500','bg-blue-50')}
             ${tL(r.int_m)}${t(r.int_f)}${tTotal(intT,'text-cyan-500','bg-cyan-50')}
@@ -326,7 +330,7 @@ function renderFirstTime(data) {
         const intT  = +r.int_m    + +r.int_f;
         const qualT = +r.qual_m   + +r.qual_f;
         const nqT   = +r.nqual_m  + +r.nqual_f;
-        const plcT  = +r.placed_m + +r.placed_f;  // FIX: was +r.placed_m++r.placed_f (broken ++ operator)
+        const plcT  = +r.placed_m + +r.placed_f;
         const ffiT  = +r.ffi_m    + +r.ffi_f;
 
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
@@ -361,7 +365,7 @@ function renderFirstTime(data) {
 function renderJobFair(data) {
     const tbody = document.getElementById('jobfair-tbody');
     if (!data || !data.rows.length) {
-        clearLoading('jobfair-tbody', 20);
+        clearLoading('jobfair-tbody', 28);
         return;
     }
 
@@ -369,11 +373,34 @@ function renderJobFair(data) {
     const totals = data.totals;
     let html = '';
 
+    // Format date range same as job-fair.php
+    const fmtDate = (start, end) => {
+        if (!start) return '—';
+        const s = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        if (!end || end === start) return s;
+        const e = new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `${s} – ${e}`;
+    };
+
+    // Format type badge same as job-fair.php
+    const typeBadge = type => {
+        const isLocal = String(type).toUpperCase().includes('LOCAL');
+        const cls = isLocal
+            ? 'bg-teal-100 text-teal-700'
+            : 'bg-purple-100 text-purple-700';
+        const label = isLocal ? 'LOCAL' : 'OVERSEAS';
+        return `<span class="px-2 py-0.5 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
+    };
+
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
             <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)} ${r.year}</td>
+            <td class="px-4 py-2 border-l border-gray-100">${typeBadge(r.job_fair_type)}</td>
+            <td class="px-4 py-2 text-gray-500 border-l border-gray-100 whitespace-nowrap">${fmtDate(r.date_start, r.date_end)}</td>
             <td class="px-4 py-2 text-gray-600 border-l border-gray-100">${escHtml(r.company_name)}</td>
             ${tL(r.vacancy_male)}${t(r.vacancy_female)}${tTotal(r.vacancy_total,'text-blue-500','bg-blue-50')}
+            ${tL(r.reg_m)}${t(r.reg_f)}${tTotal(r.reg_total,'text-teal-600','bg-teal-50')}
+            ${tL(r.ref_m)}${t(r.ref_f)}${tTotal(r.ref_total,'text-indigo-500','bg-indigo-50')}
             ${tL(r.int_m)}${t(r.int_f)}${tTotal(r.int_total,'text-cyan-500','bg-cyan-50')}
             ${tL(r.qual_m)}${t(r.qual_f)}${tTotal(r.qual_total,'text-green-500','bg-green-50')}
             ${tL(r.nqual_m)}${t(r.nqual_f)}${tTotal(r.nqual_total,'text-red-400','bg-red-50')}
@@ -383,8 +410,10 @@ function renderJobFair(data) {
     });
 
     html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
-        <td class="px-4 py-2 text-gray-800 font-bold" colspan="2">TOTALS</td>
+        <td class="px-4 py-2 text-gray-800 font-bold" colspan="4">TOTALS</td>
         <td colspan="3" class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.job_vacancies}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">—</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-indigo-500 bg-indigo-100 border-l border-gray-100">—</td>
         <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${totals.interviewed}</td>
         <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">${totals.qualified}</td>
         <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">—</td>
