@@ -64,22 +64,17 @@ try {
 
         $yearFilter = $_GET['year'] ?? 'all';
 
-        // GET AVAILABLE YEARS
-        $years = [];
-        $yearRes = $conn->query("
+        // Available years
+        $years    = [];
+        $yearRes  = $conn->query("
             SELECT DISTINCT YEAR(date_hired) AS yr
             FROM whip
             WHERE date_hired IS NOT NULL
             ORDER BY yr DESC
         ");
-
         while ($row = $yearRes->fetch_assoc()) {
             $years[] = (int) $row['yr'];
         }
-
-        // ─────────────────────────────────────────
-        // BUILD QUERY (ALL YEARS FIX HERE)
-        // ─────────────────────────────────────────
 
         $sql = "
             SELECT
@@ -124,18 +119,16 @@ try {
 
         if ($yearFilter !== 'all' && !empty($yearFilter)) {
             $sql .= " WHERE YEAR(w.date_hired) = ? ";
-            $params[] = (int)$yearFilter;
-            $types .= "i";
+            $params[] = (int) $yearFilter;
+            $types   .= "i";
         }
 
         $sql .= " ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC";
 
         $stmt = $conn->prepare($sql);
-
         if (!empty($params)) {
             $stmt->bind_param($types, ...$params);
         }
-
         $stmt->execute();
         $result = $stmt->get_result();
 
@@ -145,15 +138,14 @@ try {
         $projectSet  = [];
 
         while ($row = $result->fetch_assoc()) {
-
-            $row['budget'] = $row['budget'] !== null ? (float)$row['budget'] : null;
-            $row['persons_from_locality'] = (int)($row['persons_from_locality'] ?? 0);
-            $row['is_legitimate_contractor'] = (bool)($row['is_legitimate_contractor'] ?? false);
-            $row['filled'] = (int)($row['filled'] ?? 0);
-            $row['unfilled'] = (int)($row['unfilled'] ?? 0);
+            $row['budget']                   = $row['budget'] !== null ? (float) $row['budget'] : null;
+            $row['persons_from_locality']    = (int) ($row['persons_from_locality'] ?? 0);
+            $row['is_legitimate_contractor'] = (bool) ($row['is_legitimate_contractor'] ?? false);
+            $row['filled']                   = (int) ($row['filled'] ?? 0);
+            $row['unfilled']                 = (int) ($row['unfilled'] ?? 0);
 
             $sex = strtolower($row['sex'] ?? '');
-            if ($sex === 'male') $maleCount++;
+            if ($sex === 'male')   $maleCount++;
             if ($sex === 'female') $femaleCount++;
 
             if (!empty($row['project_id'])) {
@@ -163,18 +155,16 @@ try {
             $rows[] = $row;
         }
 
-        $defaultYear = !empty($years)
-            ? max($years)
-            : (int) date('Y');
+        $defaultYear = !empty($years) ? max($years) : (int) date('Y');
 
         json_ok([
-            'rows' => $rows,
-            'years' => $years,
+            'rows'         => $rows,
+            'years'        => $years,
             'default_year' => $defaultYear,
-            'totals' => [
-                'total' => $maleCount + $femaleCount,
-                'male' => $maleCount,
-                'female' => $femaleCount,
+            'totals'       => [
+                'total'    => $maleCount + $femaleCount,
+                'male'     => $maleCount,
+                'female'   => $femaleCount,
                 'projects' => count($projectSet),
             ]
         ]);
