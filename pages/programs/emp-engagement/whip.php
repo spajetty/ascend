@@ -78,12 +78,29 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
         </div>
 
-        <!-- Filter + Add Button -->
-        <div class="flex items-center justify-between gap-3 mb-4 flex-wrap">
+        <!-- Filters -->
+        <div class="flex flex-wrap items-center gap-3 mb-4">
             <div class="flex items-center gap-2">
                 <span class="text-sm text-gray-500">Filter by year:</span>
                 <select id="yearFilter" onchange="loadData()"
                     class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                </select>
+            </div>
+            <div class="relative flex-1 max-w-sm">
+                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" id="searchInput" placeholder="Search worker or project..."
+                    oninput="applyFilters()"
+                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300" />
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Sex:</span>
+                <select id="filterSex" onchange="applyFilters()"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                    <option value="">All</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                 </select>
             </div>
         </div>
@@ -99,17 +116,18 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="text-left px-4 py-3 text-gray-500 font-medium w-36">MONTH</th>
-                            <th class="px-4 py-3 text-center text-teal-600 font-semibold border-l border-gray-100">MALE</th>
-                            <th class="px-4 py-3 text-center text-pink-500 font-semibold border-l border-gray-100">FEMALE</th>
-                            <th class="px-4 py-3 text-center text-orange-500 font-semibold border-l border-gray-100">TOTAL</th>
-                            <th class="px-4 py-3 text-center text-gray-500 font-semibold border-l border-gray-100">PROJECT NAME</th>
-                            <th class="px-4 py-3 text-center text-gray-400 font-semibold border-l border-gray-100">ACTIONS</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-medium">MONTH</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-medium">WORKER NAME</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-medium border-l border-gray-100">SEX</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-medium border-l border-gray-100">POSITION</th>
+                            <th class="text-left px-4 py-3 text-gray-500 font-medium border-l border-gray-100">PROJECT</th>
+                            <th class="text-center px-4 py-3 text-gray-500 font-medium border-l border-gray-100">DATE HIRED</th>
+                            <th class="text-center px-4 py-3 text-gray-400 font-medium border-l border-gray-100">ACTIONS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr id="loadingRow">
-                            <td colspan="6" class="text-center py-16 text-gray-400">
+                            <td colspan="7" class="text-center py-16 text-gray-400">
                                 <div class="flex items-center justify-center gap-3">
                                     <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
@@ -155,7 +173,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             </div>
             <h3 class="text-lg font-bold text-gray-900">Delete Entry</h3>
         </div>
-        <p class="text-gray-600 mb-6">Are you sure you want to delete this entry? This action cannot be undone.</p>
+        <p class="text-gray-600 mb-6">Are you sure you want to remove this worker from the project? This action cannot be undone.</p>
         <div class="flex gap-3">
             <button onclick="closeDeleteModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
             <button onclick="confirmDelete()" class="flex-1 px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600">Delete</button>
@@ -163,75 +181,41 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
-<!-- Save Confirmation Modal -->
-<div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="bg-green-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">Save Changes</h3>
-        </div>
-        <p class="text-gray-600 mb-6">Do you want to save the changes to this entry?</p>
-        <div class="flex gap-3">
-            <button onclick="closeSaveModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
-            <button onclick="confirmSave()" class="flex-1 px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600">Save</button>
-        </div>
-    </div>
-</div>
-
 <script>
-const API = '/api/whip-api.php';
-const ROWS_PER_PAGE = 9;
+const API = '/backend/emp engagement/show-whip.php';
+const ROWS_PER_PAGE = 15;
 
-let allRows      = [];   // full dataset from API
+let allRows      = [];
+let filteredRows = [];
 let currentPage  = 1;
 let deletingId   = null;
-let savingId     = null;
-let editingData  = {};   // { whip_id: { male, female, project_name } }
 
-// ─── Bootstrap ───────────────────────────────────────────────────────────────
+// ─── Load Data ────────────────────────────────────────────────────────────────
 async function loadData() {
-    const year = document.getElementById('yearFilter').value;
-    setLoading(true);
+    const year = document.getElementById('yearFilter').value || new Date().getFullYear();
+    document.getElementById('tableBody').innerHTML =
+        `<tr><td colspan="7" class="text-center py-16 text-gray-400 text-sm">Loading…</td></tr>`;
 
     try {
         const res  = await fetch(`${API}?year=${year}`);
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        // Rebuild year dropdown (keep selection)
+        // Rebuild year dropdown
         const sel = document.getElementById('yearFilter');
-        const cur = sel.value || year;
+        const cur = sel.value;
         sel.innerHTML = json.data.years
-            .map(y => `<option value="${y}" ${y == cur ? 'selected' : ''}>${y}</option>`)
+            .map(y => `<option value="${y}" ${y == year ? 'selected' : ''}>${y}</option>`)
             .join('');
+        if (cur && json.data.years.includes(parseInt(cur))) sel.value = cur;
 
         allRows = json.data.rows;
         updateCards(json.data.totals);
-        currentPage = 1;
-        renderTable();
-    } catch (err) {
-        console.error(err);
-    } finally {
-        setLoading(false);
-    }
-}
+        applyFilters();
 
-function setLoading(state) {
-    if (state) {
-        document.getElementById('tableBody').innerHTML = `
-            <tr><td colspan="6" class="text-center py-16 text-gray-400">
-                <div class="flex items-center justify-center gap-3">
-                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
-                    </svg>
-                    <span class="text-sm">Loading data…</span>
-                </div>
-            </td></tr>`;
+    } catch (err) {
+        document.getElementById('tableBody').innerHTML =
+            `<tr><td colspan="7" class="text-center py-10 text-red-400 text-sm">Failed to load: ${err.message}</td></tr>`;
     }
 }
 
@@ -244,80 +228,75 @@ function updateCards(t) {
     document.getElementById('tableTotal').textContent   = `${t.total} Total`;
 }
 
+// ─── Filters ─────────────────────────────────────────────────────────────────
+function applyFilters() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const sex   = document.getElementById('filterSex').value.toLowerCase().trim();
+
+    filteredRows = allRows.filter(r => {
+        const nameMatch    = !query || (r.full_name    || '').toLowerCase().includes(query)
+                                    || (r.project_title|| '').toLowerCase().includes(query)
+                                    || (r.position     || '').toLowerCase().includes(query);
+        const sexMatch     = !sex   || (r.sex          || '').toLowerCase() === sex;
+        return nameMatch && sexMatch;
+    });
+
+    currentPage = 1;
+    renderTable();
+}
+
 // ─── Table Render ─────────────────────────────────────────────────────────────
 function renderTable() {
     const tbody = document.getElementById('tableBody');
+    const total = filteredRows.length;
 
-    if (!allRows.length) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-16 text-gray-400 text-sm">No entries for this year.</td></tr>`;
+    if (total === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-16 text-gray-400 text-sm">No entries found.</td></tr>`;
         updatePagination(0);
         return;
     }
 
-    const total  = allRows.length;
-    const start  = (currentPage - 1) * ROWS_PER_PAGE;
-    const end    = Math.min(start + ROWS_PER_PAGE, total);
-    const page   = allRows.slice(start, end);
+    const start   = (currentPage - 1) * ROWS_PER_PAGE;
+    const end     = Math.min(start + ROWS_PER_PAGE, total);
+    const pageRows = filteredRows.slice(start, end);
 
-    // Data rows
-    const rowsHtml = page.map(r => `
-        <tr class="border-b border-gray-50 hover:bg-gray-50 data-row" data-id="${r.whip_id}">
-            <td class="px-4 py-3 text-gray-700 font-medium">${r.month} ${r.year}</td>
-            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 cell-male">${r.male}</td>
-            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 cell-female">${r.female}</td>
-            <td class="px-4 py-3 text-center font-semibold text-orange-500 bg-orange-50 border-l border-gray-100 cell-total">${r.total}</td>
-            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 cell-project">
-                ${r.project_name
+    tbody.innerHTML = pageRows.map(r => {
+        const sexBadge = r.sex
+            ? (r.sex.toLowerCase() === 'male'
+                ? `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-teal-100 text-teal-700">Male</span>`
+                : `<span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold bg-pink-100 text-pink-600">Female</span>`)
+            : '<span class="text-gray-300">—</span>';
+
+        const dateHired = r.date_hired
+            ? new Date(r.date_hired).toLocaleDateString('en-PH', { year:'numeric', month:'short', day:'numeric' })
+            : '—';
+
+        return `
+        <tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-4 py-3 text-gray-700 font-medium whitespace-nowrap">${r.month_name} ${r.year}</td>
+            <td class="px-4 py-3 text-gray-800 font-medium">${escHtml(r.full_name)}</td>
+            <td class="px-4 py-3 text-center border-l border-gray-100">${sexBadge}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.position || '—')}</td>
+            <td class="px-4 py-3 border-l border-gray-100">
+                ${r.project_title
                     ? `<span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg font-medium">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-                        </svg>
-                        ${escHtml(r.project_name)}
+                           <svg class="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+                           </svg>
+                           ${escHtml(r.project_title)}
                        </span>`
-                    : '<span class="text-gray-300 text-xs">—</span>'}
+                    : '<span class="text-gray-300">—</span>'}
             </td>
+            <td class="px-4 py-3 text-center text-gray-600 border-l border-gray-100 whitespace-nowrap">${dateHired}</td>
             <td class="px-4 py-3 text-center border-l border-gray-100">
-                <div class="flex items-center justify-center gap-2 action-buttons">
-                    <button onclick="toggleEditMode(${r.whip_id})" class="text-yellow-500 hover:text-yellow-600 edit-btn" title="Edit">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                        </svg>
-                    </button>
-                    <button onclick="deleteRow(${r.whip_id})" class="text-red-400 hover:text-red-600 delete-btn" title="Delete">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                        </svg>
-                    </button>
-                    <button onclick="saveRow(${r.whip_id})" class="text-green-500 hover:text-green-600 save-btn hidden" title="Save">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </button>
-                    <button onclick="cancelEdit(${r.whip_id})" class="text-gray-400 hover:text-gray-600 cancel-btn hidden" title="Cancel">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+                <button onclick="deleteRow(${r.whip_id})" class="text-red-400 hover:text-red-600" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
             </td>
-        </tr>
-    `).join('');
-
-    // Totals row (always sum full allRows, not just page)
-    const totM = allRows.reduce((s, r) => s + +r.male,   0);
-    const totF = allRows.reduce((s, r) => s + +r.female, 0);
-    const totT = totM + totF;
-
-    tbody.innerHTML = rowsHtml + `
-        <tr class="bg-gray-50 font-semibold border-t-2 border-gray-200 total-row">
-            <td class="px-4 py-3 text-gray-800 font-bold">TOTAL</td>
-            <td class="px-4 py-3 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${totM}</td>
-            <td class="px-4 py-3 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${totF}</td>
-            <td class="px-4 py-3 text-center font-bold text-orange-500 bg-orange-100 border-l border-gray-100">${totT}</td>
-            <td class="px-4 py-3 border-l border-gray-100"></td>
-            <td class="border-l border-gray-100"></td>
-        </tr>
-    `;
+        </tr>`;
+    }).join('');
 
     updatePagination(total);
 }
@@ -349,268 +328,63 @@ function updatePagination(total) {
 }
 
 function changePage(dir) {
-    const totalPages = Math.max(1, Math.ceil(allRows.length / ROWS_PER_PAGE));
+    const totalPages = Math.max(1, Math.ceil(filteredRows.length / ROWS_PER_PAGE));
     currentPage = Math.max(1, Math.min(currentPage + dir, totalPages));
     renderTable();
-}
-
-// ─── Edit Mode ────────────────────────────────────────────────────────────────
-function getRowEl(id) {
-    return document.querySelector(`tr[data-id="${id}"]`);
-}
-
-function toggleEditMode(id) {
-    const row = getRowEl(id);
-    if (!row) return;
-    if (row.classList.contains('editing')) { cancelEdit(id); return; }
-
-    // Save original values
-    editingData[id] = {
-        male:         row.querySelector('.cell-male').textContent.trim(),
-        female:       row.querySelector('.cell-female').textContent.trim(),
-        project_name: row.querySelector('.cell-project').textContent.trim()
-    };
-
-    row.classList.add('editing', 'bg-yellow-50');
-
-    // Make male, female, project editable
-    const cellMale    = row.querySelector('.cell-male');
-    const cellFemale  = row.querySelector('.cell-female');
-    const cellProject = row.querySelector('.cell-project');
-
-    [cellMale, cellFemale].forEach(c => {
-        c.contentEditable = 'true';
-        c.classList.add('border', 'border-yellow-300', 'bg-white');
-    });
-
-    // Replace project badge with an input
-    const projVal = allRows.find(r => r.whip_id == id)?.project_name ?? '';
-    cellProject.innerHTML = `<input type="text" value="${escAttr(projVal)}"
-        class="edit-project-input w-full text-xs border border-yellow-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-yellow-400">`;
-
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.add('hidden');
-    ab.querySelector('.delete-btn').classList.add('hidden');
-    ab.querySelector('.save-btn').classList.remove('hidden');
-    ab.querySelector('.cancel-btn').classList.remove('hidden');
-}
-
-function cancelEdit(id) {
-    const row = getRowEl(id);
-    if (!row) return;
-    const orig = editingData[id] || {};
-
-    row.querySelector('.cell-male').contentEditable   = 'false';
-    row.querySelector('.cell-female').contentEditable = 'false';
-    row.querySelector('.cell-male').textContent       = orig.male   ?? '';
-    row.querySelector('.cell-female').textContent     = orig.female ?? '';
-
-    // Restore project cell
-    const r = allRows.find(r => r.whip_id == id);
-    row.querySelector('.cell-project').innerHTML = projectBadge(r?.project_name ?? '');
-
-    [row.querySelector('.cell-male'), row.querySelector('.cell-female')].forEach(c => {
-        c.classList.remove('border', 'border-yellow-300', 'bg-white');
-    });
-
-    row.classList.remove('editing', 'bg-yellow-50');
-    const ab = row.querySelector('.action-buttons');
-    ab.querySelector('.edit-btn').classList.remove('hidden');
-    ab.querySelector('.delete-btn').classList.remove('hidden');
-    ab.querySelector('.save-btn').classList.add('hidden');
-    ab.querySelector('.cancel-btn').classList.add('hidden');
-}
-
-function saveRow(id) {
-    savingId = id;
-    showModal('saveModal');
-}
-
-async function confirmSave() {
-    const id  = savingId;
-    const row = getRowEl(id);
-    if (!row) return;
-
-    const male         = parseInt(row.querySelector('.cell-male').textContent.trim())   || 0;
-    const female       = parseInt(row.querySelector('.cell-female').textContent.trim()) || 0;
-    const project_name = row.querySelector('.edit-project-input')?.value?.trim() ?? '';
-
-    closeSaveModal();
-
-    try {
-        const res  = await fetch(API, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ whip_id: id, male, female, project_name })
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-
-        // Update local data
-        const idx = allRows.findIndex(r => r.whip_id == id);
-        if (idx !== -1) {
-            allRows[idx].male         = male;
-            allRows[idx].female       = female;
-            allRows[idx].total        = male + female;
-            allRows[idx].project_name = project_name;
-        }
-
-        // Recalculate cards
-        const totals = calcTotals();
-        updateCards(totals);
-        renderTable();
-
-        // Flash green
-        setTimeout(() => {
-            const r = getRowEl(id);
-            if (r) {
-                r.style.transition = 'background-color 0.3s ease-out';
-                r.style.backgroundColor = '#dcfce7';
-                setTimeout(() => { r.style.backgroundColor = ''; r.style.transition = ''; }, 1500);
-            }
-        }, 50);
-
-    } catch (err) {
-        alert('Failed to save: ' + err.message);
-    }
 }
 
 // ─── Delete ───────────────────────────────────────────────────────────────────
 function deleteRow(id) {
     deletingId = id;
-    showModal('deleteModal');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('deleteModal').classList.remove('hidden');
+}
+
+function closeDeleteModal() {
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    document.getElementById('deleteModal').classList.add('hidden');
+    deletingId = null;
 }
 
 async function confirmDelete() {
-    const id = deletingId;
-    closeDeleteModal();
-
+    if (!deletingId) return;
     try {
-        const res  = await fetch(`${API}?id=${id}`, { method: 'DELETE' });
+        const res  = await fetch(`${API}?id=${deletingId}`, { method: 'DELETE' });
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        allRows = allRows.filter(r => r.whip_id != id);
-        updateCards(calcTotals());
+        allRows      = allRows.filter(r => r.whip_id != deletingId);
+        filteredRows = filteredRows.filter(r => r.whip_id != deletingId);
 
-        // Go back a page if current page is now empty
-        const totalPages = Math.max(1, Math.ceil(allRows.length / ROWS_PER_PAGE));
+        const totals = {
+            total:    allRows.length,
+            male:     allRows.filter(r => (r.sex||'').toLowerCase() === 'male').length,
+            female:   allRows.filter(r => (r.sex||'').toLowerCase() === 'female').length,
+            projects: new Set(allRows.map(r => r.project_id)).size,
+        };
+        updateCards(totals);
+
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / ROWS_PER_PAGE));
         if (currentPage > totalPages) currentPage = totalPages;
         renderTable();
 
     } catch (err) {
         alert('Failed to delete: ' + err.message);
-    }
-}
-
-// ─── Add Modal ────────────────────────────────────────────────────────────────
-function openAddModal() {
-    document.getElementById('addMonth').value       = '';
-    document.getElementById('addYear').value        = new Date().getFullYear();
-    document.getElementById('addMale').value        = '0';
-    document.getElementById('addFemale').value      = '0';
-    document.getElementById('addProjectName').value = '';
-    document.getElementById('addError').classList.add('hidden');
-    showModal('addModal');
-}
-
-function closeAddModal() {
-    hideModal('addModal');
-}
-
-async function submitAdd() {
-    const month        = document.getElementById('addMonth').value;
-    const year         = parseInt(document.getElementById('addYear').value);
-    const male         = parseInt(document.getElementById('addMale').value)   || 0;
-    const female       = parseInt(document.getElementById('addFemale').value) || 0;
-    const project_name = document.getElementById('addProjectName').value.trim();
-
-    const errEl = document.getElementById('addError');
-    if (!month || !year) {
-        errEl.textContent = 'Month and year are required.';
-        errEl.classList.remove('hidden');
-        return;
-    }
-    errEl.classList.add('hidden');
-
-    const btn = document.getElementById('addSubmitBtn');
-    btn.disabled = true;
-    btn.textContent = 'Saving…';
-
-    try {
-        const res  = await fetch(API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ month, year, male, female, project_name })
-        });
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-
-        closeAddModal();
-        await loadData();   // reload everything fresh
-
-    } catch (err) {
-        errEl.textContent = 'Error: ' + err.message;
-        errEl.classList.remove('hidden');
     } finally {
-        btn.disabled = false;
-        btn.textContent = 'Add Entry';
+        closeDeleteModal();
     }
 }
 
-// ─── Modal Helpers ────────────────────────────────────────────────────────────
-function showModal(id) {
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById(id).classList.remove('hidden');
-}
-function closeDeleteModal() {
-    hideModal('deleteModal');
-    deletingId = null;
-}
-function closeSaveModal() {
-    hideModal('saveModal');
-    savingId = null;
-}
-function hideModal(id) {
-    document.getElementById(id).classList.add('hidden');
-    // hide backdrop only if no other modal is open
-    const open = ['addModal','deleteModal','saveModal']
-        .filter(m => !document.getElementById(m).classList.contains('hidden'));
-    if (!open.length) document.getElementById('modalBackdrop').classList.add('hidden');
-}
+document.getElementById('modalBackdrop').addEventListener('click', closeDeleteModal);
 
-document.addEventListener('click', e => {
-    if (e.target === document.getElementById('modalBackdrop')) {
-        closeDeleteModal(); closeSaveModal(); closeAddModal();
-    }
-});
-
-// ─── Utilities ────────────────────────────────────────────────────────────────
-function calcTotals() {
-    const male     = allRows.reduce((s, r) => s + +r.male,   0);
-    const female   = allRows.reduce((s, r) => s + +r.female, 0);
-    return { total: male + female, male, female, projects: allRows.length };
-}
-
-function projectBadge(name) {
-    if (!name) return '<span class="text-gray-300 text-xs">—</span>';
-    return `<span class="inline-flex items-center gap-1 bg-blue-50 text-blue-600 text-xs px-2 py-1 rounded-lg font-medium">
-        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
-        </svg>
-        ${escHtml(name)}
-    </span>`;
-}
-
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 function escHtml(str) {
-    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function escAttr(str) {
-    return String(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    return String(str ?? '')
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-// Seed year dropdown then load
 (function init() {
     const sel  = document.getElementById('yearFilter');
     const year = new Date().getFullYear();

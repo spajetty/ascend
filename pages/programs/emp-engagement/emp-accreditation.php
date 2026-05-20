@@ -98,12 +98,17 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';?>
                     class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300" />
             </div>
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Establishment Type:</span>
+                <span class="text-sm text-gray-500">Est. Type:</span>
                 <select id="filterEstType" onchange="applyFilters()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    <option value="">All Establishment Types</option>
-                    <option value="manpower">Manpower</option>
-                    <option value="direct">Direct</option>
-                    <option value="direct (overseas)">Direct (Overseas)</option>
+                    <option value="">All Types</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Status:</span>
+                <select id="filterStatus" onchange="applyFilters()" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="">All</option>
+                    <option value="new">New</option>
+                    <option value="renew">Renew</option>
                 </select>
             </div>
 
@@ -255,6 +260,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';?>
             </button>
         </div>
 
+        <input type="hidden" id="editAccreditationId" />
         <input type="hidden" id="editCompanyId" />
 
         <div class="grid grid-cols-2 gap-4 mb-4">
@@ -342,7 +348,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';?>
 </div>
 
 <script>
-const API_URL = '/api/emp-accreditation-api.php';
+const API_URL = '/backend/emp engagement/show-emp-accreditation.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];   // full dataset from API
@@ -352,10 +358,12 @@ let deletingId   = null;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function estTypeBadge(type) {
+    if (!type || type.trim() === '') return `<span class="text-gray-400">—</span>`;
     const t = (type || '').toLowerCase();
-    if (t === 'manpower')         return `<span class="font-medium text-blue-500">Manpower</span>`;
-    if (t === 'direct (overseas)') return `<span class="font-medium text-teal-500">Direct (Overseas)</span>`;
-    return `<span class="font-medium text-green-500">Direct</span>`;
+    if (t === 'manpower')          return `<span class="font-medium text-blue-500">${type}</span>`;
+    if (t === 'direct (overseas)') return `<span class="font-medium text-teal-500">${type}</span>`;
+    if (t === 'direct')            return `<span class="font-medium text-green-500">${type}</span>`;
+    return `<span class="font-medium text-gray-600">${type}</span>`;
 }
 
 function accreditationBadge(val) {
@@ -407,6 +415,18 @@ async function loadData() {
             el.textContent = `Active Employers (${year})`;
         });
 
+        // Populate est_type dropdown dynamically from actual data
+        const estSel      = document.getElementById('filterEstType');
+        const prevEst     = estSel.value;
+        const uniqueTypes = [...new Set(
+            allRows.map(r => r.est_type).filter(v => v && v.trim() !== '')
+        )].sort();
+        estSel.innerHTML  = '<option value="">All Types</option>' +
+            uniqueTypes.map(t => `<option value="${t.toLowerCase()}">${t}</option>`).join('');
+        if (prevEst && uniqueTypes.some(t => t.toLowerCase() === prevEst)) {
+            estSel.value = prevEst;
+        }
+
         applyFilters();
     } catch (err) {
         document.getElementById('accreditationTbody').innerHTML =
@@ -418,11 +438,13 @@ async function loadData() {
 function applyFilters() {
     const query   = document.getElementById('searchCompany').value.toLowerCase().trim();
     const estType = document.getElementById('filterEstType').value.toLowerCase().trim();
+    const status  = document.getElementById('filterStatus').value.toLowerCase().trim();
 
     filteredRows = allRows.filter(r => {
-        const companyMatch  = !query   || r.company_name.toLowerCase().includes(query);
-        const estTypeMatch  = !estType || r.est_type.toLowerCase() === estType;
-        return companyMatch && estTypeMatch;
+        const companyMatch  = !query   || (r.company_name || '').toLowerCase().includes(query);
+        const estTypeMatch  = !estType || (r.est_type || '').toLowerCase() === estType;
+        const statusMatch   = !status  || (r.status || '').toLowerCase() === status;
+        return companyMatch && estTypeMatch && statusMatch;
     });
 
     currentPage = 1;
@@ -443,13 +465,13 @@ function renderPage() {
     } else {
         tbody.innerHTML = pageRows.map(r => `
             <tr class="border-b border-gray-50 hover:bg-gray-50">
-                <td class="px-4 py-3 text-gray-700 font-medium">${r.month} ${r.year}</td>
-                <td class="px-4 py-3">${accreditationBadge(r.accreditation)}</td>
-                <td class="px-4 py-3 text-gray-700">${r.company_name}</td>
+                <td class="px-4 py-3 text-gray-700 font-medium">${r.month_name} ${r.year}</td>
+                <td class="px-4 py-3">${accreditationBadge(r.status)}</td>
+                <td class="px-4 py-3 text-gray-700">${r.company_name || '—'}</td>
                 <td class="px-4 py-3">${estTypeBadge(r.est_type)}</td>
-                <td class="px-4 py-3 text-gray-600">${r.industry}</td>
-                <td class="px-4 py-3 text-gray-600">${r.city}</td>
-                <td class="px-4 py-3 text-center">${actionBtns(r.company_id)}</td>
+                <td class="px-4 py-3 text-gray-600">${r.industry || '—'}</td>
+                <td class="px-4 py-3 text-gray-600">${r.city || '—'}</td>
+                <td class="px-4 py-3 text-center">${actionBtns(r.accreditation_id)}</td>
             </tr>
         `).join('');
     }
@@ -506,10 +528,15 @@ async function submitAddEntry() {
     const errEl = document.getElementById('addError');
     errEl.classList.add('hidden');
 
+    const monthNamesAdd = ['January','February','March','April','May','June',
+                           'July','August','September','October','November','December'];
+    const addMonthVal = document.getElementById('addMonth').value;
+    const addMonthNum = monthNamesAdd.indexOf(addMonthVal) + 1;
+
     const payload = {
-        month:        document.getElementById('addMonth').value,
+        month:        addMonthNum,
         year:         parseInt(document.getElementById('addYear').value),
-        accreditation: document.getElementById('addAccreditation').value,
+        status:       document.getElementById('addAccreditation').value,
         est_type:     document.getElementById('addEstType').value,
         company_name: document.getElementById('addCompany').value.trim(),
         industry:     document.getElementById('addIndustry').value.trim(),
@@ -544,18 +571,19 @@ async function submitAddEntry() {
 
 // ── Edit Entry ────────────────────────────────────────────────────────────────
 function openEditModal(id) {
-    const row = allRows.find(r => r.company_id == id);
+    const row = allRows.find(r => r.accreditation_id == id);
     if (!row) return;
 
     document.getElementById('editError').classList.add('hidden');
-    document.getElementById('editCompanyId').value    = row.company_id;
-    document.getElementById('editMonth').value        = row.month;
-    document.getElementById('editYear').value         = row.year;
-    document.getElementById('editAccreditation').value = row.accreditation;
-    document.getElementById('editEstType').value      = row.est_type;
-    document.getElementById('editCompany').value      = row.company_name;
-    document.getElementById('editIndustry').value     = row.industry;
-    document.getElementById('editCity').value         = row.city;
+    document.getElementById('editAccreditationId').value  = row.accreditation_id;
+    document.getElementById('editCompanyId').value        = row.company_id;
+    document.getElementById('editMonth').value            = row.month_name;
+    document.getElementById('editYear').value             = row.year;
+    document.getElementById('editAccreditation').value    = row.status;
+    document.getElementById('editEstType').value          = row.est_type || '';
+    document.getElementById('editCompany').value          = row.company_name || '';
+    document.getElementById('editIndustry').value         = row.industry || '';
+    document.getElementById('editCity').value             = row.city || '';
 
     document.getElementById('modalBackdrop').classList.remove('hidden');
     document.getElementById('editModal').classList.remove('hidden');
@@ -570,11 +598,17 @@ async function submitEditEntry() {
     const errEl = document.getElementById('editError');
     errEl.classList.add('hidden');
 
+    const monthNames = ['January','February','March','April','May','June',
+                        'July','August','September','October','November','December'];
+    const monthVal = document.getElementById('editMonth').value;
+    const monthNum = monthNames.indexOf(monthVal) + 1;
+
     const payload = {
+        accreditation_id: parseInt(document.getElementById('editAccreditationId').value),
         company_id:   parseInt(document.getElementById('editCompanyId').value),
-        month:        document.getElementById('editMonth').value,
+        month:        monthNum,
         year:         parseInt(document.getElementById('editYear').value),
-        accreditation: document.getElementById('editAccreditation').value,
+        status:       document.getElementById('editAccreditation').value,
         est_type:     document.getElementById('editEstType').value,
         company_name: document.getElementById('editCompany').value.trim(),
         industry:     document.getElementById('editIndustry').value.trim(),

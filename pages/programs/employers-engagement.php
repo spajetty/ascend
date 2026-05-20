@@ -148,9 +148,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
 <script>
 const YEAR         = new Date().getFullYear();
-const ACCRED_API   = `/api/emp-accreditation-api.php?year=${YEAR}`;
-const WHIP_API     = `/api/whip-api.php?year=${YEAR}`;
-const PREVIEW_ROWS = 3;
+const ACCRED_API   = `/backend/emp engagement/show-emp-accreditation.php?year=${YEAR}`;
+const WHIP_API     = `/backend/emp engagement/show-whip.php?year=${YEAR}`;
+const PREVIEW_ROWS = 5;
 
 function clearLoading(tbodyId, colspan, msg = 'No data available.') {
     document.getElementById(tbodyId).innerHTML =
@@ -200,42 +200,32 @@ function renderAccreditation(data) {
         return;
     }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const rows   = data.rows.slice(0, PREVIEW_ROWS);
     const totals = data.totals;
 
-    // Update subtitle with new/renew counts for the current year
     document.getElementById('accred-subtitle').innerHTML =
         `<span class="text-green-600 font-semibold">${totals.new} New</span>`  +
         `<span class="mx-1">·</span>` +
         `<span class="text-orange-500 font-semibold">${totals.renewed} Renew</span>`;
 
-    const estTypeColor = {
-        'Manpower':          'text-green-600',
-        'Direct (Overseas)': 'text-orange-500',
-        'Direct':            'text-blue-500',
-    };
-
-    const accredBadge = type => type === 'new'
+    const accredBadge = status => status === 'new'
         ? `<span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">New</span>`
         : `<span class="bg-orange-100 text-orange-600 text-xs font-semibold px-3 py-1 rounded-full">Renew</span>`;
 
-    let html = '';
-    rows.forEach(r => {
-        const estColor = estTypeColor[r.est_type] ?? 'text-gray-600';
-        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 border-l border-gray-100">${accredBadge(r.accreditation)}</td>
+    tbody.innerHTML = rows.map(r => `
+        <tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month_name).toUpperCase()} ${r.year}</td>
+            <td class="px-4 py-3 border-l border-gray-100">${accredBadge(r.status)}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.company_name)}</td>
-            <td class="px-4 py-3 ${estColor} font-medium border-l border-gray-100">${escHtml(r.est_type)}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.industry)}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.city)}</td>
-        </tr>`;
-    });
-
-    tbody.innerHTML = html;
+            <td class="px-4 py-3 text-gray-600 font-medium border-l border-gray-100">${escHtml(r.est_type || '—')}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.industry || '—')}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.city || '—')}</td>
+        </tr>`).join('');
 }
 
 // ─── WHIP ─────────────────────────────────────────────────────────────────────
+// The WHIP API now returns individual worker rows (one row per hired worker).
+// For the summary preview we show PREVIEW_ROWS workers with name, sex, project.
 function renderWhip(data) {
     const tbody = document.getElementById('whip-tbody');
 
@@ -244,39 +234,40 @@ function renderWhip(data) {
         return;
     }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
     const totals = data.totals;
-
     document.getElementById('whip-subtitle').textContent = `${totals.total} Total`;
 
-    // Running totals for the TOTAL row (full dataset, not just preview)
-    const allRows = data.rows;
-    const totM = allRows.reduce((s, r) => s + +r.male,   0);
-    const totF = allRows.reduce((s, r) => s + +r.female, 0);
-    const totT = totM + totF;
-
-    let html = '';
-    rows.forEach(r => {
-        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.male}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.female}</td>
-            <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${r.total}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_name || '—')}</td>
-        </tr>`;
+    // Aggregate male/female/total per month+project for a compact preview
+    const grouped = {};
+    data.rows.forEach(r => {
+        const key = `${r.month_name} ${r.year}||${r.project_title || '—'}`;
+        if (!grouped[key]) grouped[key] = { month: `${r.month_name} ${r.year}`, project: r.project_title || '—', male: 0, female: 0 };
+        if ((r.sex || '').toLowerCase() === 'male')   grouped[key].male++;
+        if ((r.sex || '').toLowerCase() === 'female') grouped[key].female++;
     });
 
-    html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
-        <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totM}</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totF}</td>
-        <td class="px-4 py-3 border-l border-gray-100">
-            <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totT}</span>
-        </td>
-        <td class="px-4 py-3 text-gray-400 border-l border-gray-100">—</td>
-    </tr>`;
+    const groupedRows = Object.values(grouped).slice(0, PREVIEW_ROWS);
+    const totM = totals.male;
+    const totF = totals.female;
+    const totT = totals.total;
 
-    tbody.innerHTML = html;
+    tbody.innerHTML = groupedRows.map(r => `
+        <tr class="border-b border-gray-50 hover:bg-gray-50">
+            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.male}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.female}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${r.male + r.female}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project)}</td>
+        </tr>`).join('') +
+        `<tr class="bg-gray-50 border-t-2 border-gray-200">
+            <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totM}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totF}</td>
+            <td class="px-4 py-3 border-l border-gray-100">
+                <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totT}</span>
+            </td>
+            <td class="px-4 py-3 text-gray-400 border-l border-gray-100">—</td>
+        </tr>`;
 }
 </script>
 
