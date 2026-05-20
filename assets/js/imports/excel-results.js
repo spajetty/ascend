@@ -2,6 +2,7 @@
 // rollback confirm modal, CSV download, and panel show/hide.
 
 import { showToast } from '../toast.js';
+import { runWithButtonLoading } from '../loading.js';
 import { state } from './excel-state.js';
 import { formatColumnName } from './common.js';
 
@@ -477,40 +478,22 @@ export function initImportResultsUi() {
                 return;
             }
             openRollbackConfirmModal(() => {
-                rollbackBtn.disabled = true;
-                rollbackBtn.innerHTML = `
-                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                        <path d="M3 3v5h5"/>
-                    </svg>
-                    Rolling back…`;
-
-                fetch('../../backend/import/undo_import.php', {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ undoToken: state.latestUndoToken }),
-                })
-                    .then(async res => {
-                        const data = JSON.parse(await res.text());
-                        if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
-                        return data;
-                    })
-                    .then(data => {
-                        state.latestUndoToken = null;
-                        state.latestImportResultsData = null;
-                        showImportFormView();
-                        showToast(data.message ?? 'Import rolled back successfully.', 'success');
-                    })
-                    .catch(err => {
-                        showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
-                        rollbackBtn.disabled = false;
-                        rollbackBtn.innerHTML = `
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                                <path d="M3 3v5h5"/>
-                            </svg>
-                            Rollback Import`;
+                runWithButtonLoading(rollbackBtn, async () => {
+                    const res = await fetch('../../backend/import/undo_import.php', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ undoToken: state.latestUndoToken }),
                     });
+                    const data = JSON.parse(await res.text());
+                    if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
+
+                    state.latestUndoToken = null;
+                    state.latestImportResultsData = null;
+                    showImportFormView();
+                    showToast(data.message ?? 'Import rolled back successfully.', 'success');
+                }, { label: 'Rolling back…' }).catch(err => {
+                    showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
+                });
             });
         });
     }

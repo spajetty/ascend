@@ -3,6 +3,7 @@
 import { previewTableRows, previewTableHeaders } from './common.js';
 import { state } from './excel-state.js';
 import { showToast } from '../toast.js';
+import { runWithButtonLoading, setButtonLoading } from '../loading.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PREVIEW_PAGE_SIZE = 25;
@@ -139,39 +140,46 @@ export function renderPreviewPage(page = 1) {
     });
 }
 
-export async function revalidateCurrentPreview() {
+export async function revalidateCurrentPreview(options = {}) {
     const program = document.getElementById('excelProgram')?.value ?? '';
     if (!program || !state.parsedExcelData.length) return;
 
-    const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
-    const gipCategory = document.getElementById('gipCategory')?.value ?? '';
-    const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
+    const confirmBtn = options.button ?? document.getElementById('confirmImport');
+    if (confirmBtn && !options.skipButtonLoading) setButtonLoading(confirmBtn, true, { label: 'Validating…' });
 
-    const res = await fetch('../../backend/import/validate_preview.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            program,
-            data: state.parsedExcelData,
-            wiirpCategory,
-            gipCategory,
-            jobFairEvent,
-        }),
-    });
-
-    const raw = await res.text();
-    let result;
     try {
-        result = JSON.parse(raw);
-    } catch {
-        const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
-        throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
-    }
-    if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+        const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+        const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+        const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
 
-    state.parsedExcelData = result.data;
-    state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
-    showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
+        const res = await fetch('../../backend/import/validate_preview.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                program,
+                data: state.parsedExcelData,
+                wiirpCategory,
+                gipCategory,
+                jobFairEvent,
+            }),
+        });
+
+        const raw = await res.text();
+        let result;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+            throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+        }
+        if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+
+        state.parsedExcelData = result.data;
+        state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
+        showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
+    } finally {
+        if (confirmBtn && !options.skipButtonLoading) setButtonLoading(confirmBtn, false);
+    }
 }
 
 export function hasJobFairCompanySuggestion(row) {
@@ -241,9 +249,11 @@ async function acceptCompanySuggestion(rowIndex) {
     row.status_message = 'Accepted company suggestion. Revalidating...';
     row._sys_skip = false;
 
+    const acceptBtn = document.querySelector(`[data-accept-company-suggestion][data-preview-row-index="${index}"]`);
+
     try {
         showToast(`Accepted suggestion: ${suggestion}. Revalidating rows...`, 'info');
-        await revalidateCurrentPreview();
+        await runWithButtonLoading(acceptBtn, () => revalidateCurrentPreview({ skipButtonLoading: true }), { label: 'Applying…' });
 
         const refreshedRow = state.parsedExcelData[index];
         if (refreshedRow && isUnresolvedJobFairCompanyRow(refreshedRow)) {

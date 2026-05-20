@@ -1,7 +1,7 @@
-// ─── job-fair-modal.js ────────────────────────────────────────────────────────
 // Job Fair event + company participants in one modal (two sections, one save).
 
 import { showToast } from '../toast.js';
+import { runWithButtonLoading } from '../loading.js';
 
 const esc = v => String(v ?? '')
     .replace(/&/g, '&amp;')
@@ -297,11 +297,6 @@ async function _handleSave(modal) {
     }
 
     const saveBtn = modal.querySelector('#jfSaveBtn');
-    const defaultLabel = saveBtn?.innerHTML ?? SAVE_BTN_HTML;
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Saving…';
-    }
 
     const payload = {
         company_ids: _addedCompanies.map(c => c.company_id),
@@ -315,36 +310,34 @@ async function _handleSave(modal) {
     }
 
     try {
-        const res = await fetch('../../backend/import/save_job_fair_event.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error ?? 'Unknown error');
+        await runWithButtonLoading(saveBtn, async () => {
+            const res = await fetch('../../backend/import/save_job_fair_event.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (!data.success) throw new Error(data.error ?? 'Unknown error');
 
-        _eventId = data.jobfairevent_id;
-        _eventDate = data.date_start ?? date;
+            _eventId = data.jobfairevent_id;
+            _eventDate = data.date_start ?? date;
 
-        showToast(
-            isParticipantsOnly
-                ? (data.participants?.length ?? _addedCompanies.length) + ' company participant(s) saved!'
-                : 'Job fair event and participants saved!',
-            'success'
-        );
-        _closeModal();
-        _onDoneCallback?.({
-            eventId: _eventId,
-            eventDate: _eventDate,
-            participants: data.participants ?? _addedCompanies,
-        });
+            showToast(
+                isParticipantsOnly
+                    ? (data.participants?.length ?? _addedCompanies.length) + ' company participant(s) saved!'
+                    : 'Job fair event and participants saved!',
+                'success'
+            );
+            _closeModal();
+            _onDoneCallback?.({
+                eventId: _eventId,
+                eventDate: _eventDate,
+                participants: data.participants ?? _addedCompanies,
+            });
+        }, { label: 'Saving…' });
     } catch (err) {
         showToast('Failed to save: ' + err.message, 'error');
-    } finally {
-        if (saveBtn) {
-            saveBtn.disabled = _addedCompanies.length === 0;
-            saveBtn.innerHTML = defaultLabel;
-        }
+        if (saveBtn && _addedCompanies.length === 0) saveBtn.disabled = true;
     }
 }
 

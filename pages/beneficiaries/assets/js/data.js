@@ -84,6 +84,11 @@ function mapRow(b) {
  * @param {object} params - Keys: page, limit, search, section, program, status
  */
 async function fetchBeneficiaries(params = {}) {
+  const tableBody = document.getElementById('tableBody');
+  if (window.AscendLoading) {
+    window.AscendLoading.setContainerLoading(tableBody, true, 'Loading beneficiaries…');
+  }
+
   try {
     // Build query string from non-empty params only
     const qs = new URLSearchParams(
@@ -107,8 +112,16 @@ async function fetchBeneficiaries(params = {}) {
 
     updateStatCards(beneficiaryStats);
 
+    if (tableBody && window.AscendLoading) {
+      window.AscendLoading.releaseContainerLoading(tableBody);
+    }
+
   } catch (err) {
     console.error('[data.js] Failed to fetch beneficiaries:', err);
+    if (tableBody) {
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted);">Failed to load beneficiaries.</td></tr>';
+      if (window.AscendLoading) window.AscendLoading.releaseContainerLoading(tableBody);
+    }
   }
 }
 

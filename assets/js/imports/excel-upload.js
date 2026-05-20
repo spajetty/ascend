@@ -748,6 +748,9 @@ export function handleFile(file) {
             document.getElementById('previewBody').innerHTML  = '';
             document.getElementById('dataPreview').classList.remove('hidden');
 
+            const browseBtn = document.getElementById('excelBrowseBtn');
+            if (browseBtn) browseBtn.disabled = true;
+
             fetch('../../backend/import/validate_preview.php', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -818,6 +821,9 @@ export function handleFile(file) {
                     state.unknownEmployers = [];
                     document.getElementById('dataPreview').classList.add('hidden');
                     resetPreviewPaginationState();
+                })
+                .finally(() => {
+                    if (browseBtn) browseBtn.disabled = false;
                 });
         }
 
