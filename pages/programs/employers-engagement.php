@@ -239,7 +239,9 @@ function renderAccreditation(data) {
     let html = '';
     rows.forEach(r => {
         const estColor = estTypeColor[r.est_type] ?? 'text-gray-600';
-        const mo = fmtMonth(r.date_hired);
+        const mo = r.month && r.year
+            ? `${String(r.month).toUpperCase()} ${r.year}`
+            : '—';
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
             <td class="px-6 py-3 text-gray-800 font-semibold">${mo}</td>
             <td class="px-4 py-3">${accredBadge(r.accreditation)}</td>
