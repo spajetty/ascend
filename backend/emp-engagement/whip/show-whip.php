@@ -60,16 +60,12 @@ try {
     // ─────────────────────────────────────────
     // GET
     // ─────────────────────────────────────────
-
     if ($method === 'GET') {
 
-        $requestedYear = isset($_GET['year'])
-            ? (int) $_GET['year']
-            : null;
+        $yearFilter = $_GET['year'] ?? 'all';
 
-        // AVAILABLE YEARS — derived from date_hired
+        // GET AVAILABLE YEARS
         $years = [];
-
         $yearRes = $conn->query("
             SELECT DISTINCT YEAR(date_hired) AS yr
             FROM whip
@@ -81,15 +77,11 @@ try {
             $years[] = (int) $row['yr'];
         }
 
-        // Use requested year only if it exists in database
-        // otherwise fallback to latest available year
-        $year = $requestedYear && in_array($requestedYear, $years, true)
-            ? $requestedYear
-            : ($years[0] ?? (int) date('Y'));
+        // ─────────────────────────────────────────
+        // BUILD QUERY (ALL YEARS FIX HERE)
+        // ─────────────────────────────────────────
 
-        // FETCH WHIP ENTRIES
-        // Join beneficiaries for name/sex/city and projects for project details
-        $stmt = $conn->prepare("
+        $sql = "
             SELECT
                 w.whip_id,
                 w.benef_id,
@@ -123,21 +115,28 @@ try {
                 p.unfilled
 
             FROM whip w
+            LEFT JOIN beneficiaries b ON w.benef_id = b.benef_id
+            LEFT JOIN projects p ON w.project_id = p.project_id
+        ";
 
-            LEFT JOIN beneficiaries b
-                ON w.benef_id = b.benef_id
+        $params = [];
+        $types  = "";
 
-            LEFT JOIN projects p
-                ON w.project_id = p.project_id
+        if ($yearFilter !== 'all' && !empty($yearFilter)) {
+            $sql .= " WHERE YEAR(w.date_hired) = ? ";
+            $params[] = (int)$yearFilter;
+            $types .= "i";
+        }
 
-            WHERE YEAR(w.date_hired) = ?
+        $sql .= " ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC";
 
-            ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC
-        ");
+        $stmt = $conn->prepare($sql);
 
-        $stmt->bind_param("i", $year);
+        if (!empty($params)) {
+            $stmt->bind_param($types, ...$params);
+        }
+
         $stmt->execute();
-
         $result = $stmt->get_result();
 
         $rows        = [];
@@ -147,26 +146,14 @@ try {
 
         while ($row = $result->fetch_assoc()) {
 
-            // Cast numeric fields
-            $row['budget']                  = $row['budget'] !== null ? (float) $row['budget'] : null;
-            $row['persons_from_locality'] = isset($row['persons_from_locality'])
-                ? (int)$row['persons_from_locality']
-                : 0;
-
-            $row['is_legitimate_contractor'] = isset($row['is_legitimate_contractor'])
-                ? (bool)$row['is_legitimate_contractor']
-                : false;
-
-            $row['filled'] = isset($row['filled'])
-                ? (int)$row['filled']
-                : 0;
-
-            $row['unfilled'] = isset($row['unfilled'])
-                ? (int)$row['unfilled']
-                : 0;
+            $row['budget'] = $row['budget'] !== null ? (float)$row['budget'] : null;
+            $row['persons_from_locality'] = (int)($row['persons_from_locality'] ?? 0);
+            $row['is_legitimate_contractor'] = (bool)($row['is_legitimate_contractor'] ?? false);
+            $row['filled'] = (int)($row['filled'] ?? 0);
+            $row['unfilled'] = (int)($row['unfilled'] ?? 0);
 
             $sex = strtolower($row['sex'] ?? '');
-            if ($sex === 'male')   $maleCount++;
+            if ($sex === 'male') $maleCount++;
             if ($sex === 'female') $femaleCount++;
 
             if (!empty($row['project_id'])) {
@@ -181,52 +168,42 @@ try {
             : (int) date('Y');
 
         json_ok([
-            'rows'         => $rows,
-            'years'        => $years,
+            'rows' => $rows,
+            'years' => $years,
             'default_year' => $defaultYear,
             'totals' => [
-                'total'    => $maleCount + $femaleCount,
-                'male'     => $maleCount,
-                'female'   => $femaleCount,
+                'total' => $maleCount + $femaleCount,
+                'male' => $maleCount,
+                'female' => $femaleCount,
                 'projects' => count($projectSet),
             ]
         ]);
     }
 
     // ─────────────────────────────────────────
-    // PUT  — update position and/or date_hired
+    // PUT
     // ─────────────────────────────────────────
-
     if ($method === 'PUT') {
 
         $body = json_decode(file_get_contents('php://input'), true);
 
-        $whip_id = isset($body['whip_id']) ? (int) $body['whip_id'] : 0;
+        $whip_id = (int)($body['whip_id'] ?? 0);
         if (!$whip_id) json_error('Missing whip_id');
 
-        $position   = isset($body['position'])   ? trim($body['position'])   : null;
-        $date_hired = isset($body['date_hired'])  ? trim($body['date_hired']) : null;
+        $position   = trim($body['position'] ?? '');
+        $date_hired = trim($body['date_hired'] ?? '');
 
-        // Validate date format if provided
         if ($date_hired && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_hired)) {
-            json_error('Invalid date_hired format. Use YYYY-MM-DD.');
+            json_error('Invalid date format');
         }
 
         $stmt = $conn->prepare("
             UPDATE whip
-            SET
-                position   = ?,
-                date_hired = ?
+            SET position = ?, date_hired = ?
             WHERE whip_id = ?
         ");
 
-        $stmt->bind_param(
-            "ssi",
-            $position,
-            $date_hired,
-            $whip_id
-        );
-
+        $stmt->bind_param("ssi", $position, $date_hired, $whip_id);
         $stmt->execute();
 
         json_ok(['updated' => $stmt->affected_rows]);
@@ -235,15 +212,13 @@ try {
     // ─────────────────────────────────────────
     // DELETE
     // ─────────────────────────────────────────
-
     if ($method === 'DELETE') {
 
-        $whip_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
+        $whip_id = (int)($_GET['id'] ?? 0);
         if (!$whip_id) json_error('Missing id');
 
         $stmt = $conn->prepare("
-            DELETE FROM whip
-            WHERE whip_id = ?
+            DELETE FROM whip WHERE whip_id = ?
         ");
 
         $stmt->bind_param("i", $whip_id);
@@ -258,6 +233,6 @@ try {
 
     echo json_encode([
         'success' => false,
-        'error'   => $e->getMessage()
+        'error' => $e->getMessage()
     ]);
 }

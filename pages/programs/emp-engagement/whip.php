@@ -243,24 +243,16 @@ async function loadData(year) {
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        const res  = await fetch(`${API_URL}?year=${year}`);
+        const url = year === 'all'
+            ? API_URL
+            : `${API_URL}?year=${year}`;
+
+        const res = await fetch(url);
         const json = await res.json();
         console.log(json);
         if (!json.success) throw new Error(json.error);
 
         const { rows, totals, years } = json.data;
-
-        // Populate year dropdown (only on first load)
-        const sel = document.getElementById('yearSelect');
-        if (sel.options.length === 0) {
-            years.forEach(y => {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.textContent = y;
-                if (y === year) opt.selected = true;
-                sel.appendChild(opt);
-            });
-        }
 
         // Update cards
         document.getElementById('cardTotal').textContent    = totals.total;
@@ -722,7 +714,7 @@ document.addEventListener('click', (e) => {
 
 // ─── Year change ──────────────────────────────────────────────────────────────
 document.getElementById('yearSelect').addEventListener('change', function () {
-    loadData(parseInt(this.value));
+    loadData(this.value);
 });
 
 async function initializePage() {
@@ -732,9 +724,28 @@ async function initializePage() {
 
         if (!json.success) throw new Error(json.error);
 
-        const defaultYear = json.data.default_year || new Date().getFullYear();
+        const years = json.data.years || [];
 
-        await loadData(defaultYear);
+        // Populate dropdown
+        const sel = document.getElementById('yearSelect');
+
+        // Add ALL YEARS option first
+        const allOpt = document.createElement('option');
+        allOpt.value = 'all';
+        allOpt.textContent = 'All Years';
+        allOpt.selected = true;
+        sel.appendChild(allOpt);
+
+        // Add years
+        years.forEach(y => {
+            const opt = document.createElement('option');
+            opt.value = y;
+            opt.textContent = y;
+            sel.appendChild(opt);
+        });
+
+        // Load ALL records initially
+        await loadData('all');
 
     } catch (err) {
         console.error(err);
