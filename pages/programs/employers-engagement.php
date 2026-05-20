@@ -149,7 +149,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script>
 const YEAR         = new Date().getFullYear();
 const ACCRED_API   = `/backend/emp-engagement/emp-accred/show-employers.php?year=${YEAR}`;
-const WHIP_API     = `/backend/emp-engagement/whip/show-whip.php?year=${YEAR}`;
+const WHIP_API     = `/backend/emp-engagement/whip/show-whip.php?year=all`;
 const PREVIEW_ROWS = 3;
 
 function clearLoading(tbodyId, colspan, msg = 'No data available.') {
@@ -159,6 +159,23 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 
 function escHtml(s) {
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function computeRowGender(rows) {
+    return rows.map(r => {
+        const sex = (r.sex || '').toLowerCase();
+
+        const date = r.date_hired ? new Date(r.date_hired) : null;
+
+        return {
+            ...r,
+            month: date ? date.toLocaleString('default', { month: 'short' }) : '—',
+            year: date ? date.getFullYear() : '—',
+            male: sex === 'male' ? 1 : 0,
+            female: sex === 'female' ? 1 : 0,
+            total: 1
+        };
+    });
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
@@ -200,7 +217,7 @@ function renderAccreditation(data) {
         return;
     }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const rows = computeRowGender(data.rows).slice(-PREVIEW_ROWS);
     const totals = data.totals;
 
     // Update subtitle with new/renew counts for the current year
@@ -223,7 +240,7 @@ function renderAccreditation(data) {
     rows.forEach(r => {
         const estColor = estTypeColor[r.est_type] ?? 'text-gray-600';
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()} ${r.year}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
             <td class="px-4 py-3 border-l border-gray-100">${accredBadge(r.accreditation)}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.company_name)}</td>
             <td class="px-4 py-3 ${estColor} font-medium border-l border-gray-100">${escHtml(r.est_type)}</td>
@@ -244,13 +261,13 @@ function renderWhip(data) {
         return;
     }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
+    const rows = computeRowGender(data.rows).slice(-PREVIEW_ROWS);
     const totals = data.totals;
 
     document.getElementById('whip-subtitle').textContent = `${totals.total} Total`;
 
     // Running totals for the TOTAL row (full dataset, not just preview)
-    const allRows = data.rows;
+    const allRows = computeRowGender(data.rows);
     const totM = allRows.reduce((s, r) => s + +r.male,   0);
     const totF = allRows.reduce((s, r) => s + +r.female, 0);
     const totT = totM + totF;
@@ -258,8 +275,8 @@ function renderWhip(data) {
     let html = '';
     rows.forEach(r => {
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${escHtml(r.month).toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_name || '—')}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold text-xs">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
+            <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${escHtml(r.project_title || '—')}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.male}</td>
             <td class="px-4 py-3 text-gray-600 border-l border-gray-100">${r.female}</td>
             <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${r.total}</td>
@@ -268,12 +285,12 @@ function renderWhip(data) {
 
     html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
         <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">—</td>
         <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totM}</td>
         <td class="px-4 py-3 text-gray-700 font-semibold border-l border-gray-100">${totF}</td>
         <td class="px-4 py-3 border-l border-gray-100">
             <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totT}</span>
         </td>
-        <td class="px-4 py-3 text-gray-400 border-l border-gray-100">—</td>
     </tr>`;
 
     tbody.innerHTML = html;
