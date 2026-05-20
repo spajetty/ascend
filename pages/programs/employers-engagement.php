@@ -148,8 +148,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
 <script>
 const YEAR         = new Date().getFullYear();
-const ACCRED_API   = `/api/emp-accreditation-api.php?year=${YEAR}`;
-const WHIP_API     = `/api/whip-api.php?year=${YEAR}`;
+const ACCRED_API   = `/backend/emp-engagement/emp-accred/show-employers.php?year=${YEAR}`;
+const WHIP_API     = `/backend/emp-engagement/whip/show-whip.php?year=${YEAR}`;
 const PREVIEW_ROWS = 3;
 
 function clearLoading(tbodyId, colspan, msg = 'No data available.') {

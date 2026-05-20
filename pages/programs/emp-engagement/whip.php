@@ -183,7 +183,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
-const API = '/api/whip-api.php';
+const API = '/backend/emp-engagement/whip/show-whip.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];   // full dataset from API
