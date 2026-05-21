@@ -9,7 +9,16 @@ require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    .thin-scroll::-webkit-scrollbar { height: 3px !important; }
+    .thin-scroll::-webkit-scrollbar-track { background: #f1f5f9 !important; border-radius: 999px; }
+    .thin-scroll::-webkit-scrollbar-thumb { background: #cbd5e1 !important; border-radius: 999px; }
+    .thin-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8 !important; }
+
+    .thin-scroll { scrollbar-width: thin !important; scrollbar-color: #cbd5e1 #f1f5f9 !important; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-full overflow-x-hidden">
     <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>
 
     <div class="px-6 md:px-8 pt-6">
@@ -23,13 +32,13 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-3 md:px-8 py-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
 
             <!-- Total Accreditations -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="min-w-0 bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
                     <span class="text-2xl font-bold text-gray-800" id="card-total-accred">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
@@ -42,7 +51,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- New vs Renewed -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
+            <div class="min-w-0 bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
                     <div class="flex flex-wrap items-end gap-x-2 gap-y-0.5">
                         <span class="text-2xl font-bold text-gray-800" id="card-new">—</span>
@@ -61,7 +70,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- Workers Hired (WHIP) -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="min-w-0 bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
                     <span class="text-2xl font-bold text-gray-800" id="card-workers-hired">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
@@ -74,7 +83,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- Infrastructure Projects (WHIP) -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="min-w-0 bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <span class="text-2xl font-bold text-gray-800" id="card-projects">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
@@ -93,7 +102,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <div class="bg-gradient-to-r from-green-50 to-teal-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Employers Accreditation</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto w-full max-w-full thin-scroll">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -120,7 +129,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <div class="bg-gradient-to-r from-orange-50 to-red-50 px-6 py-4 border-b border-gray-100">
                 <h2 class="font-bold text-gray-800 text-base">Workers Hiring for Infrastructure Projects</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto thin-scroll">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
