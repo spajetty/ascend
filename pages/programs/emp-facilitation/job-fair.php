@@ -9,10 +9,14 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    body.modal-open { overflow: hidden; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen min-w-0 overflow-hidden">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/employment-facilitation.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,57 +27,57 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-4 md:px-8 pt-6 pb-24 md:pb-6 space-y-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-vacancies">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-vacancies">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Job Vacancies</span>
+                <span class="text-xs text-gray-500 leading-tight">Job Vacancies</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-employers">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-employers">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Employers</span>
+                <span class="text-xs text-gray-500 leading-tight">Employers</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-interviewed">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-interviewed">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Interviewed</span>
+                <span class="text-xs text-gray-500 leading-tight">Interviewed</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-qualified">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-qualified">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Qualified</span>
+                <span class="text-xs text-gray-500 leading-tight">Qualified</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-placed">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-placed">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/>
@@ -81,63 +85,68 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500">Placed / HOTS</span>
+                <span class="text-xs text-gray-500 leading-tight">Placed / HOTS</span>
             </div>
         </div>
 
         <!-- Filters + Import button -->
-        <div class="flex flex-wrap items-center gap-3 mb-4">
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Year:</span>
-                <select id="yearFilter" onchange="loadData()"
-                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
-                </select>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Month:</span>
-                <select id="monthFilter" onchange="applyFilters()"
-                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
-                    <option value="">All Months</option>
-                    <option value="1">January</option>
-                    <option value="2">February</option>
-                    <option value="3">March</option>
-                    <option value="4">April</option>
-                    <option value="5">May</option>
-                    <option value="6">June</option>
-                    <option value="7">July</option>
-                    <option value="8">August</option>
-                    <option value="9">September</option>
-                    <option value="10">October</option>
-                    <option value="11">November</option>
-                    <option value="12">December</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-1.5">
-                <span class="text-sm text-gray-500">Type:</span>
-                <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
-                    <button id="filterAll"      onclick="setTypeFilter('')"         class="px-3 py-1.5 bg-teal-500 text-white font-medium transition-colors">All</button>
-                    <button id="filterLocal"    onclick="setTypeFilter('LOCAL')"    class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors border-l border-gray-200">Local</button>
-                    <button id="filterOverseas" onclick="setTypeFilter('OVERSEAS')" class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors border-l border-gray-200">Overseas</button>
+        <div class="flex flex-col gap-2 mb-4">
+            <!-- Row 1: Year + Month + Type filters -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Year:</span>
+                    <select id="yearFilter" onchange="loadData()"
+                            class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Month:</span>
+                    <select id="monthFilter" onchange="applyFilters()"
+                            class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <option value="">All Months</option>
+                        <option value="1">January</option>
+                        <option value="2">February</option>
+                        <option value="3">March</option>
+                        <option value="4">April</option>
+                        <option value="5">May</option>
+                        <option value="6">June</option>
+                        <option value="7">July</option>
+                        <option value="8">August</option>
+                        <option value="9">September</option>
+                        <option value="10">October</option>
+                        <option value="11">November</option>
+                        <option value="12">December</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Type:</span>
+                    <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
+                        <button id="filterAll"      onclick="setTypeFilter('')"         class="px-3 py-1.5 bg-teal-500 text-white font-medium transition-colors">All</button>
+                        <button id="filterLocal"    onclick="setTypeFilter('LOCAL')"    class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors border-l border-gray-200">Local</button>
+                        <button id="filterOverseas" onclick="setTypeFilter('OVERSEAS')" class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors border-l border-gray-200">Overseas</button>
+                    </div>
                 </div>
             </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchCompany" placeholder="Search company…" oninput="filterTable()"
-                       class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"/>
+            <!-- Row 2: Search -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="searchCompany" placeholder="Search company…" oninput="filterTable()"
+                           class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"/>
+                </div>
             </div>
-
         </div>
 
         <!-- Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 class="font-bold text-gray-800 text-base">Job Fair</h2>
+            <div class="bg-gradient-to-r from-blue-50 to-cyan-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Job Fair</h2>
                 <span id="activeFilterBadge" class="hidden text-xs font-medium px-2.5 py-1 rounded-full bg-teal-100 text-teal-700"></span>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs" id="jobFairTable">
+            <div style="overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6; -webkit-overflow-scrolling: touch; width: 100%; max-width: 100%;" class="[&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full">
+                <table class="w-full text-xs min-w-[1400px]" id="jobFairTable">
                     <thead>
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-4 py-2 text-gray-500 font-medium w-24" rowspan="2">MONTH</th>
@@ -202,7 +211,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
                 <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
