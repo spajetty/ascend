@@ -44,9 +44,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Accredited Employers -->
             <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-xl p-5 shadow-md flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-red-100 mb-1 font-medium uppercase tracking-wide">Accredited Employers</p>
-                    <h3 class="text-3xl font-bold text-white">856</h3>
-                    <p class="text-xs text-red-100 mt-1">↑ +5.2% from last month</p>
+                    <p class="text-xs text-red-100 mb-3 font-medium uppercase tracking-wide">Accredited Employers</p>
+                    <h3 class="text-4xl font-bold text-white">856</h3>
                 </div>
                 <div class="bg-white/20 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -56,9 +55,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Active Job Vacancies -->
             <div class="bg-white rounded-xl p-5 shadow-md flex items-start justify-between border border-gray-100">
                 <div>
-                    <p class="text-xs text-gray-500 mb-1 font-medium uppercase tracking-wide">Active Job Vacancies</p>
-                    <h3 class="text-3xl font-bold text-gray-800">1,234</h3>
-                    <p class="text-xs text-gray-500 mt-1">↓ -2.1% from last month</p>
+                    <p class="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Active Job Vacancies</p>
+                    <h3 class="text-4xl font-bold text-gray-800">1,234</h3>
                 </div>
                 <div class="bg-blue-600 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
@@ -188,7 +186,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Job Matching</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Job Matching and Referral</td>
                             <td class="px-4 py-3 text-center text-gray-600">4,523</td>
                             <td class="px-4 py-3 text-center text-gray-600">3,933</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">8,456</td>
@@ -202,7 +200,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <td class="px-6 py-3 text-right text-gray-500">17.1%</td>
                         </tr>
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">TUPAD</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Job Fair</td>
                             <td class="px-4 py-3 text-center text-gray-600">945</td>
                             <td class="px-4 py-3 text-center text-gray-600">922</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">1,867</td>
@@ -238,14 +236,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Employers Accreditation</td>
-                            <td class="px-4 py-3 text-center text-gray-600">512</td>
-                            <td class="px-4 py-3 text-center text-gray-600">344</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">856</td>
-                            <td class="px-6 py-3 text-right text-gray-500">66.9%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Workers Hiring</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Workers Hiring for Infrastructure Projects</td>
                             <td class="px-4 py-3 text-center text-gray-600">234</td>
                             <td class="px-4 py-3 text-center text-gray-600">189</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">423</td>
@@ -281,39 +272,25 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">SPES Baby</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">SPES</td>
                             <td class="px-4 py-3 text-center text-gray-600">1,789</td>
                             <td class="px-4 py-3 text-center text-gray-600">1,667</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">3,456</td>
                             <td class="px-6 py-3 text-right text-gray-500">49.0%</td>
                         </tr>
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">4Ps Beneficiaries</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Government Internship Program</td>
                             <td class="px-4 py-3 text-center text-gray-600">1,123</td>
                             <td class="px-4 py-3 text-center text-gray-600">1,111</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">2,234</td>
                             <td class="px-6 py-3 text-right text-gray-500">31.6%</td>
                         </tr>
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">PWD</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Work Immersion and Internship Referral Program</td>
                             <td class="px-4 py-3 text-center text-gray-600">298</td>
                             <td class="px-4 py-3 text-center text-gray-600">269</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">567</td>
                             <td class="px-6 py-3 text-right text-gray-500">8.0%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Government Internship</td>
-                            <td class="px-4 py-3 text-center text-gray-600">145</td>
-                            <td class="px-4 py-3 text-center text-gray-600">167</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">312</td>
-                            <td class="px-6 py-3 text-right text-gray-500">4.4%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Work Immersion</td>
-                            <td class="px-4 py-3 text-center text-gray-600">234</td>
-                            <td class="px-4 py-3 text-center text-gray-600">256</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">490</td>
-                            <td class="px-6 py-3 text-right text-gray-500">6.9%</td>
                         </tr>
                         <tr class="bg-gray-50 font-semibold">
                             <td class="px-6 py-3 text-gray-800">Section Total</td>
@@ -345,7 +322,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Career Development Support</td>
+                            <td class="px-6 py-3 font-medium text-gray-800">Career Development Support Program</td>
                             <td class="px-4 py-3 text-center text-gray-600">567</td>
                             <td class="px-4 py-3 text-center text-gray-600">623</td>
                             <td class="px-4 py-3 text-center font-semibold text-gray-800">1,190</td>
