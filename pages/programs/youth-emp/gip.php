@@ -13,7 +13,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     body.modal-open { overflow: hidden; }
 </style>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-0 md:w-auto">
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen overflow-x-hidden">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
     <div class="px-4 md:px-8 pt-6">
