@@ -58,11 +58,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <p class="text-2xl md:text-3xl font-extrabold text-gray-900">2,040</p>
-                <p class="text-xs text-emerald-500 font-semibold mt-1 flex items-center gap-1">
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>
-                    1.8% Up from last month
-                </p>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900">2,040</p>
             </div>
 
             <div class="stat-card bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
@@ -74,11 +70,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <p class="text-2xl md:text-3xl font-extrabold text-gray-900">1,024</p>
-                <p class="text-xs text-red-400 font-semibold mt-1 flex items-center gap-1">
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
-                    4.3% Down from last month
-                </p>
+                <p class="text-3xl md:text-4xl font-extrabold text-gray-900">1,024</p>
             </div>
 
         </div>
@@ -103,7 +95,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <?php foreach ([['Job Matching', 8456], ['First Time Jobseeker', 7367], ['Job Fair', 3459]] as $item): ?>
+                        <?php foreach ([['Job Matching and Referral', 8456], ['First Time Jobseeker', 7367], ['Job Fair', 3459]] as $item): ?>
                         <div class="prog-item flex items-center justify-between bg-white/20 rounded-xl px-4 py-3 cursor-default">
                             <span class="text-sm font-medium"><?= htmlspecialchars($item[0]) ?></span>
                             <span class="text-sm font-bold"><?= number_format($item[1]) ?></span>
@@ -149,7 +141,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <?php foreach ([['SPES Baby', 1104], ['4Ps Beneficiaries', 1500], ['PWD', 928], ['Government Internship Program', 210], ['Work Immersion & Internship Referral', 151]] as $item): ?>
+                        <?php foreach ([['SPES', 1104], ['Government Internship Program', 210], ['Work Immersion and Internship Referral Program', 151]] as $item): ?>
                         <div class="prog-item flex items-center justify-between bg-white/20 rounded-xl px-4 py-3 cursor-default">
                             <span class="text-sm font-medium"><?= htmlspecialchars($item[0]) ?></span>
                             <span class="text-sm font-bold"><?= number_format($item[1]) ?></span>
@@ -172,7 +164,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </div>
                     </div>
                     <div class="space-y-2">
-                        <?php foreach ([['Career Support', 4002], ['LMI Orientation', 1098]] as $item): ?>
+                        <?php foreach ([['Career Development Support Program', 4002], ['LMI Orientation', 1098]] as $item): ?>
                         <div class="prog-item flex items-center justify-between bg-white/20 rounded-xl px-4 py-3 cursor-default">
                             <span class="text-sm font-medium"><?= htmlspecialchars($item[0]) ?></span>
                             <span class="text-sm font-bold"><?= number_format($item[1]) ?></span>
