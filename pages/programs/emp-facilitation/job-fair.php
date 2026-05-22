@@ -93,6 +93,25 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
                 </select>
             </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-500">Month:</span>
+                <select id="monthFilter" onchange="applyFilters()"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-blue-300">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+            </div>
             <div class="flex items-center gap-1.5">
                 <span class="text-sm text-gray-500">Type:</span>
                 <div class="flex rounded-lg border border-gray-200 overflow-hidden text-sm">
@@ -324,11 +343,13 @@ function populateYears(years, selectedYear) {
 function filterTable() { applyFilters(); }
 
 function applyFilters() {
-    const q = (document.getElementById('searchCompany').value || '').toLowerCase().trim();
+    const q           = (document.getElementById('searchCompany').value || '').toLowerCase().trim();
+    const monthFilter = document.getElementById('monthFilter').value;
     filteredRows = allRows.filter(r => {
         const matchType    = !activeType || r.job_fair_type.toUpperCase().includes(activeType);
         const matchCompany = !q || (r.company_name || '').toLowerCase().includes(q);
-        return matchType && matchCompany;
+        const matchMonth   = !monthFilter || String(r.month_num) === monthFilter;
+        return matchType && matchCompany && matchMonth;
     });
     updateFooter(computeTotals(filteredRows));
     currentPage = 1;
@@ -450,12 +471,12 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
     const fmtDate = d => {
         if (!d) return '';
         const dt = new Date(d);
-        return isNaN(dt) ? d : dt.toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' });
+        return isNaN(dt) ? d : dt.toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' });
     };
     const dateStr = r.date_start
         ? (r.date_end && r.date_end !== r.date_start
-            ? `${fmtDate(r.date_start)} – ${fmtDate(r.date_end)}`
-            : fmtDate(r.date_start))
+            ? `<span class="block text-gray-500"><span class="font-medium text-gray-600">Start:</span> ${fmtDate(r.date_start)}</span><span class="block text-gray-500"><span class="font-medium text-gray-600">End:</span> ${fmtDate(r.date_end)}</span>`
+            : `<span class="block text-gray-500"><span class="font-medium text-gray-600">Start:</span> ${fmtDate(r.date_start)}</span>`)
         : '—';
 
     const isOverseas = (r.job_fair_type || '').toUpperCase().includes('OVERSEAS');
@@ -469,7 +490,7 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
 
     const eventCells = eventRowspan > 0
         ? `<td class="px-3 py-2 align-top border-r border-gray-100" rowspan="${eventRowspan}">${typeBadge}</td>
-           <td class="px-3 py-2 text-gray-500 align-top whitespace-nowrap text-xs" rowspan="${eventRowspan}">${escHtml(dateStr)}</td>`
+           <td class="px-3 py-2 text-gray-500 align-top text-xs leading-relaxed" rowspan="${eventRowspan}">${dateStr}</td>`
         : '';
 
     const batchId = r.batch_id || '';
