@@ -9,10 +9,16 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    body.modal-open { overflow: hidden; }
+    #mainContent { box-sizing: border-box; width: 100%; }
+    #mainContent * { box-sizing: border-box; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen" style="max-width:100%;">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/youth-employability.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,89 +29,93 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-2 pb-8">
+    <div class="px-4 md:px-8 py-2 pb-8">
 
         <!-- Row 1 Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-registered" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-registered" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg"><svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">Total Registered</span>
+                <span class="text-xs text-gray-500 leading-tight">Total Registered</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-referred" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-referred" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg"><svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">Total Referred</span>
+                <span class="text-xs text-gray-500 leading-tight">Total Referred</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-placed" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-placed" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-green-100 p-2 rounded-lg"><svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">Total Placed</span>
+                <span class="text-xs text-gray-500 leading-tight">Total Placed</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-vacancies" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-vacancies" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg"><svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">Job Vacancies</span>
+                <span class="text-xs text-gray-500 leading-tight">Job Vacancies</span>
             </div>
         </div>
 
         <!-- Row 2 Cards -->
-        <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-pink-400">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-pink-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-spes-baby" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-spes-baby" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-pink-100 p-2 rounded-lg"><svg class="w-5 h-5 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">SPES Baby Beneficiaries</span>
+                <span class="text-xs text-gray-500 leading-tight">SPES Baby Beneficiaries</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-fourps" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-fourps" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-purple-100 p-2 rounded-lg"><svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">4Ps Beneficiaries</span>
+                <span class="text-xs text-gray-500 leading-tight">4Ps Beneficiaries</span>
             </div>
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-cyan-400">
                 <div class="flex items-center justify-between">
-                    <span id="card-pwd" class="text-2xl font-bold text-gray-800">—</span>
+                    <span id="card-pwd" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                     <div class="bg-cyan-100 p-2 rounded-lg"><svg class="w-5 h-5 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
                 </div>
-                <span class="text-xs text-gray-500">PWD Beneficiaries</span>
+                <span class="text-xs text-gray-500 leading-tight">PWD Beneficiaries</span>
             </div>
         </div>
 
         <!-- Filter Bar -->
-        <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="flex flex-col gap-2 mb-4">
+            <!-- Row 1: Year filter -->
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filter by year:</span>
+                <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
                 <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
             </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchEmployer" placeholder="Search employer..."
-                    oninput="handleSearch()"
-                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+            <!-- Row 2: Search + loading indicator -->
+            <div class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="searchEmployer" placeholder="Search employer..."
+                        oninput="handleSearch()"
+                        class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+                </div>
+                <span id="loadingIndicator" class="text-xs text-gray-400 hidden shrink-0">Loading…</span>
             </div>
-            <span id="loadingIndicator" class="text-xs text-gray-400 hidden">Loading…</span>
         </div>
 
         <!-- Main SPES Table -->
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden mb-6">
-            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Special Program for Employment of Students (SPES)</h2>
+        <div class="bg-white rounded-2xl shadow-sm mb-6">
+            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 md:px-6 py-4 border-b border-gray-100 rounded-t-2xl">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base">Special Program for Employment of Students (SPES)</h2>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs" id="spesTable">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                <table class="w-full text-xs min-w-[900px]" id="spesTable">
                     <thead>
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-3 py-2 text-gray-500 font-medium w-24" rowspan="2">MONTH<br>REPORTED</th>
@@ -137,7 +147,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     </tbody>
                 </table>
             </div>
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100">
                 <span class="text-sm text-gray-500" id="paginationInfo"></span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed" disabled>&#8249;</button>
@@ -148,12 +158,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </div>
 
         <!-- Monthly LGU/Private Summary Table -->
-        <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Monthly SPES-LGU / SPES-Private Summary <span class="text-gray-400 font-normal text-sm">(Placed)</span></h2>
+        <div class="bg-white rounded-2xl shadow-sm">
+            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 md:px-6 py-4 border-b border-gray-100 rounded-t-2xl">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base">Monthly SPES-LGU / SPES-Private Summary <span class="text-gray-400 font-normal text-sm">(Placed)</span></h2>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                <table class="w-full text-xs min-w-[600px]">
                     <thead>
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-6 py-3 text-gray-500 font-medium w-36" rowspan="2">MONTH</th>

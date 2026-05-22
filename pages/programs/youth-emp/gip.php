@@ -9,10 +9,14 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    body.modal-open { overflow: hidden; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen w-0 md:w-auto">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/youth-employability.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,15 +27,15 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-2 pb-8">
+    <div class="px-4 md:px-8 py-2 pb-8">
 
         <!-- Row 1 Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-participants-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-participants-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-participants-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -43,10 +47,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Participants</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-inquired-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-inquired-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-inquired-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -58,10 +62,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Inquired</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-violet-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-violet-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-referred-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-referred-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-referred-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -73,10 +77,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Referred</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-amber-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-amber-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-interviewed-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-interviewed-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-interviewed-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -90,12 +94,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </div>
 
         <!-- Row 2 Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-8">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-peso-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-peso-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-peso-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -107,10 +111,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">PESO-Accepted</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-private-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-private-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-private-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -122,10 +126,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Privately-Accepted</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span id="card-notp-total" class="text-2xl font-bold text-gray-800">—</span>
+                        <span id="card-notp-total" class="text-xl md:text-2xl font-bold text-gray-800">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span id="card-notp-m" class="text-xs text-blue-500 font-medium">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -139,37 +143,43 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </div>
 
         <!-- Filter Bar -->
-        <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="flex flex-col gap-2 mb-4">
+            <!-- Row 1: Year + Type filters -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
+                    <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500">Type:</span>
+                    <select id="filterType" onchange="applyFilters()"
+                        class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
+                        <option value="">All</option>
+                        <option value="college">College</option>
+                        <option value="shs">SHS</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Row 2: Search always on its own row -->
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filter by year:</span>
-                <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
+                <div class="relative flex-1">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="searchSchool" placeholder="Search school..."
+                        oninput="handleSearch()"
+                        class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
+                </div>
+                <span id="loadingIndicator" class="text-xs text-gray-400 hidden shrink-0">Loading…</span>
             </div>
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Type:</span>
-                <select id="filterType" onchange="applyFilters()"
-                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
-                    <option value="">All</option>
-                    <option value="college">College</option>
-                    <option value="shs">SHS</option>
-                </select>
-            </div>
-            <div class="relative flex-1 max-w-sm">
-                <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                </svg>
-                <input type="text" id="searchSchool" placeholder="Search school..."
-                    oninput="handleSearch()"
-                    class="w-full pl-9 pr-4 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"/>
-            </div>
-            <span id="loadingIndicator" class="text-xs text-gray-400 hidden">Loading…</span>
         </div>
 
         <!-- Main GIP Table -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Government Internship Program (GIP)</h2>
+            <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Government Internship Program (GIP)</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
                 <table class="w-full text-xs" id="gipTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -203,7 +213,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     </tbody>
                 </table>
             </div>
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
                 <span class="text-sm text-gray-500" id="paginationInfo"></span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn" class="px-3 py-1.5 rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed" disabled>&#8249;</button>
@@ -220,7 +230,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <!-- Delete Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 animate-modal">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-red-100 p-3 rounded-lg"><svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h3 class="text-lg font-bold text-gray-900">Delete Entry</h3>
@@ -235,7 +245,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <!-- Save Modal -->
 <div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 animate-modal">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-green-100 p-3 rounded-lg"><svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
             <h3 class="text-lg font-bold text-gray-900">Save Changes</h3>
