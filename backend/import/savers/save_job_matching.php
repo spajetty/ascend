@@ -105,13 +105,24 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
     if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstJobSeek')) {
         $occPermit = toBoolInt(rowValue($row, ['Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
         $healthCard = toBoolInt(rowValue($row, ['Health Card', 'health_card'], 0));
+        $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
 
         if (tableHasColumn($conn, 'firstJobSeek', 'company_id')) {
-            $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
-            $ins->bind_param('iiii', $benefId, $companyId, $occPermit, $healthCard);
+            if (tableHasColumn($conn, 'firstJobSeek', 'batch_id') && $batchId !== null) {
+                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?, ?)');
+                $ins->bind_param('iiiii', $benefId, $companyId, $batchId, $occPermit, $healthCard);
+            } else {
+                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
+                $ins->bind_param('iiii', $benefId, $companyId, $occPermit, $healthCard);
+            }
         } else {
-            $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, occ_permit, health_card) VALUES (?, ?, ?)');
-            $ins->bind_param('iii', $benefId, $occPermit, $healthCard);
+            if (tableHasColumn($conn, 'firstJobSeek', 'batch_id') && $batchId !== null) {
+                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
+                $ins->bind_param('iiii', $benefId, $batchId, $occPermit, $healthCard);
+            } else {
+                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, occ_permit, health_card) VALUES (?, ?, ?)');
+                $ins->bind_param('iii', $benefId, $occPermit, $healthCard);
+            }
         }
         $ins->execute();
         $state['insertedFirstJobSeekIds'][] = (int)$ins->insert_id;
