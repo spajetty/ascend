@@ -9,10 +9,14 @@ require_once __DIR__ . '/../../../includes/layout/head.php';
 require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<style>
+    body.modal-open { overflow: hidden; }
+</style>
+
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen overflow-x-hidden">
     <?php require_once __DIR__ . '/../../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/youth-employability.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,15 +27,15 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-2 pb-8">
+    <div class="px-4 md:px-8 py-2 pb-8">
 
         <!-- ===== SUMMARY CARDS Row 1 ===== -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-part-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-part-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-part-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -47,10 +51,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Participants</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-inq-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-inq-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-inq-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -66,10 +70,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Inquired</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-violet-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-violet-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-ref-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-ref-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-ref-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -85,10 +89,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Total Referred</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-amber-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-amber-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-int-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-int-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-int-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -106,12 +110,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </div>
 
         <!-- ===== SUMMARY CARDS Row 2 ===== -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4 mb-8">
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-peso-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-peso-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-peso-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -127,10 +131,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">PESO-Accepted</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-priv-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-priv-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-priv-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -146,10 +150,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <span class="text-xs text-gray-500">Privately-Accepted</span>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-red-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-red-400">
                 <div class="flex items-center justify-between">
                     <div>
-                        <span class="text-2xl font-bold text-gray-800" id="card-notpr-total">—</span>
+                        <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-notpr-total">—</span>
                         <div class="flex items-center gap-2 mt-0.5">
                             <span class="text-xs text-blue-500 font-medium" id="card-notpr-m">—M</span>
                             <span class="text-gray-300 text-xs">/</span>
@@ -167,9 +171,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         </div>
 
         <!-- ===== FILTER BAR ===== -->
-        <div class="flex items-center gap-3 mb-4 flex-wrap">
+        <div class="flex flex-col gap-2 mb-4">
             <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500">Filter by year:</span>
+                <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
                 <select id="yearFilter" onchange="loadData()"
                     class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300">
                 </select>
@@ -178,10 +182,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
         <!-- ===== MAIN TABLE ===== -->
         <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Work Immersion &amp; Internship Referral Program</h2>
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Work Immersion &amp; Internship Referral Program</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
                 <table class="w-full text-xs" id="wiTable">
                     <thead>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -212,7 +216,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             </div>
 
             <!-- Pagination -->
-            <div class="flex items-center justify-between px-6 py-4 border-t border-gray-100">
+            <div class="flex flex-wrap items-center justify-between gap-2 px-4 md:px-6 py-4 border-t border-gray-100 bg-white rounded-b-2xl">
                 <span class="text-sm text-gray-500" id="paginationInfo">—</span>
                 <div class="flex items-center gap-1">
                     <button onclick="changePage(-1)" id="prevBtn"
@@ -233,7 +237,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <!-- Delete Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4 animate-modal">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-red-100 p-3 rounded-lg">
                 <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

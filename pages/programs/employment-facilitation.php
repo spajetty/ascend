@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen min-w-0 overflow-hidden">
     <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>
 
     <div class="px-6 md:px-8 pt-6">
@@ -23,7 +23,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-6 md:px-8 pt-6 pb-24 md:pb-6">
 
         <!-- Summary Cards -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -369,56 +369,225 @@ function renderJobFair(data) {
         return;
     }
 
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
-    const totals = data.totals;
-    let html = '';
+    // Show only latest N job fair rows on summary page
+    const PREVIEW_JOB_FAIR_ROWS = 5;
 
-    // Format date range same as job-fair.php
-    const fmtDate = (start, end) => {
-        if (!start) return '—';
-        const s = new Date(start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        if (!end || end === start) return s;
-        const e = new Date(end).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-        return `${s} – ${e}`;
+    const allRows = data.rows;
+    const totals  = data.totals;
+
+    // Collect unique month keys in order, then take the last PREVIEW_ROWS months
+    const seenMonths = [];
+    allRows.forEach(r => {
+        const key = `${r.month} ${r.year}`;
+        if (!seenMonths.includes(key)) seenMonths.push(key);
+    });
+
+    const previewMonths = new Set(seenMonths.slice(-PREVIEW_ROWS));
+
+    // LIMIT FINAL DISPLAYED ROWS
+    const rows = allRows
+        .filter(r => previewMonths.has(`${r.month} ${r.year}`))
+        .slice(-PREVIEW_JOB_FAIR_ROWS);
+
+    // Two-line date formatter
+    const fmtDate = d => {
+        if (!d) return '';
+        const dt = new Date(d);
+        return isNaN(dt)
+            ? d
+            : dt.toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric'
+              });
     };
 
-    // Format type badge same as job-fair.php
+    const dateHtml = (start, end) => {
+        if (!start) return '—';
+
+        const startLine =
+            `<span class="block">
+                <span class="font-medium text-gray-600">Start:</span>
+                ${fmtDate(start)}
+            </span>`;
+
+        if (!end || end === start) return startLine;
+
+        return startLine +
+            `<span class="block">
+                <span class="font-medium text-gray-600">End:</span>
+                ${fmtDate(end)}
+            </span>`;
+    };
+
+    // Type badge
     const typeBadge = type => {
         const isLocal = String(type).toUpperCase().includes('LOCAL');
+
         const cls = isLocal
             ? 'bg-teal-100 text-teal-700'
             : 'bg-purple-100 text-purple-700';
+
         const label = isLocal ? 'LOCAL' : 'OVERSEAS';
-        return `<span class="px-2 py-0.5 rounded-full text-xs font-semibold ${cls}">${label}</span>`;
+
+        return `
+            <span class="px-2 py-0.5 rounded-full text-xs font-semibold ${cls}">
+                ${label}
+            </span>
+        `;
     };
 
+    // Group: month → event → employers
+    const monthMap = new Map();
+
     rows.forEach(r => {
-        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(r.month)} ${r.year}</td>
-            <td class="px-4 py-2 border-l border-gray-100">${typeBadge(r.job_fair_type)}</td>
-            <td class="px-4 py-2 text-gray-500 border-l border-gray-100 whitespace-nowrap">${fmtDate(r.date_start, r.date_end)}</td>
-            <td class="px-4 py-2 text-gray-600 border-l border-gray-100">${escHtml(r.company_name)}</td>
-            ${tL(r.vacancy_male)}${t(r.vacancy_female)}${tTotal(r.vacancy_total,'text-blue-500','bg-blue-50')}
-            ${tL(r.reg_m)}${t(r.reg_f)}${tTotal(r.reg_total,'text-teal-600','bg-teal-50')}
-            ${tL(r.ref_m)}${t(r.ref_f)}${tTotal(r.ref_total,'text-indigo-500','bg-indigo-50')}
-            ${tL(r.int_m)}${t(r.int_f)}${tTotal(r.int_total,'text-cyan-500','bg-cyan-50')}
-            ${tL(r.qual_m)}${t(r.qual_f)}${tTotal(r.qual_total,'text-green-500','bg-green-50')}
-            ${tL(r.nqual_m)}${t(r.nqual_f)}${tTotal(r.nqual_total,'text-red-400','bg-red-50')}
-            ${tL(r.placed_m)}${t(r.placed_f)}${tTotal(r.placed_total,'text-orange-400','bg-orange-50')}
-            ${tL(r.ffi_m)}${t(r.ffi_f)}${tTotal(r.ffi_total,'text-purple-400','bg-purple-50')}
-        </tr>`;
+        const monthKey = `${r.month} ${r.year}`;
+
+        if (!monthMap.has(monthKey)) {
+            monthMap.set(monthKey, { events: new Map() });
+        }
+
+        const events = monthMap.get(monthKey).events;
+        const eventKey = String(r.jobfairevent_id);
+
+        if (!events.has(eventKey)) {
+            events.set(eventKey, {
+                meta: r,
+                employers: []
+            });
+        }
+
+        events.get(eventKey).employers.push(r);
+    });
+
+    let html = '';
+
+    monthMap.forEach((monthData, monthKey) => {
+
+        // Total rowspan for this month
+        let monthRowspan = 0;
+
+        monthData.events.forEach(ev => {
+            monthRowspan += ev.employers.length;
+        });
+
+        let firstMonthRow = true;
+
+        monthData.events.forEach(eventData => {
+
+            const eventRowspan = eventData.employers.length;
+            let firstEventRow = true;
+
+            eventData.employers.forEach(r => {
+
+                const monthCell = firstMonthRow
+                    ? `
+                        <td class="px-4 py-3 font-bold text-sm text-teal-700 align-top bg-teal-50/40 border-r border-gray-100"
+                            rowspan="${monthRowspan}">
+                            ${escHtml(monthKey)}
+                        </td>
+                    `
+                    : '';
+
+                const eventCells = firstEventRow
+                    ? `
+                        <td class="px-3 py-2 align-top border-r border-gray-100"
+                            rowspan="${eventRowspan}">
+                            ${typeBadge(r.job_fair_type)}
+                        </td>
+
+                        <td class="px-3 py-2 text-gray-500 align-top text-xs leading-relaxed border-r border-gray-100"
+                            rowspan="${eventRowspan}">
+                            ${dateHtml(r.date_start, r.date_end)}
+                        </td>
+                    `
+                    : '';
+
+                html += `
+                    <tr class="border-b border-gray-50 hover:bg-gray-50">
+
+                        ${monthCell}
+                        ${eventCells}
+
+                        <td class="px-4 py-2 text-gray-600">
+                            ${escHtml(r.company_name)}
+                        </td>
+
+                        ${tL(r.vacancy_male)}
+                        ${t(r.vacancy_female)}
+                        ${tTotal(r.vacancy_total,'text-blue-500','bg-blue-50')}
+
+                        ${tL(r.reg_m)}
+                        ${t(r.reg_f)}
+                        ${tTotal(r.reg_total,'text-teal-600','bg-teal-50')}
+
+                        ${tL(r.ref_m)}
+                        ${t(r.ref_f)}
+                        ${tTotal(r.ref_total,'text-indigo-500','bg-indigo-50')}
+
+                        ${tL(r.int_m)}
+                        ${t(r.int_f)}
+                        ${tTotal(r.int_total,'text-cyan-500','bg-cyan-50')}
+
+                        ${tL(r.qual_m)}
+                        ${t(r.qual_f)}
+                        ${tTotal(r.qual_total,'text-green-500','bg-green-50')}
+
+                        ${tL(r.nqual_m)}
+                        ${t(r.nqual_f)}
+                        ${tTotal(r.nqual_total,'text-red-400','bg-red-50')}
+
+                        ${tL(r.placed_m)}
+                        ${t(r.placed_f)}
+                        ${tTotal(r.placed_total,'text-orange-400','bg-orange-50')}
+
+                        ${tL(r.ffi_m)}
+                        ${t(r.ffi_f)}
+                        ${tTotal(r.ffi_total,'text-purple-400','bg-purple-50')}
+
+                    </tr>
+                `;
+
+                firstMonthRow = false;
+                firstEventRow = false;
+            });
+        });
     });
 
     html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
         <td class="px-4 py-2 text-gray-800 font-bold" colspan="4">TOTALS</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.job_vacancies}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-indigo-500 bg-indigo-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${totals.interviewed}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">${totals.qualified}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">${totals.placed}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">—</td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">
+            ${data.grandTotals.vacancy_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">
+            ${data.grandTotals.reg_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-indigo-500 bg-indigo-100 border-l border-gray-100">
+            ${data.grandTotals.ref_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">
+            ${data.grandTotals.int_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">
+            ${data.grandTotals.qual_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">
+            ${data.grandTotals.nqual_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">
+            ${data.grandTotals.placed_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">
+            ${data.grandTotals.ffi_total}
+        </td>
     </tr>`;
 
     tbody.innerHTML = html;

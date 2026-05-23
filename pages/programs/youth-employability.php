@@ -9,10 +9,10 @@ require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
 ?>
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<main id="mainContent" class="flex-1 md:ml-56 min-h-screen overflow-x-hidden">
     <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 pt-6">
+    <div class="px-4 md:px-8 pt-6">
         <a href="/pages/programs/program.php"
            class="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-4">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -23,15 +23,15 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
         </a>
     </div>
 
-    <div class="px-6 md:px-8 py-6">
+    <div class="px-4 md:px-8 py-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 md:gap-4 mb-8">
 
             <!-- Total Youth Served -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-green-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-green-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-total-youth">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-total-youth">—</span>
                     <div class="bg-green-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -42,9 +42,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- SPES Participants -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-orange-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-orange-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-spes-participants">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-spes-participants">—</span>
                     <div class="bg-orange-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -55,9 +55,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- GIP Interns -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-teal-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-teal-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-gip-interns">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-gip-interns">—</span>
                     <div class="bg-teal-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -68,9 +68,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- Work Immersion Participants -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-purple-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-purple-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-wimm-participants">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-wimm-participants">—</span>
                     <div class="bg-purple-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
@@ -81,9 +81,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             </div>
 
             <!-- Total Placed -->
-            <div class="bg-white rounded-2xl shadow-sm p-5 flex flex-col gap-2 border-l-4 border-blue-400">
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
-                    <span class="text-2xl font-bold text-gray-800" id="card-total-placed">—</span>
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-total-placed">—</span>
                     <div class="bg-blue-100 p-2 rounded-lg">
                         <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
@@ -97,10 +97,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
         <!-- SPES Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Special Program for Employment of Students (SPES)</h2>
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Special Program for Employment of Students (SPES)</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100">
@@ -132,17 +132,17 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-end px-6 py-3 border-t border-gray-100">
+            <div class="flex justify-end px-4 md:px-6 py-3 border-t border-gray-100">
                 <a href="/pages/programs/youth-emp/spes.php" class="text-sm text-green-600 hover:text-green-800 font-medium">See More →</a>
             </div>
         </div>
 
         <!-- GIP Preview Table -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Government Internship Program (GIP)</h2>
+            <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Government Internship Program (GIP)</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100">
@@ -175,7 +175,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-end px-6 py-3 border-t border-gray-100">
+            <div class="flex justify-end px-4 md:px-6 py-3 border-t border-gray-100">
                 <a href="/pages/programs/youth-emp/gip.php" class="text-sm text-teal-600 hover:text-teal-800 font-medium">See More →</a>
             </div>
         </div>
@@ -183,10 +183,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
         <!-- Work Immersion & Internship Referral Preview Table -->
         <!-- WIMM rows are grouped by month/batch, so only PERIOD column + stat columns -->
         <div class="bg-white rounded-2xl shadow-sm mb-6 overflow-hidden">
-            <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-gray-100">
-                <h2 class="font-bold text-gray-800 text-base">Work Immersion &amp; Internship Referral Program</h2>
+            <div class="bg-gradient-to-r from-orange-50 to-amber-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
+                <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Work Immersion &amp; Internship Referral Program</h2>
             </div>
-            <div class="overflow-x-auto">
+            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
                 <table class="w-full text-xs">
                     <thead>
                         <tr class="border-b border-gray-100">
@@ -216,7 +216,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-end px-6 py-3 border-t border-gray-100">
+            <div class="flex justify-end px-4 md:px-6 py-3 border-t border-gray-100">
                 <a href="/pages/programs/youth-emp/work-imm.php" class="text-sm text-orange-600 hover:text-orange-800 font-medium">See More →</a>
             </div>
         </div>
