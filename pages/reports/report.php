@@ -89,7 +89,7 @@ $monthLabels   = [];
 $monthReg      = [];
 $monthHired    = [];
 foreach ($compRows as $row) {
-    $monthLabels[] = substr($row['month'], 0, 3); // e.g. "January" → "Jan"
+    $monthLabels[] = $row['month_label'] ?? substr((string) ($row['month'] ?? ''), 0, 3);
     $monthReg[]    = (int) $row['total_registered'];
     $monthHired[]  = (int) $row['total_hired'];
 }

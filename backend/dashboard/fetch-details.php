@@ -140,22 +140,130 @@ try {
         ORDER BY p.section_id, b.program_id, YEAR(b.created_at), MONTH(b.created_at)
     ");
     $classRows = $classStmt->fetchAll();
+    
+        /* ── 1C. Classification counts per import batch month × year ── */
+        $monthRows = $pdo->query("
+            SELECT
+                x.year_num,
+                x.month_num,
+                SUM(x.total_registered) AS total_registered,
+                SUM(x.total_hired)      AS total_hired
+            FROM (
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN jobmatch jm ON jm.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = jm.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
 
-    /* ── 1D. Roll up to month × year for total_comparison ── */
-    $monthTotals = [];
-    foreach ($classRows as $row) {
-        $key = $row['year'] . '-' . $row['month'];
-        if (!isset($monthTotals[$key])) {
-            $monthTotals[$key] = [
-                'month'            => $row['month'],
-                'year'             => (int) $row['year'],
-                'total_registered' => 0,
-                'total_hired'      => 0,
-            ];
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN firstJobSeek fjs ON fjs.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = fjs.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN jobfair jf ON jf.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = jf.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN whip w ON w.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = w.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN spes s ON s.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = s.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN gip g ON g.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = g.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+
+                UNION ALL
+
+                SELECT
+                    ib.year  AS year_num,
+                    ib.month AS month_num,
+                    SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                FROM beneficiaries b
+                JOIN wiirp w ON w.benef_id = b.benef_id
+                JOIN import_batches ib ON ib.batch_id = w.batch_id
+                WHERE b.classification IS NOT NULL
+                GROUP BY ib.year, ib.month
+            ) x
+            GROUP BY x.year_num, x.month_num
+            ORDER BY x.year_num, x.month_num
+        ")->fetchAll();
+
+        /* ── 1D. Roll up to month × year for total_comparison ── */
+        $monthTotals = [];
+        foreach ($monthRows as $row) {
+            $monthNum = (int) $row['month_num'];
+            $yearNum  = (int) $row['year_num'];
+            $monthName = date('F', mktime(0, 0, 0, $monthNum, 1));
+            $key = $yearNum . '-' . $monthNum;
+
+            if (!isset($monthTotals[$key])) {
+                $monthTotals[$key] = [
+                    'month'            => $monthName,
+                    'month_num'        => $monthNum,
+                    'year'             => $yearNum,
+                    'month_label'      => $monthName . ' ' . $yearNum,
+                    'total_registered' => 0,
+                    'total_hired'      => 0,
+                ];
+            }
+
+            $monthTotals[$key]['total_registered'] += (int) $row['total_registered'];
+            $monthTotals[$key]['total_hired']      += (int) $row['total_hired'];
         }
-        $monthTotals[$key]['total_registered'] += (int) $row['total_registered'];
-        $monthTotals[$key]['total_hired']      += (int) $row['total_hired'];
-    }
 
     $checkComp = $pdo->prepare("
         SELECT COUNT(*) FROM total_comparison WHERE month = :month AND year = :year
