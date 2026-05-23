@@ -15,6 +15,12 @@ import {
     resetPreviewPaginationState,
 } from './excel-preview.js';
 import { openProgramMismatchModal } from './excel-modals.js';
+import {
+    openCreateEventModal,
+    openAddCompaniesModal,
+    setParticipantsWarning,
+    hideParticipantsWarning,
+} from './job-fair-modal.js';
 
 const WIIRP_PRIVATE_PREVIEW_HEADERS = [
     '# of hours',
@@ -151,47 +157,154 @@ export function syncProgramSpecificFields(program = excelProgram?.value ?? '') {
     }
 }
 
-export function fetchJobFairEvents() {
-    const month = document.getElementById('importMonth')?.value;
-    const year = document.getElementById('importYear')?.value;
-    const eventSelect = document.getElementById('jobFairEvent');
-    const selectedEventId = state.selectedJobFairEvent || eventSelect?.value || '';
-    
-    if (!eventSelect) return;
-    
-    if (!month || !year) {
-        eventSelect.innerHTML = '<option value="">Select month and year first...</option>';
-        eventSelect.disabled = true;
+let _allJobFairEvents = [];
+
+function renderCustomSelectOptions(filterText = '') {
+    const container = document.getElementById('jfSelectOptions');
+    if (!container) return;
+
+    if (_allJobFairEvents.length === 0) {
+        container.innerHTML = `<div class="px-4 py-2 text-sm text-gray-500 text-center">No events found.</div>`;
         return;
     }
+
+    const lowerFilter = filterText.toLowerCase();
+    const filtered = _allJobFairEvents.filter(e => {
+        const label = e.venue ? `${e.venue} (${e.date_start})` : `Event (${e.date_start})`;
+        return label.toLowerCase().includes(lowerFilter);
+    });
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<div class="px-4 py-2 text-sm text-gray-500 text-center">No matching events.</div>`;
+        return;
+    }
+
+    container.innerHTML = filtered.map(e => {
+        const label = e.venue ? `${e.venue} (${e.date_start})` : `Event (${e.date_start})`;
+        const isSelected = state.selectedJobFairEvent === String(e.jobfairevent_id);
+        // Basic HTML escaping for safety
+        const safeLabel = label.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        return `
+            <div class="jf-option cursor-pointer px-4 py-2 text-sm hover:bg-blue-50 rounded-lg ${isSelected ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-gray-700'}"
+                 data-value="${e.jobfairevent_id}" data-label="${safeLabel}">
+                ${safeLabel}
+            </div>
+        `;
+    }).join('');
+
+    container.querySelectorAll('.jf-option').forEach(opt => {
+        opt.addEventListener('click', async () => {
+            const val = opt.getAttribute('data-value');
+            const lbl = opt.getAttribute('data-label');
+            
+            document.getElementById('jobFairEvent').value = val;
+            document.getElementById('jfSelectSearch').value = lbl;
+            document.getElementById('jfSelectDropdown').classList.add('hidden');
+            
+            state.selectedJobFairEvent = val;
+            const hasParticipants = await _checkEventParticipants(val, lbl);
+            
+            const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+            if (selectedProgram === 'Job Fair' && state.selectedFile && hasParticipants) {
+                handleFile(state.selectedFile);
+            }
+        });
+    });
+}
+
+// ─── Load Job Fair events (filtered by month/year, or all if empty) ────────────
+export function fetchJobFairEvents() {
+    const month = document.getElementById('importMonth')?.value || '';
+    const year = document.getElementById('importYear')?.value || '';
+    const jfSelectSearch = document.getElementById('jfSelectSearch');
     
-    eventSelect.innerHTML = '<option value="">Loading events...</option>';
-    eventSelect.disabled = true;
-    
+    if (!jfSelectSearch) return;
+
+    jfSelectSearch.value = 'Loading events…';
+    jfSelectSearch.disabled = true;
+
     fetch(`../../backend/import/get_job_fair_events.php?month=${month}&year=${year}`)
         .then(res => res.json())
         .then(data => {
-            if (data.success) {
-                if (data.events.length === 0) {
-                    eventSelect.innerHTML = '<option value="">No events found for this period</option>';
-                    state.selectedJobFairEvent = '';
+            if (!data.success) throw new Error(data.error ?? 'Error loading events');
+            jfSelectSearch.disabled = false;
+            
+            _allJobFairEvents = data.events;
+            renderCustomSelectOptions();
+            
+            const prev = state.selectedJobFairEvent;
+            if (prev) {
+                const found = _allJobFairEvents.find(e => String(e.jobfairevent_id) === String(prev));
+                if (found) {
+                    const lbl = found.venue ? `${found.venue} (${found.date_start})` : `Event (${found.date_start})`;
+                    document.getElementById('jobFairEvent').value = prev;
+                    jfSelectSearch.value = lbl;
+                    _checkEventParticipants(prev, lbl);
                 } else {
-                    eventSelect.innerHTML = '<option value="">Select event...</option>' + 
-                        data.events.map(e => `<option value="${e.jobfairevent_id}">${e.venue} (${e.date_start})</option>`).join('');
-                    eventSelect.disabled = false;
-
-                    if (selectedEventId && Array.from(eventSelect.options).some(option => option.value === selectedEventId)) {
-                        eventSelect.value = selectedEventId;
-                        state.selectedJobFairEvent = selectedEventId;
-                    }
+                    state.selectedJobFairEvent = ''; 
+                    jfSelectSearch.value = '';
+                    document.getElementById('jobFairEvent').value = '';
                 }
             } else {
-                eventSelect.innerHTML = '<option value="">Error loading events</option>';
+                jfSelectSearch.value = '';
+                document.getElementById('jobFairEvent').value = '';
             }
         })
-        .catch(err => {
-            eventSelect.innerHTML = '<option value="">Error loading events</option>';
+        .catch(() => {
+            jfSelectSearch.disabled = false;
+            jfSelectSearch.value = 'Error loading events';
+            _allJobFairEvents = [];
+            renderCustomSelectOptions();
         });
+}
+
+if (monthSelect) monthSelect.addEventListener('change', () => {
+    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
+});
+if (yearSelect) yearSelect.addEventListener('change', () => {
+    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
+});
+
+// ─── Participants check ───────────────────────────────────────────────────────
+async function _checkEventParticipants(eventId, eventLabel) {
+    if (!eventId || eventId === '__create_new__') {
+        hideParticipantsWarning();
+        _setImportButtonGated(false);
+        return true;
+    }
+
+    try {
+        const res = await fetch(`../../backend/import/get_event_participants.php?event_id=${eventId}`);
+        const data = await res.json();
+        if (!data.success) return false;
+
+        if (data.participants.length === 0) {
+            setParticipantsWarning(eventId, eventLabel);
+            _setImportButtonGated(true);
+            return false;
+        }
+
+        hideParticipantsWarning();
+        _setImportButtonGated(false);
+        // Cache for confirmation panel display
+        state.currentEventParticipants = data.participants;
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+
+function _setImportButtonGated(gated) {
+    // Disable/re-enable the Confirm & Import button
+    const confirmBtn = document.getElementById('confirmImport');
+    if (!confirmBtn) return;
+    if (gated) {
+        confirmBtn.disabled = true;
+        confirmBtn.title = 'Add at least one company participant to this event before importing.';
+    } else {
+        confirmBtn.disabled = false;
+        confirmBtn.title = '';
+    }
 }
 
 function applyJobFairMismatchMode(rows, programColumnKey, program, mode) {
@@ -209,25 +322,120 @@ function applyJobFairMismatchMode(rows, programColumnKey, program, mode) {
     });
 }
 
-// Add event listeners to trigger fetch when month/year changes
-if (monthSelect) monthSelect.addEventListener('change', () => {
-    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
-});
-if (yearSelect) yearSelect.addEventListener('change', () => {
-    if (document.getElementById('excelProgram')?.value === 'Job Fair') fetchJobFairEvents();
-});
+// ─── Custom Job Fair Dropdown Logic ──────────────────────────────────────────
+const jfSelectToggle = document.getElementById('jfSelectToggle');
+const jfSelectDropdown = document.getElementById('jfSelectDropdown');
+const jfSelectFilter = document.getElementById('jfSelectFilter');
+if (jfSelectToggle && jfSelectDropdown) {
+    jfSelectToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (document.getElementById('jfSelectSearch').disabled) return;
 
-// Re-run validation when Job Fair Event selection changes so participant check runs
-const jobFairEventEl = document.getElementById('jobFairEvent');
-if (jobFairEventEl) {
-    jobFairEventEl.addEventListener('change', function () {
-        state.selectedJobFairEvent = this.value || '';
-        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
-        if (selectedProgram === 'Job Fair' && state.selectedFile) {
-            handleFile(state.selectedFile);
+        // Toggle visibility first so we can measure size when visible
+        const willOpen = jfSelectDropdown.classList.contains('hidden');
+        if (!willOpen) {
+            jfSelectDropdown.classList.add('hidden');
+            // clear any inline positioning styles
+            jfSelectDropdown.style.top = '';
+            jfSelectDropdown.style.bottom = '';
+            jfSelectDropdown.style.marginTop = '';
+            jfSelectDropdown.style.marginBottom = '';
+            return;
+        }
+
+        // Open dropdown then compute positioning to decide up/down
+        jfSelectDropdown.classList.remove('hidden');
+        jfSelectFilter.value = '';
+        renderCustomSelectOptions();
+
+        // Allow layout to update then measure
+        requestAnimationFrame(() => {
+            const rect = jfSelectToggle.getBoundingClientRect();
+            const ddHeight = jfSelectDropdown.offsetHeight || jfSelectDropdown.scrollHeight || 200;
+            const spaceBelow = window.innerHeight - rect.bottom;
+            const spaceAbove = rect.top;
+
+            // If not enough space below and more space above, open upwards
+            if (spaceBelow < ddHeight + 8 && spaceAbove > spaceBelow) {
+                jfSelectDropdown.style.top = 'auto';
+                jfSelectDropdown.style.bottom = 'calc(100% + 0.25rem)';
+                jfSelectDropdown.style.marginTop = '';
+                jfSelectDropdown.style.marginBottom = '0.25rem';
+            } else {
+                jfSelectDropdown.style.top = '';
+                jfSelectDropdown.style.bottom = '';
+                jfSelectDropdown.style.marginTop = '0.25rem';
+                jfSelectDropdown.style.marginBottom = '';
+            }
+
+            jfSelectFilter.focus();
+        });
+    });
+
+    jfSelectFilter.addEventListener('input', (e) => {
+        renderCustomSelectOptions(e.target.value);
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!jfSelectToggle.contains(e.target) && !jfSelectDropdown.contains(e.target)) {
+            jfSelectDropdown.classList.add('hidden');
+            // cleanup inline styles when closed
+            jfSelectDropdown.style.top = '';
+            jfSelectDropdown.style.bottom = '';
+            jfSelectDropdown.style.marginTop = '';
+            jfSelectDropdown.style.marginBottom = '';
         }
     });
 }
+
+// ─── Standalone "Create New Event" button ────────────────────────────────────
+const jfCreateStandaloneBtn = document.getElementById('jfCreateStandaloneBtn');
+if (jfCreateStandaloneBtn) {
+    jfCreateStandaloneBtn.addEventListener('click', () => {
+        openCreateEventModal(({ eventId, eventDate, participants }) => {
+            state.selectedJobFairEvent = String(eventId);
+            hideParticipantsWarning();
+            _setImportButtonGated(false);
+            state.currentEventParticipants = participants ?? [];
+
+            // Update month/year dropdowns to match the newly created event's date
+            if (eventDate) {
+                const d = new Date(eventDate);
+                if (!isNaN(d.getTime())) {
+                    const m = d.toLocaleString('en-US', { month: 'long' }); // e.g., 'January'
+                    const y = String(d.getFullYear());
+                    const monthSelect = document.getElementById('importMonth');
+                    const yearSelect = document.getElementById('importYear');
+                    if (monthSelect) monthSelect.value = m;
+                    if (yearSelect) yearSelect.value = y;
+                }
+            }
+
+            // Reload list so new event appears (will auto-select state.selectedJobFairEvent)
+            fetchJobFairEvents();
+
+            // If file already loaded, re-validate
+            const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+            if (selectedProgram === 'Job Fair' && state.selectedFile) {
+                handleFile(state.selectedFile);
+            }
+        });
+    });
+}
+
+// Handle the custom event fired when participants are added via the B2 warning link
+document.addEventListener('jfParticipantsResolved', async (e) => {
+    const { eventId } = e.detail ?? {};
+    if (eventId) {
+        const hasParticipants = await _checkEventParticipants(String(eventId), '');
+
+        // Re-run validation so preview appears once participants are added.
+        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+        if (selectedProgram === 'Job Fair' && state.selectedFile && hasParticipants) {
+            handleFile(state.selectedFile);
+        }
+    }
+});
 
 // Show notice when WIIRP category changes to Private after a preview has been rendered
 const wiirpCategoryEl = document.getElementById('wiirpCategory');
@@ -467,7 +675,7 @@ export function handleFile(file) {
         }
 
         // Helper function to proceed with validation after mismatch handling
-        function proceedWithValidation() {
+        async function proceedWithValidation() {
             state.selectedFile = file;
             fileName.textContent = file.name;
             fileSize.textContent = formatBytes(file.size);
@@ -475,24 +683,28 @@ export function handleFile(file) {
             setProgramSelectorsLocked(true);
             setUploadEnabled(false);
 
-            // Period detection
-            const byName    = detectPeriodFromFilename(file.name);
-            const byContent = detectPeriodFromRows(json);
-            state.detectedPeriod = byName.confidence === 'high' ? byName : {
-                ...byContent,
-                month:      byName.month || byContent.month,
-                year:       byName.year  || byContent.year,
-                confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
-                source:     byName.month || byName.year ? 'filename' : 'content',
-            };
-            const isAccreditation = program === 'Employers Accreditation';
-            const isSchools = program === 'Schools';
-            applyDetectedPeriod(state.detectedPeriod, {
-                hideMonth: isAccreditation || isSchools,
-                hideYear: isSchools,
-            });
-            if (program === 'Job Fair' && monthSelect?.value && yearSelect?.value) {
-                fetchJobFairEvents();
+            // Period detection — only on first load of this file, not when re-validating
+            // after the user changes month/year or selects a job fair event.
+            if (!isSameSelectedFile) {
+                const byName    = detectPeriodFromFilename(file.name);
+                const byContent = detectPeriodFromRows(json);
+                state.detectedPeriod = byName.confidence === 'high' ? byName : {
+                    ...byContent,
+                    month:      byName.month || byContent.month,
+                    year:       byName.year  || byContent.year,
+                    confidence: (byName.month || byContent.month) && (byName.year || byContent.year) ? 'medium' : 'low',
+                    source:     byName.month || byName.year ? 'filename' : 'content',
+                };
+                const isAccreditation = program === 'Employers Accreditation';
+                const isSchools = program === 'Schools';
+                applyDetectedPeriod(state.detectedPeriod, {
+                    hideMonth: isAccreditation || isSchools,
+                    hideYear: isSchools,
+                });
+
+                if (program === 'Job Fair' && monthSelect?.value && yearSelect?.value) {
+                    fetchJobFairEvents();
+                }
             }
 
             // Capture category values so preview validation can apply program-specific rules.
@@ -500,16 +712,44 @@ export function handleFile(file) {
             const gipCategory = document.getElementById('gipCategory')?.value ?? '';
             const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
 
-            // Require selecting an event for Job Fair uploads so participant checks run.
+            // Require selecting a real event for Job Fair uploads.
             if (program === 'Job Fair' && (!jobFairEvent || jobFairEvent === '')) {
-                showToast('Please select a Job Fair event before validating.', 'warning');
+                showToast('Please select a Job Fair event from the dropdown before validating.', 'warning');
                 return;
             }
 
+            // Prevent first-load race: wait for participants check before showing preview.
+            if (program === 'Job Fair') {
+                const selectedEventLabel = document.getElementById('jfSelectSearch')?.value ?? '';
+                const hasParticipants = await _checkEventParticipants(jobFairEvent, selectedEventLabel);
+                if (!hasParticipants) {
+                    document.getElementById('previewMeta').innerHTML = '';
+                    document.getElementById('previewBody').innerHTML = '';
+                    document.getElementById('dataPreview').classList.add('hidden');
+                    resetPreviewPaginationState();
+                    return;
+                }
+            }
+
             // Validation request
+            // If Job Fair event has no registered companies, do not show preview
+            if (program === 'Job Fair') {
+                const noPartWarn = document.getElementById('jfNoParticipantsWarning');
+                if (noPartWarn && !noPartWarn.classList.contains('hidden')) {
+                    document.getElementById('previewMeta').innerHTML  = '';
+                    document.getElementById('previewBody').innerHTML  = '';
+                    document.getElementById('dataPreview').classList.add('hidden');
+                    resetPreviewPaginationState();
+                    return;
+                }
+            }
+
             document.getElementById('previewMeta').innerHTML  = '<span class="text-gray-400 animate-pulse">Validating rows…</span>';
             document.getElementById('previewBody').innerHTML  = '';
             document.getElementById('dataPreview').classList.remove('hidden');
+
+            const browseBtn = document.getElementById('excelBrowseBtn');
+            if (browseBtn) browseBtn.disabled = true;
 
             fetch('../../backend/import/validate_preview.php', {
                 method:  'POST',
@@ -581,6 +821,9 @@ export function handleFile(file) {
                     state.unknownEmployers = [];
                     document.getElementById('dataPreview').classList.add('hidden');
                     resetPreviewPaginationState();
+                })
+                .finally(() => {
+                    if (browseBtn) browseBtn.disabled = false;
                 });
         }
 

@@ -3,6 +3,7 @@
 import { previewTableRows, previewTableHeaders } from './common.js';
 import { state } from './excel-state.js';
 import { showToast } from '../toast.js';
+import { runWithButtonLoading, setButtonLoading } from '../loading.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const PREVIEW_PAGE_SIZE = 25;
@@ -139,39 +140,82 @@ export function renderPreviewPage(page = 1) {
     });
 }
 
-export async function revalidateCurrentPreview() {
+export async function revalidateCurrentPreview(options = {}) {
     const program = document.getElementById('excelProgram')?.value ?? '';
     if (!program || !state.parsedExcelData.length) return;
 
-    const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
-    const gipCategory = document.getElementById('gipCategory')?.value ?? '';
-    const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
+    const confirmBtn = options.button ?? document.getElementById('confirmImport');
+    if (confirmBtn && !options.skipButtonLoading) setButtonLoading(confirmBtn, true, { label: 'Validating…' });
 
-    const res = await fetch('../../backend/import/validate_preview.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            program,
-            data: state.parsedExcelData,
-            wiirpCategory,
-            gipCategory,
-            jobFairEvent,
-        }),
-    });
-
-    const raw = await res.text();
-    let result;
     try {
-        result = JSON.parse(raw);
-    } catch {
-        const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
-        throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
-    }
-    if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+        const wiirpCategory = document.getElementById('wiirpCategory')?.value ?? '';
+        const gipCategory = document.getElementById('gipCategory')?.value ?? '';
+        const jobFairEvent = (document.getElementById('jobFairEvent')?.value || state.selectedJobFairEvent || '').trim();
 
-    state.parsedExcelData = result.data;
-    state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
-    showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
+        const res = await fetch('../../backend/import/validate_preview.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                program,
+                data: state.parsedExcelData,
+                wiirpCategory,
+                gipCategory,
+                jobFairEvent,
+            }),
+        });
+
+        const raw = await res.text();
+        let result;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 180);
+            throw new Error(`Unexpected validation response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+        }
+        if (!res.ok) throw new Error(result.error ?? `Validation failed (HTTP ${res.status}).`);
+
+        state.parsedExcelData = result.data;
+        state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
+        showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
+    } finally {
+        if (confirmBtn && !options.skipButtonLoading) setButtonLoading(confirmBtn, false);
+    }
+}
+
+export function hasJobFairCompanySuggestion(row) {
+    if ((row?.badge_status ?? '').toLowerCase() !== 'invalid') return false;
+
+    if (String(row?.suggested_company_name ?? '').trim() !== '') return true;
+
+    return String(row?.status_message ?? '').toLowerCase().includes('did you mean');
+}
+
+export function isUnresolvedJobFairCompanyRow(row) {
+    if ((row?.badge_status ?? '').toLowerCase() !== 'invalid') return false;
+
+    if (hasJobFairCompanySuggestion(row)) return true;
+
+    const msg = String(row?.status_message ?? '').toLowerCase();
+    return msg.includes('not a participant')
+        || msg.includes('missing company')
+        || (msg.includes('company') && msg.includes('not found'));
+}
+
+export function getJobFairCompanyImportBlockMessage(rows) {
+    const unresolved = rows.filter(isUnresolvedJobFairCompanyRow);
+    const count = unresolved.length;
+    if (count === 0) return null;
+
+    const suggestionCount = unresolved.filter(hasJobFairCompanySuggestion).length;
+    const hardInvalidCount = count - suggestionCount;
+
+    if (suggestionCount === count) {
+        return `Cannot import: ${count} row(s) need confirmation. Review and accept each suggestion to proceed.`;
+    }
+    if (hardInvalidCount === count) {
+        return `Cannot import: ${count} row(s) have unrecognized companies. Fix your file and re-upload.`;
+    }
+    return `Cannot import: ${count} row(s) have unresolved companies. Accept each suggestion or fix in your file, then re-upload.`;
 }
 
 async function acceptCompanySuggestion(rowIndex) {
@@ -197,13 +241,38 @@ async function acceptCompanySuggestion(rowIndex) {
         row.Company = suggestion;
     }
 
+    delete row.suggested_company_name;
+    delete row.suggested_company_id;
+    delete row.suggested_company_similarity;
+
     row.badge_status = 'new';
     row.status_message = 'Accepted company suggestion. Revalidating...';
     row._sys_skip = false;
 
+    const acceptBtn = document.querySelector(`[data-accept-company-suggestion][data-preview-row-index="${index}"]`);
+
     try {
         showToast(`Accepted suggestion: ${suggestion}. Revalidating rows...`, 'info');
-        await revalidateCurrentPreview();
+        await runWithButtonLoading(acceptBtn, () => revalidateCurrentPreview({ skipButtonLoading: true }), { label: 'Applying…' });
+
+        const refreshedRow = state.parsedExcelData[index];
+        if (refreshedRow && isUnresolvedJobFairCompanyRow(refreshedRow)) {
+            showToast(
+                `Company was updated to "${suggestion}" but this row is still invalid. Check the status message or try another company name.`,
+                'warning'
+            );
+            return;
+        }
+
+        const remaining = state.parsedExcelData.filter(isUnresolvedJobFairCompanyRow).length;
+        if (remaining > 0) {
+            showToast(
+                `Suggestion applied. ${remaining} row(s) still have unresolved company names — accept suggestions or fix them before importing.`,
+                'warning'
+            );
+            return;
+        }
+
         showToast('Suggestion applied and rows revalidated.', 'success');
     } catch (err) {
         if (originalCompany) {
@@ -371,9 +440,13 @@ export function applyDetectedPeriod(period, { hideMonth = false, hideYear = fals
         if (period.month && monthSelect) monthSelect.value = period.month;
         if (period.year)  yearSelect.value = period.year;
 
-        periodSuggestionText.textContent = (period.month && period.year)
-            ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
-            : 'Could not confidently detect period. Please select month and year before import.';
+        if (state.program !== 'Job Fair') {
+            periodSuggestionText.textContent = (period.month && period.year)
+                ? `Detected from ${period.source === 'filename' ? 'filename' : 'file contents'}: ${period.month} ${period.year}`
+                : 'Could not confidently detect period. Please select month and year before import.';
+        } else {
+            periodSuggestionText.textContent = '';
+        }
     }
 }
 
@@ -436,5 +509,11 @@ export function showExcelPreview(rows, summary, requiredCols, extraCols) {
 
     const preview = document.getElementById('dataPreview');
     preview.classList.remove('hidden');
-    preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    const scrollTarget = periodPanel || preview;
+    if (scrollTarget) {
+        const topOffset = 100;
+        const targetTop = window.scrollY + scrollTarget.getBoundingClientRect().top - topOffset;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+    }
 }

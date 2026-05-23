@@ -2,6 +2,14 @@
  * Handles opening/closing the profile detail view and tab switching.
  */
 
+function _withModalSaveLoading(label, run) {
+  const btn = window.AscendLoading?.getOpenModalConfirmButton?.() ?? null;
+  if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, true, { label });
+  return Promise.resolve(run()).finally(() => {
+    if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
+  });
+}
+
 /** Calculate age from date of birth. */
 function calculateAge(dob) {
   if (!dob) return '—';
@@ -873,7 +881,7 @@ function submitEditPersonal() {
   const last = parts.length > 1 ? parts[parts.length - 1] : '';
   const middle = parts.length > 2 ? parts.slice(1, -1).join(' ') : '';
 
-  fetch(`../../backend/beneficiaries/update_personal.php`, {
+  _withModalSaveLoading('Saving…', () => fetch(`../../backend/beneficiaries/update_personal.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -926,7 +934,7 @@ function submitEditPersonal() {
     } else {
       _showEditToast(j.message || 'Failed to save personal information.', 'error');
     }
-  }).catch(err => {
+  })).catch(err => {
     console.error('[profile.js] submitEditPersonal error', err);
     _showEditToast('Failed to save personal information.', 'error');
   });
@@ -987,7 +995,7 @@ function submitEditContact() {
     return;
   }
 
-  fetch(`../../backend/beneficiaries/update_contact.php`, {
+  _withModalSaveLoading('Saving…', () => fetch(`../../backend/beneficiaries/update_contact.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ benef_id: id, contact: phone, email })
@@ -1013,7 +1021,7 @@ function submitEditContact() {
     } else {
       _showEditToast(j.message || 'Failed to save contact information.', 'error');
     }
-  }).catch(err => {
+  })).catch(err => {
     console.error('[profile.js] submitEditContact error', err);
     _showEditToast('Failed to save contact information.', 'error');
   });
@@ -1075,7 +1083,7 @@ function confirmDeleteEmploymentRecord() {
   formData.append('history_id', historyId);
   formData.append('benef_id', window.currentBeneficiaryId);
 
-  fetch('../../backend/beneficiaries/delete_employment.php', {
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_employment.php', {
     method: 'POST',
     body: formData
   })
@@ -1109,7 +1117,7 @@ function confirmDeleteEmploymentRecord() {
       } else {
         _showEditToast(j?.error || 'Error deleting employment record.', 'error');
       }
-    })
+    }))
     .catch(() => {
       _showEditToast('Error deleting employment record.', 'error');
     });
@@ -1146,7 +1154,7 @@ function _submitEmploymentRecord(endpoint, successMessage, errorMessage, modalCl
     formData.append('history_id', historyId);
   }
 
-  fetch(endpoint, {
+  _withModalSaveLoading('Saving…', () => fetch(endpoint, {
     method: 'POST',
     body: formData
   })
@@ -1180,7 +1188,7 @@ function _submitEmploymentRecord(endpoint, successMessage, errorMessage, modalCl
       } else {
         _showEditToast(j?.error || errorMessage, 'error');
       }
-    })
+    }))
     .catch(() => {
       _showEditToast(errorMessage, 'error');
     });
@@ -1249,7 +1257,7 @@ function submitEditSpes() {
   formData.append('course', document.getElementById('editSpesCourse').value.trim());
   formData.append('school', document.getElementById('editSpesSchool').value.trim());
 
-  fetch('../../backend/beneficiaries/update_spes.php', {
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_spes.php', {
     method: 'POST',
     body: formData
   })
@@ -1272,7 +1280,7 @@ function submitEditSpes() {
       } else {
         _showEditToast(j?.error || 'Error updating SPES student information.', 'error');
       }
-    })
+    }))
     .catch(() => {
       _showEditToast('Error updating SPES student information.', 'error');
     });
@@ -1355,7 +1363,7 @@ function submitEditWiirp() {
   formData.append('year_level', document.getElementById('editWiirpYearLevel').value.trim());
   // Assignment details are display-only in this modal — do not send them for update here.
 
-  fetch('../../backend/beneficiaries/update_wiirp.php', {
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_wiirp.php', {
     method: 'POST',
     body: formData
   })
@@ -1370,7 +1378,7 @@ function submitEditWiirp() {
       } else {
         _showEditToast(j?.error || 'Error updating WIIRP record.', 'error');
       }
-    })
+    }))
     .catch(() => {
       _showEditToast('Error updating WIIRP record.', 'error');
     });
@@ -1425,7 +1433,7 @@ function submitEditGip() {
   formData.append('office_assignment', document.getElementById('editGipOfficeAssignment').value.trim());
   formData.append('type', document.getElementById('editGipType').value);
 
-  fetch('../../backend/beneficiaries/update_gip.php', {
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_gip.php', {
     method: 'POST',
     body: formData
   })
@@ -1440,7 +1448,7 @@ function submitEditGip() {
       } else {
         _showEditToast(j?.error || 'Error updating GIP record.', 'error');
       }
-    })
+    }))
     .catch(() => {
       _showEditToast('Error updating GIP record.', 'error');
     });
@@ -1502,7 +1510,7 @@ function submitUpdateIssuance() {
 
   console.log('FormData entries:', Array.from(formData.entries()));
 
-  fetch('../../backend/beneficiaries/update_issuance.php', {
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_issuance.php', {
     method: 'POST',
     body: formData
   })
@@ -1521,7 +1529,7 @@ function submitUpdateIssuance() {
       } else {
         _showEditToast(j?.error || 'Error updating issuance status.', 'error');
       }
-    })
+    }))
     .catch(err => {
       console.error('Fetch error:', err);
       _showEditToast('Error updating issuance status.', 'error');

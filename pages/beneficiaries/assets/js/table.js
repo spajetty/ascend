@@ -441,20 +441,26 @@ async function confirmBulkDelete() {
   const ids = [...selectedIds];
   if (!ids.length) return;
 
-  // ── Loading state ────────────────────────────────────────────────────────
   const btn = document.querySelector('#modalBulkDelete .btn-confirm');
-  const originalText = btn ? btn.textContent : '';
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-           style="animation:spin 0.8s linear infinite">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-      </svg>
-      Deleting…`;
-  }
 
+  try {
+    if (window.AscendLoading && btn) {
+      await window.AscendLoading.runWithButtonLoading(btn, async () => {
+        await _executeBulkDelete(ids);
+      }, { label: 'Deleting…' });
+    } else {
+      await _executeBulkDelete(ids);
+    }
+  } catch (err) {
+    console.error('Bulk delete error:', err);
+    closeBulkDeleteModal();
+    if (typeof window.showToast === 'function') {
+      window.showToast('Network error. Could not delete beneficiaries.', 'error');
+    }
+  }
+}
+
+async function _executeBulkDelete(ids) {
   try {
     const res  = await fetch('../../backend/beneficiaries/bulk_delete.php', {
       method:  'POST',
@@ -484,11 +490,6 @@ async function confirmBulkDelete() {
     if (typeof window.showToast === 'function') {
       window.showToast('Network error. Could not delete beneficiaries.', 'error');
     }
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = originalText;
-    }
   }
 }
 
@@ -506,20 +507,26 @@ async function confirmBulkClassify() {
     return;
   }
 
-  // ── Loading state ────────────────────────────────────────────────────────
   const btn = document.getElementById('bulkClassifySubmitBtn');
-  const originalText = btn ? btn.textContent : '';
-  if (btn) {
-    btn.disabled = true;
-    btn.innerHTML = `
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-           stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-           style="animation:spin 0.8s linear infinite">
-        <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
-      </svg>
-      Applying…`;
-  }
 
+  try {
+    if (window.AscendLoading && btn) {
+      await window.AscendLoading.runWithButtonLoading(btn, async () => {
+        await _executeBulkClassify(ids, status);
+      }, { label: 'Applying…' });
+    } else {
+      await _executeBulkClassify(ids, status);
+    }
+  } catch (err) {
+    console.error('Bulk classify error:', err);
+    closeBulkClassifyModal();
+    if (typeof window.showToast === 'function') {
+      window.showToast('Network error. Could not update classification.', 'error');
+    }
+  }
+}
+
+async function _executeBulkClassify(ids, status) {
   try {
     const res  = await fetch('../../backend/beneficiaries/bulk_update_classification.php', {
       method:  'POST',
@@ -548,11 +555,6 @@ async function confirmBulkClassify() {
     closeBulkClassifyModal();
     if (typeof window.showToast === 'function') {
       window.showToast('Network error. Could not update classification.', 'error');
-    }
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.textContent = originalText;
     }
   }
 }

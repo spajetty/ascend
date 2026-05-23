@@ -206,34 +206,41 @@ function closeAddReferralModal() {
   _toggleTimelineModal('modalAddReferral', 'none');
 }
 
-function submitLogVisit() {
+async function submitLogVisit() {
   const id = window.currentBeneficiaryId;
   if (!id) { _showTimelineToast('No beneficiary selected.', 'error'); return; }
   const dateEl = document.getElementById('visitDate');
   const dateVal = dateEl ? dateEl.value : new Date().toISOString().slice(0,10);
 
-  fetch('../../backend/beneficiaries/save_visit.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ benef_id: id, date_of_record: dateVal })
-  })
-  .then(r => r.json())
-  .then(j => {
+  const save = async () => {
+    const r = await fetch('../../backend/beneficiaries/save_visit.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ benef_id: id, date_of_record: dateVal }),
+    });
+    const j = await r.json();
     if (j && j.success) {
       closeLogVisitModal();
-      // reload timeline to show the new visit
       if (typeof window.loadBeneficiaryTimeline === 'function') window.loadBeneficiaryTimeline(id);
       _showTimelineToast(`Visit ${j.visit_number || ''} saved successfully.`, 'success');
     } else {
       _showTimelineToast(j.message || 'Failed to save visit.', 'error');
     }
-  }).catch(err => {
+  };
+
+  try {
+    if (window.AscendLoading) {
+      await window.AscendLoading.runModalConfirmLoading('Saving…', save);
+    } else {
+      await save();
+    }
+  } catch (err) {
     console.error('[timeline.js] submitLogVisit error', err);
     _showTimelineToast('Failed to save visit.', 'error');
-  });
+  }
 }
 
-function submitAddReferral() {
+async function submitAddReferral() {
   const id = window.currentBeneficiaryId;
   if (!id) {
     _showTimelineToast('No beneficiary selected.', 'error');
@@ -260,31 +267,38 @@ function submitAddReferral() {
     return;
   }
 
-  fetch('../../backend/beneficiaries/save_referral.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      benef_id: id,
-      company_id: companyId,
-      position,
-      referral_status: referralStatus,
-      date_of_record: dateVal,
-    }),
-  })
-    .then(r => r.json())
-    .then(j => {
-      if (j && j.success) {
-        closeAddReferralModal();
-        if (typeof window.loadBeneficiaryTimeline === 'function') window.loadBeneficiaryTimeline(id);
-        _showTimelineToast('Referral saved successfully.', 'success');
-      } else {
-        _showTimelineToast(j.message || 'Failed to save referral.', 'error');
-      }
-    })
-    .catch(err => {
-      console.error('[timeline.js] submitAddReferral error', err);
-      _showTimelineToast('Failed to save referral.', 'error');
+  const save = async () => {
+    const r = await fetch('../../backend/beneficiaries/save_referral.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        benef_id: id,
+        company_id: companyId,
+        position,
+        referral_status: referralStatus,
+        date_of_record: dateVal,
+      }),
     });
+    const j = await r.json();
+    if (j && j.success) {
+      closeAddReferralModal();
+      if (typeof window.loadBeneficiaryTimeline === 'function') window.loadBeneficiaryTimeline(id);
+      _showTimelineToast('Referral saved successfully.', 'success');
+    } else {
+      _showTimelineToast(j.message || 'Failed to save referral.', 'error');
+    }
+  };
+
+  try {
+    if (window.AscendLoading) {
+      await window.AscendLoading.runModalConfirmLoading('Saving…', save);
+    } else {
+      await save();
+    }
+  } catch (err) {
+    console.error('[timeline.js] submitAddReferral error', err);
+    _showTimelineToast('Failed to save referral.', 'error');
+  }
 }
 
 // ── Delete Timeline Item ──────────────────────────────────
@@ -312,7 +326,7 @@ function closeDeleteTimelineModal() {
   pendingDeleteHistoryId = null;
 }
 
-function confirmDeleteTimelineItem() {
+async function confirmDeleteTimelineItem() {
   const historyId = pendingDeleteHistoryId;
   if (!historyId) {
     _showTimelineToast('Unable to delete this record.', 'error');
@@ -333,24 +347,19 @@ function confirmDeleteTimelineItem() {
     item.style.pointerEvents = 'none';
   }
 
-  // Call backend to delete
-  fetch(`../../backend/beneficiaries/delete_activity.php`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      benef_id: benef_id,
-      history_id: historyId
-    })
-  })
-  .then(r => r.json())
-  .then(j => {
+  const deleteBtn = document.querySelector('#modalDeleteTimelineItem .btn-confirm');
+
+  const runDelete = async () => {
+    const r = await fetch('../../backend/beneficiaries/delete_activity.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ benef_id, history_id: historyId }),
+    });
+    const j = await r.json();
     if (j && j.success) {
-      // Remove from DOM
       if (item) {
         setTimeout(() => {
           item.remove();
-          
-          // Check if timeline is now empty
           const list = document.getElementById('timelineList');
           const items = list ? list.querySelectorAll('.tl-item') : [];
           if (items.length === 0) {
@@ -358,15 +367,11 @@ function confirmDeleteTimelineItem() {
           }
         }, 300);
       }
-      
-      // Reload timeline to update visit count and other data
       if (typeof window.loadBeneficiaryTimeline === 'function') {
         window.loadBeneficiaryTimeline(benef_id);
       }
-      
       _showTimelineToast('Timeline record deleted successfully.', 'success');
     } else {
-      // Restore item if deletion failed
       if (item) {
         item.style.opacity = '1';
         item.style.pointerEvents = 'auto';
@@ -374,17 +379,23 @@ function confirmDeleteTimelineItem() {
       _showTimelineToast(j.message || 'Failed to delete timeline record.', 'error');
     }
     closeDeleteTimelineModal();
-  })
-  .catch(err => {
+  };
+
+  try {
+    if (window.AscendLoading && deleteBtn) {
+      await window.AscendLoading.runWithButtonLoading(deleteBtn, runDelete, { label: 'Deleting…' });
+    } else {
+      await runDelete();
+    }
+  } catch (err) {
     console.error('[timeline.js] confirmDeleteTimelineItem error', err);
-    // Restore item if deletion failed
     if (item) {
       item.style.opacity = '1';
       item.style.pointerEvents = 'auto';
     }
     _showTimelineToast('Failed to delete timeline record.', 'error');
     closeDeleteTimelineModal();
-  });
+  }
 }
 
 window.filterTimeline = filterTimeline;

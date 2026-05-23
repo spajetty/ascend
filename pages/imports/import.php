@@ -24,6 +24,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
 <script src="../../assets/js/xlsx.full.min.js"></script>
 <script src="../../assets/js/address-data.js"></script>
+<script type="module" src="../../assets/js/loading.js?v=<?= time() ?>"></script>
 <script type="module" src="../../assets/js/imports/excel.js?v=<?= time() ?>"></script>
 <script type="module" src="../../assets/js/imports/resume.js?v=<?= time() ?>"></script>
 <script type="module" src="../../assets/js/imports/manual.js?v=<?= time() ?>"></script>

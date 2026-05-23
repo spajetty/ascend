@@ -31,6 +31,8 @@ $jobFairEventRaw = trim((string)($input['jobFairEvent'] ?? ''));
 require_once __DIR__ . '/helpers/db_utils.php';
 require_once __DIR__ . '/helpers/formatting_utils.php';
 require_once __DIR__ . '/helpers/program_utils.php';
+require_once __DIR__ . '/helpers/followup_utils.php';
+$inputBatchId = isset($input['batchId']) ? (int)$input['batchId'] : 0;
 
 // Row savers
 require_once __DIR__ . '/savers/save_common_person.php';
@@ -93,6 +95,31 @@ try {
     $needsBatch = in_array($program, $batchTrackedPrograms, true) && tableExists($conn, 'import_batches');
 
     if ($needsBatch) {
+        if ($program === 'Job Fair' && ($importMonthRaw === '' || $importYearRaw === '')) {
+            $eventId = (int)$jobFairEventRaw;
+            if ($eventId <= 0) {
+                throw new RuntimeException('Please select a Job Fair event before importing.');
+            }
+            $eventStmt = $conn->prepare('SELECT date_start FROM job_fair_events WHERE jobfairevent_id = ? LIMIT 1');
+            $eventStmt->bind_param('i', $eventId);
+            $eventStmt->execute();
+            $eventRow = $eventStmt->get_result()->fetch_assoc();
+            $eventStmt->close();
+            if (!$eventRow || trim((string)($eventRow['date_start'] ?? '')) === '') {
+                throw new RuntimeException('Selected Job Fair event has no event date.');
+            }
+            $eventTs = strtotime((string)$eventRow['date_start']);
+            if ($eventTs === false) {
+                throw new RuntimeException('Invalid date on selected Job Fair event.');
+            }
+            if ($importMonthRaw === '') {
+                $importMonthRaw = date('F', $eventTs);
+            }
+            if ($importYearRaw === '') {
+                $importYearRaw = date('Y', $eventTs);
+            }
+        }
+
         $monthInt = monthToInt($importMonthRaw);
         if ($monthInt === null) {
             throw new RuntimeException('Invalid import month. Please select a valid month.');
@@ -122,6 +149,31 @@ try {
         'gipCategory' => $gipCategoryRaw,
         'jobFairEvent' => $jobFairEventRaw,
     ];
+
+    // Server-side validation: Employers Accreditation follow-up must have all required fields
+    if ($program === 'Employers Accreditation') {
+        $required = ['Company', 'Month', 'Year', 'Accreditation', 'Est. Type', 'Industry', 'City/Municipality/Province'];
+        foreach ($rows as $i => $r) {
+            $missing = [];
+            $company = trim((string)($r['Company'] ?? $r['company_name'] ?? ''));
+            $month = trim((string)($r['Month'] ?? $r['month'] ?? ''));
+            $year = trim((string)($r['Year'] ?? $r['year'] ?? ''));
+            $status = trim((string)($r['Accreditation'] ?? $r['status'] ?? ''));
+            $est = trim((string)($r['Est. Type'] ?? $r['est_type'] ?? ''));
+            $industry = trim((string)($r['Industry'] ?? $r['industry'] ?? ''));
+            $city = trim((string)($r['City/Municipality/Province'] ?? $r['city'] ?? ''));
+            if ($company === '') $missing[] = 'Company';
+            if ($month === '') $missing[] = 'Month';
+            if ($year === '') $missing[] = 'Year';
+            if ($status === '') $missing[] = 'Accreditation';
+            if ($est === '') $missing[] = 'Est. Type';
+            if ($industry === '') $missing[] = 'Industry';
+            if ($city === '') $missing[] = 'City/Municipality/Province';
+            if (!empty($missing)) {
+                throw new RuntimeException('Accreditation row '.($i+1).' is missing required fields: '.implode(', ', $missing));
+            }
+        }
+    }
 
     foreach ($rows as $row) {
         if (!empty($row['_sys_skip'])) {
@@ -208,6 +260,33 @@ try {
 
     $conn->commit();
 
+    $createdEmployers = [];
+    $createdEmployerIds = array_values(array_unique(array_filter(array_map('intval', $state['createdEmployerIds']))));
+    if (!empty($createdEmployerIds)) {
+        $placeholders = implode(', ', array_fill(0, count($createdEmployerIds), '?'));
+        $stmt = $conn->prepare(
+            'SELECT company_id, company_name, est_type, industry, city, batch_id
+             FROM employers
+             WHERE company_id IN (' . $placeholders . ')
+             ORDER BY company_name ASC'
+        );
+        $types = str_repeat('i', count($createdEmployerIds));
+        $stmt->bind_param($types, ...$createdEmployerIds);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $createdEmployers[] = [
+                'company_id' => (int)($row['company_id'] ?? 0),
+                'company_name' => (string)($row['company_name'] ?? ''),
+                'est_type' => (string)($row['est_type'] ?? ''),
+                'industry' => (string)($row['industry'] ?? ''),
+                'city' => (string)($row['city'] ?? ''),
+                'batch_id' => (int)($row['batch_id'] ?? 0),
+            ];
+        }
+        $stmt->close();
+    }
+
     $hasUndoPayload =
         !empty($state['insertedBenefIds']) ||
         !empty($state['insertedDocIds']) ||
@@ -265,15 +344,45 @@ try {
         ];
     }
 
+    $followupRecorded = false;
+    if ($program === 'Employers Accreditation') {
+        $followupRecorded = completeImportFollowup($conn, $inputBatchId);
+    } elseif (!empty($createdEmployers) && $batchId) {
+        $followupRecorded = recordImportFollowup($conn, $batchId, $program, [
+            'program' => $program,
+            'period' => trim(($importMonthRaw !== '' ? $importMonthRaw : '') . ' ' . ($importYearRaw !== '' ? $importYearRaw : '')),
+            'fileName' => $sourceFileName,
+            'importMonth' => $importMonthRaw,
+            'importYear' => $importYearRaw,
+            'batchId' => $batchId,
+            'createdEmployers' => $createdEmployers,
+        ]);
+    }
+
+    if (!empty($createdEmployers) && !$followupRecorded && $program !== 'Employers Accreditation') {
+        $state['warnings'][] = 'Employer follow-up could not be persisted. Please complete accreditation before logging out.';
+    }
+
     echo json_encode([
         'success' => true,
         'saved' => $saved,
         'skipped' => $skipped,
         'batch_id' => $batchId,
+        'created_employers' => $createdEmployers,
         'undo_token' => $undoToken,
         'warnings' => array_values(array_unique($state['warnings'])),
         'message' => "{$saved} record(s) imported, {$skipped} skipped.",
     ]);
+
+    if ($program === 'Employers Accreditation') {
+        unset($_SESSION['pending_employer_accreditation']);
+    } elseif (!empty($createdEmployers)) {
+        $_SESSION['pending_employer_accreditation'] = [
+            'program' => $program,
+            'batch_id' => $batchId,
+            'created_at' => time(),
+        ];
+    }
 } catch (Throwable $e) {
     $conn->rollback();
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);

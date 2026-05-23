@@ -33,6 +33,12 @@ function validateJobMatchingFamily(mysqli $conn, array $rows, string $program, s
         $existingEmployers = loadNormalizedEmployers($conn);
 
         foreach ($validatedData as &$row) {
+            unset(
+                $row['suggested_company_name'],
+                $row['suggested_company_id'],
+                $row['suggested_company_similarity']
+            );
+
             if (!empty($row['_sys_skip'])) {
                 continue;
             }
@@ -74,6 +80,9 @@ function validateJobMatchingFamily(mysqli $conn, array $rows, string $program, s
                 }
                 $row['badge_status'] = 'invalid';
                 $row['_sys_skip'] = true;
+            } else {
+                $row['badge_status'] = $row['badge_status'] ?? 'new';
+                $row['_sys_skip'] = false;
             }
         }
         unset($row);

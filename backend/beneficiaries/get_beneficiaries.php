@@ -2,6 +2,12 @@
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../../backend/import/helpers/program_utils.php';
+require_once __DIR__ . '/../../backend/import/helpers/followup_utils.php';
+
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
 
 $response = ['success' => false, 'data' => [], 'stats' => [], 'total' => 0];
 
@@ -15,10 +21,23 @@ try {
     $statusF   = trim($_GET['status']   ?? '');
     $offset    = ($page - 1) * $limit;
 
+    $pendingFollowup = isset($_SESSION['user_id'])
+        ? getLatestPendingImportFollowupForUser($conn, (int)$_SESSION['user_id'])
+        : null;
+    $pendingBatchId = $pendingFollowup ? (int)($pendingFollowup['batch_id'] ?? 0) : 0;
+
     // ── Build WHERE clause ──────────────────────────────────────────────────
     $where  = [];
     $params = [];
     $types  = '';
+
+    $appendWhere = function(string $clause, array $clauseParams = [], string $clauseTypes = '') use (&$where, &$params, &$types): void {
+        $where[] = $clause;
+        if ($clauseParams) {
+            $params = array_merge($params, $clauseParams);
+            $types .= $clauseTypes;
+        }
+    };
 
     if ($search !== '') {
         $like = '%' . $search . '%';
@@ -38,9 +57,43 @@ try {
         $types   .= 's';
     }
     if ($statusF !== '') {
-        $where[]  = 'b.classification = ?';
-        $params[] = $statusF;
-        $types   .= 's';
+        $appendWhere('b.classification = ?', [$statusF], 's');
+    }
+
+    if ($pendingBatchId > 0) {
+        if (tableExists($conn, 'jobMatch') && tableHasColumn($conn, 'jobMatch', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM jobMatch jm WHERE jm.benef_id = b.benef_id AND jm.batch_id = ?)', [$pendingBatchId], 'i');
+        }
+        if ((tableExists($conn, 'jobfair') || tableExists($conn, 'jobFair'))) {
+            $jobFairTable = tableExists($conn, 'jobfair') ? 'jobfair' : 'jobFair';
+            if (tableHasColumn($conn, $jobFairTable, 'batch_id')) {
+                $appendWhere('NOT EXISTS (SELECT 1 FROM `' . $jobFairTable . '` jf WHERE jf.benef_id = b.benef_id AND jf.batch_id = ?)', [$pendingBatchId], 'i');
+            }
+        }
+
+        if (tableExists($conn, 'firstJobSeek') && tableHasColumn($conn, 'firstJobSeek', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM firstJobSeek fjs WHERE fjs.benef_id = b.benef_id AND fjs.batch_id = ?)', [$pendingBatchId], 'i');
+        }
+
+        if (tableExists($conn, 'spes') && tableHasColumn($conn, 'spes', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM spes s2 WHERE s2.benef_id = b.benef_id AND s2.batch_id = ?)', [$pendingBatchId], 'i');
+        }
+
+        if (tableExists($conn, 'wiirp') && tableHasColumn($conn, 'wiirp', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM wiirp w WHERE w.benef_id = b.benef_id AND w.batch_id = ?)', [$pendingBatchId], 'i');
+        }
+
+        if (tableExists($conn, 'gip') && tableHasColumn($conn, 'gip', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM gip g WHERE g.benef_id = b.benef_id AND g.batch_id = ?)', [$pendingBatchId], 'i');
+        }
+
+        $whipSchema = resolveWhipTableSchema($conn);
+        $whipTable = $whipSchema['table'] ?? null;
+        $whipBenefCol = $whipSchema['benef_id_col'] ?? null;
+        $whipBatchCol = $whipSchema['batch_id_col'] ?? null;
+        if ($whipTable && $whipBenefCol && $whipBatchCol) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM `' . $whipTable . '` wh WHERE wh.`' . $whipBenefCol . '` = b.benef_id AND wh.`' . $whipBatchCol . '` = ?)', [$pendingBatchId], 'i');
+        }
     }
 
     $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
@@ -154,12 +207,21 @@ try {
     $statsSql  = "
         SELECT
             COUNT(*) AS total,
-            SUM(LOWER(classification) LIKE '%hired%' OR LOWER(classification) LIKE '%placed%' OR LOWER(classification) LIKE '%hots%') AS hired,
-            SUM(LOWER(classification) LIKE '%refer%') AS referred,
-            SUM(LOWER(classification) LIKE '%register%' OR LOWER(classification) LIKE '%issued%' OR LOWER(classification) LIKE '%inquir%' OR classification IS NULL OR classification = '') AS registered
-        FROM beneficiaries
+            SUM(CASE WHEN LOWER(COALESCE(classification, '')) LIKE '%hired%' OR LOWER(COALESCE(classification, '')) LIKE '%placed%' OR LOWER(COALESCE(classification, '')) LIKE '%hots%' THEN 1 ELSE 0 END) AS hired,
+            SUM(CASE WHEN LOWER(COALESCE(classification, '')) LIKE '%refer%' THEN 1 ELSE 0 END) AS referred,
+            SUM(CASE WHEN LOWER(COALESCE(classification, '')) LIKE '%register%' THEN 1 ELSE 0 END) AS registered
+        FROM beneficiaries b
+        LEFT JOIN programs p ON p.program_id = b.program_id
+        LEFT JOIN sections s ON s.section_id = p.section_id
+        $whereSql
     ";
-    $statsRow = $conn->query($statsSql)->fetch_assoc();
+    $statsStmt = $conn->prepare($statsSql);
+    if ($params) {
+        $statsStmt->bind_param($types, ...$params);
+    }
+    $statsStmt->execute();
+    $statsRow = $statsStmt->get_result()->fetch_assoc();
+    $statsStmt->close();
 
     $response['success'] = true;
     $response['data']    = $data;

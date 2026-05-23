@@ -426,7 +426,7 @@ function submitEditDrive() {
     return;
   }
 
-  fetch(`../../backend/beneficiaries/update_document.php`, {
+  const save = () => fetch(`../../backend/beneficiaries/update_document.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -459,11 +459,18 @@ function submitEditDrive() {
     } else {
       _showEditDriveToast(j.message || 'Failed to update Google Drive link.', 'error');
     }
-  })
-  .catch(err => {
+  });
+
+  const runSave = () => save().catch(err => {
     console.error('[documents.js] submitEditDrive error', err);
     _showEditDriveToast('Failed to update Google Drive link.', 'error');
   });
+
+  if (window.AscendLoading) {
+    window.AscendLoading.runModalConfirmLoading('Saving…', runSave);
+  } else {
+    runSave();
+  }
 }
 
 window.openEditDriveModal = openEditDriveModal;

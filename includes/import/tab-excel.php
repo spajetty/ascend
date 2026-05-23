@@ -106,7 +106,33 @@
             </button>
         </div>
 
-        <!-- Import period detection + editable confirmation -->
+        <!-- Guidelines -->
+        <div class="mt-5 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
+            <p class="text-sm font-semibold text-yellow-700 flex items-center gap-2 mb-2">
+                <svg class="w-4 h-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                </svg>
+                Excel Format Guidelines
+            </p>
+            <ul class="space-y-1 text-sm text-yellow-700">
+                <li class="flex items-start gap-2"><span
+                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>First row should
+                    contain column headers</li>
+                <li class="flex items-start gap-2"><span
+                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Supported formats:
+                    .xlsx, .xls, .csv</li>
+                <li class="flex items-start gap-2"><span
+                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Maximum file size:
+                    10MB</li>
+                <li class="flex items-start gap-2"><span
+                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Ensure data matches
+                    the required fields for each section</li>
+                        <li class="flex items-start gap-2"><span
+                            class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Preferred file naming: use the format MONTHNAME_YEAR_PROGRAMNAME — e.g. JANUARY_2026_SPES.xlsx</li>
+            </ul>
+        </div>
+
+         <!-- Import period detection + editable confirmation -->
         <div id="importPeriodPanel" class="hidden mt-4 bg-blue-50 border border-blue-200 rounded-xl px-4 py-4">
             <p id="periodSuggestionText" class="text-sm text-blue-800 font-medium mb-3"></p>
             <div id="importPeriodGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -178,42 +204,46 @@
 
             <!-- Job Fair Event Dropdown (hidden by default, shown only for Job Fair) -->
             <div id="jobFairEventWrapper" class="hidden mt-4">
-                <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">Job Fair Event</label>
-                <select id="jobFairEvent"
-                    class="w-full appearance-none bg-white border border-blue-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition disabled:opacity-50">
-                    <option value="">Select month and year first...</option>
-                </select>
+                <label class="block text-xs font-semibold text-blue-700 uppercase tracking-wider mb-1.5">
+                    Job Fair Event <span class="text-red-400">*</span>
+                </label>
+                <div class="flex items-center gap-3">
+                    <!-- Custom Searchable Dropdown -->
+                    <div class="relative flex-1" id="jobFairCustomSelect">
+                        <div class="relative cursor-pointer" id="jfSelectToggle">
+                            <input type="text" id="jfSelectSearch" placeholder="Search or select an event…" readonly
+                                class="w-full cursor-pointer bg-white border border-blue-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" autocomplete="off">
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="6 9 12 15 18 9"/>
+                            </svg>
+                        </div>
+                        <!-- Dropdown list -->
+                        <div id="jfSelectDropdown" class="hidden absolute left-0 right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-50 flex flex-col">
+                            <div class="p-2 border-b border-gray-100">
+                                <input type="text" id="jfSelectFilter" placeholder="Type to search..." 
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" autocomplete="off">
+                            </div>
+                            <div id="jfSelectOptions" class="max-h-48 overflow-y-auto p-1">
+                                <!-- Options populated by JS -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="jobFairEvent" value="">
+                    </div>
+                    <button id="jfCreateStandaloneBtn" type="button" class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 hover:border-blue-300 text-sm font-semibold rounded-xl transition-colors">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create New Event
+                    </button>
+                </div>
             </div>
 
             <p class="text-xs text-blue-700 mt-2">Suggestion is pre-filled but editable before final import.</p>
         </div>
-
-        <!-- Guidelines -->
-        <div class="mt-5 bg-yellow-50 border border-yellow-200 rounded-xl px-5 py-4">
-            <p class="text-sm font-semibold text-yellow-700 flex items-center gap-2 mb-2">
-                <svg class="w-4 h-4 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                </svg>
-                Excel Format Guidelines
-            </p>
-            <ul class="space-y-1 text-sm text-yellow-700">
-                <li class="flex items-start gap-2"><span
-                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>First row should
-                    contain column headers</li>
-                <li class="flex items-start gap-2"><span
-                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Supported formats:
-                    .xlsx, .xls, .csv</li>
-                <li class="flex items-start gap-2"><span
-                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Maximum file size:
-                    10MB</li>
-                <li class="flex items-start gap-2"><span
-                        class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Ensure data matches
-                    the required fields for each section</li>
-                        <li class="flex items-start gap-2"><span
-                            class="mt-1.5 w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0"></span>Preferred file naming: use the format MONTHNAME_YEAR_PROGRAMNAME — e.g. JANUARY_2026_SPES.xlsx</li>
-            </ul>
-        </div>
     </div>
+
+    
 
     <!-- Data Preview (hidden until file selected) -->
     <div id="dataPreview" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

@@ -2,6 +2,7 @@
 // rollback confirm modal, CSV download, and panel show/hide.
 
 import { showToast } from '../toast.js';
+import { runWithButtonLoading } from '../loading.js';
 import { state } from './excel-state.js';
 import { formatColumnName } from './common.js';
 
@@ -10,6 +11,32 @@ const importFormScreen   = document.getElementById('importFormScreen');
 const importResultsView  = document.getElementById('importResultsView');
 const importResultsSummary  = document.getElementById('importResultsSummary');
 const importResultsWarnings = document.getElementById('importResultsWarnings');
+const employerAccreditationView = document.getElementById('employerAccreditationView');
+const employerAccreditationTableBody = document.getElementById('employerAccreditationTableBody');
+const PENDING_ACCRREDITATION_KEY = 'ascend.pendingEmployerAccreditation';
+
+const EMPLOYER_ACCRUAL_PROGRAMS = new Set([
+    'Job Matching and Referral',
+    'First Time Jobseeker',
+    'SPES',
+    'Workers Hiring for Infrastructure Projects - Projects',
+    'Workers Hiring for Infrastructure Projects — Projects',
+]);
+
+const ACCREDITATION_MONTHS = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function escapeHtml(value) {
@@ -59,6 +86,17 @@ function getProceedButtonLabel(program) {
     };
     const abbr = ACRONYMS[p] || null;
     return `Proceed to ${abbr || p}`;
+}
+
+function isEmployerAccreditationFollowupProgram(program) {
+    return EMPLOYER_ACCRUAL_PROGRAMS.has(String(program || '').trim());
+}
+
+function buildDropdownOptions(values, selectedValue = '') {
+    return values.map(value => {
+        const isSelected = String(value) === String(selectedValue);
+        return `<option value="${escapeHtml(value)}"${isSelected ? ' selected' : ''}>${escapeHtml(value)}</option>`;
+    }).join('');
 }
 
 // ─── Tab switching ────────────────────────────────────────────────────────────
@@ -169,6 +207,221 @@ function statCard(value, label, c, iconPath) {
                 <p class="text-xs font-medium ${c.label} leading-tight">${label}</p>
             </div>
         </div>`;
+}
+
+function buildEmployerAccreditationRows(createdEmployers, fallbackMonth = '', fallbackYear = '') {
+    if (!employerAccreditationTableBody) return;
+
+    const currentYear = new Date().getFullYear();
+    const yearOptions = [];
+    const startYear = 1990;
+    const endYear = currentYear;
+    for (let year = endYear; year >= startYear; year--) {
+        yearOptions.push(String(year));
+    }
+
+    employerAccreditationTableBody.innerHTML = (createdEmployers || []).map((emp, index) => {
+        const monthValue = fallbackMonth || new Date().toLocaleString('default', { month: 'long' });
+        const yearValue = fallbackYear || String(new Date().getFullYear());
+        return `
+            <tr class="border-b border-gray-100 bg-white hover:bg-blue-50/30 transition-colors" data-employer-row="1" data-employer-id="${escapeHtml(emp.company_id ?? '')}">
+                <td class="px-4 py-3">
+                    <input type="text" class="accreditation-input w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-medium text-gray-800 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" value="${escapeHtml(emp.company_name ?? '')}" data-field="company_name" />
+                </td>
+                <td class="px-4 py-3 w-40">
+                    <select class="accreditation-input w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" data-field="month">
+                        <option value="">Select month</option>
+                        ${buildDropdownOptions(ACCREDITATION_MONTHS, monthValue)}
+                    </select>
+                </td>
+                <td class="px-4 py-3 w-28">
+                    <select class="accreditation-input w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" data-field="year">
+                        <option value="">Select year</option>
+                        ${buildDropdownOptions(yearOptions, yearValue)}
+                    </select>
+                </td>
+                <td class="px-4 py-3 w-36">
+                    <select class="accreditation-input w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" data-field="status">
+                        <option value="new">New</option>
+                        <option value="renew">Renew</option>
+                    </select>
+                </td>
+                <td class="px-4 py-3">
+                    <input type="text" class="accreditation-input w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" value="${escapeHtml(emp.est_type ?? '')}" data-field="est_type" placeholder="Est. type" />
+                </td>
+                <td class="px-4 py-3">
+                    <input type="text" class="accreditation-input w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" value="${escapeHtml(emp.industry ?? '')}" data-field="industry" placeholder="Industry" />
+                </td>
+                <td class="px-4 py-3">
+                    <input type="text" class="accreditation-input w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100" value="${escapeHtml(emp.city ?? '')}" data-field="city" placeholder="City" />
+                </td>
+                <td class="px-4 py-3 text-xs text-gray-400 whitespace-nowrap">
+                    #${index + 1}
+                    <input type="hidden" data-field="company_id" value="${escapeHtml(emp.company_id ?? '')}" />
+                </td>
+            </tr>`;
+    }).join('');
+
+    // After rendering, wire up input listeners to clear errors and update submit state
+    try {
+        const inputs = employerAccreditationTableBody.querySelectorAll('.accreditation-input');
+        inputs.forEach(inp => {
+            inp.addEventListener('input', () => {
+                try { inp.classList.remove('border-red-500', 'ring-2', 'ring-red-200'); } catch (e) {}
+                updateSubmitButtonState();
+            });
+            inp.addEventListener('change', () => updateSubmitButtonState());
+        });
+    } catch (e) {}
+    updateSubmitButtonState();
+}
+
+function collectEmployerAccreditationRows() {
+    if (!employerAccreditationTableBody) return [];
+
+    return [...employerAccreditationTableBody.querySelectorAll('tr[data-employer-row="1"]')].map(row => {
+        const readField = (field) => row.querySelector(`[data-field="${field}"]`)?.value ?? '';
+        return {
+            _sys_employer_id: Number(readField('company_id') || 0),
+            Company: readField('company_name'),
+            Month: readField('month'),
+            Year: readField('year'),
+            Accreditation: readField('status'),
+            'Est. Type': readField('est_type'),
+            Industry: readField('industry'),
+            'City/Municipality/Province': readField('city'),
+        };
+    });
+}
+
+function updateSubmitButtonState() {
+    const btn = document.getElementById('submitEmployerAccreditationBtn');
+    if (!btn) return;
+    const rows = collectEmployerAccreditationRows();
+    const ok = rows.length > 0 && validateEmployerAccreditationRows(rows).valid;
+    btn.dataset.accreditationReady = ok ? '1' : '0';
+    btn.classList.toggle('opacity-60', !ok);
+    btn.classList.toggle('cursor-not-allowed', !ok);
+    btn.classList.toggle('hover:bg-blue-700', ok);
+}
+
+function validateEmployerAccreditationRows(rows) {
+    const requiredKeys = ['Company', 'Month', 'Year', 'Accreditation', 'Est. Type', 'Industry', 'City/Municipality/Province'];
+    const errors = [];
+    rows.forEach((r, idx) => {
+        const missing = requiredKeys.filter(k => {
+            const v = (r[k] ?? '').toString().trim();
+            return v === '';
+        });
+        if (missing.length) errors.push({ row: idx, missing });
+    });
+    return { valid: errors.length === 0, errors };
+}
+
+function highlightAccreditationErrors(errors) {
+    // errors: [{row, missing: [keys]}]
+    const trs = [...employerAccreditationTableBody.querySelectorAll('tr[data-employer-row="1"]')];
+    errors.forEach(err => {
+        const tr = trs[err.row];
+        if (!tr) return;
+        err.missing.forEach(field => {
+            // map display keys to data-field attributes
+            let df = '';
+            switch (field) {
+                case 'Company': df = 'company_name'; break;
+                case 'Month': df = 'month'; break;
+                case 'Year': df = 'year'; break;
+                case 'Accreditation': df = 'status'; break;
+                case 'Est. Type': df = 'est_type'; break;
+                case 'Industry': df = 'industry'; break;
+                case 'City/Municipality/Province': df = 'city'; break;
+                default: df = '';
+            }
+            if (!df) return;
+            const el = tr.querySelector(`[data-field="${df}"]`);
+            if (el && el.classList) {
+                el.classList.add('border-red-500', 'ring-2', 'ring-red-200');
+            }
+        });
+    });
+}
+
+function ensureEmployerAccreditationViewState(show) {
+    if (importFormScreen) importFormScreen.classList.toggle('hidden', show);
+    if (importResultsView) importResultsView.classList.toggle('hidden', show);
+    if (employerAccreditationView) employerAccreditationView.classList.toggle('hidden', !show);
+}
+
+export function showEmployerAccreditationView(data) {
+    if (!employerAccreditationView || !employerAccreditationTableBody) return;
+
+    state.pendingEmployerAccreditation = data;
+    sessionStorage.setItem(PENDING_ACCRREDITATION_KEY, JSON.stringify(data));
+
+    const metaLine = document.getElementById('employerAccreditationMetaLine');
+    if (metaLine) {
+        metaLine.textContent = `${escapeHtml(data.program)} • ${escapeHtml(data.period)} • Complete employer accreditation before leaving this step.`;
+    }
+
+    const summaryLine = document.getElementById('employerAccreditationSummaryLine');
+    if (summaryLine) {
+        summaryLine.textContent = `${(data.createdEmployers || []).length} employer${(data.createdEmployers || []).length === 1 ? '' : 's'} need accreditation.`;
+    }
+
+    buildEmployerAccreditationRows(data.createdEmployers || [], data.importMonth || '', data.importYear || '');
+    ensureEmployerAccreditationViewState(true);
+}
+
+async function submitEmployerAccreditationFollowup() {
+    const payloadRows = collectEmployerAccreditationRows();
+    if (!payloadRows.length) {
+        showToast('No employer rows found to submit.', 'warning');
+        return;
+    }
+
+    // Client-side validation: all fields required
+    const validation = validateEmployerAccreditationRows(payloadRows);
+    if (!validation.valid) {
+        showToast('Please complete all required fields before submitting.', 'warning');
+        highlightAccreditationErrors(validation.errors);
+        return;
+    }
+
+    const programData = state.pendingEmployerAccreditation || {};
+    const btn = document.getElementById('submitEmployerAccreditationBtn');
+
+    await runWithButtonLoading(btn, async () => {
+        const res = await fetch('../../backend/import/save_data.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                program: 'Employers Accreditation',
+                batchId: programData.batchId || null,
+                data: payloadRows,
+                importMonth: programData.importMonth || '',
+                importYear: programData.importYear || '',
+                fileName: programData.fileName || 'Employer accreditation follow-up',
+            }),
+        });
+
+        const raw = await res.text();
+        let result;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            throw new Error(`Unexpected server response (HTTP ${res.status}).`);
+        }
+        if (!res.ok || !result.success) {
+            throw new Error(result.error ?? `Request failed (HTTP ${res.status}).`);
+        }
+
+        sessionStorage.removeItem('ascend.pendingEmployerAccreditation');
+        state.pendingEmployerAccreditation = null;
+        showToast(result.message ?? 'Employer accreditation saved.', 'success');
+        window.location.href = '../../pages/beneficiaries/beneficiary.php';
+    }, { label: 'Saving accreditation…' }).catch(err => {
+        showToast('Accreditation submission failed: ' + (err.message ?? 'Unknown error'), 'error');
+    });
 }
 
 // ─── Render results view ──────────────────────────────────────────────────────
@@ -450,6 +703,14 @@ export function initImportResultsUi() {
     document.getElementById('reviewEmployersBtn')?.addEventListener('click',
         () => showToast('Review newly created employers in the Employers module.', 'success'));
 
+    document.getElementById('submitEmployerAccreditationBtn')?.addEventListener('click', submitEmployerAccreditationFollowup);
+    document.getElementById('backToResultsBtn')?.addEventListener('click', () => {
+        if (state.pendingEmployerAccreditation) {
+            showToast('Complete employer accreditation before leaving this step.', 'warning');
+            return;
+        }
+    });
+
     document.querySelectorAll('.results-tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             if (btn.dataset.resultsTab) setResultsTab(btn.dataset.resultsTab);
@@ -477,41 +738,51 @@ export function initImportResultsUi() {
                 return;
             }
             openRollbackConfirmModal(() => {
-                rollbackBtn.disabled = true;
-                rollbackBtn.innerHTML = `
-                    <svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                        <path d="M3 3v5h5"/>
-                    </svg>
-                    Rolling back…`;
-
-                fetch('../../backend/import/undo_import.php', {
-                    method:  'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body:    JSON.stringify({ undoToken: state.latestUndoToken }),
-                })
-                    .then(async res => {
-                        const data = JSON.parse(await res.text());
-                        if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
-                        return data;
-                    })
-                    .then(data => {
-                        state.latestUndoToken = null;
-                        state.latestImportResultsData = null;
-                        showImportFormView();
-                        showToast(data.message ?? 'Import rolled back successfully.', 'success');
-                    })
-                    .catch(err => {
-                        showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
-                        rollbackBtn.disabled = false;
-                        rollbackBtn.innerHTML = `
-                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
-                                <path d="M3 3v5h5"/>
-                            </svg>
-                            Rollback Import`;
+                runWithButtonLoading(rollbackBtn, async () => {
+                    const res = await fetch('../../backend/import/undo_import.php', {
+                        method:  'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify({ undoToken: state.latestUndoToken }),
                     });
+                    const data = JSON.parse(await res.text());
+                    if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
+
+                    state.latestUndoToken = null;
+                    state.latestImportResultsData = null;
+                    showImportFormView();
+                    showToast(data.message ?? 'Import rolled back successfully.', 'success');
+                }, { label: 'Rolling back…' }).catch(err => {
+                    showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
+                });
             });
         });
     }
+}
+
+export function restorePendingEmployerAccreditationView() {
+    if (!employerAccreditationView || !employerAccreditationTableBody) return false;
+
+    const raw = sessionStorage.getItem(PENDING_ACCRREDITATION_KEY);
+    const embedded = window.__ASCEND_PENDING_EMPLOYER_ACCRREDITATION__;
+
+    const hydrate = (data) => {
+        if (!data || !Array.isArray(data.createdEmployers) || data.createdEmployers.length === 0) return false;
+        showEmployerAccreditationView(data);
+        return true;
+    };
+
+    if (raw) {
+        try {
+            const data = JSON.parse(raw);
+            if (hydrate(data)) return true;
+        } catch {
+            // Fall through to the server-embedded payload.
+        }
+    }
+
+    if (hydrate(embedded)) {
+        return true;
+    }
+
+    return false;
 }
