@@ -61,6 +61,12 @@ if (isset($_SESSION['user_id'])) {
                             case 'not_verified':
                                 echo "Please verify your email before logging in.";
                                 break;
+                            case 'pending':
+                                echo "Your account is awaiting admin approval.";
+                                break;
+                            case 'declined':
+                                echo "Your account access has been declined. Contact the administrator.";
+                                break;
                             default:
                                 echo "An error occurred.";
                         }

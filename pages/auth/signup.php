@@ -32,6 +32,36 @@
                 </p>
             </div>
 
+            <!-- Error Alert -->
+                <?php if (isset($_GET['error'])): ?>
+                    <div class="mb-5 p-3 rounded-lg bg-red-100 text-red-700 text-sm text-center">
+                        <?php
+                            switch ($_GET['error']) {
+                                case 'password_mismatch':
+                                    echo "Passwords do not match.";
+                                    break;
+                                case 'email_exists':
+                                    echo "This email is already registered.";
+                                    break;
+                                case 'contact_exists':
+                                    echo "This contact number is already in use.";
+                                    break;
+                                case 'mail_failed':
+                                    echo "Failed to send verification email. Please try again.";
+                                    break;
+                                case 'declined_email':
+                                    echo "This email has been declined and cannot be used to register.";
+                                    break;
+                                case 'server':
+                                    echo "A server error occurred. Please try again.";
+                                    break;
+                                default:
+                                    echo "An error occurred. Please try again.";
+                            }
+                        ?>
+                    </div>
+                <?php endif; ?>
+
             <!-- Sign Up Form -->
             <form method="POST" action="../../backend/auth/signup_handler.php" class="space-y-5">
 
