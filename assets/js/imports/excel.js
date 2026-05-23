@@ -4,7 +4,7 @@
 import { showToast } from '../toast.js';
 import { runWithButtonLoading } from '../loading.js';
 import { state } from './excel-state.js';
-import { initImportResultsUi, showImportResultsView } from './excel-results.js';
+import { initImportResultsUi, restorePendingEmployerAccreditationView, showEmployerAccreditationView, showImportResultsView } from './excel-results.js';
 import { openImportConfirmModal, openUnknownEmployersModal } from './excel-modals.js';
 import { resetPreviewPaginationState, revalidateCurrentPreview, getJobFairCompanyImportBlockMessage } from './excel-preview.js';
 import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProgramSpecificFields } from './excel-upload.js';
@@ -21,6 +21,14 @@ const WIIRP_PRIVATE_PREVIEW_HEADERS = [
     'Endorsement 2',
 ];
 
+const EMPLOYER_AUTO_CREATE_PROGRAMS = new Set([
+    'Job Matching and Referral',
+    'First Time Jobseeker',
+    'SPES',
+    'Workers Hiring for Infrastructure Projects - Projects',
+    'Workers Hiring for Infrastructure Projects — Projects',
+]);
+
 const WIIRP_PRIVATE_REQUIRED_HEADERS = [
     'Office Assignment',
     'Endorsement 1',
@@ -36,6 +44,9 @@ const WIIRP_PESO_REQUIRED_HEADERS = [
 
 // ─── Initialise results UI ────────────────────────────────────────────────────
 initImportResultsUi();
+if (restorePendingEmployerAccreditationView()) {
+    showToast('Resume the employer accreditation table to continue.', 'warning');
+}
 
 // ─── Cancel preview ───────────────────────────────────────────────────────────
 const cancelImportBtn = document.getElementById('cancelImport');
@@ -277,6 +288,23 @@ if (confirmImportBtn) {
 
                     document.getElementById('cancelImport').click();
 
+                    const createdEmployers = Array.isArray(result.created_employers) ? result.created_employers : [];
+                    const followupEmployerFlow = EMPLOYER_AUTO_CREATE_PROGRAMS.has(program) && createdEmployers.length > 0;
+
+                    if (followupEmployerFlow) {
+                        showEmployerAccreditationView({
+                            program,
+                            period: periodLabel,
+                            fileName: importedFileName,
+                            importMonth,
+                            importYear,
+                            batchId: result.batch_id ?? null,
+                            createdEmployers,
+                        });
+                        showToast('Complete employer accreditation to continue.', 'warning');
+                        return;
+                    }
+
                     showImportResultsView({
                         processed:    rowsSnapshot.length,
                         added:        Number(result.saved ?? 0),
@@ -291,6 +319,7 @@ if (confirmImportBtn) {
                         warnings,
                         newEmployers,
                         newSchools,
+                        createdEmployers,
                         duplicateRows,
                         errorRows,
                     }, result.undo_token ?? null);
