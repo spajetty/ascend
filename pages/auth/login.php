@@ -49,7 +49,14 @@ if (isset($_SESSION['user_id'])) {
                                 echo "Please fill in all fields.";
                                 break;
                             case 'invalid':
+                                $left = intval($_GET['left'] ?? 0);
                                 echo "Invalid email or password.";
+                                if ($left > 0) {
+                                    echo " <strong>{$left} attempt(s) remaining</strong> before your account is locked.";
+                                }
+                                break;
+                            case 'locked':
+                                echo htmlspecialchars($_GET['wait'] ?? 'Account is temporarily locked.');
                                 break;
                             case 'not_verified':
                                 echo "Please verify your email before logging in.";
