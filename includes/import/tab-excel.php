@@ -424,4 +424,47 @@
         </div>
     </div>
 
+    <!-- Employer Accreditation Follow-up View -->
+    <div id="employerAccreditationView" class="hidden space-y-5">
+        <div class="bg-white rounded-2xl shadow-sm border border-amber-200 p-6">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                    <div class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800 mb-3">
+                        Required follow-up
+                    </div>
+                    <h2 class="text-base font-bold text-gray-900">Complete Employer Accreditation</h2>
+                    <p id="employerAccreditationMetaLine" class="mt-1 text-sm text-gray-500"></p>
+                </div>
+                <div class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 max-w-xl">
+                    <p id="employerAccreditationSummaryLine" class="font-semibold">Complete the table below before viewing the beneficiaries for this import.</p>
+                    <p class="mt-1 text-xs text-amber-700">This step is locked to the current session until you submit the employer accreditations.</p>
+                </div>
+            </div>
+
+            <div class="mt-5 overflow-x-auto preview-scrollbar rounded-xl border border-gray-100">
+                <table class="min-w-[1100px] w-full text-sm">
+                    <thead class="sticky top-0 bg-gray-50 border-b border-gray-100">
+                        <tr>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Company Name</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Month</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Year</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Est. Type</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Industry Type</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">City</th>
+                            <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">#</th>
+                        </tr>
+                    </thead>
+                    <tbody id="employerAccreditationTableBody" class="divide-y divide-gray-50"></tbody>
+                </table>
+            </div>
+
+            <div class="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                <button id="submitEmployerAccreditationBtn" type="button" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700">
+                    Submit Accreditation
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
