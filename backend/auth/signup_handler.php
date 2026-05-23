@@ -24,6 +24,16 @@ if (emailExists($email, $conn)) {
     exit;
 }
 
+// Block declined emails from re-registering
+$chk = $conn->prepare("SELECT access FROM users WHERE email = ? LIMIT 1");
+$chk->bind_param("s", $email);
+$chk->execute();
+$chkRes = $chk->get_result();
+if ($chkRes->num_rows === 1 && $chkRes->fetch_assoc()['access'] === 'Declined') {
+    header("Location: /pages/auth/signup.php?error=declined_email");
+    exit;
+}
+
 if (contactExists($contact, $conn)) {
     header("Location: /pages/auth/signup.php?error=contact_exists");
     exit;
@@ -32,10 +42,10 @@ if (contactExists($contact, $conn)) {
 // Hash password
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-// Insert user
+// Insert user — role defaults to Staff, access defaults to Pending
 $stmt = $conn->prepare("
-    INSERT INTO users (fname, lname, middle_initial, contact, email, password, is_verified)
-    VALUES (?, ?, ?, ?, ?, ?, 0)
+    INSERT INTO users (fname, lname, middle_initial, contact, email, password, is_verified, role, access)
+    VALUES (?, ?, ?, ?, ?, ?, 0, 'Staff', 'Pending')
 ");
 $stmt->bind_param("ssssss", $fname, $lname, $mi, $contact, $email, $hashedPassword);
 
@@ -54,8 +64,8 @@ if ($stmt->execute()) {
         $mail->isSMTP();
         $mail->Host       = 'smtp.gmail.com';
         $mail->SMTPAuth   = true;
-        $mail->Username   = 'jayjayangadok21@gmail.com';   // ← your real Gmail
-        $mail->Password   = 'nkqnarvivoomnghf';            // ← your real app password
+        $mail->Username   = 'ascend.ped@gmail.com';
+        $mail->Password   = 'ydmpejzmkxlrivof';
         $mail->SMTPSecure = 'tls';
         $mail->Port       = 587;
 
