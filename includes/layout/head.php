@@ -33,6 +33,15 @@ $navItems = [
     ],
 ];
 
+// Access menu — Admin only
+if (($_SESSION['user_role'] ?? '') === 'Admin') {
+    $navItems['access'] = [
+        'href'        => '/pages/access/access.php',
+        'label'       => 'Access',
+        'mobileLabel' => 'Access',
+    ];
+}
+
 // ── Icon renderer (used by sidebar & mobile nav) ──────────────────────────
 if (!function_exists('renderNavIcon')) {
     function renderNavIcon(string $pageKey, string $class = 'w-5 h-5'): string
@@ -50,6 +59,8 @@ if (!function_exists('renderNavIcon')) {
                 return '<svg ' . $base . '><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
             case 'reports':
                 return '<svg ' . $base . '><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>';
+            case 'access':
+                return '<svg ' . $base . '><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>';
             default:
                 return '';
         }

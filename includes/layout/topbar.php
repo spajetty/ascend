@@ -31,7 +31,9 @@
             <p class="text-sm font-semibold text-gray-800 leading-tight">
                 <?= htmlspecialchars($_SESSION['user_name'] ?? 'User', ENT_QUOTES, 'UTF-8') ?>
             </p>
-            <p class="text-xs text-gray-400">Admin</p>
+            <p class="text-xs text-gray-400">
+                <?= htmlspecialchars($_SESSION['user_role'] ?? 'Staff', ENT_QUOTES, 'UTF-8') ?>
+            </p>
         </div>
     </div>
 
