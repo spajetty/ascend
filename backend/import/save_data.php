@@ -152,19 +152,21 @@ try {
 
     // Server-side validation: Employers Accreditation follow-up must have all required fields
     if ($program === 'Employers Accreditation') {
-        $required = ['Company', 'Month', 'Year', 'Accreditation', 'Est. Type', 'Industry', 'City/Municipality/Province'];
+        $importYear = trim((string)$importYearRaw);
+        if ($importYear === '') {
+            throw new RuntimeException('Please select a Year before importing Employers Accreditation data.');
+        }
+
         foreach ($rows as $i => $r) {
             $missing = [];
-            $company = trim((string)($r['Company'] ?? $r['company_name'] ?? ''));
-            $month = trim((string)($r['Month'] ?? $r['month'] ?? ''));
-            $year = trim((string)($r['Year'] ?? $r['year'] ?? ''));
-            $status = trim((string)($r['Accreditation'] ?? $r['status'] ?? ''));
-            $est = trim((string)($r['Est. Type'] ?? $r['est_type'] ?? ''));
-            $industry = trim((string)($r['Industry'] ?? $r['industry'] ?? ''));
-            $city = trim((string)($r['City/Municipality/Province'] ?? $r['city'] ?? ''));
+            $company = s(rowValue($r, ['COMPANY', 'Company', 'CompanyName', 'company_name'], ''));
+            $month = s(rowValue($r, ['MONTH', 'Month', 'month'], ''));
+            $status = s(rowValue($r, ['ACCREDITATION', 'Accreditation', 'accreditation', 'status'], ''));
+            $est = s(rowValue($r, ['EST. TYPE', 'Est. Type', 'Establishment Type', 'est_type'], ''));
+            $industry = s(rowValue($r, ['INDUSTRY', 'Industry', 'industry'], ''));
+            $city = s(rowValue($r, ['CITY/MUNICIPALITY/PROVINCE', 'City/Municipality/Province', 'City/Municipality', 'city'], ''));
             if ($company === '') $missing[] = 'Company';
             if ($month === '') $missing[] = 'Month';
-            if ($year === '') $missing[] = 'Year';
             if ($status === '') $missing[] = 'Accreditation';
             if ($est === '') $missing[] = 'Est. Type';
             if ($industry === '') $missing[] = 'Industry';
