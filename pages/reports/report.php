@@ -1,9 +1,110 @@
+<!-- report.php -->
 <?php
 require_once __DIR__ . '/../../includes/auth-check.php';
 
 $currentPage = 'reports';
 $pageTitle   = 'ASCEND PED System – Reports';
 $pageHeading = 'Reports';
+
+/* ═══════════════════════════════════════════════════════════════════
+ * Load cached dashboard data from fetch-details.json
+ * Same pattern as dashboard.php — falls back to safe defaults.
+ * ═══════════════════════════════════════════════════════════════════ */
+$cachePath = __DIR__ . '/../../cache/fetch-details.json';
+$cacheData = [];
+
+if (file_exists($cachePath)) {
+    $decoded = json_decode(file_get_contents($cachePath), true);
+    if (json_last_error() === JSON_ERROR_NONE) {
+        $cacheData = $decoded;
+    }
+}
+
+/* ── Helper: safely dig into the nested array ── */
+function cacheVal(array $data, ...$keys): int {
+    $current = $data;
+    foreach ($keys as $key) {
+        if (!isset($current[$key])) return 0;
+        $current = $current[$key];
+    }
+    return (int) $current;
+}
+
+/* ── Stat-card values ── */
+$totalRegistered = cacheVal($cacheData, 'beneficiaries_totals', 'total_registered');
+$totalHired      = cacheVal($cacheData, 'beneficiaries_totals', 'total_hired');
+$totalMale       = cacheVal($cacheData, 'beneficiaries_totals', 'total_male');
+$totalFemale     = cacheVal($cacheData, 'beneficiaries_totals', 'total_female');
+$totalEmployers  = cacheVal($cacheData, 'employers',            'total_employers');
+$totalVacancies  = cacheVal($cacheData, 'employers',            'total_vacancies');
+
+/* ── Previous-month delta helpers ── */
+$compRows       = $cacheData['comparison_by_month'] ?? [];
+$prevRegistered = 0;
+$prevHired      = 0;
+
+if (count($compRows) >= 2) {
+    $last = end($compRows);
+    prev($compRows);
+    $prev = current($compRows);
+
+    $prevRegistered = (int) ($prev['total_registered'] ?? 0);
+    $prevHired      = (int) ($prev['total_hired']      ?? 0);
+}
+
+function pctChange(int $current, int $previous): string {
+    if ($previous === 0) return '';
+    $change = (($current - $previous) / $previous) * 100;
+    $sign   = $change >= 0 ? '+' : '';
+    return $sign . number_format($change, 1) . '% ' . ($change >= 0 ? '↑' : '↓') . ' from last month';
+}
+
+$registeredBadge = pctChange($totalRegistered, $prevRegistered);
+$hiredBadge      = pctChange($totalHired, $prevHired);
+
+/* ── Gender percentages ── */
+$grandTotal     = $totalMale + $totalFemale;
+$malePct        = $grandTotal > 0 ? round(($totalMale   / $grandTotal) * 100, 1) : 0;
+$femalePct      = $grandTotal > 0 ? round(($totalFemale / $grandTotal) * 100, 1) : 0;
+
+/* ── Build program list grouped by section ── */
+$programsBySection = [];
+foreach ($cacheData['beneficiaries_by_program'] ?? [] as $prog) {
+    $sid = (int) $prog['section_id'];
+    $programsBySection[$sid][] = $prog;
+}
+
+/* ── Section totals for grand total banner ── */
+$grandMale   = $totalMale;
+$grandFemale = $totalFemale;
+
+/* Compute grand total across ALL sections (benef + special sources) ── */
+$allSectionTotal = 0;
+foreach ($cacheData['beneficiaries_by_section'] ?? [] as $s) {
+    $allSectionTotal += (int) $s['total'];
+}
+
+/* ── Monthly chart data ── */
+$monthLabels   = [];
+$monthReg      = [];
+$monthHired    = [];
+foreach ($compRows as $row) {
+    $monthLabels[] = substr($row['month'], 0, 3); // e.g. "January" → "Jan"
+    $monthReg[]    = (int) $row['total_registered'];
+    $monthHired[]  = (int) $row['total_hired'];
+}
+// Limit to last 6 months for the chart
+$monthLabels = array_slice($monthLabels, -6);
+$monthReg    = array_slice($monthReg,    -6);
+$monthHired  = array_slice($monthHired,  -6);
+
+/* ── Section name → tab id map ── */
+$sectionTabMap = [
+    1 => ['tab' => 'facilitation', 'label' => 'Employment Facilitation'],
+    2 => ['tab' => 'employers',    'label' => 'Employers Engagement'],
+    3 => ['tab' => 'youth',        'label' => 'Youth Employability'],
+    4 => ['tab' => 'career',       'label' => 'Career Development'],
+];
 
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
@@ -14,21 +115,18 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
     <div class="px-6 md:px-8 py-6">
 
-        <!-- ── Stat Cards + Report Action ────────────────────────── -->
+        <!-- ── Stat Cards ──────────────────────────────────────────── -->
         <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-5 mb-8">
 
             <!-- Total Registered -->
             <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-5 shadow-md flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-blue-100 mb-2 font-medium uppercase tracking-wide">
-                        Total Registered
-                    </p>
-                    <h3 class="text-4xl font-bold text-white">12,458</h3>
-                    <p class="text-xs text-blue-100 mt-2">
-                        ↑ +12.5% from last month
+                    <p class="text-xs text-blue-100 mb-2 font-medium uppercase tracking-wide">Total Registered</p>
+                    <h3 id="stat-registered" class="text-4xl font-bold text-white"><?= number_format($totalRegistered) ?></h3>
+                    <p id="badge-registered" class="text-xs text-blue-100 mt-2 <?= $registeredBadge ? '' : 'invisible' ?>">
+                        <?= htmlspecialchars($registeredBadge) ?>
                     </p>
                 </div>
-
                 <div class="bg-white/20 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87m6-4a4 4 0 11-8 0 4 4 0 018 0z"/>
@@ -39,15 +137,12 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Total Hired -->
             <div class="bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl p-5 shadow-md flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-amber-100 mb-2 font-medium uppercase tracking-wide">
-                        Total Hired
-                    </p>
-                    <h3 class="text-4xl font-bold text-white">3,247</h3>
-                    <p class="text-xs text-amber-100 mt-2">
-                        ↑ +8.3% from last month
+                    <p class="text-xs text-amber-100 mb-2 font-medium uppercase tracking-wide">Total Hired</p>
+                    <h3 id="stat-hired" class="text-4xl font-bold text-white"><?= number_format($totalHired) ?></h3>
+                    <p id="badge-hired" class="text-xs text-amber-100 mt-2 <?= $hiredBadge ? '' : 'invisible' ?>">
+                        <?= htmlspecialchars($hiredBadge) ?>
                     </p>
                 </div>
-
                 <div class="bg-white/20 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m8 0H8m8 0a2 2 0 012 2v6a2 2 0 01-2 2H8a2 2 0 01-2-2V8a2 2 0 012-2"/>
@@ -58,12 +153,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Accredited Employers -->
             <div class="bg-gradient-to-br from-red-600 to-red-700 rounded-xl p-5 shadow-md flex items-start justify-between">
                 <div>
-                    <p class="text-xs text-red-100 mb-3 font-medium uppercase tracking-wide">
-                        Accredited Employers
-                    </p>
-                    <h3 class="text-4xl font-bold text-white">856</h3>
+                    <p class="text-xs text-red-100 mb-3 font-medium uppercase tracking-wide">Accredited Employers</p>
+                    <h3 id="stat-employers" class="text-4xl font-bold text-white"><?= number_format($totalEmployers) ?></h3>
                 </div>
-
                 <div class="bg-white/20 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
@@ -74,12 +166,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <!-- Active Job Vacancies -->
             <div class="bg-white rounded-xl p-5 shadow-md flex items-start justify-between border border-gray-100">
                 <div>
-                    <p class="text-xs text-gray-500 mb-3 mr-3 font-medium uppercase tracking-wide">
-                        Active Job Vacancies
-                    </p>
-                    <h3 class="text-4xl font-bold text-gray-800">1,234</h3>
+                    <p class="text-xs text-gray-500 mb-3 mr-3 font-medium uppercase tracking-wide">Active Job Vacancies</p>
+                    <h3 id="stat-vacancies" class="text-4xl font-bold text-gray-800"><?= number_format($totalVacancies) ?></h3>
                 </div>
-
                 <div class="bg-blue-600 rounded-lg w-11 h-11 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
@@ -87,23 +176,17 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 </div>
             </div>
 
-            <!-- Report Period Card -->
+            <!-- Export Report Card -->
             <div class="bg-white rounded-xl p-5 shadow-md border border-gray-100">
-
-                <p class="text-xs text-gray-500 mb-5 font-medium uppercase tracking-wide">
-                    Export Report
-                </p>
-
-                <div class="flex items-start gap-2 ">
-
-                    <!-- Shorter Month Picker -->
-                    <input 
+                <p class="text-xs text-gray-500 mb-5 font-medium uppercase tracking-wide">Export Report</p>
+                <div class="flex items-start gap-2">
+                    <input
                         type="month"
+                        id="reportMonth"
                         class="w-[75%] text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
-
-                    <!-- Print Button -->
-                    <button 
+                    <button
+                        onclick="window.print()"
                         class="flex items-center justify-center w-[20%] h-10 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         title="Print Report"
                     >
@@ -111,9 +194,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4h6zm0-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                         </svg>
                     </button>
-
                 </div>
-
             </div>
 
         </div>
@@ -125,7 +206,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <h3 class="text-base font-semibold text-gray-800 mb-5">Monthly Registration &amp; Hiring Trends</h3>
                 <div class="relative h-64">
-                    <canvas id="trendChart" role="img" aria-label="Monthly registration and hiring trends Jan–Jun 2024">Registrations ranged from 1,245 to 1,678; hirings from 456 to 623.</canvas>
+                    <canvas id="trendChart"></canvas>
                 </div>
                 <div class="flex justify-center gap-6 mt-4 pt-4 border-t border-gray-100">
                     <span class="flex items-center gap-2 text-sm text-gray-500">
@@ -142,9 +223,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                 <h3 class="text-base font-semibold text-gray-800 mb-5">Gender Distribution</h3>
                 <div class="flex items-center justify-center mb-5">
                     <div class="relative w-52 h-52">
-                        <canvas id="genderChart" role="img" aria-label="Donut chart: 54.5% male, 45.5% female">Male 54.5%, Female 45.5%.</canvas>
+                        <canvas id="genderChart"></canvas>
                         <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                            <p class="text-2xl font-bold text-gray-800">12,458</p>
+                            <p id="gender-total" class="text-2xl font-bold text-gray-800"><?= number_format($grandTotal) ?></p>
                             <p class="text-xs text-gray-500">Total</p>
                         </div>
                     </div>
@@ -157,10 +238,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Male</p>
-                                <p class="text-sm font-bold text-gray-800">6,789</p>
+                                <p id="gender-male-count" class="text-sm font-bold text-gray-800"><?= number_format($totalMale) ?></p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold text-blue-600">54.5%</p>
+                        <p id="gender-male-pct" class="text-lg font-bold text-blue-600"><?= $malePct ?>%</p>
                     </div>
                     <div class="bg-amber-50 rounded-lg p-3 flex items-center justify-between">
                         <div class="flex items-center gap-2">
@@ -169,41 +250,49 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             </div>
                             <div>
                                 <p class="text-xs text-gray-500">Female</p>
-                                <p class="text-sm font-bold text-gray-800">5,669</p>
+                                <p id="gender-female-count" class="text-sm font-bold text-gray-800"><?= number_format($totalFemale) ?></p>
                             </div>
                         </div>
-                        <p class="text-lg font-bold text-amber-500">45.5%</p>
+                        <p id="gender-female-pct" class="text-lg font-bold text-amber-500"><?= $femalePct ?>%</p>
                     </div>
                 </div>
             </div>
+
         </div>
 
         <!-- ── Program Tables ──────────────────────────────────────── -->
 
         <!-- Tab navigation -->
         <div class="flex flex-wrap gap-2 mb-4" id="programTabs">
-            <button onclick="showSection('facilitation')" data-tab="facilitation"
-                class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-colors bg-blue-600 text-white border-blue-600">
-                Employment Facilitation
+            <?php foreach ($sectionTabMap as $sid => $info):
+                $isFirst = $sid === array_key_first($sectionTabMap);
+            ?>
+            <button onclick="showSection('<?= $info['tab'] ?>')" data-tab="<?= $info['tab'] ?>"
+                class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-colors <?= $isFirst ? 'bg-blue-600 text-white border-blue-600' : 'text-gray-600 bg-white border-gray-300' ?>">
+                <?= $info['label'] ?>
             </button>
-            <button onclick="showSection('employers')" data-tab="employers"
-                class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-colors text-gray-600 bg-white border-gray-300">
-                Employers Engagement
-            </button>
-            <button onclick="showSection('youth')" data-tab="youth"
-                class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-colors text-gray-600 bg-white border-gray-300">
-                Youth Employability
-            </button>
-            <button onclick="showSection('career')" data-tab="career"
-                class="tab-btn px-4 py-2 rounded-lg text-sm font-medium border transition-colors text-gray-600 bg-white border-gray-300">
-                Career Development
-            </button>
+            <?php endforeach; ?>
         </div>
 
-        <!-- Employment Facilitation -->
-        <div id="section-facilitation" class="program-section bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
+        <!-- Program Section Tables (rendered from cache) -->
+        <?php foreach ($sectionTabMap as $sid => $info):
+            $programs   = $programsBySection[$sid] ?? [];
+            $isFirst    = $sid === array_key_first($sectionTabMap);
+
+            /* Compute section totals from cache rows */
+            $secMale    = 0;
+            $secFemale  = 0;
+            $secTotal   = 0;
+            foreach ($programs as $p) {
+                $secMale   += (int) $p['total_male'];
+                $secFemale += (int) $p['total_female'];
+                $secTotal  += (int) $p['total'];
+            }
+        ?>
+        <div id="section-<?= $info['tab'] ?>" class="program-section <?= $isFirst ? '' : 'hidden' ?> bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6"
+             data-section-id="<?= $sid ?>">
             <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Employment Facilitation</h3>
+                <h3 class="text-base font-semibold text-gray-800"><?= $info['label'] ?></h3>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
@@ -216,187 +305,55 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">%</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Job Matching and Referral</td>
-                            <td class="px-4 py-3 text-center text-gray-600">4,523</td>
-                            <td class="px-4 py-3 text-center text-gray-600">3,933</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">8,456</td>
-                            <td class="px-6 py-3 text-right text-gray-500">67.9%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">First Time Jobseeker</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,089</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,045</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">2,134</td>
-                            <td class="px-6 py-3 text-right text-gray-500">17.1%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Job Fair</td>
-                            <td class="px-4 py-3 text-center text-gray-600">945</td>
-                            <td class="px-4 py-3 text-center text-gray-600">922</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">1,867</td>
-                            <td class="px-6 py-3 text-right text-gray-500">15.0%</td>
-                        </tr>
-                        <tr class="bg-gray-50 font-semibold">
-                            <td class="px-6 py-3 text-gray-800">Section Total</td>
-                            <td class="px-4 py-3 text-center text-gray-800">6,557</td>
-                            <td class="px-4 py-3 text-center text-gray-800">5,900</td>
-                            <td class="px-4 py-3 text-center text-gray-800">12,457</td>
-                            <td class="px-6 py-3 text-right text-gray-800">100%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Employers Engagement -->
-        <div id="section-employers" class="program-section hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Employers Engagement</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50">
+                    <tbody class="divide-y divide-gray-50" data-program-rows>
+                        <?php if (empty($programs)): ?>
                         <tr>
-                            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Program</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Male</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Female</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
-                            <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">%</th>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-400 text-sm">No program data available</td>
                         </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Workers Hiring for Infrastructure Projects</td>
-                            <td class="px-4 py-3 text-center text-gray-600">234</td>
-                            <td class="px-4 py-3 text-center text-gray-600">189</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">423</td>
-                            <td class="px-6 py-3 text-right text-gray-500">33.1%</td>
-                        </tr>
+                        <?php else: ?>
+                            <?php foreach ($programs as $prog):
+                                $pct = $secTotal > 0 ? round(($prog['total'] / $secTotal) * 100, 1) : 0;
+                            ?>
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-3 font-medium text-gray-800"><?= htmlspecialchars($prog['program_name']) ?></td>
+                                <td class="px-4 py-3 text-center text-gray-600"><?= number_format((int)$prog['total_male']) ?></td>
+                                <td class="px-4 py-3 text-center text-gray-600"><?= number_format((int)$prog['total_female']) ?></td>
+                                <td class="px-4 py-3 text-center font-semibold text-gray-800"><?= number_format((int)$prog['total']) ?></td>
+                                <td class="px-6 py-3 text-right text-gray-500"><?= $pct ?>%</td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                         <tr class="bg-gray-50 font-semibold">
                             <td class="px-6 py-3 text-gray-800">Section Total</td>
-                            <td class="px-4 py-3 text-center text-gray-800">746</td>
-                            <td class="px-4 py-3 text-center text-gray-800">533</td>
-                            <td class="px-4 py-3 text-center text-gray-800">1,279</td>
+                            <td class="px-4 py-3 text-center text-gray-800" data-col-male><?= number_format($secMale) ?></td>
+                            <td class="px-4 py-3 text-center text-gray-800" data-col-female><?= number_format($secFemale) ?></td>
+                            <td class="px-4 py-3 text-center text-gray-800" data-col-total><?= number_format($secTotal) ?></td>
                             <td class="px-6 py-3 text-right text-gray-800">100%</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-
-        <!-- Youth Employability -->
-        <div id="section-youth" class="program-section hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Youth Employability</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Program</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Male</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Female</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
-                            <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">%</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">SPES</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,789</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,667</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">3,456</td>
-                            <td class="px-6 py-3 text-right text-gray-500">49.0%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Government Internship Program</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,123</td>
-                            <td class="px-4 py-3 text-center text-gray-600">1,111</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">2,234</td>
-                            <td class="px-6 py-3 text-right text-gray-500">31.6%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Work Immersion and Internship Referral Program</td>
-                            <td class="px-4 py-3 text-center text-gray-600">298</td>
-                            <td class="px-4 py-3 text-center text-gray-600">269</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">567</td>
-                            <td class="px-6 py-3 text-right text-gray-500">8.0%</td>
-                        </tr>
-                        <tr class="bg-gray-50 font-semibold">
-                            <td class="px-6 py-3 text-gray-800">Section Total</td>
-                            <td class="px-4 py-3 text-center text-gray-800">3,589</td>
-                            <td class="px-4 py-3 text-center text-gray-800">3,470</td>
-                            <td class="px-4 py-3 text-center text-gray-800">7,059</td>
-                            <td class="px-6 py-3 text-right text-gray-800">100%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Career Development -->
-        <div id="section-career" class="program-section hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-6">
-            <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Career Development</h3>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Program</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Male</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Female</th>
-                            <th class="text-center px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Total</th>
-                            <th class="text-right px-6 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">%</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">Career Development Support Program</td>
-                            <td class="px-4 py-3 text-center text-gray-600">567</td>
-                            <td class="px-4 py-3 text-center text-gray-600">623</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">1,190</td>
-                            <td class="px-6 py-3 text-right text-gray-500">56.3%</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">LMI Orientation</td>
-                            <td class="px-4 py-3 text-center text-gray-600">445</td>
-                            <td class="px-4 py-3 text-center text-gray-600">478</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">923</td>
-                            <td class="px-6 py-3 text-right text-gray-500">43.7%</td>
-                        </tr>
-                        <tr class="bg-gray-50 font-semibold">
-                            <td class="px-6 py-3 text-gray-800">Section Total</td>
-                            <td class="px-4 py-3 text-center text-gray-800">1,012</td>
-                            <td class="px-4 py-3 text-center text-gray-800">1,101</td>
-                            <td class="px-4 py-3 text-center text-gray-800">2,113</td>
-                            <td class="px-6 py-3 text-right text-gray-800">100%</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <?php endforeach; ?>
 
         <!-- ── Grand Total Banner ──────────────────────────────────── -->
         <div class="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl shadow-md p-6">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                 <div>
                     <p class="text-blue-100 text-xs uppercase tracking-wide mb-1">Grand Total</p>
-                    <p class="text-white text-3xl font-bold">22,908</p>
+                    <p id="grand-total" class="text-white text-3xl font-bold"><?= number_format($allSectionTotal) ?></p>
                 </div>
                 <div>
                     <p class="text-blue-100 text-xs uppercase tracking-wide mb-1">Total Male</p>
-                    <p class="text-white text-3xl font-bold">11,904</p>
+                    <p id="grand-male" class="text-white text-3xl font-bold"><?= number_format($grandMale) ?></p>
                 </div>
                 <div>
                     <p class="text-blue-100 text-xs uppercase tracking-wide mb-1">Total Female</p>
-                    <p class="text-white text-3xl font-bold">11,004</p>
+                    <p id="grand-female" class="text-white text-3xl font-bold"><?= number_format($grandFemale) ?></p>
                 </div>
                 <div>
                     <p class="text-blue-100 text-xs uppercase tracking-wide mb-1">Total Programs</p>
-                    <p class="text-white text-3xl font-bold">12</p>
+                    <p id="grand-programs" class="text-white text-3xl font-bold"><?= count($cacheData['beneficiaries_by_program'] ?? []) ?></p>
                 </div>
             </div>
         </div>
@@ -407,80 +364,243 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-    /* ── Monthly Trend Chart ─────────────────────────── */
-    new Chart(document.getElementById('trendChart'), {
-        type: 'bar',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [
-                {
-                    label: 'Registered',
-                    data: [1245, 1389, 1567, 1423, 1678, 1534],
-                    backgroundColor: '#2563EB',
-                    borderRadius: 4,
-                    borderSkipped: false,
-                },
-                {
-                    label: 'Hired',
-                    data: [456, 512, 589, 534, 623, 578],
-                    backgroundColor: '#F59E0B',
-                    borderRadius: 4,
-                    borderSkipped: false,
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: {
-                    ticks: { font: { size: 12 }, autoSkip: false },
-                    grid: { display: false }
-                },
-                y: {
-                    ticks: { font: { size: 11 } },
-                    grid: { color: 'rgba(0,0,0,0.05)' }
-                }
+/* ─────────────────────────────────────────────────────────────
+ * Initial chart data seeded from PHP cache (same as dashboard)
+ * Will be updated after the live fetch-details call.
+ * ─────────────────────────────────────────────────────────────*/
+const initialTrendLabels  = <?= json_encode($monthLabels) ?>;
+const initialTrendReg     = <?= json_encode($monthReg) ?>;
+const initialTrendHired   = <?= json_encode($monthHired) ?>;
+const initialMale         = <?= (int) $totalMale ?>;
+const initialFemale       = <?= (int) $totalFemale ?>;
+
+/* ── Monthly Trend Chart ──────────────────────────── */
+const trendChart = new Chart(document.getElementById('trendChart'), {
+    type: 'bar',
+    data: {
+        labels: initialTrendLabels.length ? initialTrendLabels : ['No data'],
+        datasets: [
+            {
+                label: 'Registered',
+                data: initialTrendReg,
+                backgroundColor: '#2563EB',
+                borderRadius: 4,
+                borderSkipped: false,
+            },
+            {
+                label: 'Hired',
+                data: initialTrendHired,
+                backgroundColor: '#F59E0B',
+                borderRadius: 4,
+                borderSkipped: false,
             }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { ticks: { font: { size: 12 } }, grid: { display: false } },
+            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
-    });
-
-    /* ── Gender Donut Chart ──────────────────────────── */
-    new Chart(document.getElementById('genderChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Male', 'Female'],
-            datasets: [{
-                data: [6789, 5669],
-                backgroundColor: ['#2563EB', '#F59E0B'],
-                borderWidth: 0,
-                hoverOffset: 6,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '68%',
-            plugins: { legend: { display: false } }
-        }
-    });
-
-    /* ── Tab Switcher ────────────────────────────────── */
-    function showSection(id) {
-        document.querySelectorAll('.program-section').forEach(el => el.classList.add('hidden'));
-        document.getElementById('section-' + id).classList.remove('hidden');
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            const active = btn.dataset.tab === id;
-            btn.classList.toggle('bg-blue-600',  active);
-            btn.classList.toggle('text-white',    active);
-            btn.classList.toggle('border-blue-600', active);
-            btn.classList.toggle('bg-white',      !active);
-            btn.classList.toggle('text-gray-600', !active);
-            btn.classList.toggle('border-gray-300', !active);
-        });
     }
+});
+
+/* ── Gender Donut Chart ───────────────────────────── */
+const genderChart = new Chart(document.getElementById('genderChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Male', 'Female'],
+        datasets: [{
+            data: [initialMale || 1, initialFemale || 1], // avoid empty chart
+            backgroundColor: ['#2563EB', '#F59E0B'],
+            borderWidth: 0,
+            hoverOffset: 6,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: { legend: { display: false } }
+    }
+});
+
+/* ── Tab Switcher ─────────────────────────────────── */
+function showSection(id) {
+    document.querySelectorAll('.program-section').forEach(el => el.classList.add('hidden'));
+    document.getElementById('section-' + id).classList.remove('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        const active = btn.dataset.tab === id;
+        btn.classList.toggle('bg-blue-600',     active);
+        btn.classList.toggle('text-white',       active);
+        btn.classList.toggle('border-blue-600',  active);
+        btn.classList.toggle('bg-white',        !active);
+        btn.classList.toggle('text-gray-600',   !active);
+        btn.classList.toggle('border-gray-300', !active);
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════════
+ * Live refresh — same fetch-details API call as dashboard.php
+ * Runs on every page load; updates charts + tables with fresh data.
+ * ═══════════════════════════════════════════════════════════════ */
+(async function initReports() {
+    const apiUrl = new URL(
+        '<?= htmlspecialchars(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/../../backend/dashboard/fetch-details.php', ENT_QUOTES) ?>',
+        window.location.origin
+    ).href;
+
+    console.group('[Reports] Fetching fresh data from fetch-details API');
+    console.log('Endpoint →', apiUrl);
+
+    try {
+        const res = await fetch(apiUrl, { credentials: 'same-origin' });
+
+        if (!res.ok) {
+            console.error('[Reports] HTTP error:', res.status, res.statusText);
+            return;
+        }
+
+        const json = await res.json();
+        console.log('[Reports] fetch-details.json cache content:', json);
+
+        if (!json.success) {
+            console.error('[Reports] API error:', json.error ?? 'Unknown error');
+            return;
+        }
+
+        const data = json.data;
+
+        const fmt = (n) => Number(n ?? 0).toLocaleString('en-US');
+
+        const pctChange = (current, previous) => {
+            if (!previous) return null;
+            const change = ((current - previous) / previous) * 100;
+            const sign   = change >= 0 ? '+' : '';
+            const dir    = change >= 0 ? '↑' : '↓';
+            return `${sign}${change.toFixed(1)}% ${dir} from last month`;
+        };
+
+        /* ── Pull values ── */
+        const totals    = data.beneficiaries_totals ?? {};
+        const employers = data.employers            ?? {};
+        const monthRows = data.comparison_by_month  ?? [];
+        const programs  = data.beneficiaries_by_program ?? [];
+        const sections  = data.beneficiaries_by_section ?? [];
+
+        const totalReg      = totals.total_registered ?? 0;
+        const totalHired    = totals.total_hired      ?? 0;
+        const totalMale     = totals.total_male       ?? 0;
+        const totalFemale   = totals.total_female     ?? 0;
+        const totalEmpl     = employers.total_employers ?? 0;
+        const totalVac      = employers.total_vacancies ?? 0;
+        const grandTotal    = totalMale + totalFemale;
+
+        let prevReg = 0, prevHired = 0;
+        if (monthRows.length >= 2) {
+            const prev = monthRows[monthRows.length - 2];
+            prevReg    = prev.total_registered ?? 0;
+            prevHired  = prev.total_hired      ?? 0;
+        }
+
+        /* ── Update stat cards ── */
+        document.getElementById('stat-registered').textContent = fmt(totalReg);
+        document.getElementById('stat-hired').textContent      = fmt(totalHired);
+        document.getElementById('stat-employers').textContent  = fmt(totalEmpl);
+        document.getElementById('stat-vacancies').textContent  = fmt(totalVac);
+
+        const badgeEl = (id, current, previous) => {
+            const el   = document.getElementById(id);
+            if (!el) return;
+            const text = pctChange(current, previous);
+            if (text) { el.textContent = text; el.classList.remove('invisible'); }
+            else      { el.classList.add('invisible'); }
+        };
+        badgeEl('badge-registered', totalReg,   prevReg);
+        badgeEl('badge-hired',      totalHired, prevHired);
+
+        /* ── Update gender section ── */
+        const malePct   = grandTotal > 0 ? ((totalMale   / grandTotal) * 100).toFixed(1) : 0;
+        const femalePct = grandTotal > 0 ? ((totalFemale / grandTotal) * 100).toFixed(1) : 0;
+
+        document.getElementById('gender-total').textContent        = fmt(grandTotal);
+        document.getElementById('gender-male-count').textContent   = fmt(totalMale);
+        document.getElementById('gender-female-count').textContent = fmt(totalFemale);
+        document.getElementById('gender-male-pct').textContent     = malePct + '%';
+        document.getElementById('gender-female-pct').textContent   = femalePct + '%';
+
+        /* ── Update donut chart ── */
+        genderChart.data.datasets[0].data = [totalMale || 1, totalFemale || 1];
+        genderChart.update();
+
+        /* ── Update trend chart (last 6 months) ── */
+        const recent = monthRows.slice(-6);
+        trendChart.data.labels                   = recent.map(r => r.month.slice(0, 3));
+        trendChart.data.datasets[0].data         = recent.map(r => r.total_registered ?? 0);
+        trendChart.data.datasets[1].data         = recent.map(r => r.total_hired      ?? 0);
+        trendChart.update();
+
+        /* ── Update program tables ── */
+        const bySection = {};
+        programs.forEach(p => {
+            if (!bySection[p.section_id]) bySection[p.section_id] = [];
+            bySection[p.section_id].push(p);
+        });
+
+        document.querySelectorAll('[data-section-id]').forEach(tableEl => {
+            const sid      = parseInt(tableEl.dataset.sectionId);
+            const progs    = bySection[sid] ?? [];
+            const tbody    = tableEl.querySelector('[data-program-rows]');
+            if (!tbody) return;
+
+            const secTotal = progs.reduce((s, p) => s + (parseInt(p.total) || 0), 0);
+            const secMale  = progs.reduce((s, p) => s + (parseInt(p.total_male) || 0), 0);
+            const secFem   = progs.reduce((s, p) => s + (parseInt(p.total_female) || 0), 0);
+
+            const rows = progs.length
+                ? progs.map(p => {
+                    const pct = secTotal > 0 ? ((p.total / secTotal) * 100).toFixed(1) : 0;
+                    return `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-3 font-medium text-gray-800">${p.program_name}</td>
+                            <td class="px-4 py-3 text-center text-gray-600">${fmt(p.total_male)}</td>
+                            <td class="px-4 py-3 text-center text-gray-600">${fmt(p.total_female)}</td>
+                            <td class="px-4 py-3 text-center font-semibold text-gray-800">${fmt(p.total)}</td>
+                            <td class="px-6 py-3 text-right text-gray-500">${pct}%</td>
+                        </tr>`;
+                  }).join('')
+                : `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-400 text-sm">No program data available</td></tr>`;
+
+            const totalRow = `
+                <tr class="bg-gray-50 font-semibold">
+                    <td class="px-6 py-3 text-gray-800">Section Total</td>
+                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secMale)}</td>
+                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secFem)}</td>
+                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secTotal)}</td>
+                    <td class="px-6 py-3 text-right text-gray-800">100%</td>
+                </tr>`;
+
+            tbody.innerHTML = rows + totalRow;
+        });
+
+        /* ── Update grand total banner ── */
+        const allTotal = sections.reduce((s, sec) => s + (parseInt(sec.total) || 0), 0);
+        document.getElementById('grand-total').textContent    = fmt(allTotal);
+        document.getElementById('grand-male').textContent     = fmt(totalMale);
+        document.getElementById('grand-female').textContent   = fmt(totalFemale);
+        document.getElementById('grand-programs').textContent = programs.length;
+
+        console.log('[Reports] All values updated successfully.');
+
+    } catch (err) {
+        console.error('[Reports] Failed to fetch or parse fetch-details:', err);
+    } finally {
+        console.groupEnd();
+    }
+})();
 </script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
