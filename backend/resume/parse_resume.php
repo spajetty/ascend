@@ -1,14 +1,17 @@
 <?php
+ob_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'Method not allowed']);
     exit;
 }
 
 if (!isset($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK) {
     $code = $_FILES['resume']['error'] ?? -1;
+    ob_clean();
     echo json_encode(['success' => false, 'error' => "Upload error (code $code)"]);
     exit;
 }
@@ -16,20 +19,27 @@ if (!isset($_FILES['resume']) || $_FILES['resume']['error'] !== UPLOAD_ERR_OK) {
 $file = $_FILES['resume'];
 $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
 
-if ($ext !== 'docx') {
-    echo json_encode(['success' => false, 'error' => 'Only .docx files are supported.']);
+if (!in_array($ext, ['docx', 'pdf'], true)) {
+    ob_clean();
+    echo json_encode(['success' => false, 'error' => 'Only .docx and .pdf files are supported.']);
     exit;
 }
 
 if ($file['size'] > 5 * 1024 * 1024) {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'File too large. Maximum 5MB.']);
     exit;
 }
 
 try {
-    $data = parseResume($file['tmp_name']);
+    $data = $ext === 'pdf'
+        ? parseResumePdf($file['tmp_name'])
+        : parseResume($file['tmp_name']);
+
+    ob_clean();
     echo json_encode(['success' => true, 'data' => $data]);
 } catch (Throwable $e) {
+    ob_clean();
     echo json_encode(['success' => false, 'error' => 'Could not parse resume: ' . $e->getMessage()]);
 }
 
@@ -222,4 +232,66 @@ function cleanValue(string $value, string $field): ?string
     }
 
     return $value;
+}
+
+function parseResumePdf(string $filePath): array
+{
+    $parser   = new \Smalot\PdfParser\Parser();
+    $pdf      = $parser->parseFile($filePath);
+    $fullText = $pdf->getText();
+
+    $data = [
+        'last_name' => null, 'first_name' => null, 'middle_name' => null, 'suffix' => null,
+        'dob' => null, 'sex' => null, 'civil_status' => null,
+        'contact' => null, 'email' => null,
+        'house_no' => null, 'barangay' => null, 'district' => null, 'city' => null,
+        'is_4ps' => 0, 'ps4_id_no' => null, 'is_pwd' => 0, 'is_ofw_dependent' => 0,
+    ];
+
+    // ── Plain text fields — "Label: Value" on same line ──────────────────────
+    $plainFields = [
+        'Last Name \*:'      => 'last_name',
+        'First Name \*:'     => 'first_name',
+        'Middle Name:'       => 'middle_name',
+        'Suffix:'            => 'suffix',
+        'Date of Birth \*:'  => 'dob',
+        'Contact No\. \*:'   => 'contact',
+        'Email:'             => 'email',
+        'House No\.\/Street:' => 'house_no',
+        'Barangay \*:'       => 'barangay',
+        'District:'          => 'district',
+        'City \*:'           => 'city',
+        '4Ps ID No\.:'       => 'ps4_id_no',
+    ];
+
+    foreach ($plainFields as $pattern => $col) {
+        if (preg_match('/' . $pattern . '\s*(.*?)(?=Last Name \*:|First Name \*:|Middle Name:|Suffix:|Date of Birth \*:|Sex \*:|Civil Status \*:|Contact No\. \*:|Email:|House No\.\/Street:|Barangay \*:|District:|City \*:|4Ps ID No\.:|SECTION|$)/s', $fullText, $m)) {
+            $cleaned = cleanValue(trim($m[1]), $col);
+            if ($cleaned !== null) {
+                $data[$col] = $cleaned;
+            }
+        }
+    }
+
+    // ── Sex ───────────────────────────────────────────────────────────────────
+    // PDF renders "☑ Female" or "☑ Male" as plain text
+    if (preg_match('/Sex \*:.*?☑\s*(Male|Female)/is', $fullText, $m)) {
+        $data['sex'] = trim($m[1]);
+    }
+
+    // ── Civil Status ──────────────────────────────────────────────────────────
+    $civilOptions = ['Single', 'Married', 'Widowed', 'Separated', 'Annulled', 'Cohabiting'];
+    foreach ($civilOptions as $option) {
+        if (preg_match('/Civil Status \*:.*?☑\s*' . $option . '/is', $fullText)) {
+            $data['civil_status'] = $option;
+            break;
+        }
+    }
+
+    // ── Boolean flags
+    if (preg_match('/4Ps Member\?:.*?☑\s*Yes/is', $fullText))           $data['is_4ps'] = 1;
+    if (preg_match('/PWD\?:.*?☑\s*Yes/is', $fullText))                   $data['is_pwd'] = 1;
+    if (preg_match('/OFW\s+Dependent\?:.*?☑\s*Yes/is', $fullText))       $data['is_ofw_dependent'] = 1;
+
+    return $data;
 }
