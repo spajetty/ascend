@@ -43,6 +43,16 @@ set_error_handler(function (int $errno, string $errstr) {
 header('Content-Type: application/json');
 
 $currentYear = (int) date('Y');
+$cacheDir  = __DIR__ . '/../../cache';
+$cachePath = $cacheDir . '/fetch-details.json';
+$previousResetCount = 0;
+
+if (file_exists($cachePath)) {
+    $existingCache = json_decode((string) file_get_contents($cachePath), true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($existingCache)) {
+        $previousResetCount = (int) ($existingCache['cache_reset_count'] ?? 0);
+    }
+}
 
 try {
 
@@ -250,8 +260,19 @@ try {
      * Skipped in the main loop and injected explicitly below.           */
     $specialPrograms = [4, 9, 10];
 
-    /* ── Build from beneficiaries (standard programs only) ── */
-    foreach ($sexRows as $row) {
+    /* ── Build from programs table directly (not just sexRows) ── */
+    $allPrograms = $pdo->query("
+        SELECT
+            p.program_id,
+            p.name       AS program_name,
+            p.section_id,
+            s.name       AS section_name
+        FROM programs p
+        JOIN sections s ON s.section_id = p.section_id
+        ORDER BY p.section_id, p.program_id
+    ")->fetchAll();
+
+    foreach ($allPrograms as $row) {
         $sid = (int) $row['section_id'];
         $pid = (int) $row['program_id'];
 
@@ -261,10 +282,19 @@ try {
 
         $sectionName = $row['section_name'];
         $programName = $row['program_name'];
-        $male        = (int) $row['total_male'];
-        $fem         = (int) $row['total_female'];
-        $reg         = $classByProgram[$sid][$pid]['total_registered'] ?? 0;
-        $hired       = $classByProgram[$sid][$pid]['total_hired']      ?? 0;
+
+        // Pull sex counts from sexRows if they exist, otherwise 0
+        $sexKey = null;
+        foreach ($sexRows as $sr) {
+            if ((int)$sr['section_id'] === $sid && (int)$sr['program_id'] === $pid) {
+                $sexKey = $sr;
+                break;
+            }
+        }
+        $male = $sexKey ? (int)$sexKey['total_male']   : 0;
+        $fem  = $sexKey ? (int)$sexKey['total_female']  : 0;
+        $reg  = $classByProgram[$sid][$pid]['total_registered'] ?? 0;
+        $hired = $classByProgram[$sid][$pid]['total_hired']     ?? 0;
 
         $programList[] = [
             'section_id'       => $sid,
@@ -370,6 +400,8 @@ try {
 
     $payload = [
         'generated_at'             => date('Y-m-d H:i:s'),
+        'cache_reset_count'        => $previousResetCount + 1,
+        'cache_refreshed_at'       => date('Y-m-d H:i:s'),
         'beneficiaries_totals'     => [
             'total_male'       => $grandMale,
             'total_female'     => $grandFemale,
@@ -386,9 +418,6 @@ try {
     ];
 
     /* ── Cache to file ── */
-    $cacheDir  = __DIR__ . '/../../cache';
-    $cachePath = $cacheDir . '/fetch-details.json';
-
     if (!is_dir($cacheDir)) {
         mkdir($cacheDir, 0755, true);
     }

@@ -312,6 +312,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                         <?php else: ?>
                             <?php foreach ($programs as $prog):
+                                if ((int)$prog['program_id'] === 4) continue;
                                 $pct = $secTotal > 0 ? round(($prog['total'] / $secTotal) * 100, 1) : 0;
                             ?>
                             <tr class="hover:bg-gray-50 transition-colors">
@@ -361,12 +362,16 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
     </div><!-- /px-6 -->
 </main>
 
+<script>
+console.log('[Reports] cache reset count:', <?= (int) ($cacheData['cache_reset_count'] ?? 0) ?>);
+console.log('[Reports] cache refreshed at:', <?= json_encode($cacheData['cache_refreshed_at'] ?? '') ?>);
+</script>
+
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 /* ─────────────────────────────────────────────────────────────
- * Initial chart data seeded from PHP cache (same as dashboard)
- * Will be updated after the live fetch-details call.
+ * Initial chart data seeded from the cached PHP snapshot only.
  * ─────────────────────────────────────────────────────────────*/
 const initialTrendLabels  = <?= json_encode($monthLabels) ?>;
 const initialTrendReg     = <?= json_encode($monthReg) ?>;
@@ -443,164 +448,6 @@ function showSection(id) {
     });
 }
 
-/* ═══════════════════════════════════════════════════════════════
- * Live refresh — same fetch-details API call as dashboard.php
- * Runs on every page load; updates charts + tables with fresh data.
- * ═══════════════════════════════════════════════════════════════ */
-(async function initReports() {
-    const apiUrl = new URL(
-        '<?= htmlspecialchars(rtrim(dirname($_SERVER['SCRIPT_NAME']), '/') . '/../../backend/dashboard/fetch-details.php', ENT_QUOTES) ?>',
-        window.location.origin
-    ).href;
-
-    console.group('[Reports] Fetching fresh data from fetch-details API');
-    console.log('Endpoint →', apiUrl);
-
-    try {
-        const res = await fetch(apiUrl, { credentials: 'same-origin' });
-
-        if (!res.ok) {
-            console.error('[Reports] HTTP error:', res.status, res.statusText);
-            return;
-        }
-
-        const json = await res.json();
-        console.log('[Reports] fetch-details.json cache content:', json);
-
-        if (!json.success) {
-            console.error('[Reports] API error:', json.error ?? 'Unknown error');
-            return;
-        }
-
-        const data = json.data;
-
-        const fmt = (n) => Number(n ?? 0).toLocaleString('en-US');
-
-        const pctChange = (current, previous) => {
-            if (!previous) return null;
-            const change = ((current - previous) / previous) * 100;
-            const sign   = change >= 0 ? '+' : '';
-            const dir    = change >= 0 ? '↑' : '↓';
-            return `${sign}${change.toFixed(1)}% ${dir} from last month`;
-        };
-
-        /* ── Pull values ── */
-        const totals    = data.beneficiaries_totals ?? {};
-        const employers = data.employers            ?? {};
-        const monthRows = data.comparison_by_month  ?? [];
-        const programs  = data.beneficiaries_by_program ?? [];
-        const sections  = data.beneficiaries_by_section ?? [];
-
-        const totalReg      = totals.total_registered ?? 0;
-        const totalHired    = totals.total_hired      ?? 0;
-        const totalMale     = totals.total_male       ?? 0;
-        const totalFemale   = totals.total_female     ?? 0;
-        const totalEmpl     = employers.total_employers ?? 0;
-        const totalVac      = employers.total_vacancies ?? 0;
-        const grandTotal    = totalMale + totalFemale;
-
-        let prevReg = 0, prevHired = 0;
-        if (monthRows.length >= 2) {
-            const prev = monthRows[monthRows.length - 2];
-            prevReg    = prev.total_registered ?? 0;
-            prevHired  = prev.total_hired      ?? 0;
-        }
-
-        /* ── Update stat cards ── */
-        document.getElementById('stat-registered').textContent = fmt(totalReg);
-        document.getElementById('stat-hired').textContent      = fmt(totalHired);
-        document.getElementById('stat-employers').textContent  = fmt(totalEmpl);
-        document.getElementById('stat-vacancies').textContent  = fmt(totalVac);
-
-        const badgeEl = (id, current, previous) => {
-            const el   = document.getElementById(id);
-            if (!el) return;
-            const text = pctChange(current, previous);
-            if (text) { el.textContent = text; el.classList.remove('invisible'); }
-            else      { el.classList.add('invisible'); }
-        };
-        badgeEl('badge-registered', totalReg,   prevReg);
-        badgeEl('badge-hired',      totalHired, prevHired);
-
-        /* ── Update gender section ── */
-        const malePct   = grandTotal > 0 ? ((totalMale   / grandTotal) * 100).toFixed(1) : 0;
-        const femalePct = grandTotal > 0 ? ((totalFemale / grandTotal) * 100).toFixed(1) : 0;
-
-        document.getElementById('gender-total').textContent        = fmt(grandTotal);
-        document.getElementById('gender-male-count').textContent   = fmt(totalMale);
-        document.getElementById('gender-female-count').textContent = fmt(totalFemale);
-        document.getElementById('gender-male-pct').textContent     = malePct + '%';
-        document.getElementById('gender-female-pct').textContent   = femalePct + '%';
-
-        /* ── Update donut chart ── */
-        genderChart.data.datasets[0].data = [totalMale || 1, totalFemale || 1];
-        genderChart.update();
-
-        /* ── Update trend chart (last 6 months) ── */
-        const recent = monthRows.slice(-6);
-        trendChart.data.labels                   = recent.map(r => r.month.slice(0, 3));
-        trendChart.data.datasets[0].data         = recent.map(r => r.total_registered ?? 0);
-        trendChart.data.datasets[1].data         = recent.map(r => r.total_hired      ?? 0);
-        trendChart.update();
-
-        /* ── Update program tables ── */
-        const bySection = {};
-        programs.forEach(p => {
-            if (!bySection[p.section_id]) bySection[p.section_id] = [];
-            bySection[p.section_id].push(p);
-        });
-
-        document.querySelectorAll('[data-section-id]').forEach(tableEl => {
-            const sid      = parseInt(tableEl.dataset.sectionId);
-            const progs    = bySection[sid] ?? [];
-            const tbody    = tableEl.querySelector('[data-program-rows]');
-            if (!tbody) return;
-
-            const secTotal = progs.reduce((s, p) => s + (parseInt(p.total) || 0), 0);
-            const secMale  = progs.reduce((s, p) => s + (parseInt(p.total_male) || 0), 0);
-            const secFem   = progs.reduce((s, p) => s + (parseInt(p.total_female) || 0), 0);
-
-            const rows = progs.length
-                ? progs.map(p => {
-                    const pct = secTotal > 0 ? ((p.total / secTotal) * 100).toFixed(1) : 0;
-                    return `
-                        <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-3 font-medium text-gray-800">${p.program_name}</td>
-                            <td class="px-4 py-3 text-center text-gray-600">${fmt(p.total_male)}</td>
-                            <td class="px-4 py-3 text-center text-gray-600">${fmt(p.total_female)}</td>
-                            <td class="px-4 py-3 text-center font-semibold text-gray-800">${fmt(p.total)}</td>
-                            <td class="px-6 py-3 text-right text-gray-500">${pct}%</td>
-                        </tr>`;
-                  }).join('')
-                : `<tr><td colspan="5" class="px-6 py-4 text-center text-gray-400 text-sm">No program data available</td></tr>`;
-
-            const totalRow = `
-                <tr class="bg-gray-50 font-semibold">
-                    <td class="px-6 py-3 text-gray-800">Section Total</td>
-                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secMale)}</td>
-                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secFem)}</td>
-                    <td class="px-4 py-3 text-center text-gray-800">${fmt(secTotal)}</td>
-                    <td class="px-6 py-3 text-right text-gray-800">100%</td>
-                </tr>`;
-
-            tbody.innerHTML = rows + totalRow;
-        });
-
-        /* ── Update grand total banner ── */
-        const allTotal = sections.reduce((s, sec) => s + (parseInt(sec.total) || 0), 0);
-        document.getElementById('grand-total').textContent    = fmt(allTotal);
-        document.getElementById('grand-male').textContent     = fmt(totalMale);
-        document.getElementById('grand-female').textContent   = fmt(totalFemale);
-        document.getElementById('grand-programs').textContent = programs.length;
-
-        console.log('[Reports] All values updated successfully.');
-
-    } catch (err) {
-        console.error('[Reports] Failed to fetch or parse fetch-details:', err);
-    } finally {
-        console.groupEnd();
-    }
-})();
 </script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>

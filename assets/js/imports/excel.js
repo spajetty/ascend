@@ -12,6 +12,32 @@ import { setProgramSelectorsLocked, setUploadStateFromProgramSelection, syncProg
 // Side-effect imports — these modules wire their own DOM event listeners on load.
 import './excel-upload.js';
 
+const FETCH_DETAILS_ENDPOINT = '../../backend/dashboard/fetch-details.php';
+
+async function refreshDashboardCache() {
+    try {
+        const res = await fetch(FETCH_DETAILS_ENDPOINT, { credentials: 'same-origin' });
+        const raw = await res.text();
+
+        let result;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            const snippet = (raw || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+            throw new Error(`Unexpected cache refresh response (HTTP ${res.status}). ${snippet ? `Details: ${snippet}` : ''}`.trim());
+        }
+
+        if (!res.ok || !result.success) {
+            throw new Error(result.error ?? `Cache refresh failed (HTTP ${res.status}).`);
+        }
+
+        return result;
+    } catch (err) {
+        console.error('[Import] Failed to refresh fetch-details cache:', err);
+        return null;
+    }
+}
+
 const WIIRP_PRIVATE_PREVIEW_HEADERS = [
     '# of hours',
     'Starting Date',
@@ -287,6 +313,8 @@ if (confirmImportBtn) {
                         : [];
 
                     document.getElementById('cancelImport').click();
+
+                    await refreshDashboardCache();
 
                     const createdEmployers = Array.isArray(result.created_employers) ? result.created_employers : [];
                     const followupEmployerFlow = EMPLOYER_AUTO_CREATE_PROGRAMS.has(program) && createdEmployers.length > 0;
