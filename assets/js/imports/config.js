@@ -28,6 +28,51 @@ export const programs = {
         ],*/
 };
 
+// ─── Statuses (= Classification) per program ────────────────────────────────
+export const statusesByProgram = {
+    'Job Matching and Referral': [
+        'registered',
+        'referred',
+        'interviewed',
+        'qualified',
+        'not qualified',
+        'placed/hots',
+        'for further interview',
+    ],
+    'First Time Jobseeker': [
+        'issued',
+        'interviewed',
+        'qualified',
+        'not qualified',
+        'placed/hots',
+        'for further interview',
+    ],
+    'Job Fair': [
+        'interviewed',
+        'qualified',
+        'not qualified',
+        'placed/hots',
+        'for further interview',
+    ],
+    'SPES': [
+        'registered',
+        'referred',
+        'placed',
+    ],
+    'Government Internship Program': [
+        'peso-accepted',
+        'dole-accepted',
+    ],
+    'Work Immersion and Internship Referral Program': [
+        'inquired',
+        'referred',
+        'interviewed',
+        'peso-accepted',
+        'private-accepted',
+        'not proceeded',
+    ],
+};
+
 // Import status - (new / duplicate / invalid)
 // badge_status values returned by validate_preview.php:
 //   'new'       → green   — will be inserted
