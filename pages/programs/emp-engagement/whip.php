@@ -186,6 +186,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 const API_URL = '/backend/emp-engagement/whip/show-whip.php';
+const CACHE_URL = '/cache/fetch-whip.json';
 const ROWS_PER_PAGE = 10;
 
 let allRows      = [];   // raw worker rows from API
@@ -193,18 +194,50 @@ let groupedRows  = [];   // aggregated month+project rows
 let currentPage  = 1;
 let deletingKey  = null; // { month_key, project_id }
 
-// ─── Load data from API ───────────────────────────────────────────────────────
+// ─── Load data from cache/API ────────────────────────────────────────────────
 async function loadData(year) {
     document.getElementById('loadingRow').style.display = '';
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        const url = year === 'all' ? API_URL : `${API_URL}?year=${year}`;
-        const res  = await fetch(url);
-        const json = await res.json();
+        let json = null;
+
+        try {
+            const cacheRes = await fetch(CACHE_URL, { cache: 'no-store' });
+            if (cacheRes.ok) {
+                const cacheJson = await cacheRes.json();
+                if (cacheJson.success && String(cacheJson.data?.year) === String(year)) {
+                    json = cacheJson;
+                }
+            }
+        } catch (cacheErr) {
+            console.warn('[WHIP] cache fetch failed:', cacheErr);
+        }
+
+        if (!json) {
+            const url = year === 'all' ? API_URL : `${API_URL}?year=${year}`;
+            const res = await fetch(url);
+            json = await res.json();
+        }
+
         if (!json.success) throw new Error(json.error);
 
-        const { rows, totals } = json.data;
+        const { rows, totals, years } = json.data;
+
+        const sel = document.getElementById('yearSelect');
+        if (sel.options.length === 0 && Array.isArray(years)) {
+            years.forEach(y => {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                if (String(y) === String(year)) opt.selected = true;
+                sel.appendChild(opt);
+            });
+        }
+
+        if (sel.options.length > 0) {
+            sel.value = String(year);
+        }
 
         // Update summary cards
         document.getElementById('cardTotal').textContent    = totals.total;
@@ -213,14 +246,20 @@ async function loadData(year) {
         document.getElementById('cardProjects').textContent = totals.projects;
         document.getElementById('tableTotal').textContent   = totals.total + ' Total';
 
+        console.log('[WHIP] cache refresh count:', json.data.cache_refresh_count ?? 0);
+        console.log('[WHIP] cache refreshed at:', json.data.cache_refreshed_at ?? '—');
+
         allRows = rows;
         buildGrouped();
         currentPage = 1;
         renderPage();
 
+        return json.data;
+
     } catch (err) {
         document.getElementById('loadingRow').innerHTML =
             `<td colspan="5" class="px-4 py-8 text-center text-red-500 text-sm">Error: ${err.message}</td>`;
+        return null;
     }
 }
 
@@ -526,36 +565,7 @@ document.getElementById('yearSelect').addEventListener('change', function () {
 });
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-async function initializePage() {
-    try {
-        const res  = await fetch(API_URL);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
-
-        const years = json.data.years || [];
-        const sel   = document.getElementById('yearSelect');
-
-        const allOpt = document.createElement('option');
-        allOpt.value = 'all';
-        allOpt.textContent = 'All Years';
-        allOpt.selected = true;
-        sel.appendChild(allOpt);
-
-        years.forEach(y => {
-            const opt = document.createElement('option');
-            opt.value = y;
-            opt.textContent = y;
-            sel.appendChild(opt);
-        });
-
-        await loadData('all');
-
-    } catch (err) {
-        console.error(err);
-    }
-}
-
-initializePage();
+loadData(new Date().getFullYear());
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>

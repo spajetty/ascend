@@ -5,6 +5,31 @@ $currentPage = 'programs';
 $pageTitle   = 'ASCEND PED System – Employers Engagement Section';
 $pageHeading = 'Employers Engagement Section';
 
+$overviewYear = (int) date('Y');
+
+function loadOverviewCache(string $path, int $expectedYear): ?array
+{
+    if (!file_exists($path)) {
+        return null;
+    }
+
+    $decoded = json_decode((string) file_get_contents($path), true);
+    if (
+        json_last_error() !== JSON_ERROR_NONE ||
+        !is_array($decoded) ||
+        empty($decoded['success']) ||
+        !isset($decoded['data']['year']) ||
+        (int) $decoded['data']['year'] !== $expectedYear
+    ) {
+        return null;
+    }
+
+    return $decoded['data'] ?? null;
+}
+
+$accredCache = loadOverviewCache(__DIR__ . '/../../cache/fetch-employers.json', $overviewYear);
+$whipCache   = loadOverviewCache(__DIR__ . '/../../cache/fetch-whip.json', $overviewYear);
+
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
 ?>
@@ -154,10 +179,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-// ─── API paths ────────────────────────────────────────────────────────────────
-const YEAR       = new Date().getFullYear();
-const ACCRED_API = `/backend/emp-engagement/emp-accred/show-employers.php?year=${YEAR}`;
-const WHIP_API   = `/backend/emp-engagement/whip/show-whip.php?year=all`;
+const ACCRED_CACHE_DATA = <?= json_encode($accredCache) ?>;
+const WHIP_CACHE_DATA   = <?= json_encode($whipCache) ?>;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
@@ -170,33 +193,24 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
+    const acData = ACCRED_CACHE_DATA;
+    const whData = WHIP_CACHE_DATA;
 
-    const fetchJson = url => fetch(url).then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-    });
+    console.log('[Employers Engagement] accreditation cache refresh count:', acData ? (acData.cache_refresh_count ?? 0) : 0);
+    console.log('[Employers Engagement] accreditation cache refreshed at:', acData ? (acData.cache_refreshed_at ?? '—') : '—');
+    console.log('[Employers Engagement] whip cache refresh count:', whData ? (whData.cache_refresh_count ?? 0) : 0);
+    console.log('[Employers Engagement] whip cache refreshed at:', whData ? (whData.cache_refreshed_at ?? '—') : '—');
 
-    Promise.allSettled([
-        fetchJson(ACCRED_API),
-        fetchJson(WHIP_API),
-    ]).then(([acResult, whResult]) => {
+    // ── Summary Cards ──────────────────────────────────────────────────────
+    document.getElementById('card-total-accred').textContent  = acData ? acData.totals.total   : '—';
+    document.getElementById('card-new').textContent           = acData ? acData.totals.new      : '—';
+    document.getElementById('card-renew').textContent         = acData ? acData.totals.renewed  : '—';
+    document.getElementById('card-workers-hired').textContent = whData ? whData.totals.total    : '—';
+    document.getElementById('card-projects').textContent      = whData ? whData.totals.projects : '—';
 
-        const acData = (acResult.status === 'fulfilled' && acResult.value.success)
-            ? acResult.value.data : null;
-        const whData = (whResult.status === 'fulfilled' && whResult.value.success)
-            ? whResult.value.data : null;
-
-        // ── Summary Cards ──────────────────────────────────────────────────────
-        document.getElementById('card-total-accred').textContent  = acData ? acData.totals.total   : '—';
-        document.getElementById('card-new').textContent           = acData ? acData.totals.new      : '—';
-        document.getElementById('card-renew').textContent         = acData ? acData.totals.renewed  : '—';
-        document.getElementById('card-workers-hired').textContent = whData ? whData.totals.total    : '—';
-        document.getElementById('card-projects').textContent      = whData ? whData.totals.projects : '—';
-
-        // ── Preview Tables ─────────────────────────────────────────────────────
-        renderAccreditation(acData);
-        renderWhip(whData);
-    });
+    // ── Preview Tables ─────────────────────────────────────────────────────
+    renderAccreditation(acData);
+    renderWhip(whData);
 });
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────

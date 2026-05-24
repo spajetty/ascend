@@ -205,6 +205,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 const API_URL = '/backend/emp-engagement/emp-accred/show-employers.php';
+const CACHE_URL = '/cache/fetch-employers.json';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];
@@ -214,14 +215,31 @@ let deletingId   = null;
 let savingId     = null;
 let editingData  = {};
 
-// ─── Load data from API ───────────────────────────────────────────────────────
+// ─── Load data from cache/API ────────────────────────────────────────────────
 async function loadData(year) {
     document.getElementById('loadingRow').style.display = '';
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        const res  = await fetch(`${API_URL}?year=${year}`);
-        const json = await res.json();
+        let json = null;
+
+        try {
+            const cacheRes = await fetch(CACHE_URL, { cache: 'no-store' });
+            if (cacheRes.ok) {
+                const cacheJson = await cacheRes.json();
+                if (cacheJson.success && (parseInt(cacheJson.data?.year, 10) === parseInt(year, 10))) {
+                    json = cacheJson;
+                }
+            }
+        } catch (cacheErr) {
+            console.warn('[Employers Accreditation] cache fetch failed:', cacheErr);
+        }
+
+        if (!json) {
+            const res = await fetch(`${API_URL}?year=${year}`);
+            json = await res.json();
+        }
+
         if (!json.success) throw new Error(json.error);
 
         const { rows, totals, years } = json.data;
@@ -248,14 +266,20 @@ async function loadData(year) {
             el.textContent = `Active Employers (${year})`;
         });
 
+        console.log('[Employers Accreditation] cache refresh count:', json.data.cache_refresh_count ?? 0);
+        console.log('[Employers Accreditation] cache refreshed at:', json.data.cache_refreshed_at ?? '—');
+
         allRows = rows;
         document.getElementById('searchCompany').value = '';
         document.getElementById('filterEstType').value = '';
         applyFilters();
 
+        return json.data;
+
     } catch (err) {
         document.getElementById('loadingRow').innerHTML =
             `<td colspan="7" class="px-4 py-8 text-center text-red-500 text-sm">Error: ${err.message}</td>`;
+        return null;
     }
 }
 

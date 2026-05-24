@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../../../includes/auth-check.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
+require_once __DIR__ . '/../../career-dev/cache-refresh.php';
 
 header('Content-Type: application/json');
 
@@ -36,10 +37,6 @@ set_error_handler(function ($errno, $errstr) {
     exit;
 });
 
-// ─────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────
-
 function json_error(string $msg, int $code = 400): void
 {
     http_response_code($code);
@@ -53,132 +50,66 @@ function json_ok($data = null): void
     exit;
 }
 
+function refreshWhipCacheFresh($yearFilter): array
+{
+    $freshConn = new mysqli(
+        $_ENV['DB_HOST'],
+        $_ENV['DB_USER'],
+        $_ENV['DB_PASS'],
+        $_ENV['DB_NAME']
+    );
+
+    if ($freshConn->connect_error) {
+        throw new Exception($freshConn->connect_error);
+    }
+
+    try {
+        return refreshWhipCache($freshConn, $yearFilter);
+    } finally {
+        $freshConn->close();
+    }
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-
-    // ─────────────────────────────────────────
-    // GET
-    // ─────────────────────────────────────────
     if ($method === 'GET') {
-
         $yearFilter = $_GET['year'] ?? 'all';
+        $cachePath = __DIR__ . '/../../../cache/fetch-whip.json';
 
-        // Available years
-        $years    = [];
-        $yearRes  = $conn->query("
-            SELECT DISTINCT YEAR(date_hired) AS yr
-            FROM whip
-            WHERE date_hired IS NOT NULL
-            ORDER BY yr DESC
-        ");
-        while ($row = $yearRes->fetch_assoc()) {
-            $years[] = (int) $row['yr'];
-        }
-
-        $sql = "
-            SELECT
-                w.whip_id,
-                w.benef_id,
-                w.project_id,
-                w.batch_id,
-                w.position,
-                w.date_hired,
-                w.created_at,
-
-                b.first_name,
-                b.middle_name,
-                b.last_name,
-                b.suffix,
-                b.sex,
-                b.city,
-                b.barangay,
-                b.district,
-                b.classification,
-
-                p.project_title,
-                p.nature_of_project,
-                p.duration,
-                p.budget,
-                p.fund_source,
-                p.persons_from_locality,
-                p.skills_required,
-                p.skills_deficiencies,
-                p.contractor,
-                p.is_legitimate_contractor,
-                p.filled,
-                p.unfilled
-
-            FROM whip w
-            LEFT JOIN beneficiaries b ON w.benef_id = b.benef_id
-            LEFT JOIN projects p ON w.project_id = p.project_id
-        ";
-
-        $params = [];
-        $types  = "";
-
-        if ($yearFilter !== 'all' && !empty($yearFilter)) {
-            $sql .= " WHERE YEAR(w.date_hired) = ? ";
-            $params[] = (int) $yearFilter;
-            $types   .= "i";
-        }
-
-        $sql .= " ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC";
-
-        $stmt = $conn->prepare($sql);
-        if (!empty($params)) {
-            $stmt->bind_param($types, ...$params);
-        }
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $rows        = [];
-        $maleCount   = 0;
-        $femaleCount = 0;
-        $projectSet  = [];
-
-        while ($row = $result->fetch_assoc()) {
-            $row['budget']                   = $row['budget'] !== null ? (float) $row['budget'] : null;
-            $row['persons_from_locality']    = (int) ($row['persons_from_locality'] ?? 0);
-            $row['is_legitimate_contractor'] = (bool) ($row['is_legitimate_contractor'] ?? false);
-            $row['filled']                   = (int) ($row['filled'] ?? 0);
-            $row['unfilled']                 = (int) ($row['unfilled'] ?? 0);
-
-            $sex = strtolower($row['sex'] ?? '');
-            if ($sex === 'male')   $maleCount++;
-            if ($sex === 'female') $femaleCount++;
-
-            if (!empty($row['project_id'])) {
-                $projectSet[$row['project_id']] = true;
+        if (file_exists($cachePath)) {
+            $cached = json_decode((string) file_get_contents($cachePath), true);
+            if (
+                json_last_error() === JSON_ERROR_NONE &&
+                !empty($cached['success']) &&
+                isset($cached['data']['year']) &&
+                (string) $cached['data']['year'] === (string) $yearFilter
+            ) {
+                echo json_encode($cached, JSON_PRETTY_PRINT);
+                exit;
             }
-
-            $rows[] = $row;
         }
 
-        $defaultYear = !empty($years) ? max($years) : (int) date('Y');
-
-        json_ok([
-            'rows'         => $rows,
-            'years'        => $years,
-            'default_year' => $defaultYear,
-            'totals'       => [
-                'total'    => $maleCount + $femaleCount,
-                'male'     => $maleCount,
-                'female'   => $femaleCount,
-                'projects' => count($projectSet),
-            ]
-        ]);
+        echo json_encode(refreshWhipCache($conn, $yearFilter), JSON_PRETTY_PRINT);
+        exit;
     }
 
-    // ─────────────────────────────────────────
-    // PUT
-    // ─────────────────────────────────────────
     if ($method === 'PUT') {
-
         $body = json_decode(file_get_contents('php://input'), true);
 
-        $whip_id = (int)($body['whip_id'] ?? 0);
-        if (!$whip_id) json_error('Missing whip_id');
+        $whip_id = (int) ($body['whip_id'] ?? 0);
+        if (!$whip_id) {
+            json_error('Missing whip_id');
+        }
+
+        $yearStmt = $conn->prepare("\n            SELECT YEAR(date_hired) AS yr\n            FROM whip\n            WHERE whip_id = ?\n            LIMIT 1\n        ");
+        $yearStmt->bind_param('i', $whip_id);
+        $yearStmt->execute();
+        $yearResult = $yearStmt->get_result();
+        $yearRow = $yearResult->fetch_assoc();
+        $yearResult->free();
+        $yearStmt->close();
+        $cacheYear = isset($yearRow['yr']) ? (int) $yearRow['yr'] : (int) date('Y');
 
         $position   = trim($body['position'] ?? '');
         $date_hired = trim($body['date_hired'] ?? '');
@@ -187,32 +118,45 @@ try {
             json_error('Invalid date format');
         }
 
-        $stmt = $conn->prepare("
-            UPDATE whip
-            SET position = ?, date_hired = ?
-            WHERE whip_id = ?
-        ");
+        $stmt = $conn->prepare("\n            UPDATE whip\n            SET position = ?, date_hired = ?\n            WHERE whip_id = ?\n        ");
 
-        $stmt->bind_param("ssi", $position, $date_hired, $whip_id);
+        $stmt->bind_param('ssi', $position, $date_hired, $whip_id);
         $stmt->execute();
+
+        if ($date_hired) {
+            $cacheYear = (int) date('Y', strtotime($date_hired));
+        }
+
+        $stmt->close();
+
+        refreshWhipCacheFresh($cacheYear);
 
         json_ok(['updated' => $stmt->affected_rows]);
     }
 
-    // ─────────────────────────────────────────
-    // DELETE
-    // ─────────────────────────────────────────
     if ($method === 'DELETE') {
+        $whip_id = (int) ($_GET['id'] ?? 0);
+        if (!$whip_id) {
+            json_error('Missing id');
+        }
 
-        $whip_id = (int)($_GET['id'] ?? 0);
-        if (!$whip_id) json_error('Missing id');
+        $yearStmt = $conn->prepare("\n            SELECT YEAR(date_hired) AS yr\n            FROM whip\n            WHERE whip_id = ?\n            LIMIT 1\n        ");
+        $yearStmt->bind_param('i', $whip_id);
+        $yearStmt->execute();
+        $yearResult = $yearStmt->get_result();
+        $yearRow = $yearResult->fetch_assoc();
+        $yearResult->free();
+        $yearStmt->close();
+        $cacheYear = isset($yearRow['yr']) ? (int) $yearRow['yr'] : (int) date('Y');
 
-        $stmt = $conn->prepare("
-            DELETE FROM whip WHERE whip_id = ?
-        ");
+        $stmt = $conn->prepare("\n            DELETE FROM whip WHERE whip_id = ?\n        ");
 
-        $stmt->bind_param("i", $whip_id);
+        $stmt->bind_param('i', $whip_id);
         $stmt->execute();
+
+        $stmt->close();
+
+        refreshWhipCacheFresh($cacheYear);
 
         json_ok(['deleted' => $stmt->affected_rows]);
     }
