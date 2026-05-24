@@ -467,6 +467,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 const API_URL = '/backend/career-dev/lmi/show-lmi.php';
+const CACHE_URL = '/cache/fetch-lmi.json';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];   // raw data from API
@@ -493,11 +494,38 @@ async function loadData(year) {
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        const res  = await fetch(`${API_URL}?year=${year}`);
-        const json = await res.json();
-        if (!json.success) throw new Error(json.error);
+        let json = null;
 
-        const { rows, totals, years } = json.data;
+        try {
+            const cacheRes = await fetch(`${CACHE_URL}?t=${Date.now()}`, { cache: 'no-store' });
+            json = await cacheRes.json();
+        } catch (cacheErr) {
+            console.warn('[LMI] cache read failed:', cacheErr);
+        }
+
+        const cacheYear = Number(json?.data?.year ?? 0);
+        const wantsYear = Number(year);
+        const hasUsableCache = Boolean(
+            json &&
+            json.success &&
+            json.data &&
+            Array.isArray(json.data.rows) &&
+            cacheYear === wantsYear
+        );
+
+        if (!hasUsableCache) {
+            const refreshRes = await fetch(`${API_URL}?year=${year}`, { cache: 'no-store' });
+            const refreshJson = await refreshRes.json();
+            if (!refreshJson.success) {
+                throw new Error(refreshJson.error || 'Failed to refresh cache');
+            }
+            json = refreshJson;
+        }
+
+        const { rows, totals, years, cache_refresh_count, cache_refreshed_at } = json.data;
+
+        console.log('[LMI] cache refresh count:', cache_refresh_count ?? 0);
+        console.log('[LMI] cache refreshed at:', cache_refreshed_at ?? '');
 
         // Populate year dropdown (only on first load)
         const sel = document.getElementById('yearSelect');

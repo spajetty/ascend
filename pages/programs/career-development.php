@@ -1,9 +1,30 @@
+<!-- career-development.php -->
 <?php
 require_once __DIR__ . '/../../includes/auth-check.php';
 
 $currentPage = 'programs';
 $pageTitle   = 'ASCEND PED System – Career Development Section';
 $pageHeading = 'Career Development Section';
+
+$cdspCachePath = __DIR__ . '/../../cache/fetch-cdsp.json';
+$lmiCachePath  = __DIR__ . '/../../cache/fetch-lmi.json';
+
+$cdspCache = null;
+$lmiCache  = null;
+
+if (file_exists($cdspCachePath)) {
+    $decoded = json_decode((string) file_get_contents($cdspCachePath), true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && !empty($decoded['success'])) {
+        $cdspCache = $decoded['data'] ?? null;
+    }
+}
+
+if (file_exists($lmiCachePath)) {
+    $decoded = json_decode((string) file_get_contents($lmiCachePath), true);
+    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && !empty($decoded['success'])) {
+        $lmiCache = $decoded['data'] ?? null;
+    }
+}
 
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
@@ -138,10 +159,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-// ─── API paths ────────────────────────────────────────────────────────────────
-const YEAR     = new Date().getFullYear();
-const CDSP_API = `/backend/career-dev/cdsp/show-cdsp.php?year=${YEAR}`;
-const LMI_API  = `/backend/career-dev/lmi/show-lmi.php?year=${YEAR}`;
+const CDSP_CACHE_DATA = <?= json_encode($cdspCache) ?>;
+const LMI_CACHE_DATA  = <?= json_encode($lmiCache) ?>;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
@@ -155,24 +174,15 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
 
-    const fetchJson = url => fetch(url).then(r => {
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        return r.json();
-    });
-
-    Promise.allSettled([
-        fetchJson(CDSP_API),
-        fetchJson(LMI_API),
-    ]).then(([cdspResult, lmiResult]) => {
-
-        const cdspData = (cdspResult.status === 'fulfilled' && cdspResult.value.success)
-            ? cdspResult.value.data : null;
-        const lmiData  = (lmiResult.status  === 'fulfilled' && lmiResult.value.success)
-            ? lmiResult.value.data  : null;
+        const cdspData = CDSP_CACHE_DATA;
+        const lmiData  = LMI_CACHE_DATA;
 
         // ── Summary Cards ──────────────────────────────────────────────────────
         const cdspTotal = cdspData ? cdspData.totals.total    : 0;
         const lmiTotal  = lmiData  ? lmiData.totals.total     : 0;
+
+        console.log('[Career Dev] CDSP cache refresh count:', cdspData ? (cdspData.cache_refresh_count ?? 0) : 0);
+        console.log('[Career Dev] LMI cache refresh count:', lmiData ? (lmiData.cache_refresh_count ?? 0) : 0);
 
         document.getElementById('card-total-participants').textContent = cdspTotal + lmiTotal;
         document.getElementById('card-cdsp-sessions').textContent      = cdspData ? cdspData.totals.sessions : '—';
@@ -182,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Preview Tables ─────────────────────────────────────────────────────
         renderCdsp(cdspData);
         renderLmi(lmiData);
-    });
 });
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
