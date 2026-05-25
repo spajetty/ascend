@@ -121,6 +121,14 @@
                 </svg>
                 Job Fair Events
             </h4>
+            <button class="edit-btn-icon" onclick="openAddJobFairModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Job Fair Event">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
         <table class="emp-table">
             <thead>
@@ -128,12 +136,14 @@
                     <th>Event Type</th>
                     <th>Venue</th>
                     <th>Date</th>
+                    <th>Company</th>
                     <th>Position</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pJobFairEvents">
                 <tr>
-                    <td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
+                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
                     </td>
                 </tr>
             </tbody>
@@ -184,6 +194,14 @@
                 </svg>
                 Project Assignment
             </h4>
+            <button class="edit-btn-icon" onclick="openAddWhipModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Project Assignment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
         <table class="emp-table">
             <thead>
@@ -194,11 +212,12 @@
                     <th>Project</th>
                     <th>Duration</th>
                     <th>Budget</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pWhipProjects">
                 <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
+                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
                     </td>
                 </tr>
             </tbody>
