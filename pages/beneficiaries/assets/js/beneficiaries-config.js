@@ -22,45 +22,45 @@ export const programsBySection = {
 // Statuses organized by program
 export const statusesByProgram = {
     'Job Matching and Referral': [
-        'registered',
-        'referred',
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview'
+        'Registered',
+        'Referred',
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview'
     ],
     'First Time Jobseeker': [
-        'issued',
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview'
+        'Issued',
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview'
     ],
     'Job Fair': [
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview'
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview'
     ],
     'SPES': [
-        'registered',
-        'referred',
-        'placed'
+        'Registered',
+        'Referred',
+        'Placed'
     ],
     'Government Internship Program': [
-        'peso-accepted',
-        'dole-accepted'
+        'Peso-Accepted',
+        'Dole-Accepted'
     ],
     'Work Immersion and Internship Referral Program': [
-        'inquired',
-        'referred',
-        'interviewed',
-        'peso-accepted',
-        'private-accepted',
-        'not proceeded'
+        'Inquired',
+        'Referred',
+        'Interviewed',
+        'Peso-Accepted',
+        'Private-Accepted',
+        'Not Proceeded'
     ]
 };
 
