@@ -418,7 +418,9 @@ async function submitEmployerAccreditationFollowup() {
         sessionStorage.removeItem('ascend.pendingEmployerAccreditation');
         state.pendingEmployerAccreditation = null;
         showToast(result.message ?? 'Employer accreditation saved.', 'success');
-        window.location.href = '../../pages/beneficiaries/beneficiary.php';
+        
+        // Show the import results view instead of redirecting
+        showImportResultsView(programData, programData.undoToken);
     }, { label: 'Saving accreditation…' }).catch(err => {
         showToast('Accreditation submission failed: ' + (err.message ?? 'Unknown error'), 'error');
     });
@@ -464,12 +466,13 @@ export function renderImportResultsView(data) {
     ].join('');
 
     // Warnings accordion
-    if (data.warnings.length) {
+    const warnings = data.warnings || [];
+    if (warnings.length) {
         importResultsWarnings.classList.remove('hidden');
         const countEl = document.getElementById('warningsCount');
         const listEl  = document.getElementById('warningsList');
-        if (countEl) countEl.textContent = `${data.warnings.length} Warning${data.warnings.length !== 1 ? 's' : ''}`;
-        if (listEl)  listEl.innerHTML = data.warnings
+        if (countEl) countEl.textContent = `${warnings.length} Warning${warnings.length !== 1 ? 's' : ''}`;
+        if (listEl)  listEl.innerHTML = warnings
             .map(w => `<div class="flex gap-2"><span class="text-amber-400 flex-shrink-0">•</span><span>${escapeHtml(w)}</span></div>`)
             .join('');
     } else {
@@ -498,8 +501,8 @@ export function renderImportResultsView(data) {
 
     if (labelNE) labelNE.textContent = primaryLabel;
     if (badgeNE)  badgeNE.textContent  = createdItems.length;
-    if (badgeDup) badgeDup.textContent = data.duplicateRows.length;
-    if (badgeErr) badgeErr.textContent = data.errorRows.length;
+    if (badgeDup) badgeDup.textContent = (data.duplicateRows || []).length;
+    if (badgeErr) badgeErr.textContent = (data.errorRows || []).length;
 
     // Panel content — program-specific created items
     const newEmployersPanel = employerTabPanel;
@@ -530,10 +533,10 @@ export function renderImportResultsView(data) {
     }
 
     const duplicatesPanel = document.getElementById('resultsPanelDuplicates');
-    if (duplicatesPanel) duplicatesPanel.innerHTML = buildRowsTable(data.duplicateRows, 'No duplicate rows — all records were unique.');
+    if (duplicatesPanel) duplicatesPanel.innerHTML = buildRowsTable(data.duplicateRows || [], 'No duplicate rows — all records were unique.');
 
     const errorsPanel = document.getElementById('resultsPanelErrors');
-    if (errorsPanel) errorsPanel.innerHTML = buildRowsTable(data.errorRows, 'No errors — all records passed validation.');
+    if (errorsPanel) errorsPanel.innerHTML = buildRowsTable(data.errorRows || [], 'No errors — all records passed validation.');
 
     setResultsTab(showEmployerTab ? 'new-employers' : 'duplicates');
 }
@@ -559,6 +562,7 @@ export function showImportResultsView(data, undoToken = null) {
     if (importFormScreen) importFormScreen.classList.add('hidden');
     const preview = document.getElementById('dataPreview');
     if (preview) preview.classList.add('hidden');
+    if (employerAccreditationView) employerAccreditationView.classList.add('hidden');
     if (importResultsView) importResultsView.classList.remove('hidden');
 }
 
@@ -729,34 +733,46 @@ export function initImportResultsUi() {
         });
     }
 
-    // Rollback button
-    const rollbackBtn = document.getElementById('rollbackImportBtn');
-    if (rollbackBtn) {
-        rollbackBtn.addEventListener('click', () => {
-            if (!state.latestUndoToken) {
-                showToast('No rollback available for this import.', 'warning');
-                return;
-            }
-            openRollbackConfirmModal(() => {
-                runWithButtonLoading(rollbackBtn, async () => {
-                    const res = await fetch('../../backend/import/undo_import.php', {
-                        method:  'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body:    JSON.stringify({ undoToken: state.latestUndoToken }),
-                    });
-                    const data = JSON.parse(await res.text());
-                    if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
-
-                    state.latestUndoToken = null;
-                    state.latestImportResultsData = null;
-                    showImportFormView();
-                    showToast(data.message ?? 'Import rolled back successfully.', 'success');
-                }, { label: 'Rolling back…' }).catch(err => {
-                    showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
+    // Rollback logic shared between results view and accreditation view
+    const handleRollback = (btn) => {
+        // If coming from accreditation view, we might use the pending undo token
+        const tokenToUse = state.latestUndoToken || (state.pendingEmployerAccreditation ? state.pendingEmployerAccreditation.undoToken : null);
+        
+        if (!tokenToUse) {
+            showToast('No rollback available for this import.', 'warning');
+            return;
+        }
+        openRollbackConfirmModal(() => {
+            runWithButtonLoading(btn, async () => {
+                const res = await fetch('../../backend/import/undo_import.php', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ undoToken: tokenToUse }),
                 });
+                const data = JSON.parse(await res.text());
+                if (!res.ok || !data.success) throw new Error(data.error ?? 'Rollback failed.');
+
+                state.latestUndoToken = null;
+                state.latestImportResultsData = null;
+                
+                sessionStorage.removeItem('ascend.pendingEmployerAccreditation');
+                state.pendingEmployerAccreditation = null;
+                const accrView = document.getElementById('employerAccreditationView');
+                if (accrView) accrView.classList.add('hidden');
+
+                showImportFormView();
+                showToast(data.message ?? 'Import rolled back successfully.', 'success');
+            }, { label: 'Rolling back…' }).catch(err => {
+                showToast('Rollback failed: ' + (err.message ?? 'Unknown error'), 'error');
             });
         });
-    }
+    };
+
+    const rollbackBtn = document.getElementById('rollbackImportBtn');
+    if (rollbackBtn) rollbackBtn.addEventListener('click', () => handleRollback(rollbackBtn));
+    
+    const rollbackAccrBtn = document.getElementById('rollbackEmployerAccreditationBtn');
+    if (rollbackAccrBtn) rollbackAccrBtn.addEventListener('click', () => handleRollback(rollbackAccrBtn));
 }
 
 export function restorePendingEmployerAccreditationView() {

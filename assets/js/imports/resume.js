@@ -356,9 +356,21 @@ export async function showResumePreview(section, program) {
                 ${fieldInput('district', 'District', d.district)}
                 ${fieldInput('city', 'City / Municipality', d.city)}
 
-                ${!isWhipProgram ? sectionLabel('Classification & Flags') : ''}
+                ${sectionLabel('Classification & Flags')}
 
-                ${!isWhipProgram ? `
+                ${isWhipProgram ? `
+                <div class="flex flex-col gap-1">
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Classification</label>
+                    <input
+                        type="text"
+                        data-field="classification"
+                        class="resume-field w-full text-sm bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2 text-emerald-800 font-semibold focus:outline-none"
+                        value="Placed"
+                        readonly
+                    >
+                    <p class="text-[11px] text-emerald-600">Automatically applied for WHIP beneficiaries.</p>
+                </div>
+                ` : `
                 <!-- Classification dropdown based on selected program -->
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Classification</label>
@@ -373,7 +385,7 @@ export async function showResumePreview(section, program) {
                         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                 </div>
-                ` : ''}
+                `}
 
                 <!-- Checkboxes row -->
                 <div class="col-span-full grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
@@ -425,6 +437,10 @@ if (confirmResumeBtn) {
                     if (!field) return;
                     updated[field] = el.type === 'checkbox' ? (el.checked ? 1 : 0) : el.value;
                 });
+
+                if (program.includes('Workers Hiring for Infrastructure Projects')) {
+                    updated.classification = 'Placed';
+                }
                 return updated;
             });
 

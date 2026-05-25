@@ -460,6 +460,13 @@
             </div>
 
             <div class="mt-5 flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
+                <button id="rollbackEmployerAccreditationBtn" type="button" class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                    Rollback Import
+                </button>
                 <button id="submitEmployerAccreditationBtn" type="button" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700">
                     Submit Accreditation
                 </button>

@@ -53,7 +53,7 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $contact = s(rowValue($row, ['Contact', 'contact'], ''));
         $email = s(rowValue($row, ['Email', 'email'], '')) ?: null;
         $classification = isWhipBeneficiariesProgram((string)($ctx['program'] ?? ''))
-            ? null
+            ? 'Placed'
             : (s(rowValue($row, ['Classification', 'classification'], '')) ?: null);
         if ($classification !== null && $classification !== '') {
             $classification = titleCase($classification);
