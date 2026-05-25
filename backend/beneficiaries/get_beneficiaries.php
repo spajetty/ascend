@@ -61,18 +61,17 @@ try {
     }
 
     if ($pendingBatchId > 0) {
-        if (tableExists($conn, 'jobMatch') && tableHasColumn($conn, 'jobMatch', 'batch_id')) {
-            $appendWhere('NOT EXISTS (SELECT 1 FROM jobMatch jm WHERE jm.benef_id = b.benef_id AND jm.batch_id = ?)', [$pendingBatchId], 'i');
+        if (tableExists($conn, 'jobmatch') && tableHasColumn($conn, 'jobmatch', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM jobmatch jm WHERE jm.benef_id = b.benef_id AND jm.batch_id = ?)', [$pendingBatchId], 'i');
         }
-        if ((tableExists($conn, 'jobfair') || tableExists($conn, 'jobFair'))) {
-            $jobFairTable = tableExists($conn, 'jobfair') ? 'jobfair' : 'jobFair';
-            if (tableHasColumn($conn, $jobFairTable, 'batch_id')) {
-                $appendWhere('NOT EXISTS (SELECT 1 FROM `' . $jobFairTable . '` jf WHERE jf.benef_id = b.benef_id AND jf.batch_id = ?)', [$pendingBatchId], 'i');
+        if (tableExists($conn, 'jobfair')) {
+            if (tableHasColumn($conn, 'jobfair', 'batch_id')) {
+                $appendWhere('NOT EXISTS (SELECT 1 FROM jobfair jf WHERE jf.benef_id = b.benef_id AND jf.batch_id = ?)', [$pendingBatchId], 'i');
             }
         }
 
-        if (tableExists($conn, 'firstJobSeek') && tableHasColumn($conn, 'firstJobSeek', 'batch_id')) {
-            $appendWhere('NOT EXISTS (SELECT 1 FROM firstJobSeek fjs WHERE fjs.benef_id = b.benef_id AND fjs.batch_id = ?)', [$pendingBatchId], 'i');
+        if (tableExists($conn, 'firstjobseek') && tableHasColumn($conn, 'firstjobseek', 'batch_id')) {
+            $appendWhere('NOT EXISTS (SELECT 1 FROM firstjobseek fjs WHERE fjs.benef_id = b.benef_id AND fjs.batch_id = ?)', [$pendingBatchId], 'i');
         }
 
         if (tableExists($conn, 'spes') && tableHasColumn($conn, 'spes', 'batch_id')) {

@@ -429,7 +429,7 @@ if (confirmResumeBtn) {
         confirmResumeBtn.textContent = 'Importing…';
 
         try {
-            const res = await fetch('../../backend/resume/save_resume.php', {
+            const res = await fetch('../../backend/resume/import_resume.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ program, data: rows }),

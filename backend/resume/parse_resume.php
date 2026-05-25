@@ -2,6 +2,10 @@
 ob_start();
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../import/helpers/db_utils.php';
+require_once __DIR__ . '/../import/helpers/program_utils.php';
+require_once __DIR__ . '/../import/helpers/formatting_utils.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     ob_clean();
@@ -35,6 +39,17 @@ try {
     $data = $ext === 'pdf'
         ? parseResumePdf($file['tmp_name'])
         : parseResume($file['tmp_name']);
+
+    // Check for duplicates
+    $fname = trim($data['first_name'] ?? '');
+    $lname = trim($data['last_name'] ?? '');
+    $contact = trim($data['contact'] ?? '');
+    $email = trim($data['email'] ?? '');
+    $dob = parseExcelDate($data['dob'] ?? ''); // Use formatting util for robust date parsing
+
+    $dup = checkDuplicate($conn, $fname, $lname, $dob, $contact, $email);
+    $data['_is_duplicate'] = $dup['found'];
+    $data['_dup_message'] = $dup['found'] ? 'Already Exists' : 'New Record';
 
     ob_clean();
     echo json_encode(['success' => true, 'data' => $data]);

@@ -30,15 +30,19 @@ $conn->begin_transaction();
 
 try {
     // Tables that reference beneficiaries via benef_id (delete children first)
+    // Canonical child tables that reference beneficiaries by `benef_id`.
+    // Keep this list minimal and canonical to avoid confusion with legacy/variant names.
     $childTables = [
+        'docs_benef',
+        'emphistory',
+        'firstjobseek',
         'beneficiary_activity_history',
-        'beneficiary_documents',
-        'spes_beneficiaries',
-        'gip_beneficiaries',
-        'wiirp_work_immersions',
-        'first_time_jobseekers',
-        'employment_history',
-        'beneficiary_referrals',
+        'jobfair',
+        'jobmatch',
+        'gip',
+        'spes',
+        'wiirp',
+        'whip',
     ];
 
     foreach ($childTables as $table) {
