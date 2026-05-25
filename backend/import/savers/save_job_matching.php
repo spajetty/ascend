@@ -35,14 +35,14 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         $position = s(rowValue($row, ['Position', 'Desired Position', 'desired_position'], '')) ?: 'N/A';
 
         $hasBatchField = false;
-        if (tableExists($conn, 'jobMatch')) {
+        if (tableExists($conn, 'jobmatch')) {
             $fieldCheck = $conn->prepare('
                 SELECT 1
                 FROM information_schema.columns
                 WHERE table_schema = DATABASE() AND table_name = ? AND column_name = ?
                 LIMIT 1
             ');
-            $tbl = 'jobMatch';
+            $tbl = 'jobmatch';
             $col = 'batch_id';
             $fieldCheck->bind_param('ss', $tbl, $col);
             $fieldCheck->execute();
@@ -50,10 +50,10 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         }
 
         if ($hasBatchField) {
-            $ins = $conn->prepare('INSERT INTO jobMatch (benef_id, company_id, batch_id, position) VALUES (?, ?, ?, ?)');
+            $ins = $conn->prepare('INSERT INTO jobmatch (benef_id, company_id, batch_id, position) VALUES (?, ?, ?, ?)');
             $ins->bind_param('iiis', $benefId, $companyId, $batchId, $position);
         } else {
-            $ins = $conn->prepare('INSERT INTO jobMatch (benef_id, company_id, position) VALUES (?, ?, ?)');
+            $ins = $conn->prepare('INSERT INTO jobmatch (benef_id, company_id, position) VALUES (?, ?, ?)');
             $ins->bind_param('iis', $benefId, $companyId, $position);
         }
         $ins->execute();
@@ -61,7 +61,7 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         return 'saved';
     }
 
-    if ($program === 'Job Fair' && (tableExists($conn, 'jobfair') || tableExists($conn, 'jobFair'))) {
+    if ($program === 'Job Fair' && tableExists($conn, 'jobfair')) {
         $position = s(rowValue($row, ['Position', 'Desired Position', 'desired_position'], '')) ?: 'N/A';
         $jobFairEventId = isset($ctx['jobFairEvent']) && is_numeric($ctx['jobFairEvent']) ? (int)$ctx['jobFairEvent'] : null;
         $historyInserted = null;
@@ -102,25 +102,24 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         return 'saved';
     }
 
-    if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstJobSeek')) {
+    if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstjobseek')) {
         $occPermit = toBoolInt(rowValue($row, ['Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
         $healthCard = toBoolInt(rowValue($row, ['Health Card', 'health_card'], 0));
         $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
-
-        if (tableHasColumn($conn, 'firstJobSeek', 'company_id')) {
-            if (tableHasColumn($conn, 'firstJobSeek', 'batch_id') && $batchId !== null) {
-                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?, ?)');
+        if (tableHasColumn($conn, 'firstjobseek', 'company_id')) {
+            if (tableHasColumn($conn, 'firstjobseek', 'batch_id') && $batchId !== null) {
+                $ins = $conn->prepare('INSERT INTO firstjobseek (benef_id, company_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?, ?)');
                 $ins->bind_param('iiiii', $benefId, $companyId, $batchId, $occPermit, $healthCard);
             } else {
-                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, company_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
+                $ins = $conn->prepare('INSERT INTO firstjobseek (benef_id, company_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
                 $ins->bind_param('iiii', $benefId, $companyId, $occPermit, $healthCard);
             }
         } else {
-            if (tableHasColumn($conn, 'firstJobSeek', 'batch_id') && $batchId !== null) {
-                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
+            if (tableHasColumn($conn, 'firstjobseek', 'batch_id') && $batchId !== null) {
+                $ins = $conn->prepare('INSERT INTO firstjobseek (benef_id, batch_id, occ_permit, health_card) VALUES (?, ?, ?, ?)');
                 $ins->bind_param('iiii', $benefId, $batchId, $occPermit, $healthCard);
             } else {
-                $ins = $conn->prepare('INSERT INTO firstJobSeek (benef_id, occ_permit, health_card) VALUES (?, ?, ?)');
+                $ins = $conn->prepare('INSERT INTO firstjobseek (benef_id, occ_permit, health_card) VALUES (?, ?, ?)');
                 $ins->bind_param('iii', $benefId, $occPermit, $healthCard);
             }
         }
