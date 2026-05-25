@@ -12,13 +12,29 @@ const resumeBrowseBtn = document.getElementById('resumeBrowseBtn');
 const resumeSection = document.getElementById('resumeSection');
 const resumeProgram = document.getElementById('resumeProgram');
 
+function getResumeProgramOptions(sectionKey) {
+    const values = Array.isArray(programs?.[sectionKey]) ? programs[sectionKey] : [];
+    if (sectionKey === 'employers_engagement') {
+        return values.filter(value => value === 'Workers Hiring for Infrastructure Projects - Beneficiaries');
+    }
+    return values;
+}
+
+function getResumeProgramLabel(program) {
+    if (program === 'Workers Hiring for Infrastructure Projects - Beneficiaries') {
+        return "Worker's Hiring for Infrastructure Project";
+    }
+    return program;
+}
+
 if (resumeSection && resumeProgram) {
     resumeSection.addEventListener('change', function () {
         const val = this.value;
-        if (val && typeof programs !== 'undefined' && programs[val]) {
+        const options = getResumeProgramOptions(val);
+        if (val && options.length > 0) {
             resumeProgram.innerHTML =
                 '<option value="">Select a program…</option>' +
-                programs[val].map(p => `<option value="${p}">${p}</option>`).join('');
+                options.map(p => `<option value="${p}">${getResumeProgramLabel(p)}</option>`).join('');
             resumeProgram.disabled = false;
         } else {
             resumeProgram.innerHTML = '<option value="">Select a section first…</option>';
@@ -273,6 +289,9 @@ export async function showResumePreview(section, program) {
             ${title}
         </div>`;
 
+    // Determine if this program is WHIP (Workers Hiring for Infrastructure Projects)
+    const isWhipProgram = ['Workers Hiring for Infrastructure Projects - Beneficiaries', 'Workers Hiring for Infrastructure Projects'].includes(program);
+
     // ── Render cards ───────────────────────────────────────────────────────────
     previewBody.innerHTML = results.map((r, i) => {
         if (r.error) {
@@ -337,8 +356,9 @@ export async function showResumePreview(section, program) {
                 ${fieldInput('district', 'District', d.district)}
                 ${fieldInput('city', 'City / Municipality', d.city)}
 
-                ${sectionLabel('Classification & Flags')}
+                ${!isWhipProgram ? sectionLabel('Classification & Flags') : ''}
 
+                ${!isWhipProgram ? `
                 <!-- Classification dropdown based on selected program -->
                 <div class="flex flex-col gap-1">
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Classification</label>
@@ -348,13 +368,12 @@ export async function showResumePreview(section, program) {
                             class="resume-field w-full text-sm bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 pr-8 appearance-none focus:outline-none focus:ring-2 focus:ring-red-300 focus:bg-white transition"
                         >
                             <option value="">— select —</option>
-                            ${(statusesByProgram[program] ?? []).map(s =>
-                                `<option value="${s}">${s}</option>`
-                            ).join('')}
+                            ${(statusesByProgram[program] ?? []).map(s => `<option value="${s}">${s}</option>`).join('')}
                         </select>
                         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                     </div>
                 </div>
+                ` : ''}
 
                 <!-- Checkboxes row -->
                 <div class="col-span-full grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
@@ -414,15 +433,19 @@ if (confirmResumeBtn) {
             return;
         }
 
-        const missingClassificationIndex = rows.findIndex(row => !String(row.classification ?? '').trim());
-        if (missingClassificationIndex !== -1) {
-            showToast('Classification is required before importing.', 'warning');
-            const firstMissingCard = document.querySelector(`[data-index="${missingClassificationIndex}"]`);
-            const classificationField = firstMissingCard?.querySelector('[data-field="classification"]');
-            if (classificationField && typeof classificationField.focus === 'function') {
-                classificationField.focus();
+        // Skip classification requirement for WHIP programs
+        const isWhipProgramPost = (program || '').toString().includes('Workers Hiring for Infrastructure Projects');
+        if (!isWhipProgramPost) {
+            const missingClassificationIndex = rows.findIndex(row => !String(row.classification ?? '').trim());
+            if (missingClassificationIndex !== -1) {
+                showToast('Classification is required before importing.', 'warning');
+                const firstMissingCard = document.querySelector(`[data-index="${missingClassificationIndex}"]`);
+                const classificationField = firstMissingCard?.querySelector('[data-field="classification"]');
+                if (classificationField && typeof classificationField.focus === 'function') {
+                    classificationField.focus();
+                }
+                return;
             }
-            return;
         }
 
         confirmResumeBtn.disabled = true;
