@@ -55,6 +55,9 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $classification = isWhipBeneficiariesProgram((string)($ctx['program'] ?? ''))
             ? null
             : (s(rowValue($row, ['Classification', 'classification'], '')) ?: null);
+        if ($classification !== null && $classification !== '') {
+            $classification = titleCase($classification);
+        }
         $houseNo = s(rowValue($row, ['House No.', 'house_no'], '')) ?: null;
         $barangay = s(rowValue($row, ['Barangay', 'barangay'], '')) ?: null;
         $district = s(rowValue($row, ['District', 'district'], '')) ?: null;

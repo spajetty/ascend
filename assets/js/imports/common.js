@@ -16,6 +16,16 @@ export function formatBytes(bytes) {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
+// Convert a string to title case (first letter of each word uppercase)
+export function titleCase(str) {
+    if (!str) return '';
+    return String(str)
+        .toLowerCase()
+        .split(/\s+/)
+        .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(' ');
+}
+
 // Helper to make database keys readable (e.g. 'first_name' -> 'First Name')
 export function formatColumnName(str) {
     return str.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
@@ -24,9 +34,9 @@ export function formatColumnName(str) {
 // ─── Classification badge (business status from Excel) ───────────────────────
 export function classificationBadge(value) {
     if (!value) return '<span class="text-gray-300 text-xs">—</span>';
-    const key = value.trim().toLowerCase();
-    const cls = classificationColors[key] ?? 'bg-gray-100 text-gray-600';
-    return `<span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${value}</span>`;
+    const normalized = titleCase(String(value).trim());
+    const cls = classificationColors[normalized] ?? 'bg-gray-100 text-gray-600';
+    return `<span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${escapeHtml(normalized)}</span>`;
 }
 
 // Internal keys that should never appear as data columns

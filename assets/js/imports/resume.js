@@ -47,10 +47,32 @@ if (resumeSection && resumeProgram) {
 
 let resumeFiles = [];
 
+function updateResumeSelectionLock() {
+    const hasFile = resumeFiles.length > 0;
+    const hasSection = Boolean(resumeSection?.value);
+    const hasProgram = Boolean(resumeProgram?.value);
+
+    if (resumeSection) {
+        resumeSection.disabled = hasFile;
+    }
+
+    if (resumeProgram) {
+        resumeProgram.disabled = hasFile || !hasSection;
+    }
+
+    if (resumeDropZone && resumeBrowseBtn) {
+        const disableUpload = hasFile || !hasProgram;
+        resumeDropZone.classList.toggle('opacity-40', disableUpload);
+        resumeDropZone.classList.toggle('pointer-events-none', disableUpload);
+        resumeBrowseBtn.disabled = disableUpload;
+    }
+}
+
 // ─── File list renderer ────────────────────────────────────────────────────────
 function renderResumeFileList() {
     if (resumeFiles.length === 0) {
         resumeFileList.classList.add('hidden');
+        updateResumeSelectionLock();
         return;
     }
     resumeFileList.classList.remove('hidden');
@@ -81,11 +103,13 @@ function renderResumeFileList() {
             </button>
         </div>
     `).join('');
+    updateResumeSelectionLock();
 }
 
 window.removeResumeFile = function (index) {
     resumeFiles.splice(index, 1);
     renderResumeFileList();
+    if (resumeInput) resumeInput.value = '';
     if (resumeFiles.length === 0) {
         document.getElementById('resumePreview').classList.add('hidden');
     }
@@ -96,20 +120,26 @@ function handleResumeFiles(files) {
     const allowed = ['.pdf', '.doc', '.docx'];
     const maxSize = 5 * 1024 * 1024;
 
-    Array.from(files).forEach(f => {
-        const ext = '.' + f.name.split('.').pop().toLowerCase();
-        if (!allowed.includes(ext)) {
-            showToast(`${f.name}: unsupported format. Use PDF, DOC, or DOCX.`, 'error');
-            return;
-        }
-        if (f.size > maxSize) {
-            showToast(`${f.name}: exceeds 5MB limit.`, 'error');
-            return;
-        }
-        if (!resumeFiles.find(r => r.name === f.name && r.size === f.size)) {
-            resumeFiles.push(f);
-        }
-    });
+    if (files.length > 1) {
+        showToast('Please import only one resume at a time.', 'warning');
+    }
+
+    const f = files[0];
+    if (!f) return;
+
+    resumeFiles = []; // Clear existing files to restrict to single file
+    updateResumeSelectionLock();
+
+    const ext = '.' + f.name.split('.').pop().toLowerCase();
+    if (!allowed.includes(ext)) {
+        showToast(`${f.name}: unsupported format. Use PDF, DOC, or DOCX.`, 'error');
+        return;
+    }
+    if (f.size > maxSize) {
+        showToast(`${f.name}: exceeds 5MB limit.`, 'error');
+        return;
+    }
+    resumeFiles.push(f);
 
     if (resumeFiles.length === 0) return;
 
@@ -118,6 +148,8 @@ function handleResumeFiles(files) {
     const program = document.getElementById('resumeProgram')?.value ?? '';
 
     if (!program) {
+        resumeFiles = [];
+        updateResumeSelectionLock();
         showToast('Please select a program first.', 'warning');
         return;
     }
@@ -170,11 +202,20 @@ export async function showResumePreview(section, program) {
     preview.classList.remove('hidden');
     previewMeta.textContent = 'Extracting data…';
     previewBody.innerHTML = `
-        <tr>
-            <td colspan="99" class="px-4 py-8 text-center text-sm text-gray-400">
-                Parsing resume files…
-            </td>
-        </tr>`;
+        <div class="flex flex-col items-center justify-center py-12 px-4 rounded-xl border border-gray-100 bg-gray-50/50">
+            <svg class="w-8 h-8 text-red-500 animate-spin mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="2" x2="12" y2="6"></line>
+                <line x1="12" y1="18" x2="12" y2="22"></line>
+                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
+                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
+                <line x1="2" y1="12" x2="6" y2="12"></line>
+                <line x1="18" y1="12" x2="22" y2="12"></line>
+                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
+                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
+            </svg>
+            <p class="text-sm font-semibold text-gray-700">Analyzing resume content...</p>
+            <p class="text-xs text-gray-400 mt-1">Please wait while we extract the information.</p>
+        </div>`;
     confirmBtn.disabled = true;
     preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
@@ -194,9 +235,14 @@ export async function showResumePreview(section, program) {
     window._resumeProgram = program;
     window._resumeSection = section;
 
-    const successCount = results.filter(r => !r.error).length;
-    previewMeta.textContent =
-        `${successCount} of ${results.length} resume${results.length > 1 ? 's' : ''} parsed • Review before importing`;
+    const successCount = results.filter(r => !r.error && !r.data._is_duplicate).length;
+    const hasDuplicates = results.some(r => !r.error && r.data._is_duplicate);
+
+    let message = `${successCount} of ${results.length} resume${results.length > 1 ? 's' : ''} parsed • Review before importing`;
+    if (hasDuplicates) {
+        message += ' (Duplicates cannot be imported)';
+    }
+    previewMeta.textContent = message;
 
     // ── Field helpers ──────────────────────────────────────────────────────────
     const fieldInput = (field, label, value, placeholder = '', type = 'text') => `
@@ -243,11 +289,13 @@ export async function showResumePreview(section, program) {
         }
 
         const d = r.data;
+        const isDup = d._is_duplicate;
+        
         return `
-        <div class="rounded-xl border border-gray-100 bg-gray-50/50 overflow-hidden" data-index="${i}">
+        <div class="rounded-xl border ${isDup ? 'border-yellow-200 bg-yellow-50/30' : 'border-gray-100 bg-gray-50/50'} overflow-hidden" data-index="${i}">
 
             <!-- Card header -->
-            <div class="flex items-center gap-3 px-5 py-3 bg-white border-b border-gray-100">
+            <div class="flex items-center gap-3 px-5 py-3 bg-white border-b ${isDup ? 'border-yellow-100' : 'border-gray-100'}">
                 <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
                     <svg class="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -255,11 +303,18 @@ export async function showResumePreview(section, program) {
                     </svg>
                 </div>
                 <p class="text-sm font-semibold text-gray-700">${r.file}</p>
-                <span class="ml-auto text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full">Parsed</span>
+                ${isDup 
+                    ? `<span class="ml-auto inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 cursor-help" title="${d._dup_message ?? 'Already Exists'}">
+                           <span>⚠</span><span>Duplicate</span>
+                       </span>`
+                    : `<span class="ml-auto inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                           <span>✓</span><span>New</span>
+                       </span>`
+                }
             </div>
 
             <!-- Form body -->
-            <div class="p-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-4">
+            <div class="p-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-x-4 gap-y-4 ${isDup ? 'opacity-70 pointer-events-none' : ''}">
 
                 ${sectionLabel('Name')}
                 ${fieldInput('last_name', 'Last Name', d.last_name)}
@@ -294,7 +349,7 @@ export async function showResumePreview(section, program) {
                         >
                             <option value="">— select —</option>
                             ${(statusesByProgram[program] ?? []).map(s =>
-                                `<option value="${s}">${s.charAt(0).toUpperCase() + s.slice(1)}</option>`
+                                `<option value="${s}">${s}</option>`
                             ).join('')}
                         </select>
                         <svg class="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
@@ -340,7 +395,7 @@ if (confirmResumeBtn) {
 
         // Collect the latest field values from the editable preview cards
         const rows = results
-            .filter(r => !r.error)
+            .filter(r => !r.error && !r.data._is_duplicate)
             .map((r, i) => {
                 const card = document.querySelector(`[data-index="${i}"]`);
                 if (!card) return r.data;
@@ -356,6 +411,17 @@ if (confirmResumeBtn) {
 
         if (rows.length === 0) {
             showToast('Nothing to import.', 'warning');
+            return;
+        }
+
+        const missingClassificationIndex = rows.findIndex(row => !String(row.classification ?? '').trim());
+        if (missingClassificationIndex !== -1) {
+            showToast('Classification is required before importing.', 'warning');
+            const firstMissingCard = document.querySelector(`[data-index="${missingClassificationIndex}"]`);
+            const classificationField = firstMissingCard?.querySelector('[data-field="classification"]');
+            if (classificationField && typeof classificationField.focus === 'function') {
+                classificationField.focus();
+            }
             return;
         }
 
@@ -388,3 +454,5 @@ if (confirmResumeBtn) {
         }
     });
 }
+
+updateResumeSelectionLock();
