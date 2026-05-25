@@ -93,7 +93,8 @@ try {
     // Validate required fields for the single resume
     $row = $rows[0];
     $classification = trim((string)($row['classification'] ?? $row['Classification'] ?? ''));
-    if ($classification === '') {
+    // WHIP (Workers Hiring for Infrastructure Projects) does not require classification.
+    if (stripos($program, 'Workers Hiring for Infrastructure Projects') === false && $classification === '') {
         throw new RuntimeException('Resume is missing Classification.');
     }
 
