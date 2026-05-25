@@ -762,6 +762,10 @@ function openEditPersonalModal() {
   _toggleEditModal('modalEditPersonal', 'flex');
 }
 
+function closeEditPersonalModal() {
+  _toggleEditModal('modalEditPersonal', 'none');
+}
+
 function _loadEmploymentCompanies(selectId, selectedCompanyId = '') {
   const companySelect = document.getElementById(selectId);
   if (!companySelect) return Promise.resolve(false);
