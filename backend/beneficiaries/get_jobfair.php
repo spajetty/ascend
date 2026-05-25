@@ -10,9 +10,11 @@ if ($benef_id <= 0) {
 
 try {
     $sql = "SELECT jf.jobfair_id, jf.benef_id, jf.company_id, jf.position, jf.created_at, jf.batch_id, jf.jobfairevent_id,
-                   e.jobfairevent_id as event_id, e.job_fair_type, e.date_start, e.date_end, e.venue
+                   e.job_fair_type, e.date_start, e.date_end, e.venue,
+                   c.company_name
             FROM jobfair jf
             LEFT JOIN job_fair_events e ON jf.jobfairevent_id = e.jobfairevent_id
+            LEFT JOIN employers c ON jf.company_id = c.company_id
             WHERE jf.benef_id = ?
             ORDER BY jf.created_at DESC";
     $stmt = $conn->prepare($sql);
