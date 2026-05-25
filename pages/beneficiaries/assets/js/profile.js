@@ -156,26 +156,32 @@ async function openProfile(benefId) {
 
     const eventsEl = document.getElementById('pJobFairEvents');
     
-    if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+    if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_jobfair.php?benef_id=${encodeURIComponent(b.benef_id)}`)
       .then(r => r.json())
       .then(j => {
         if (!eventsEl) return;
         if (j && j.success && Array.isArray(j.records) && j.records.length) {
-          eventsEl.innerHTML = j.records.map(r => `
+          window.currentJobFairRecords = j.records;
+          eventsEl.innerHTML = j.records.map((r, idx) => `
             <tr>
               <td>${r.job_fair_type || '—'}</td>
               <td style="font-weight:500;">${r.venue || '—'}</td>
               <td>${r.date_start ? (r.date_start + (r.date_end ? ` — ${r.date_end}` : '')) : '—'}</td>
+              <td style="font-weight:500;">${r.company_name || '—'}</td>
               <td style="color:var(--text-secondary);font-size:12.5px;">${r.position || '—'}</td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                  <button onclick="openEditJobFairModal(${idx})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
+                  <button onclick="deleteJobFairRecord(${r.jobfair_id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
+              </td>
             </tr>
           `).join('');
         } else {
-          eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>`;
+          eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>`;
         }
       }).catch(err => {
-        if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
       });
   } else {
     if (jobFairCard) jobFairCard.style.display = 'none';
@@ -354,7 +360,7 @@ async function openProfile(benefId) {
     if (wiirpCard) wiirpCard.style.display = 'none';
 
     const whipEl = document.getElementById('pWhipProjects');
-    if (whipEl) whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+    if (whipEl) whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_whip.php?benef_id=${encodeURIComponent(b.benef_id)}`)
       .then(r => r.json())
@@ -363,6 +369,7 @@ async function openProfile(benefId) {
 
         const rows = Array.isArray(j?.records) ? j.records : [];
         if (j && j.success && rows.length) {
+          window.currentWhipRecords = rows;
           const formatDate = (value) => {
             if (!value) return '—';
             const date = new Date(value);
@@ -377,7 +384,7 @@ async function openProfile(benefId) {
               : '—';
           };
 
-          whipEl.innerHTML = rows.map(r => `
+          whipEl.innerHTML = rows.map((r, idx) => `
             <tr>
               <td style="font-weight:500;">${r.position || '—'}</td>
               <td>${formatDate(r.date_hired)}</td>
@@ -385,15 +392,19 @@ async function openProfile(benefId) {
               <td>${r.project_title || '—'}</td>
               <td>${r.duration || '—'}</td>
               <td>${formatBudget(r.budget)}</td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                  <button onclick="openEditWhipModal(${idx})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
+                  <button onclick="deleteWhipRecord(${r.whip_id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
+              </td>
             </tr>
           `).join('');
         } else {
-          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>`;
+          whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>`;
         }
       })
       .catch(() => {
         if (whipEl) {
-          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+          whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
         }
       });
   } else if (whipCard) {
@@ -1461,9 +1472,19 @@ function submitEditGip() {
 function openEditIssuanceModal() {
   const rec = window.currentFirstTimeIssuanceRecord;
   console.log('Opening issuance edit modal with record:', rec);
+  const titleEl = document.querySelector('#modalEditIssuance .modal-header h3');
+  const submitBtn = document.querySelector('#modalEditIssuance .btn-confirm');
+  const jobseekIdEl = document.getElementById('editIssuanceJobseekId');
+  const occEl = document.getElementById('editIssuanceOccPermit');
+  const healthEl = document.getElementById('editIssuanceHealthCard');
   
   if (!rec) {
-    _showEditToast('No issuance record to edit.', 'error');
+    jobseekIdEl.value = '';
+    occEl.value = '0';
+    healthEl.value = '0';
+    if (titleEl) titleEl.textContent = 'Add Issuance Record';
+    if (submitBtn) submitBtn.textContent = 'Add Record';
+    _toggleEditModal('modalEditIssuance', 'flex');
     return;
   }
   
@@ -1473,9 +1494,11 @@ function openEditIssuanceModal() {
   
   console.log('Setting form values:', { jobseekId, occValue, healthValue });
   
-  document.getElementById('editIssuanceJobseekId').value = jobseekId;
-  document.getElementById('editIssuanceOccPermit').value = occValue;
-  document.getElementById('editIssuanceHealthCard').value = healthValue;
+  jobseekIdEl.value = jobseekId;
+  occEl.value = occValue;
+  healthEl.value = healthValue;
+  if (titleEl) titleEl.textContent = 'Edit Issuance Status';
+  if (submitBtn) submitBtn.textContent = 'Save Changes';
   
   _toggleEditModal('modalEditIssuance', 'flex');
 }
@@ -1485,7 +1508,7 @@ function closeEditIssuanceModal() {
 }
 
 function submitUpdateIssuance() {
-  const jobseek_id = document.getElementById('editIssuanceJobseekId').value;
+  const jobseek_id = document.getElementById('editIssuanceJobseekId').value.trim();
   const occVal = document.getElementById('editIssuanceOccPermit').value;
   const healthVal = document.getElementById('editIssuanceHealthCard').value;
   
@@ -1496,8 +1519,8 @@ function submitUpdateIssuance() {
     healthEl: document.getElementById('editIssuanceHealthCard')
   });
   
-  if (!jobseek_id || jobseek_id === '') {
-    _showEditToast('No issuance record selected.', 'error');
+  if (!window.currentBeneficiaryId) {
+    _showEditToast('No beneficiary selected.', 'error');
     return;
   }
 
@@ -1507,8 +1530,10 @@ function submitUpdateIssuance() {
   console.log('Parsed values for submission:', { jobseek_id, occInt, healthInt });
 
   const formData = new FormData();
-  formData.append('jobseek_id', jobseek_id);
   formData.append('benef_id', window.currentBeneficiaryId);
+  if (jobseek_id) {
+    formData.append('jobseek_id', jobseek_id);
+  }
   formData.append('occ_permit', occInt);
   formData.append('health_card', healthInt);
 
@@ -1525,7 +1550,7 @@ function submitUpdateIssuance() {
     .then(j => {
       console.log('Update response:', j);
       if (j && j.success) {
-        _showEditToast('Issuance status updated.', 'success');
+        _showEditToast(j.message || 'Issuance record saved.', 'success');
         closeEditIssuanceModal();
         if (window.currentBeneficiaryId) {
           openProfile(window.currentBeneficiaryId);
@@ -1572,7 +1597,448 @@ window.closeEditWiirpModal = closeEditWiirpModal;
 window.submitEditWiirp = submitEditWiirp;
 window.openEditGipModal = openEditGipModal;
 window.closeEditGipModal = closeEditGipModal;
-window.submitEditGip = submitEditGip;
+
+// ── Edit Job Fair ────────────────────────────────────────────────────────────
+
+function loadJobFairCompanies(eventId, selectedCompanyId = '', targetSelectId = 'editJobFairCompany') {
+  const compSelect = document.getElementById(targetSelectId);
+  if (!eventId) {
+    compSelect.innerHTML = '<option value="">— Select event first —</option>';
+    return;
+  }
+  
+  compSelect.innerHTML = '<option value="">Loading companies…</option>';
+  fetch(`../../backend/beneficiaries/get_jobfair_companies.php?event_id=${eventId}`)
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success && j.companies.length) {
+        compSelect.innerHTML = '<option value="">— Select company —</option>';
+        j.companies.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.company_id;
+          const fullText = c.company_name;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(c.company_id) === String(selectedCompanyId)) {
+            opt.selected = true;
+          }
+          compSelect.appendChild(opt);
+        });
+      } else {
+        compSelect.innerHTML = '<option value="">No companies available</option>';
+      }
+    })
+    .catch(() => {
+      compSelect.innerHTML = '<option value="">Error loading companies</option>';
+    });
+}
+
+function openEditJobFairModal(index) {
+  const r = window.currentJobFairRecords[index];
+  if (!r) return;
+  
+  document.getElementById('editJobFairId').value = r.jobfair_id;
+  document.getElementById('editJobFairPosition').value = r.position || '';
+  
+  const evtSelect = document.getElementById('editJobFairEvent');
+  evtSelect.innerHTML = '<option value="">Loading events…</option>';
+  
+  fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.events.length) {
+        evtSelect.innerHTML = '<option value="">— Select Event / Venue —</option>';
+        j.events.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.jobfairevent_id;
+          const fullText = `${e.job_fair_type} - ${e.venue} (${e.date_start})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(e.jobfairevent_id) === String(r.jobfairevent_id)) {
+            opt.selected = true;
+          }
+          evtSelect.appendChild(opt);
+        });
+        loadJobFairCompanies(r.jobfairevent_id, r.company_id, 'editJobFairCompany');
+      } else {
+        evtSelect.innerHTML = '<option value="">No events available</option>';
+      }
+    })
+    .catch(() => {
+      evtSelect.innerHTML = '<option value="">Error loading events</option>';
+    });
+    
+  _toggleEditModal('modalEditJobFair', 'flex');
+}
+
+function closeEditJobFairModal() {
+  _toggleEditModal('modalEditJobFair', 'none');
+}
+
+function submitEditJobFair() {
+  const jobfair_id = document.getElementById('editJobFairId').value;
+  const jobfairevent_id = document.getElementById('editJobFairEvent').value;
+  const company_id = document.getElementById('editJobFairCompany').value;
+  const position = document.getElementById('editJobFairPosition').value.trim();
+  
+  if (!jobfairevent_id || !company_id) {
+    _showEditToast('Event and Company are required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jobfair_id: jobfair_id,
+      jobfairevent_id: jobfairevent_id,
+      company_id: company_id,
+      position: position
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Job fair updated.', 'success');
+        closeEditJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to update job fair.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error updating job fair.', 'error');
+    });
+}
+
+window.openEditJobFairModal = openEditJobFairModal;
+window.closeEditJobFairModal = closeEditJobFairModal;
+window.submitEditJobFair = submitEditJobFair;
+window.loadJobFairCompanies = loadJobFairCompanies;
+
+// ── Add Job Fair ─────────────────────────────────────────────────────────────
+
+function openAddJobFairModal() {
+  document.getElementById('addJobFairPosition').value = '';
+  document.getElementById('addJobFairCompany').innerHTML = '<option value="">— Select event first —</option>';
+  
+  const evtSelect = document.getElementById('addJobFairEvent');
+  evtSelect.innerHTML = '<option value="">Loading events…</option>';
+  
+  fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.events.length) {
+        evtSelect.innerHTML = '<option value="">— Select Event / Venue —</option>';
+        j.events.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.jobfairevent_id;
+          const fullText = `${e.job_fair_type} - ${e.venue} (${e.date_start})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          evtSelect.appendChild(opt);
+        });
+      } else {
+        evtSelect.innerHTML = '<option value="">No events available</option>';
+      }
+    })
+    .catch(() => {
+      evtSelect.innerHTML = '<option value="">Error loading events</option>';
+    });
+    
+  _toggleEditModal('modalAddJobFair', 'flex');
+}
+
+function closeAddJobFairModal() {
+  _toggleEditModal('modalAddJobFair', 'none');
+}
+
+function submitAddJobFair() {
+  const jobfairevent_id = document.getElementById('addJobFairEvent').value;
+  const company_id = document.getElementById('addJobFairCompany').value;
+  const position = document.getElementById('addJobFairPosition').value.trim();
+  
+  if (!jobfairevent_id || !company_id) {
+    _showEditToast('Event and Company are required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: window.currentBeneficiaryId,
+      jobfairevent_id: jobfairevent_id,
+      company_id: company_id,
+      position: position
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Job fair record added.', 'success');
+        closeAddJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to add job fair.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error adding job fair.', 'error');
+    });
+}
+
+window.openAddJobFairModal = openAddJobFairModal;
+window.closeAddJobFairModal = closeAddJobFairModal;
+window.submitAddJobFair = submitAddJobFair;
+
+// ── Delete Job Fair ──────────────────────────────────────────────────────────
+
+function deleteJobFairRecord(jobfair_id) {
+  document.getElementById('deleteJobFairId').value = jobfair_id;
+  _toggleEditModal('modalDeleteJobFair', 'flex');
+}
+
+function closeDeleteJobFairModal() {
+  _toggleEditModal('modalDeleteJobFair', 'none');
+  document.getElementById('deleteJobFairId').value = '';
+}
+
+function confirmDeleteJobFairRecord() {
+  const id = document.getElementById('deleteJobFairId').value;
+  if (!id) return;
+  
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jobfair_id: id })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Job fair record deleted.', 'success');
+        closeDeleteJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to delete record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error deleting record.', 'error');
+    });
+}
+
+window.deleteJobFairRecord = deleteJobFairRecord;
+window.closeDeleteJobFairModal = closeDeleteJobFairModal;
+window.confirmDeleteJobFairRecord = confirmDeleteJobFairRecord;
+
+// ── Add WHIP Assignment ──────────────────────────────────────────────────────
+
+function openAddWhipModal() {
+  document.getElementById('addWhipPosition').value = '';
+  document.getElementById('addWhipDateHired').value = '';
+  
+  const projSelect = document.getElementById('addWhipProject');
+  projSelect.innerHTML = '<option value="">Loading projects…</option>';
+  
+  fetch('../../backend/beneficiaries/get_projects_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.projects.length) {
+        projSelect.innerHTML = '<option value="">— Select Project —</option>';
+        j.projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.project_id;
+          const fullText = `${p.project_title} (Contractor: ${p.contractor || 'N/A'})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          projSelect.appendChild(opt);
+        });
+      } else {
+        projSelect.innerHTML = '<option value="">No projects available</option>';
+      }
+    })
+    .catch(() => {
+      projSelect.innerHTML = '<option value="">Error loading projects</option>';
+    });
+    
+  _toggleEditModal('modalAddWhip', 'flex');
+}
+
+function closeAddWhipModal() {
+  _toggleEditModal('modalAddWhip', 'none');
+}
+
+function submitAddWhip() {
+  const project_id = document.getElementById('addWhipProject').value;
+  const position = document.getElementById('addWhipPosition').value.trim();
+  const date_hired = document.getElementById('addWhipDateHired').value;
+  
+  if (!project_id) {
+    _showEditToast('Project is required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: window.currentBeneficiaryId,
+      project_id: project_id,
+      position: position,
+      date_hired: date_hired
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Project assignment added.', 'success');
+        closeAddWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to add project assignment.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error adding project assignment.', 'error');
+    });
+}
+
+window.openAddWhipModal = openAddWhipModal;
+window.closeAddWhipModal = closeAddWhipModal;
+window.submitAddWhip = submitAddWhip;
+
+function openEditWhipModal(index) {
+  const r = window.currentWhipRecords[index];
+  if (!r) return;
+  
+  document.getElementById('editWhipId').value = r.whip_id;
+  document.getElementById('editWhipPosition').value = r.position || '';
+  document.getElementById('editWhipDateHired').value = formatDateForInput(r.date_hired) || '';
+  
+  const projSelect = document.getElementById('editWhipProject');
+  projSelect.innerHTML = '<option value="">Loading projects…</option>';
+  
+  fetch('../../backend/beneficiaries/get_projects_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.projects.length) {
+        projSelect.innerHTML = '<option value="">— Select Project —</option>';
+        j.projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.project_id;
+          const fullText = `${p.project_title} (Contractor: ${p.contractor || 'N/A'})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(p.project_id) === String(r.project_id)) {
+            opt.selected = true;
+          }
+          projSelect.appendChild(opt);
+        });
+      } else {
+        projSelect.innerHTML = '<option value="">No projects available</option>';
+      }
+    })
+    .catch(() => {
+      projSelect.innerHTML = '<option value="">Error loading projects</option>';
+    });
+    
+  _toggleEditModal('modalEditWhip', 'flex');
+}
+
+function closeEditWhipModal() {
+  _toggleEditModal('modalEditWhip', 'none');
+}
+
+function submitEditWhip() {
+  const whip_id = document.getElementById('editWhipId').value;
+  const project_id = document.getElementById('editWhipProject').value;
+  const position = document.getElementById('editWhipPosition').value.trim();
+  const date_hired = document.getElementById('editWhipDateHired').value;
+  
+  if (!project_id) {
+    _showEditToast('Project is required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      whip_id: whip_id,
+      project_id: project_id,
+      position: position,
+      date_hired: date_hired
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Project assignment updated.', 'success');
+        closeEditWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to update project assignment.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error updating project assignment.', 'error');
+    });
+}
+
+function deleteWhipRecord(whip_id) {
+  document.getElementById('deleteWhipId').value = whip_id;
+  _toggleEditModal('modalDeleteWhip', 'flex');
+}
+
+function closeDeleteWhipModal() {
+  _toggleEditModal('modalDeleteWhip', 'none');
+  document.getElementById('deleteWhipId').value = '';
+}
+
+function confirmDeleteWhipRecord() {
+  const id = document.getElementById('deleteWhipId').value;
+  if (!id) return;
+  
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ whip_id: id })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Project assignment deleted.', 'success');
+        closeDeleteWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to delete record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error deleting record.', 'error');
+    });
+}
+
+window.openEditWhipModal = openEditWhipModal;
+window.closeEditWhipModal = closeEditWhipModal;
+window.submitEditWhip = submitEditWhip;
+window.deleteWhipRecord = deleteWhipRecord;
+window.closeDeleteWhipModal = closeDeleteWhipModal;
+window.confirmDeleteWhipRecord = confirmDeleteWhipRecord;
+
 // Issuance handlers
 window.openEditIssuanceModal = openEditIssuanceModal;
 window.closeEditIssuanceModal = closeEditIssuanceModal;
