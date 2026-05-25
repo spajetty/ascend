@@ -35,18 +35,23 @@ function formatDateForInput(dateStr) {
   return `${year}-${month}-${day}`;
 }
 
+function upperText(value) {
+  const text = value == null ? '—' : String(value).trim();
+  return text ? text.toUpperCase() : '—';
+}
+
 function renderSpesStudentInfo(record) {
   const formatType = (val) => {
     if (val === 'student') return 'Student';
     if (val === 'osy') return 'Out-of-School Youth';
-    return String(val || '—');
+    return upperText(val);
   };
 
   window.currentSpesRecord = record || null;
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = value ?? '—';
+    if (el) el.textContent = upperText(value);
   };
 
   if (!record) {
@@ -69,6 +74,7 @@ async function openProfile(benefId) {
   if (!b) return;
 
   const safeText = (value) => (value && String(value).trim() ? String(value) : '—');
+  const upperSafeText = (value) => upperText(safeText(value));
 
   window.currentBeneficiaryId = b.benef_id;
   window.currentBeneficiaryName = b.name;
@@ -76,11 +82,11 @@ async function openProfile(benefId) {
 
   // ── Header ──
   document.getElementById('profAvatar').textContent    = b.avatar;
-  document.getElementById('profName').textContent      = b.name;
+  document.getElementById('profName').textContent      = upperText(b.name);
   document.getElementById('profAge').textContent       = calculateAge(b.dob);
-  document.getElementById('profProgram').textContent   = `${b.program} • ${b.section}`;
-  document.getElementById('profLastVisit').textContent = safeText(b.lastVisit);
-  document.getElementById('profVisit').textContent     = safeText(b.visit);
+  document.getElementById('profProgram').textContent   = `${upperText(b.program)} • ${upperText(b.section)}`;
+  document.getElementById('profLastVisit').textContent = upperText(safeText(b.lastVisit));
+  document.getElementById('profVisit').textContent     = upperText(safeText(b.visit));
 
   // Show visit badge and dates only if there's at least one PESO visit record
   const visitBadgeContainer = document.getElementById('visitBadgeContainer');
@@ -105,6 +111,7 @@ async function openProfile(benefId) {
   const statusKey  = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1).toLowerCase();
   const statusMap = {
     Hired:      ['status-hired',      'Hired'],
+    Placed:     ['status-hired',      'Placed'],
     Referred:   ['status-referred',   'Referred'],
     Registered: ['status-registered', 'Registered'],
   };
@@ -114,14 +121,14 @@ async function openProfile(benefId) {
   sb.textContent = lbl;
 
   // ── Overview tab ──
-  document.getElementById('pFullName').textContent  = b.name;
-  document.getElementById('pGender').textContent    = b.gender;
-  document.getElementById('pDob').textContent       = b.dob;
-  document.getElementById('pCivil').textContent     = b.civil;
-  document.getElementById('pAddress').textContent   = b.address;
+  document.getElementById('pFullName').textContent  = upperText(b.name);
+  document.getElementById('pGender').textContent    = upperText(b.gender);
+  document.getElementById('pDob').textContent       = upperText(b.dob);
+  document.getElementById('pCivil').textContent     = upperText(b.civil);
+  document.getElementById('pAddress').textContent   = upperText(b.address);
   document.getElementById('pEmail').textContent     = b.emailAddr;
   document.getElementById('pEmail').href            = `mailto:${b.emailAddr}`;
-  document.getElementById('pPhone').textContent     = b.phone;
+  document.getElementById('pPhone').textContent     = upperText(b.phone);
   // Notes column removed from database; leave overview notes empty
   document.getElementById('pNotes').textContent     = '';
   // Education & Skills are shown for most programs. For Job Fair, Job Matching,
@@ -166,11 +173,11 @@ async function openProfile(benefId) {
           window.currentJobFairRecords = j.records;
           eventsEl.innerHTML = j.records.map((r, idx) => `
             <tr>
-              <td>${r.job_fair_type || '—'}</td>
-              <td style="font-weight:500;">${r.venue || '—'}</td>
-              <td>${r.date_start ? (r.date_start + (r.date_end ? ` — ${r.date_end}` : '')) : '—'}</td>
-              <td style="font-weight:500;">${r.company_name || '—'}</td>
-              <td style="color:var(--text-secondary);font-size:12.5px;">${r.position || '—'}</td>
+              <td>${upperText(r.job_fair_type)}</td>
+              <td style="font-weight:500;">${upperText(r.venue)}</td>
+              <td>${r.date_start ? (upperText(r.date_start) + (r.date_end ? ` — ${upperText(r.date_end)}` : '')) : '—'}</td>
+              <td style="font-weight:500;">${upperText(r.company_name)}</td>
+              <td style="color:var(--text-secondary);font-size:12.5px;">${upperText(r.position)}</td>
               <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
                   <button onclick="openEditJobFairModal(${idx})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
                   <button onclick="deleteJobFairRecord(${r.jobfair_id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
@@ -288,18 +295,18 @@ async function openProfile(benefId) {
             : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         };
 
-        setText('pWiirpContractPeriod', record?.contract_period || '—');
-        setText('pWiirpSchool', record?.school || '—');
-        setText('pWiirpCourse', record?.course || '—');
+        setText('pWiirpContractPeriod', upperText(record?.contract_period));
+        setText('pWiirpSchool', upperText(record?.school));
+        setText('pWiirpCourse', upperText(record?.course));
         setText('pWiirpRequiredHours', record?.required_hours != null ? String(record.required_hours) : '—');
-        setText('pWiirpInquiryType', record?.inquiry_type || '—');
-        setText('pWiirpPreferredOrgType', record?.preferred_org_type || '—');
-        setText('pWiirpPreferredIndustry', record?.preferred_industry || '—');
+        setText('pWiirpInquiryType', upperText(record?.inquiry_type));
+        setText('pWiirpPreferredOrgType', upperText(record?.preferred_org_type));
+        setText('pWiirpPreferredIndustry', upperText(record?.preferred_industry));
         setText('pWiirpWillingOutside', record ? formatBool(record.is_willing_outside) : '—');
-        setText('pWiirpInternshipSched', record?.internship_sched || '—');
-        setText('pWiirpStartDate', record ? formatDate(record.start) : '—');
-        setText('pWiirpYearLevel', record?.year_level || '—');
-        setText('pWiirpType', formatWiirpType(record?.type));
+        setText('pWiirpInternshipSched', upperText(record?.internship_sched));
+        setText('pWiirpStartDate', record ? upperText(formatDate(record.start)) : '—');
+        setText('pWiirpYearLevel', upperText(record?.year_level));
+        setText('pWiirpType', upperText(formatWiirpType(record?.type)));
 
         const showAssignment = record && ['peso-assigned', 'private'].includes(String(record.type || '').trim().toLowerCase());
         const showEndorsements = record && String(record.type || '').trim().toLowerCase() === 'private';
@@ -318,11 +325,11 @@ async function openProfile(benefId) {
 
             assignmentsEl.innerHTML = `
               <tr>
-                <td>${formatDate(latest.start_date)}</td>
-                <td>${formatDate(latest.end_date)}</td>
+                <td>${upperText(formatDate(latest.start_date))}</td>
+                <td>${upperText(formatDate(latest.end_date))}</td>
                 <td>${latest.required_hours != null ? String(latest.required_hours) : '—'}</td>
-                <td style="font-weight:500;">${latest.office_assignment || '—'}</td>
-                ${showEndorsements ? `<td>${latest.endorsement_1 || '—'}</td><td>${latest.endorsement_2 || '—'}</td>` : ''}
+                <td style="font-weight:500;">${upperText(latest.office_assignment)}</td>
+                ${showEndorsements ? `<td>${upperText(latest.endorsement_1)}</td><td>${upperText(latest.endorsement_2)}</td>` : ''}
               </tr>
             `;
           } else if (showAssignment) {
@@ -537,34 +544,34 @@ async function openProfile(benefId) {
           };
 
           if (document.getElementById('pGipContractPeriod')) {
-            document.getElementById('pGipContractPeriod').textContent = r.contract_period || '—';
+            document.getElementById('pGipContractPeriod').textContent = upperText(r.contract_period);
           }
           if (document.getElementById('pGipSchool')) {
-            document.getElementById('pGipSchool').textContent = r.school || '—';
+            document.getElementById('pGipSchool').textContent = upperText(r.school);
           }
           if (document.getElementById('pGipCourse')) {
-            document.getElementById('pGipCourse').textContent = r.course || '—';
+            document.getElementById('pGipCourse').textContent = upperText(r.course);
           }
           if (document.getElementById('pGipRequiredHours')) {
             document.getElementById('pGipRequiredHours').textContent = r.required_hours != null ? String(r.required_hours) : '—';
           }
           if (document.getElementById('pGipCollegeOrShs')) {
-            document.getElementById('pGipCollegeOrShs').textContent = formatEdLevel(r.college_or_shs);
+            document.getElementById('pGipCollegeOrShs').textContent = upperText(formatEdLevel(r.college_or_shs));
           }
           if (document.getElementById('pGipPreferredOrgType')) {
-            document.getElementById('pGipPreferredOrgType').textContent = r.preferred_org_type || '—';
+            document.getElementById('pGipPreferredOrgType').textContent = upperText(r.preferred_org_type);
           }
           if (document.getElementById('pGipPreferredIndustry')) {
-            document.getElementById('pGipPreferredIndustry').textContent = r.preferred_industry || '—';
+            document.getElementById('pGipPreferredIndustry').textContent = upperText(r.preferred_industry);
           }
           if (document.getElementById('pGipWillingOutside')) {
-            document.getElementById('pGipWillingOutside').textContent = formatBool(r.is_willing_outside);
+            document.getElementById('pGipWillingOutside').textContent = upperText(formatBool(r.is_willing_outside));
           }
           if (document.getElementById('pGipOfficeAssignment')) {
-            document.getElementById('pGipOfficeAssignment').textContent = r.office_assignment || '—';
+            document.getElementById('pGipOfficeAssignment').textContent = upperText(r.office_assignment);
           }
           if (document.getElementById('pGipType')) {
-            document.getElementById('pGipType').textContent = formatType(r.type);
+            document.getElementById('pGipType').textContent = upperText(formatType(r.type));
           }
         } else {
           window.currentGipRecord = null;
@@ -590,8 +597,8 @@ async function openProfile(benefId) {
   }
 
   if (!hideEducationCard) {
-    document.getElementById('pEducation').textContent = b.education;
-    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${s}</span>`).join('');
+    document.getElementById('pEducation').textContent = upperText(b.education);
+    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${upperText(s)}</span>`).join('');
   }
 
   // ── Employment: show spinner then lazy-load from API ──
@@ -605,10 +612,10 @@ async function openProfile(benefId) {
     empEl.innerHTML = history.length
       ? history.map((e, idx) => `
           <tr>
-            <td style="font-weight:500;">${e.co}</td>
+            <td style="font-weight:500;">${upperText(e.co)}</td>
             <td><span class="badge ${badgeClass(e.st)}">${e.st}</span></td>
-            <td>${e.dt}</td>
-            <td style="color:var(--text-secondary);font-size:12.5px;">${e.note}</td>
+            <td>${upperText(e.dt)}</td>
+            <td style="color:var(--text-secondary);font-size:12.5px;">${upperText(e.note)}</td>
             <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
               <button onclick="editEmploymentRecord(${e.id})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
               <button onclick="deleteEmploymentRecord(${e.id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
