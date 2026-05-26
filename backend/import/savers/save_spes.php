@@ -35,29 +35,30 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
         $state['insertedSPESIds'][] = $spesId;
     }
 
-    // Handle employment data if company is provided
+    // Handle employment data
     $company = s(rowValue($row, ['Company', 'company'], ''));
+    $category = s(rowValue($row, ['_spes_category'], ''));
+    $storeAssignment = s(rowValue($row, ['Store Assignment', 'store_assignment'], ''));
+    $startDate = null;
+    $endDate = null;
+
+    // Parse contract dates
+    if (!empty($row['_parsed_start_of_contract'])) {
+        $startDate = (string)$row['_parsed_start_of_contract'];
+    } else {
+        $startRaw = rowValue($row, ['Start of Contract', 'start_of_contract'], '');
+        $startDate = parseDateNullable($startRaw);
+    }
+
+    if (!empty($row['_parsed_end_of_contract'])) {
+        $endDate = (string)$row['_parsed_end_of_contract'];
+    } else {
+        $endRaw = rowValue($row, ['End of Contract', 'end_of_contract'], '');
+        $endDate = parseDateNullable($endRaw);
+    }
+
+    $companyId = null;
     if (!empty($company)) {
-        $category = s(rowValue($row, ['_spes_category'], ''));
-        $storeAssignment = s(rowValue($row, ['Store Assignment', 'store_assignment'], ''));
-        $startDate = null;
-        $endDate = null;
-
-        // Parse contract dates
-        if (!empty($row['_parsed_start_of_contract'])) {
-            $startDate = (string)$row['_parsed_start_of_contract'];
-        } else {
-            $startRaw = rowValue($row, ['Start of Contract', 'start_of_contract'], '');
-            $startDate = parseDateNullable($startRaw);
-        }
-
-        if (!empty($row['_parsed_end_of_contract'])) {
-            $endDate = (string)$row['_parsed_end_of_contract'];
-        } else {
-            $endRaw = rowValue($row, ['End of Contract', 'end_of_contract'], '');
-            $endDate = parseDateNullable($endRaw);
-        }
-
         // Resolve employer
         $batchId = $ctx['batchId'] ?? null;
         $employerResult = resolveEmployer($conn, $company, $batchId, [
@@ -65,50 +66,50 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
             'industry' => rowValue($row, ['Industry', 'industry'], ''),
             'city' => rowValue($row, ['City/Municipality', 'City', 'city'], ''),
         ]);
-        $companyId = (int)($employerResult['id'] ?? 0);
+        $companyId = (int)($employerResult['id'] ?? 0) ?: null;
 
         if (!empty($employerResult['created']) && $companyId > 0) {
             $state['createdEmployerIds'][] = $companyId;
             $state['warnings'][] = 'New company created: ' . ($employerResult['matched_name'] ?? $company);
         }
+    }
 
-        // Calculate days between contract start and end
-        $days = null;
-        if ($startDate && $endDate) {
-            $start = new DateTime($startDate);
-            $end = new DateTime($endDate);
-            $days = (int)$start->diff($end)->days;
-        }
+    // Calculate days between contract start and end
+    $days = null;
+    if ($startDate && $endDate) {
+        $start = new DateTime($startDate);
+        $end = new DateTime($endDate);
+        $days = (int)$start->diff($end)->days;
+    }
 
-        // Validate category
-        $categoryNorm = strtolower(trim($category));
-        if (!in_array($categoryNorm, ['lgu', 'private'], true)) {
-            $categoryNorm = 'private';
-        }
+    // Validate category
+    $categoryNorm = strtolower(trim($category));
+    if (!in_array($categoryNorm, ['lgu', 'private'], true)) {
+        $categoryNorm = 'private';
+    }
 
-        // Insert SPES employment record
-        $empHasBatchId = tableHasColumn($conn, 'spes_employment', 'batch_id');
-        if ($empHasBatchId) {
-            $insEmp = $conn->prepare('
-                INSERT INTO spes_employment
-                    (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category, batch_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ');
-            $insEmp->bind_param('iisssisi', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm, $batchId);
-        } else {
-            $insEmp = $conn->prepare('
-                INSERT INTO spes_employment
-                    (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ');
-            $insEmp->bind_param('iisssis', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm);
-        }
-        $insEmp->execute();
-        $employmentId = (int)$insEmp->insert_id;
+    // Insert SPES employment record
+    $empHasBatchId = tableHasColumn($conn, 'spes_employment', 'batch_id');
+    if ($empHasBatchId) {
+        $insEmp = $conn->prepare('
+            INSERT INTO spes_employment
+                (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category, batch_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        ');
+        $insEmp->bind_param('iisssisi', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm, $batchId);
+    } else {
+        $insEmp = $conn->prepare('
+            INSERT INTO spes_employment
+                (spes_id, company_id, store_assignment, start_of_contract, end_of_contract, days, category)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ');
+        $insEmp->bind_param('iisssis', $spesId, $companyId, $storeAssignment, $startDate, $endDate, $days, $categoryNorm);
+    }
+    $insEmp->execute();
+    $employmentId = (int)$insEmp->insert_id;
 
-        if ($employmentId > 0) {
-            $state['insertedSPESEmploymentIds'][] = $employmentId;
-        }
+    if ($employmentId > 0) {
+        $state['insertedSPESEmploymentIds'][] = $employmentId;
     }
 
     return 'saved';

@@ -406,11 +406,12 @@
                     <th>End</th>
                     <th>Days</th>
                     <th>Category</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="pSpesEmployment">
                 <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
+                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
                 </tr>
             </tbody>
         </table>

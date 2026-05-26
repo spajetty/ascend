@@ -75,21 +75,15 @@ function validateSPES(mysqli $conn, array $rows, string $program): array {
             continue;
         }
 
-        // Employment fields - required for SPES employment tracking
-        if (!empty($company)) {
-            $storeAssignment = s(rowValue($row, ['Store Assignment', 'store_assignment'], ''));
-            $startOfContract = parseExcelDate(rowValue($row, ['Start of Contract', 'start_of_contract'], ''));
-            $endOfContract = parseExcelDate(rowValue($row, ['End of Contract', 'end_of_contract'], ''));
+        // Employment fields - process them regardless of whether company is provided
+        $storeAssignment = s(rowValue($row, ['Store Assignment', 'store_assignment'], ''));
+        $startOfContract = parseExcelDate(rowValue($row, ['Start of Contract', 'start_of_contract'], ''));
+        $endOfContract = parseExcelDate(rowValue($row, ['End of Contract', 'end_of_contract'], ''));
 
-            if (empty($storeAssignment)) {
-                $previewRow['status_message'] = 'Company provided but missing Store Assignment';
-                $previewRow['badge_status'] = 'invalid';
-                $previewRow['_sys_skip'] = true;
-                $validatedData[] = $previewRow;
-                continue;
-            }
-
+        if (!empty($startOfContract)) {
             $previewRow['_parsed_start_of_contract'] = $startOfContract;
+        }
+        if (!empty($endOfContract)) {
             $previewRow['_parsed_end_of_contract'] = $endOfContract;
         }
 

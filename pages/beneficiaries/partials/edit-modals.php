@@ -170,6 +170,59 @@
     </div>
 </div>
 
+<!-- ── Edit SPES OJT Employment Modal ── -->
+<div id="modalEditSpesEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:680px;">
+        <div class="modal-header">
+            <h3>Edit SPES OJT Employment</h3>
+            <button class="modal-close" onclick="closeEditSpesEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="editSpesEmploymentId" value="">
+
+            <div class="modal-field">
+                <label>Company</label>
+                <select id="editSpesEmploymentCompany" style="width:100%;">
+                    <option value="">Loading companies…</option>
+                </select>
+            </div>
+
+            <div class="modal-field">
+                <label>Store Assignment</label>
+                <input type="text" id="editSpesEmploymentStore" placeholder="e.g. Sales Floor, Backroom">
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Start of Contract</label>
+                    <input type="date" id="editSpesEmploymentStart">
+                </div>
+                <div class="modal-field">
+                    <label>End of Contract</label>
+                    <input type="date" id="editSpesEmploymentEnd">
+                </div>
+                <div class="modal-field">
+                    <label>Days</label>
+                    <input type="number" id="editSpesEmploymentDays" min="0">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label>Category</label>
+                <select id="editSpesEmploymentCategory">
+                    <option value="">— Select —</option>
+                    <option value="lgu">LGU</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditSpesEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditSpesEmployment()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Edit Government Internship Program Modal ── -->
 <div id="modalEditGip" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width:860px;">

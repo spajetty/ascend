@@ -459,18 +459,37 @@ async function openProfile(benefId) {
               : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
           };
 
+          const formatSpesCategory = (val) => {
+            if (!val) return '—';
+            const v = String(val).trim().toLowerCase();
+            if (v === 'lgu') return 'LGU';
+            if (v === 'dole') return 'DOLE';
+            return upperText(val);
+          };
+
+          // keep a copy of the records for editing
+          window.currentSpesEmploymentRecords = rows;
+
           empEl.innerHTML = rows.map(r => `
-            <tr>
+            <tr data-employment-id="${r.employment_id}">
               <td style="font-weight:500;">${r.company_name || '—'}</td>
               <td>${r.store_assignment || '—'}</td>
               <td>${formatDate(r.start_of_contract)}</td>
               <td>${formatDate(r.end_of_contract)}</td>
               <td>${r.days || '—'}</td>
-              <td><span class="badge badge-registered">${r.category || '—'}</span></td>
+              <td><span class="badge badge-registered">${formatSpesCategory(r.category)}</span></td>
+              <td>
+                <button type="button" class="edit-btn-icon" onclick="editSpesEmployment(${r.employment_id})" title="Edit OJT">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+              </td>
             </tr>
           `).join('');
         } else {
-          empEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>`;
+          empEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>`;
         }
       })
       .catch(() => {
@@ -482,6 +501,69 @@ async function openProfile(benefId) {
     if (spesStudentCard) spesStudentCard.style.display = 'none';
     if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
   }
+
+// ---------------- SPES Employment Edit Handlers ----------------
+window.editSpesEmployment = function (employmentId) {
+  const recs = Array.isArray(window.currentSpesEmploymentRecords) ? window.currentSpesEmploymentRecords : [];
+  const record = recs.find(r => String(r.employment_id) === String(employmentId));
+  if (!record) {
+    _showEditToast('Could not load the selected OJT record.', 'error');
+    return;
+  }
+  openEditSpesEmploymentModal(record);
+};
+
+window.openEditSpesEmploymentModal = function (record) {
+  if (!record) return;
+  document.getElementById('editSpesEmploymentId').value = record.employment_id || '';
+  document.getElementById('editSpesEmploymentStore').value = record.store_assignment || '';
+  document.getElementById('editSpesEmploymentStart').value = record.start_of_contract || '';
+  document.getElementById('editSpesEmploymentEnd').value = record.end_of_contract || '';
+  document.getElementById('editSpesEmploymentDays').value = record.days || '';
+  document.getElementById('editSpesEmploymentCategory').value = record.category || '';
+  _loadEmploymentCompanies('editSpesEmploymentCompany', record.company_id || '');
+  _toggleEditModal('modalEditSpesEmployment', 'flex');
+};
+
+window.closeEditSpesEmploymentModal = function () {
+  _toggleEditModal('modalEditSpesEmployment', 'none');
+};
+
+window.submitEditSpesEmployment = function () {
+  const employmentId = document.getElementById('editSpesEmploymentId').value;
+  if (!employmentId) {
+    _showEditToast('No OJT record selected.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('employment_id', employmentId);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment updated successfully.', 'success');
+        closeEditSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error updating OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error updating OJT employment.', 'error');
+    })
+  );
+};
 
   if (programName === 'Government Internship Program') {
     if (educationCard) educationCard.style.display = 'none';
