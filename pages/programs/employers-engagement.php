@@ -7,28 +7,9 @@ $pageHeading = 'Employers Engagement Section';
 
 $overviewYear = (int) date('Y');
 
-function loadOverviewCache(string $path, int $expectedYear): ?array
-{
-    if (!file_exists($path)) {
-        return null;
-    }
-
-    $decoded = json_decode((string) file_get_contents($path), true);
-    if (
-        json_last_error() !== JSON_ERROR_NONE ||
-        !is_array($decoded) ||
-        empty($decoded['success']) ||
-        !isset($decoded['data']['year']) ||
-        (int) $decoded['data']['year'] !== $expectedYear
-    ) {
-        return null;
-    }
-
-    return $decoded['data'] ?? null;
-}
-
-$accredCache = loadOverviewCache(__DIR__ . '/../../cache/fetch-employers.json', $overviewYear);
-$whipCache   = loadOverviewCache(__DIR__ . '/../../cache/fetch-whip.json', $overviewYear);
+// Caching removed: do not read cache files; frontend will fetch data from API endpoints.
+$accredCache = null;
+$whipCache   = null;
 
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
@@ -192,14 +173,28 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-    const acData = ACCRED_CACHE_DATA;
-    const whData = WHIP_CACHE_DATA;
+document.addEventListener('DOMContentLoaded', async () => {
+    let acData = ACCRED_CACHE_DATA;
+    let whData = WHIP_CACHE_DATA;
 
-    console.log('[Employers Engagement] accreditation cache refresh count:', acData ? (acData.cache_refresh_count ?? 0) : 0);
-    console.log('[Employers Engagement] accreditation cache refreshed at:', acData ? (acData.cache_refreshed_at ?? '—') : '—');
-    console.log('[Employers Engagement] whip cache refresh count:', whData ? (whData.cache_refresh_count ?? 0) : 0);
-    console.log('[Employers Engagement] whip cache refreshed at:', whData ? (whData.cache_refreshed_at ?? '—') : '—');
+    // If server didn't embed cache, fetch live data from API
+    if (!acData || !whData) {
+        try {
+            const year = <?= $overviewYear ?>;
+            const [acRes, whRes] = await Promise.all([
+                fetch('/backend/emp-engagement/emp-accred/show-employers.php?year=' + year, { credentials: 'same-origin' }),
+                fetch('/backend/emp-engagement/whip/show-whip.php?year=' + year, { credentials: 'same-origin' }),
+            ]);
+
+            const acJson = await acRes.json();
+            const whJson = await whRes.json();
+
+            if (acJson && acJson.success) acData = acJson.data;
+            if (whJson && whJson.success) whData = whJson.data;
+        } catch (err) {
+            console.warn('[Employers Engagement] failed to fetch overview data:', err);
+        }
+    }
 
     // ── Summary Cards ──────────────────────────────────────────────────────
     document.getElementById('card-total-accred').textContent  = acData ? acData.totals.total   : '—';

@@ -43,16 +43,7 @@ set_error_handler(function (int $errno, string $errstr) {
 header('Content-Type: application/json');
 
 $currentYear = (int) date('Y');
-$cacheDir  = __DIR__ . '/../../cache';
-$cachePath = $cacheDir . '/fetch-details.json';
 $previousResetCount = 0;
-
-if (file_exists($cachePath)) {
-    $existingCache = json_decode((string) file_get_contents($cachePath), true);
-    if (json_last_error() === JSON_ERROR_NONE && is_array($existingCache)) {
-        $previousResetCount = (int) ($existingCache['cache_reset_count'] ?? 0);
-    }
-}
 
 try {
 
@@ -524,13 +515,6 @@ try {
             'total_vacancies' => $totalVacancies,
         ],
     ];
-
-    /* ── Cache to file ── */
-    if (!is_dir($cacheDir)) {
-        mkdir($cacheDir, 0755, true);
-    }
-
-    file_put_contents($cachePath, json_encode($payload, JSON_PRETTY_PRINT));
 
     echo json_encode(['success' => true, 'data' => $payload], JSON_PRETTY_PRINT);
 

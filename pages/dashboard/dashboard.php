@@ -5,19 +5,8 @@ $currentPage = 'dashboard';
 $pageTitle   = 'ASCEND PED System – Dashboard';
 $pageHeading = 'Dashboard Overview';
 
-/* ═══════════════════════════════════════════════════════════════════
- * Load cached dashboard data from fetch-details.json
- * Falls back to safe defaults if the cache doesn't exist yet.
- * ═══════════════════════════════════════════════════════════════════ */
-$cachePath = __DIR__ . '/../../cache/fetch-details.json';
+/* Caching removed: do not read fetch-details.json; use fresh defaults. */
 $cacheData = [];
-
-if (file_exists($cachePath)) {
-    $decoded = json_decode(file_get_contents($cachePath), true);
-    if (json_last_error() === JSON_ERROR_NONE) {
-        $cacheData = $decoded;
-    }
-}
 
 /* ── Helper: safely dig into the nested array ── */
 function cacheVal(array $data, ...$keys): int {
@@ -241,8 +230,108 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-console.log('[Dashboard] cache reset count:', <?= (int) ($cacheData['cache_reset_count'] ?? 0) ?>);
-console.log('[Dashboard] cache refreshed at:', <?= json_encode($cacheData['cache_refreshed_at'] ?? '') ?>);
+const DASHBOARD_DETAILS_ENDPOINT = '/backend/dashboard/fetch-details.php';
+
+const dashboardNumberFormat = new Intl.NumberFormat('en-US');
+
+function dashboardText(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.textContent = value;
+    }
+}
+
+function dashboardBadge(elementId, textId, value) {
+    const badge = document.getElementById(elementId);
+    const text = document.getElementById(textId);
+    if (!badge || !text) return;
+
+    if (value) {
+        badge.classList.remove('invisible');
+        text.textContent = value;
+    } else {
+        badge.classList.add('invisible');
+        text.textContent = '';
+    }
+}
+
+function dashboardPctChange(current, previous) {
+    if (!previous) return '';
+    const change = ((current - previous) / previous) * 100;
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${change.toFixed(2)}% ${change >= 0 ? 'Up' : 'Down'} from last month`;
+}
+
+function dashboardGroupPrograms(programRows) {
+    const bySection = new Map();
+
+    for (const row of programRows) {
+        const sectionId = Number(row.section_id ?? 0);
+        if (!bySection.has(sectionId)) {
+            bySection.set(sectionId, []);
+        }
+        bySection.get(sectionId).push(row);
+    }
+
+    return bySection;
+}
+
+function dashboardRenderPrograms(sectionCard, programs, sectionTotal) {
+    const list = sectionCard.querySelector('[data-program-list]');
+    const totalNode = sectionCard.querySelector('[data-section-total]');
+    if (!list || !totalNode) return;
+
+    totalNode.textContent = `Total: ${dashboardNumberFormat.format(sectionTotal)}`;
+
+    if (!programs.length) {
+        list.innerHTML = '<div class="flex items-center justify-center bg-white/10 rounded-xl px-4 py-3"><span class="text-sm text-white/60">No program data available</span></div>';
+        return;
+    }
+
+    list.innerHTML = programs.map((program) => `
+        <div class="prog-item flex items-center justify-between bg-white/20 rounded-xl px-4 py-3 cursor-default">
+            <span class="text-sm font-medium">${String(program.program_name ?? 'Program')}</span>
+            <span class="text-sm font-bold">${dashboardNumberFormat.format(Number(program.total ?? 0))}</span>
+        </div>
+    `).join('');
+}
+
+async function loadDashboardDetails() {
+    try {
+        const response = await fetch(DASHBOARD_DETAILS_ENDPOINT, { credentials: 'same-origin' });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+            throw new Error(payload.error || `Request failed (HTTP ${response.status}).`);
+        }
+
+        const data = payload.data ?? {};
+        const totals = data.beneficiaries_totals ?? {};
+        const programs = Array.isArray(data.beneficiaries_by_program) ? data.beneficiaries_by_program : [];
+        const comparisons = Array.isArray(data.comparison_by_month) ? data.comparison_by_month : [];
+
+        dashboardText('stat-registered', dashboardNumberFormat.format(Number(totals.total_registered ?? 0)));
+        dashboardText('stat-hired', dashboardNumberFormat.format(Number(totals.total_hired ?? 0)));
+        dashboardText('stat-employers', dashboardNumberFormat.format(Number(data.employers?.total_employers ?? 0)));
+        dashboardText('stat-vacancies', dashboardNumberFormat.format(Number(data.employers?.total_vacancies ?? 0)));
+
+        const previous = comparisons.length >= 2 ? comparisons[comparisons.length - 2] : null;
+        dashboardBadge('badge-registered', 'badge-registered-text', dashboardPctChange(Number(totals.total_registered ?? 0), Number(previous?.total_registered ?? 0)));
+        dashboardBadge('badge-hired', 'badge-hired-text', dashboardPctChange(Number(totals.total_hired ?? 0), Number(previous?.total_hired ?? 0)));
+
+        const programGroups = dashboardGroupPrograms(programs);
+        document.querySelectorAll('.section-card').forEach((card) => {
+            const sectionId = Number(card.dataset.sectionId ?? 0);
+            const sectionPrograms = programGroups.get(sectionId) ?? [];
+            const sectionTotal = sectionPrograms.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+            dashboardRenderPrograms(card, sectionPrograms, sectionTotal);
+        });
+    } catch (error) {
+        console.error('[Dashboard] Failed to load live details:', error);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDashboardDetails);
 </script>
 
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>

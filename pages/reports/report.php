@@ -6,19 +6,7 @@ $currentPage = 'reports';
 $pageTitle   = 'ASCEND PED System – Reports';
 $pageHeading = 'Reports';
 
-/* ═══════════════════════════════════════════════════════════════════
- * Load cached dashboard data from fetch-details.json
- * Same pattern as dashboard.php — falls back to safe defaults.
- * ═══════════════════════════════════════════════════════════════════ */
-$cachePath = __DIR__ . '/../../cache/fetch-details.json';
 $cacheData = [];
-
-if (file_exists($cachePath)) {
-    $decoded = json_decode(file_get_contents($cachePath), true);
-    if (json_last_error() === JSON_ERROR_NONE) {
-        $cacheData = $decoded;
-    }
-}
 
 /* ── Helper: safely dig into the nested array ── */
 function cacheVal(array $data, ...$keys): int {
@@ -362,76 +350,223 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
     </div><!-- /px-6 -->
 </main>
 
-<script>
-console.log('[Reports] cache reset count:', <?= (int) ($cacheData['cache_reset_count'] ?? 0) ?>);
-console.log('[Reports] cache refreshed at:', <?= json_encode($cacheData['cache_refreshed_at'] ?? '') ?>);
-</script>
-
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-/* ─────────────────────────────────────────────────────────────
- * Initial chart data seeded from the cached PHP snapshot only.
- * ─────────────────────────────────────────────────────────────*/
-const initialTrendLabels  = <?= json_encode($monthLabels) ?>;
-const initialTrendReg     = <?= json_encode($monthReg) ?>;
-const initialTrendHired   = <?= json_encode($monthHired) ?>;
-const initialMale         = <?= (int) $totalMale ?>;
-const initialFemale       = <?= (int) $totalFemale ?>;
+const REPORT_DETAILS_ENDPOINT = '/backend/dashboard/fetch-details.php';
 
-/* ── Monthly Trend Chart ──────────────────────────── */
-const trendChart = new Chart(document.getElementById('trendChart'), {
-    type: 'bar',
-    data: {
-        labels: initialTrendLabels.length ? initialTrendLabels : ['No data'],
-        datasets: [
-            {
-                label: 'Registered',
-                data: initialTrendReg,
-                backgroundColor: '#2563EB',
-                borderRadius: 4,
-                borderSkipped: false,
-            },
-            {
-                label: 'Hired',
-                data: initialTrendHired,
-                backgroundColor: '#F59E0B',
-                borderRadius: 4,
-                borderSkipped: false,
+const reportNumberFormat = new Intl.NumberFormat('en-US');
+let reportTrendChart = null;
+let reportGenderChart = null;
+
+function reportText(id, value) {
+    const el = document.getElementById(id);
+    if (el) {
+        el.textContent = value;
+    }
+}
+
+function reportBadge(id, textId, value) {
+    const badge = document.getElementById(id);
+    const text = document.getElementById(textId);
+    if (!badge || !text) return;
+
+    if (value) {
+        badge.classList.remove('invisible');
+        text.textContent = value;
+    } else {
+        badge.classList.add('invisible');
+        text.textContent = '';
+    }
+}
+
+function reportPctChange(current, previous) {
+    if (!previous) return '';
+    const change = ((current - previous) / previous) * 100;
+    const sign = change >= 0 ? '+' : '';
+    return `${sign}${change.toFixed(1)}% ${change >= 0 ? '↑' : '↓'} from last month`;
+}
+
+function reportDestroyCharts() {
+    if (reportTrendChart) {
+        reportTrendChart.destroy();
+        reportTrendChart = null;
+    }
+    if (reportGenderChart) {
+        reportGenderChart.destroy();
+        reportGenderChart = null;
+    }
+}
+
+function reportRenderCharts(monthLabels, monthRegistered, monthHired, maleCount, femaleCount) {
+    reportDestroyCharts();
+
+    reportTrendChart = new Chart(document.getElementById('trendChart'), {
+        type: 'bar',
+        data: {
+            labels: monthLabels.length ? monthLabels : ['No data'],
+            datasets: [
+                {
+                    label: 'Registered',
+                    data: monthRegistered,
+                    backgroundColor: '#2563EB',
+                    borderRadius: 4,
+                    borderSkipped: false,
+                },
+                {
+                    label: 'Hired',
+                    data: monthHired,
+                    backgroundColor: '#F59E0B',
+                    borderRadius: 4,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { ticks: { font: { size: 12 } }, grid: { display: false } },
+                y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
             }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x: { ticks: { font: { size: 12 } }, grid: { display: false } },
-            y: { ticks: { font: { size: 11 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
         }
-    }
-});
+    });
 
-/* ── Gender Donut Chart ───────────────────────────── */
-const genderChart = new Chart(document.getElementById('genderChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Male', 'Female'],
-        datasets: [{
-            data: [initialMale || 1, initialFemale || 1], // avoid empty chart
-            backgroundColor: ['#2563EB', '#F59E0B'],
-            borderWidth: 0,
-            hoverOffset: 6,
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '68%',
-        plugins: { legend: { display: false } }
-    }
-});
+    reportGenderChart = new Chart(document.getElementById('genderChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Male', 'Female'],
+            datasets: [{
+                data: [maleCount || 1, femaleCount || 1],
+                backgroundColor: ['#2563EB', '#F59E0B'],
+                borderWidth: 0,
+                hoverOffset: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: { legend: { display: false } }
+        }
+    });
+}
 
+function reportRenderSections(programRows) {
+    const grouped = new Map();
+
+    for (const row of programRows) {
+        const sectionId = Number(row.section_id ?? 0);
+        if (!grouped.has(sectionId)) {
+            grouped.set(sectionId, []);
+        }
+        grouped.get(sectionId).push(row);
+    }
+
+    document.querySelectorAll('.program-section').forEach((section) => {
+        const sectionId = Number(section.dataset.sectionId ?? 0);
+        const rows = grouped.get(sectionId) ?? [];
+        const visibleRows = rows.filter((row) => Number(row.program_id ?? 0) !== 4);
+        const sectionTotal = rows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+        const sectionMale = rows.reduce((sum, row) => sum + Number(row.total_male ?? 0), 0);
+        const sectionFemale = rows.reduce((sum, row) => sum + Number(row.total_female ?? 0), 0);
+        const body = section.querySelector('[data-program-rows]');
+
+        if (!body) return;
+
+        if (!visibleRows.length) {
+            body.innerHTML = '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-400 text-sm">No program data available</td></tr>';
+        } else {
+            body.innerHTML = visibleRows.map((program) => {
+                const pct = sectionTotal > 0 ? Number(program.total ?? 0) / sectionTotal * 100 : 0;
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-3 font-medium text-gray-800">${String(program.program_name ?? 'Program')}</td>
+                        <td class="px-4 py-3 text-center text-gray-600">${reportNumberFormat.format(Number(program.total_male ?? 0))}</td>
+                        <td class="px-4 py-3 text-center text-gray-600">${reportNumberFormat.format(Number(program.total_female ?? 0))}</td>
+                        <td class="px-4 py-3 text-center font-semibold text-gray-800">${reportNumberFormat.format(Number(program.total ?? 0))}</td>
+                        <td class="px-6 py-3 text-right text-gray-500">${pct.toFixed(1)}%</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        body.innerHTML += `
+            <tr class="bg-gray-50 font-semibold">
+                <td class="px-6 py-3 text-gray-800">Section Total</td>
+                <td class="px-4 py-3 text-center text-gray-800" data-col-male>${reportNumberFormat.format(sectionMale)}</td>
+                <td class="px-4 py-3 text-center text-gray-800" data-col-female>${reportNumberFormat.format(sectionFemale)}</td>
+                <td class="px-4 py-3 text-center text-gray-800" data-col-total>${reportNumberFormat.format(sectionTotal)}</td>
+                <td class="px-6 py-3 text-right text-gray-800">100%</td>
+            </tr>
+        `;
+    });
+}
+
+async function loadReportDetails() {
+    try {
+        const response = await fetch(REPORT_DETAILS_ENDPOINT, { credentials: 'same-origin' });
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+            throw new Error(payload.error || `Request failed (HTTP ${response.status}).`);
+        }
+
+        const data = payload.data ?? {};
+        const totals = data.beneficiaries_totals ?? {};
+        const programRows = Array.isArray(data.beneficiaries_by_program) ? data.beneficiaries_by_program : [];
+        const comparisonRows = Array.isArray(data.comparison_by_month) ? data.comparison_by_month : [];
+        const sectionRows = Array.isArray(data.beneficiaries_by_section) ? data.beneficiaries_by_section : [];
+
+        const totalRegistered = Number(totals.total_registered ?? 0);
+        const totalHired = Number(totals.total_hired ?? 0);
+        const totalMale = Number(totals.total_male ?? 0);
+        const totalFemale = Number(totals.total_female ?? 0);
+        const totalEmployers = Number(data.employers?.total_employers ?? 0);
+        const totalVacancies = Number(data.employers?.total_vacancies ?? 0);
+
+        reportText('stat-registered', reportNumberFormat.format(totalRegistered));
+        reportText('stat-hired', reportNumberFormat.format(totalHired));
+        reportText('stat-employers', reportNumberFormat.format(totalEmployers));
+        reportText('stat-vacancies', reportNumberFormat.format(totalVacancies));
+
+        const previous = comparisonRows.length >= 2 ? comparisonRows[comparisonRows.length - 2] : null;
+        reportBadge('badge-registered', 'badge-registered-text', reportPctChange(totalRegistered, Number(previous?.total_registered ?? 0)));
+        reportBadge('badge-hired', 'badge-hired-text', reportPctChange(totalHired, Number(previous?.total_hired ?? 0)));
+
+        const grandTotal = sectionRows.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+        const grandPrograms = programRows.length;
+        const grandGenderTotal = totalMale + totalFemale;
+        const malePct = grandGenderTotal > 0 ? Math.round((totalMale / grandGenderTotal) * 1000) / 10 : 0;
+        const femalePct = grandGenderTotal > 0 ? Math.round((totalFemale / grandGenderTotal) * 1000) / 10 : 0;
+
+        reportText('grand-total', reportNumberFormat.format(grandTotal));
+        reportText('grand-male', reportNumberFormat.format(totalMale));
+        reportText('grand-female', reportNumberFormat.format(totalFemale));
+        reportText('grand-programs', reportNumberFormat.format(grandPrograms));
+        reportText('gender-total', reportNumberFormat.format(grandGenderTotal));
+        reportText('gender-male-count', reportNumberFormat.format(totalMale));
+        reportText('gender-female-count', reportNumberFormat.format(totalFemale));
+        reportText('gender-male-pct', `${malePct}%`);
+        reportText('gender-female-pct', `${femalePct}%`);
+
+        const monthLabels = comparisonRows.slice(-6).map((row) => row.month_label ?? String(row.month ?? '').slice(0, 3));
+        const monthRegistered = comparisonRows.slice(-6).map((row) => Number(row.total_registered ?? 0));
+        const monthHired = comparisonRows.slice(-6).map((row) => Number(row.total_hired ?? 0));
+
+        reportRenderSections(programRows);
+        reportRenderCharts(monthLabels, monthRegistered, monthHired, totalMale, totalFemale);
+    } catch (error) {
+        console.error('[Reports] Failed to load live details:', error);
+        reportRenderCharts([], [], [], 0, 0);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadReportDetails);
+</script>
+
+<script>
 /* ── Tab Switcher ─────────────────────────────────── */
 function showSection(id) {
     document.querySelectorAll('.program-section').forEach(el => el.classList.add('hidden'));
@@ -447,6 +582,14 @@ function showSection(id) {
         btn.classList.toggle('border-gray-300', !active);
     });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Show the first section by default after live data loads.
+    const firstTab = document.querySelector('.tab-btn')?.dataset.tab;
+    if (firstTab) {
+        showSection(firstTab);
+    }
+});
 
 </script>
 

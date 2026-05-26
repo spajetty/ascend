@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/../../../includes/auth-check.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once __DIR__ . '/../cache-refresh.php';
 
 header('Content-Type: application/json');
 
@@ -72,8 +71,7 @@ try {
 
     $stmt->execute();
 
-    $refreshYear = (int) date('Y', strtotime($date_of_conduct));
-    refreshCdspCache($conn, $refreshYear);
+    // Caching removed: no cache refresh performed
 
     ob_start();
     include __DIR__ . '/../../dashboard/fetch-details.php';

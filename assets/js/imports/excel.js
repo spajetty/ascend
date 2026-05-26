@@ -14,7 +14,7 @@ import './excel-upload.js';
 
 const FETCH_DETAILS_ENDPOINT = '../../backend/dashboard/fetch-details.php';
 
-async function refreshDashboardCache() {
+async function refreshDashboardData() {
     try {
         const res = await fetch(FETCH_DETAILS_ENDPOINT, { credentials: 'same-origin' });
         const raw = await res.text();
@@ -28,12 +28,12 @@ async function refreshDashboardCache() {
         }
 
         if (!res.ok || !result.success) {
-            throw new Error(result.error ?? `Cache refresh failed (HTTP ${res.status}).`);
+            throw new Error(result.error ?? `Request failed (HTTP ${res.status}).`);
         }
 
         return result;
     } catch (err) {
-        console.error('[Import] Failed to refresh fetch-details cache:', err);
+        console.error('[Import] Failed to refresh dashboard data:', err);
         return null;
     }
 }
@@ -314,7 +314,7 @@ if (confirmImportBtn) {
 
                     document.getElementById('cancelImport').click();
 
-                    await refreshDashboardCache();
+                    await refreshDashboardData();
 
                     const createdEmployers = Array.isArray(result.created_employers) ? result.created_employers : [];
                     const followupEmployerFlow = EMPLOYER_AUTO_CREATE_PROGRAMS.has(program) && createdEmployers.length > 0;

@@ -2,7 +2,8 @@
 
 require_once __DIR__ . '/../../../includes/auth-check.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once __DIR__ . '/../cache-refresh.php';
+
+// Caching removed: fetch fresh CDSP data directly from DB
 
 header('Content-Type: application/json');
 
@@ -43,9 +44,67 @@ if (file_exists($cachePath)) {
     }
 }
 
-// ── Cache miss or year mismatch — hit the DB ──────────────────────────────────
+// ── Fetch fresh data from DB and return (no caching) ─────────────────────────
 try {
-    echo json_encode(refreshCdspCache($conn, $year), JSON_PRETTY_PRINT);
+    $stmt = $conn->prepare("\n        SELECT
+            c.cdsp_id,
+            c.date_of_conduct,
+            c.grade_level,
+            c.participants_male,
+            c.participants_female,
+            c.approval_letter,
+            c.created_at,
+            s.school_id,
+            s.school_name,
+            s.congressional_district,
+            s.grades_offered
+        FROM careerdev c
+        LEFT JOIN schools s
+        ON c.school_id = s.school_id
+        WHERE YEAR(c.date_of_conduct) = ?
+        ORDER BY c.date_of_conduct ASC
+    ");
+
+    $stmt->bind_param('i', $year);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $rows = [];
+    $totals = [
+        'sessions' => 0,
+        'total_m' => 0,
+        'total_f' => 0,
+        'total' => 0,
+    ];
+
+    while ($row = $result->fetch_assoc()) {
+        $row['participants_male'] = (int) $row['participants_male'];
+        $row['participants_female'] = (int) $row['participants_female'];
+        $row['total'] = $row['participants_male'] + $row['participants_female'];
+        $rows[] = $row;
+        $totals['sessions']++;
+        $totals['total_m'] += $row['participants_male'];
+        $totals['total_f'] += $row['participants_female'];
+        $totals['total'] += $row['total'];
+    }
+    $result->free();
+    $stmt->close();
+
+    $years = [];
+    $yearQuery = $conn->query("\n        SELECT DISTINCT YEAR(date_of_conduct) AS yr\n        FROM careerdev\n        WHERE date_of_conduct IS NOT NULL\n        ORDER BY yr DESC\n    ");
+    while ($row = $yearQuery->fetch_assoc()) {
+        $years[] = (int) $row['yr'];
+    }
+    $yearQuery->free();
+
+    $payload = [
+        'rows' => $rows,
+        'totals' => $totals,
+        'years' => $years,
+        'year' => $year,
+    ];
+
+    echo json_encode(['success' => true, 'data' => $payload], JSON_PRETTY_PRINT);
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'error' => $e->getMessage()]);
 }

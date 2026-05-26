@@ -2,7 +2,8 @@
 
 require_once __DIR__ . '/../../../includes/auth-check.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
-require_once __DIR__ . '/../../career-dev/cache-refresh.php';
+
+// Caching removed: fetch WHIP data directly from DB
 
 header('Content-Type: application/json');
 
@@ -50,47 +51,90 @@ function json_ok($data = null): void
     exit;
 }
 
-function refreshWhipCacheFresh($yearFilter): array
+// Helper: fetch whip data directly (no cache persistence)
+function getWhipData(mysqli $conn, $yearFilter): array
 {
-    $freshConn = new mysqli(
-        $_ENV['DB_HOST'],
-        $_ENV['DB_USER'],
-        $_ENV['DB_PASS'],
-        $_ENV['DB_NAME']
-    );
+    $yearFilter = (string) $yearFilter;
+    $years = [];
 
-    if ($freshConn->connect_error) {
-        throw new Exception($freshConn->connect_error);
+    $yearRes = $conn->query("\n        SELECT DISTINCT YEAR(date_hired) AS yr\n        FROM whip\n        WHERE date_hired IS NOT NULL\n        ORDER BY yr DESC\n    ");
+
+    while ($row = $yearRes->fetch_assoc()) {
+        $years[] = (int) $row['yr'];
+    }
+    $yearRes->free();
+
+    $sql = "\n        SELECT\n            w.whip_id,\n            w.benef_id,\n            w.project_id,\n            w.batch_id,\n            w.position,\n            w.date_hired,\n            w.created_at,\n\n            b.first_name,\n            b.middle_name,\n            b.last_name,\n            b.suffix,\n            b.sex,\n            b.city,\n            b.barangay,\n            b.district,\n            b.classification,\n\n            p.project_title,\n            p.nature_of_project,\n            p.duration,\n            p.budget,\n            p.fund_source,\n            p.persons_from_locality,\n            p.skills_required,\n            p.skills_deficiencies,\n            p.contractor,\n            p.is_legitimate_contractor,\n            p.filled,\n            p.unfilled\n\n        FROM whip w\n        LEFT JOIN beneficiaries b ON w.benef_id = b.benef_id\n        LEFT JOIN projects p ON w.project_id = p.project_id\n    ";
+
+    $params = [];
+    $types = '';
+
+    if ($yearFilter !== 'all' && $yearFilter !== '') {
+        $sql .= " WHERE YEAR(w.date_hired) = ? ";
+        $params[] = (int) $yearFilter;
+        $types .= 'i';
     }
 
-    try {
-        return refreshWhipCache($freshConn, $yearFilter);
-    } finally {
-        $freshConn->close();
+    $sql .= " ORDER BY w.date_hired DESC, b.last_name ASC, b.first_name ASC";
+
+    $stmt = $conn->prepare($sql);
+    if (!empty($params)) {
+        $stmt->bind_param($types, ...$params);
     }
+    $stmt->execute();
+
+    $result = $stmt->get_result();
+    $rows = [];
+    $maleCount = 0;
+    $femaleCount = 0;
+    $projectSet = [];
+
+    while ($row = $result->fetch_assoc()) {
+        $row['budget'] = $row['budget'] !== null ? (float) $row['budget'] : null;
+        $row['persons_from_locality'] = (int) ($row['persons_from_locality'] ?? 0);
+        $row['is_legitimate_contractor'] = (bool) ($row['is_legitimate_contractor'] ?? false);
+        $row['filled'] = (int) ($row['filled'] ?? 0);
+        $row['unfilled'] = (int) ($row['unfilled'] ?? 0);
+
+        $sex = strtolower($row['sex'] ?? '');
+        if ($sex === 'male') {
+            $maleCount++;
+        }
+        if ($sex === 'female') {
+            $femaleCount++;
+        }
+
+        if (!empty($row['project_id'])) {
+            $projectSet[$row['project_id']] = true;
+        }
+
+        $rows[] = $row;
+    }
+    $result->free();
+    $stmt->close();
+
+    $payload = [
+        'rows' => $rows,
+        'years' => $years,
+        'year' => $yearFilter === 'all' || $yearFilter === '' ? 'all' : (int) $yearFilter,
+        'default_year' => !empty($years) ? max($years) : (int) date('Y'),
+        'totals' => [
+            'total' => $maleCount + $femaleCount,
+            'male' => $maleCount,
+            'female' => $femaleCount,
+            'projects' => count($projectSet),
+        ],
+    ];
+
+    return $payload;
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
-    if ($method === 'GET') {
+        if ($method === 'GET') {
         $yearFilter = $_GET['year'] ?? 'all';
-        $cachePath = __DIR__ . '/../../../cache/fetch-whip.json';
-
-        if (file_exists($cachePath)) {
-            $cached = json_decode((string) file_get_contents($cachePath), true);
-            if (
-                json_last_error() === JSON_ERROR_NONE &&
-                !empty($cached['success']) &&
-                isset($cached['data']['year']) &&
-                (string) $cached['data']['year'] === (string) $yearFilter
-            ) {
-                echo json_encode($cached, JSON_PRETTY_PRINT);
-                exit;
-            }
-        }
-
-        echo json_encode(refreshWhipCache($conn, $yearFilter), JSON_PRETTY_PRINT);
+        echo json_encode(['success' => true, 'data' => getWhipData($conn, $yearFilter)], JSON_PRETTY_PRINT);
         exit;
     }
 
@@ -129,7 +173,7 @@ try {
 
         $stmt->close();
 
-        refreshWhipCacheFresh($cacheYear);
+        // caching removed: no cache refresh
 
         json_ok(['updated' => $stmt->affected_rows]);
     }
