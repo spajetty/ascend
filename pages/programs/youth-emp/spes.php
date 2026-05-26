@@ -90,10 +90,16 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
         <!-- Filter Bar -->
         <div class="flex flex-col gap-2 mb-4">
-            <!-- Row 1: Year filter -->
-            <div class="flex items-center gap-2">
-                <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
-                <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
+            <!-- Row 1: Year + month filters -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
+                    <select id="yearFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-gray-500 whitespace-nowrap">Filter by month:</span>
+                    <select id="monthFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
+                </div>
             </div>
             <!-- Row 2: Search + loading indicator -->
             <div class="flex items-center gap-2">
@@ -230,23 +236,41 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 // API points to the correct backend file
-const API_URL       = '/backend/youth-employ/show-spes.php';
+const API_URL       = '/backend/youth-employ/spes/show-spes.php';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];
 let currentPage  = 1;
 let selectedYear = new Date().getFullYear();
+let selectedMonth = '';
 let searchQuery  = '';
 let deletingId   = null;
 let savingId     = null;
 let editSnapshot = {};
 let searchTimer  = null;
 
+const MONTH_OPTIONS = [
+    { value: '', label: 'All months' },
+    { value: '1', label: 'January' },
+    { value: '2', label: 'February' },
+    { value: '3', label: 'March' },
+    { value: '4', label: 'April' },
+    { value: '5', label: 'May' },
+    { value: '6', label: 'June' },
+    { value: '7', label: 'July' },
+    { value: '8', label: 'August' },
+    { value: '9', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+];
+
 // ─── API ───────────────────────────────────────────────────────────────────
 async function fetchData(year, search = '') {
     showLoading(true);
     try {
         const params = new URLSearchParams({ year, search });
+        if (selectedMonth !== '') params.set('month', selectedMonth);
         const res    = await fetch(`${API_URL}?${params}`);
         const json   = await res.json();
         if (!json.success) throw new Error(json.error);
@@ -441,6 +465,13 @@ function populateYearFilter(years) {
     ).join('');
 }
 
+function populateMonthFilter() {
+    const sel = document.getElementById('monthFilter');
+    sel.innerHTML = MONTH_OPTIONS.map(option =>
+        `<option value="${option.value}" ${option.value === selectedMonth ? 'selected' : ''}>${option.label}</option>`
+    ).join('');
+}
+
 // ─── Load ──────────────────────────────────────────────────────────────────
 async function load(year, search = '') {
     const data = await fetchData(year, search);
@@ -449,6 +480,7 @@ async function load(year, search = '') {
     currentPage = 1;
     updateCards(data.totals);
     populateYearFilter(data.years);
+    populateMonthFilter();
     renderTable();
     document.getElementById('summaryBody').innerHTML = buildSummaryBody(data.summary);
 }
@@ -605,7 +637,13 @@ document.getElementById('yearFilter').addEventListener('change', function () {
     load(selectedYear, searchQuery);
 });
 
+document.getElementById('monthFilter').addEventListener('change', function () {
+    selectedMonth = this.value;
+    load(selectedYear, searchQuery);
+});
+
 // ─── Init ──────────────────────────────────────────────────────────────────
+populateMonthFilter();
 load(selectedYear);
 </script>
 

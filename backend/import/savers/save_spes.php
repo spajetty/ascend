@@ -31,6 +31,21 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
     $insSPES->execute();
     $spesId = (int)$insSPES->insert_id;
 
+    // Sync 4Ps / PWD / OFW flags to the beneficiaries row
+    $is_pwd = (strtoupper(trim((string) rowValue($row, ['PWD', 'pwd'], 'NO')))                           === 'YES') ? 1 : 0;
+    $is_4ps = (strtoupper(trim((string) rowValue($row, ['4Ps BENEFICIARY', '4ps_beneficiary'], 'NO')))  === 'YES') ? 1 : 0;
+    $is_ofw = (strtoupper(trim((string) rowValue($row, ['OFW DEPENDENT',   'ofw_dependent'],   'NO')))  === 'YES') ? 1 : 0;
+    $ps4_id = s(rowValue($row, ['4Ps HOUSEHOLD ID NO.', 'ps4_id_no'], '')) ?: null;
+
+    $updFlags = $conn->prepare('
+        UPDATE beneficiaries
+        SET is_pwd = ?, is_4ps = ?, is_ofw_dependent = ?, ps4_id_no = ?
+        WHERE benef_id = ?
+    ');
+    $updFlags->bind_param('iiisi', $is_pwd, $is_4ps, $is_ofw, $ps4_id, $benefId);
+    $updFlags->execute();
+    $updFlags->close();
+
     if ($spesId > 0) {
         $state['insertedSPESIds'][] = $spesId;
     }
