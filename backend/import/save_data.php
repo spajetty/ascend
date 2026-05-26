@@ -1,6 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../career-dev/cache-refresh.php';
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
@@ -261,6 +262,61 @@ try {
     }
 
     $conn->commit();
+
+    // Refresh employers cache if this import touched employer/accreditation data
+    $employerTouchingPrograms = [
+        'Employers Accreditation',
+        'Job Matching and Referral',
+        'First Time Jobseeker',
+        'SPES',
+        'Workers Hiring for Infrastructure Projects - Projects',
+        'Workers Hiring for Infrastructure Projects — Projects',
+    ];
+
+    if (in_array($program, $employerTouchingPrograms, true)) {
+        try {
+            $cacheYear = ($importYearRaw !== '') ? (int)$importYearRaw : (int)date('Y');
+            $cacheConn = new mysqli(
+                $_ENV['DB_HOST'],
+                $_ENV['DB_USER'],
+                $_ENV['DB_PASS'],
+                $_ENV['DB_NAME']
+            );
+            if (!$cacheConn->connect_error) {
+                refreshEmployersCache($cacheConn, $cacheYear);
+                $cacheConn->close();
+            }
+        } catch (Throwable $cacheErr) {
+            // Non-fatal — log but don't fail the import response
+            error_log('[save_data] Failed to refresh employers cache: ' . $cacheErr->getMessage());
+        }
+    }
+
+    // Refresh WHIP cache if this import touched WHIP data
+    $whipTouchingPrograms = [
+        'Workers Hiring for Infrastructure Projects - Beneficiaries',
+        'Workers Hiring for Infrastructure Projects — Beneficiaries',
+        'Workers Hiring for Infrastructure Projects - Projects',
+        'Workers Hiring for Infrastructure Projects — Projects',
+    ];
+
+    if (in_array($program, $whipTouchingPrograms, true)) {
+        try {
+            $whipCacheYear = ($importYearRaw !== '') ? (int)$importYearRaw : (int)date('Y');
+            $whipCacheConn = new mysqli(
+                $_ENV['DB_HOST'],
+                $_ENV['DB_USER'],
+                $_ENV['DB_PASS'],
+                $_ENV['DB_NAME']
+            );
+            if (!$whipCacheConn->connect_error) {
+                refreshWhipCache($whipCacheConn, $whipCacheYear);
+                $whipCacheConn->close();
+            }
+        } catch (Throwable $whipCacheErr) {
+            error_log('[save_data] Failed to refresh WHIP cache: ' . $whipCacheErr->getMessage());
+        }
+    }
 
     $createdEmployers = [];
     $createdEmployerIds = array_values(array_unique(array_filter(array_map('intval', $state['createdEmployerIds']))));
