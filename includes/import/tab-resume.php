@@ -17,7 +17,7 @@
                         <option value="">Select a section…</option>
                         <option value="employment_facilitation">Employment Facilitation</option>
                         <option value="employers_engagement">Employers Engagement</option>
-                        <option value="youth_employability">Youth Employability</option>
+                        <!-- Youth Employability removed from resume imports per request -->
                     </select>
                     <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
