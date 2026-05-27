@@ -392,11 +392,13 @@ if (jfSelectToggle && jfSelectDropdown) {
 const jfCreateStandaloneBtn = document.getElementById('jfCreateStandaloneBtn');
 if (jfCreateStandaloneBtn) {
     jfCreateStandaloneBtn.addEventListener('click', () => {
-        openCreateEventModal(({ eventId, eventDate, participants }) => {
+        const importedCompanies = getImportedJobFairCompanies();
+        openCreateEventModal(({ eventId, eventDate, participants, companyMapping }) => {
             state.selectedJobFairEvent = String(eventId);
             hideParticipantsWarning();
             _setImportButtonGated(false);
             state.currentEventParticipants = participants ?? [];
+            if (companyMapping) state.jobFairCompanyMapping = companyMapping;
 
             // Update month/year dropdowns to match the newly created event's date
             if (eventDate) {
@@ -419,8 +421,40 @@ if (jfCreateStandaloneBtn) {
             if (selectedProgram === 'Job Fair' && state.selectedFile) {
                 handleFile(state.selectedFile);
             }
-        });
+        }, { importedCompanies });
     });
+}
+
+function getImportedJobFairCompanies() {
+    const rows = (Array.isArray(state.parsedExcelData) && state.parsedExcelData.length > 0)
+        ? state.parsedExcelData
+        : (Array.isArray(state.excelFileData) ? state.excelFileData : []);
+    const unique = [];
+    const seen = new Set();
+
+    const companyKeys = ['suggested_company_name', 'company', 'companyname', 'employer'];
+
+    for (const row of rows) {
+        if (!row) continue;
+        
+        // Find the first matching key (case-insensitive)
+        let name = '';
+        for (const [key, value] of Object.entries(row)) {
+            if (companyKeys.includes(key.toLowerCase().replace(/\s+/g, ''))) {
+                name = String(value).trim();
+                if (name) break;
+            }
+        }
+
+        if (!name) continue;
+
+        const key = name.toLowerCase().replace(/\s+/g, ' ');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        unique.push(name);
+    }
+
+    return unique;
 }
 
 // Handle the custom event fired when participants are added via the B2 warning link
@@ -574,6 +608,20 @@ export function handleFile(file) {
         const workbook = XLSX.read(data, { type: 'array', cellDates: false });
         const sheet    = workbook.Sheets[workbook.SheetNames[0]];
         const json     = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (state.jobFairCompanyMapping && Object.keys(state.jobFairCompanyMapping).length > 0) {
+            const companyKeys = ['suggested_company_name', 'company', 'companyname', 'employer'];
+            for (const row of json) {
+                for (const [key, value] of Object.entries(row)) {
+                    if (companyKeys.includes(key.toLowerCase().replace(/\s+/g, ''))) {
+                        const originalName = String(value).trim();
+                        if (state.jobFairCompanyMapping[originalName]) {
+                            row[key] = state.jobFairCompanyMapping[originalName];
+                        }
+                    }
+                }
+            }
+        }
 
         if (json.length === 0) {
             showToast('The uploaded file is empty.', 'warning');
