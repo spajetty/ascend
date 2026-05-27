@@ -5,26 +5,6 @@ $currentPage = 'programs';
 $pageTitle   = 'ASCEND PED System – Career Development Section';
 $pageHeading = 'Career Development Section';
 
-$cdspCachePath = __DIR__ . '/../../cache/fetch-cdsp.json';
-$lmiCachePath  = __DIR__ . '/../../cache/fetch-lmi.json';
-
-$cdspCache = null;
-$lmiCache  = null;
-
-if (file_exists($cdspCachePath)) {
-    $decoded = json_decode((string) file_get_contents($cdspCachePath), true);
-    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && !empty($decoded['success'])) {
-        $cdspCache = $decoded['data'] ?? null;
-    }
-}
-
-if (file_exists($lmiCachePath)) {
-    $decoded = json_decode((string) file_get_contents($lmiCachePath), true);
-    if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && !empty($decoded['success'])) {
-        $lmiCache = $decoded['data'] ?? null;
-    }
-}
-
 require_once __DIR__ . '/../../includes/layout/head.php';
 require_once __DIR__ . '/../../includes/layout/sidebar.php';
 ?>
@@ -158,9 +138,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 </main>
 
 <script>
-const CDSP_CACHE_DATA = <?= json_encode($cdspCache) ?>;
-const LMI_CACHE_DATA  = <?= json_encode($lmiCache) ?>;
-
+    
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
 
@@ -171,27 +149,52 @@ function clearLoading(tbodyId, colspan, msg = 'No data available.') {
 }
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+const CDSP_ENDPOINT = '/backend/career-dev/cdsp/show-cdsp.php';
+const LMI_ENDPOINT  = '/backend/career-dev/lmi/show-lmi.php';
 
-        const cdspData = CDSP_CACHE_DATA;
-        const lmiData  = LMI_CACHE_DATA;
+document.addEventListener('DOMContentLoaded', loadCareerDevelopmentData);
 
-        // ── Summary Cards ──────────────────────────────────────────────────────
-        const cdspTotal = cdspData ? cdspData.totals.total    : 0;
-        const lmiTotal  = lmiData  ? lmiData.totals.total     : 0;
+async function loadCareerDevelopmentData() {
+    try {
 
-        console.log('[Career Dev] CDSP cache refresh count:', cdspData ? (cdspData.cache_refresh_count ?? 0) : 0);
-        console.log('[Career Dev] LMI cache refresh count:', lmiData ? (lmiData.cache_refresh_count ?? 0) : 0);
+        const [cdspResponse, lmiResponse] = await Promise.all([
+            fetch(CDSP_ENDPOINT, { credentials: 'same-origin' }),
+            fetch(LMI_ENDPOINT,  { credentials: 'same-origin' })
+        ]);
+
+        const cdspPayload = await cdspResponse.json();
+        const lmiPayload  = await lmiResponse.json();
+
+        const cdspData = cdspPayload.success ? cdspPayload.data : null;
+        const lmiData  = lmiPayload.success  ? lmiPayload.data  : null;
+
+        // ── Summary Cards ─────────────────────────────────────────────
+        const cdspTotal = cdspData ? Number(cdspData.totals.total ?? 0) : 0;
+        const lmiTotal  = lmiData  ? Number(lmiData.totals.total ?? 0)  : 0;
 
         document.getElementById('card-total-participants').textContent = cdspTotal + lmiTotal;
-        document.getElementById('card-cdsp-sessions').textContent      = cdspData ? cdspData.totals.sessions : '—';
-        document.getElementById('card-lmi-sessions').textContent       = lmiData  ? lmiData.totals.sessions  : '—';
-        document.getElementById('card-lmi-participants').textContent   = lmiData  ? lmiTotal                 : '—';
 
-        // ── Preview Tables ─────────────────────────────────────────────────────
+        document.getElementById('card-cdsp-sessions').textContent =
+            cdspData ? cdspData.totals.sessions : '—';
+
+        document.getElementById('card-lmi-sessions').textContent =
+            lmiData ? lmiData.totals.sessions : '—';
+
+        document.getElementById('card-lmi-participants').textContent =
+            lmiTotal;
+
+        // ── Tables ───────────────────────────────────────────────────
         renderCdsp(cdspData);
         renderLmi(lmiData);
-});
+
+    } catch (error) {
+        console.error('[Career Development] Failed loading live data:', error);
+
+        clearLoading('cdsp-tbody', 5, 'Failed to load data.');
+        clearLoading('lmi-tbody', 5, 'Failed to load data.');
+    }
+}
+
 
 // ─── Shared helpers ───────────────────────────────────────────────────────────
 function escHtml(s) {
