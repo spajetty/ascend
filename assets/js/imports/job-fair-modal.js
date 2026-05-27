@@ -2,6 +2,7 @@
 
 import { showToast } from '../toast.js';
 import { runWithButtonLoading } from '../loading.js';
+import { state } from './excel-state.js';
 
 const esc = v => String(v ?? '')
     .replace(/&/g, '&amp;')
@@ -14,16 +15,20 @@ let _modalMode = 'create';
 let _eventId = null;
 let _eventDate = null;
 let _addedCompanies = [];
+let _importSeedCompanies = [];
+let _importUnmatchedCompanies = [];
 let _searchDebounce = null;
 let _onDoneCallback = null;
 let _eventsBound = false;
+let _companyNameMap = {};
+let _activeSearchOriginal = null;
 
 const SAVE_BTN_HTML = '<svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> Save Event';
 
 function buildModalDom() {
     return ''
         + '<div id="jobFairModalBackdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>'
-        + '<div class="relative w-full max-w-lg rounded-2xl bg-white shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">'
+        + '<div id="jobFairModalWrapper" class="relative w-full max-w-5xl rounded-2xl bg-white shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">'
         + '<div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-gray-100 flex-shrink-0">'
         + '<div class="flex items-center gap-3">'
         + '<div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">'
@@ -37,8 +42,8 @@ function buildModalDom() {
         + '<button id="jobFairModalClose" type="button" class="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-400 hover:text-gray-600">'
         + '<svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
         + '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg></button></div>'
-        + '<div class="flex-1 overflow-y-auto px-6 py-5 space-y-6">'
-        + '<section id="jfEventSection" class="space-y-4">'
+        + '<div id="jfModalBody" class="flex-1 overflow-y-auto px-8 py-6 flex flex-col md:flex-row gap-8">'
+        + '<section id="jfEventSection" class="flex-1 w-full space-y-4">'
         + '<div class="flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">1</span>'
         + '<h4 class="text-sm font-bold text-gray-800">Event Details</h4></div>'
         + '<div><label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Job Fair Type <span class="text-red-400">*</span></label>'
@@ -49,10 +54,17 @@ function buildModalDom() {
         + '<div><label class="block text-xs font-semibold text-gray-600 uppercase tracking-wider mb-1.5">Event Date <span class="text-red-400">*</span></label>'
         + '<input id="jfEventDate" type="date" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"></div>'
         + '</section>'
-        + '<section id="jfParticipantsSection" class="space-y-4 border-t border-gray-100 pt-5">'
+        + '<section id="jfParticipantsSection" class="flex-1 w-full space-y-4">'
         + '<div class="flex items-center gap-2"><span class="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 text-xs font-bold text-emerald-700">2</span>'
         + '<h4 class="text-sm font-bold text-gray-800">Company Participants</h4></div>'
         + '<p class="text-sm text-gray-500">Search and add companies from the employer registry. At least one is required.</p>'
+        + '<div id="jfImportSeedPanel" class="hidden rounded-xl border border-blue-100 bg-blue-50/40 p-4 space-y-3 max-h-72 overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200">'
+        + '<div class="flex items-center gap-2"><span class="text-xs font-bold uppercase tracking-wider text-blue-700">Imported Matches</span>'
+        + '<span class="text-[11px] text-blue-600">Auto-detected from the uploaded Job Fair file</span></div>'
+        + '<div id="jfImportSeedList" class="space-y-1"></div>'
+        + '<div id="jfImportUnmatchedWrap" class="hidden pt-2 border-t border-blue-100">'
+        + '<p class="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-2">Not detected</p>'
+        + '<div id="jfImportUnmatchedList" class="flex flex-wrap gap-2"></div></div></div>'
         + '<div class="relative"><svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'
         + '<circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>'
         + '<input id="jfCompanySearch" type="text" placeholder="Search companies…" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-10 pr-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"></div>'
@@ -78,25 +90,60 @@ function ensureJobFairModal() {
     return modal;
 }
 
-export function openCreateEventModal(onDone) {
+export function openCreateEventModal(onDone, seedData = {}) {
     _onDoneCallback = onDone;
     _resetState('create');
+    _companyNameMap = {};
+    _activeSearchOriginal = null;
+    _importSeedCompanies = Array.isArray(seedData.importedCompanies) && seedData.importedCompanies.length
+        ? seedData.importedCompanies
+        : Array.isArray(state.jobFairImportedCompanies)
+            ? state.jobFairImportedCompanies
+            : [];
+    _importUnmatchedCompanies = Array.isArray(seedData.unmatchedCompanies) && seedData.unmatchedCompanies.length
+        ? seedData.unmatchedCompanies
+        : Array.isArray(state.jobFairUnmatchedCompanies)
+            ? state.jobFairUnmatchedCompanies
+            : [];
     const modal = ensureJobFairModal();
     _bindModalEvents(modal);
     _configureModal(modal);
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+
+    if (_importSeedCompanies.length > 0 || _importUnmatchedCompanies.length > 0) {
+        _seedImportedCompanies(modal, _importSeedCompanies, _importUnmatchedCompanies);
+    } else {
+        _renderImportedSeedPanel(modal, [], []);
+    }
 }
 
-export function openAddCompaniesModal(eventId, eventLabel, onDone) {
+export function openAddCompaniesModal(eventId, eventLabel, onDone, seedData = {}) {
     _onDoneCallback = onDone;
     _resetState('participants', parseInt(eventId, 10));
+    _companyNameMap = {};
+    _activeSearchOriginal = null;
+    _importSeedCompanies = Array.isArray(seedData.importedCompanies) && seedData.importedCompanies.length
+        ? seedData.importedCompanies
+        : Array.isArray(state.jobFairImportedCompanies)
+            ? state.jobFairImportedCompanies
+            : [];
+    _importUnmatchedCompanies = Array.isArray(seedData.unmatchedCompanies) && seedData.unmatchedCompanies.length
+        ? seedData.unmatchedCompanies
+        : Array.isArray(state.jobFairUnmatchedCompanies)
+            ? state.jobFairUnmatchedCompanies
+            : [];
     const modal = ensureJobFairModal();
     _bindModalEvents(modal);
     _loadExistingParticipants(modal, eventId, () => {
         _configureModal(modal, eventLabel);
         modal.classList.remove('hidden');
         modal.classList.add('flex');
+        if (_importSeedCompanies.length > 0 || _importUnmatchedCompanies.length > 0) {
+            _seedImportedCompanies(modal, _importSeedCompanies, _importUnmatchedCompanies);
+        } else {
+            _renderImportedSeedPanel(modal, [], []);
+        }
     });
 }
 
@@ -105,6 +152,8 @@ function _resetState(mode, eventId = null) {
     _eventId = eventId;
     _eventDate = null;
     _addedCompanies = [];
+    _importSeedCompanies = [];
+    _importUnmatchedCompanies = [];
 }
 
 function _configureModal(modal, eventLabel = '') {
@@ -127,10 +176,24 @@ function _configureModal(modal, eventLabel = '') {
     if (eventSection) {
         eventSection.classList.toggle('hidden', isParticipantsOnly);
     }
+    
+    const wrapper = modal.querySelector('#jobFairModalWrapper');
+    if (wrapper) {
+        wrapper.classList.toggle('max-w-5xl', !isParticipantsOnly);
+        wrapper.classList.toggle('max-w-lg', isParticipantsOnly);
+    }
+    
+    const body = modal.querySelector('#jfModalBody');
+    if (body) {
+        body.classList.toggle('md:flex-row', !isParticipantsOnly);
+        body.classList.toggle('flex-col', isParticipantsOnly);
+    }
+    
     const participantsSection = modal.querySelector('#jfParticipantsSection');
     if (participantsSection) {
-        participantsSection.classList.toggle('border-t', !isParticipantsOnly);
-        participantsSection.classList.toggle('pt-5', !isParticipantsOnly);
+        participantsSection.classList.toggle('md:border-l', !isParticipantsOnly);
+        participantsSection.classList.toggle('md:pl-8', !isParticipantsOnly);
+        participantsSection.classList.toggle('border-gray-100', !isParticipantsOnly);
     }
     if (saveBtn) {
         saveBtn.innerHTML = isParticipantsOnly
@@ -152,6 +215,169 @@ function _configureModal(modal, eventLabel = '') {
     if (searchEl) searchEl.value = '';
     if (resultsEl) resultsEl.classList.add('hidden');
     _renderAddedList(modal);
+    _renderImportedSeedPanel(modal, _importSeedCompanies, _importUnmatchedCompanies);
+}
+
+function normalizeCompanyName(name) {
+    return String(name ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+async function _seedImportedCompanies(modal, importedCompanies, unmatchedCompanies) {
+    const uniqueNames = Array.from(new Set(
+        [...importedCompanies, ...unmatchedCompanies].map(name => String(name ?? '').trim()).filter(Boolean)
+    ));
+
+    const resolved = [];
+    let unresolved = [];
+
+    if (uniqueNames.length > 0) {
+        try {
+            const res = await fetch('../../backend/import/fuzzy_match_companies.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ companies: uniqueNames })
+            });
+            const data = await res.json();
+
+            if (data.success && Array.isArray(data.results)) {
+                for (const item of data.results) {
+                    if (item.exact_match) {
+                        const { company_id, company_name } = item.exact_match;
+                        if (!_addedCompanies.find(c => String(c.company_id) === String(company_id))) {
+                            _addedCompanies.push({ company_id, company_name });
+                        }
+                        resolved.push({ company_id, company_name, source_name: item.original });
+                    } else {
+                        unresolved.push(item);
+                    }
+                }
+            } else {
+                unresolved = uniqueNames.map(name => ({ original: name, exact_match: null, fuzzy_match: null }));
+            }
+        } catch {
+            unresolved = uniqueNames.map(name => ({ original: name, exact_match: null, fuzzy_match: null }));
+        }
+    }
+
+    _importSeedCompanies = resolved.map(item => item.company_name);
+    _importUnmatchedCompanies = unresolved;
+    _renderAddedList(modal);
+    _renderImportedSeedPanel(modal, _importSeedCompanies, _importUnmatchedCompanies);
+}
+
+function _renderImportedSeedPanel(modal, seedCompanies = [], unmatchedCompanies = []) {
+    const panel = modal.querySelector('#jfImportSeedPanel');
+    const seedList = modal.querySelector('#jfImportSeedList');
+    const unmatchedWrap = modal.querySelector('#jfImportUnmatchedWrap');
+    const unmatchedList = modal.querySelector('#jfImportUnmatchedList');
+
+    if (!panel || !seedList || !unmatchedWrap || !unmatchedList) return;
+
+    const hasSeeds = Array.isArray(seedCompanies) && seedCompanies.length > 0;
+    const hasUnmatched = Array.isArray(unmatchedCompanies) && unmatchedCompanies.length > 0;
+
+    panel.classList.toggle('hidden', !hasSeeds && !hasUnmatched);
+
+    seedList.innerHTML = hasSeeds
+        ? seedCompanies.map(name => `
+            <div class="flex items-center justify-between gap-3 rounded-lg border border-blue-100 bg-white px-3 py-2">
+                <div class="flex items-center gap-2 min-w-0">
+                    <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-[11px] font-bold text-blue-700">✓</span>
+                    <span class="text-sm font-medium text-gray-800 truncate">${esc(name)}</span>
+                </div>
+            </div>`).join('')
+        : '<p class="text-sm text-blue-700/80 italic">No imported companies were auto-detected.</p>';
+
+    unmatchedWrap.classList.toggle('hidden', !hasUnmatched);
+    unmatchedList.innerHTML = hasUnmatched
+        ? unmatchedCompanies.map(item => {
+            const originalName = typeof item === 'string' ? item : item.original;
+            const suggestion = (typeof item === 'object' && item.fuzzy_match) ? item.fuzzy_match : null;
+
+            if (suggestion) {
+                return `
+                <div class="jf-import-unmatched-card flex items-center justify-between gap-3 w-full bg-amber-50/50 border border-amber-200 rounded-lg p-2.5">
+                    <div class="flex flex-col min-w-0">
+                        <span class="text-xs text-amber-800/70 truncate line-through decoration-amber-500/40">${esc(originalName)}</span>
+                        <span class="text-sm font-semibold text-amber-900 truncate">Did you mean <span class="text-blue-700">${esc(suggestion.company_name)}</span>?</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <button type="button" class="jf-accept-suggestion px-2.5 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 text-xs font-bold rounded-md transition-colors" data-id="${esc(suggestion.company_id)}" data-name="${esc(suggestion.company_name)}" data-original="${esc(originalName)}">
+                            Accept
+                        </button>
+                        <button type="button" class="jf-search-unmatched p-1.5 hover:bg-amber-100 text-amber-600 rounded-md transition-colors" data-name="${esc(originalName)}" title="Search manually">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </button>
+                        <button type="button" class="jf-dismiss-unmatched p-1.5 hover:bg-red-100 text-red-500 rounded-md transition-colors" data-original="${esc(originalName)}" title="Dismiss">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        </button>
+                    </div>
+                </div>`;
+            } else {
+                return `
+                <div class="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 pl-3 pr-1 py-1">
+                    <button type="button" class="jf-search-unmatched flex items-center gap-1.5 text-xs font-semibold text-amber-800 hover:text-amber-900 transition-colors" data-name="${esc(originalName)}" title="Search this company">
+                        <span class="max-w-[120px] truncate">${esc(originalName)}</span>
+                        <span class="text-amber-600">Search</span>
+                    </button>
+                    <div class="w-px h-3.5 bg-amber-200 mx-0.5"></div>
+                    <button type="button" class="jf-dismiss-unmatched p-1 hover:bg-amber-200 text-amber-600 hover:text-amber-800 rounded-full transition-colors" data-original="${esc(originalName)}" title="Dismiss">
+                        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>`;
+            }
+        }).join('')
+        : '';
+
+    // Bind accept buttons
+    unmatchedList.querySelectorAll('.jf-accept-suggestion').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const original = btn.getAttribute('data-original');
+
+            if (!_addedCompanies.find(c => String(c.company_id) === String(id))) {
+                _addedCompanies.push({ company_id: id, company_name: name });
+            }
+
+            _importUnmatchedCompanies = _importUnmatchedCompanies.filter(item => {
+                const itemOriginal = typeof item === 'string' ? item : item.original;
+                return itemOriginal !== original;
+            });
+
+            if (!_importSeedCompanies.includes(name)) {
+                _importSeedCompanies.push(name);
+            }
+            
+            _companyNameMap[original] = name;
+
+            _renderAddedList(modal);
+            _renderImportedSeedPanel(modal, _importSeedCompanies, _importUnmatchedCompanies);
+        });
+    });
+
+    unmatchedList.querySelectorAll('.jf-search-unmatched').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const search = modal.querySelector('#jfCompanySearch');
+            if (!search) return;
+            const name = btn.getAttribute('data-name') || '';
+            _activeSearchOriginal = btn.getAttribute('data-original') || name;
+            search.value = name;
+            _searchCompanies(modal, name);
+            search.focus();
+        });
+    });
+
+    unmatchedList.querySelectorAll('.jf-dismiss-unmatched').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const original = btn.getAttribute('data-original');
+            _importUnmatchedCompanies = _importUnmatchedCompanies.filter(item => {
+                const itemOriginal = typeof item === 'string' ? item : item.original;
+                return itemOriginal !== original;
+            });
+            _renderImportedSeedPanel(modal, _importSeedCompanies, _importUnmatchedCompanies);
+        });
+    });
 }
 
 function _closeModal() {
@@ -234,6 +460,17 @@ async function _searchCompanies(modal, query) {
                     _addedCompanies.push({ company_id: id, company_name: name });
                     _renderAddedList(modal);
                 }
+                
+                if (_activeSearchOriginal) {
+                    _companyNameMap[_activeSearchOriginal] = name;
+                    _importUnmatchedCompanies = _importUnmatchedCompanies.filter(item => {
+                        const itemOriginal = typeof item === 'string' ? item : item.original;
+                        return itemOriginal !== _activeSearchOriginal;
+                    });
+                    _renderImportedSeedPanel(modal, _importSeedCompanies, _importUnmatchedCompanies);
+                    _activeSearchOriginal = null;
+                }
+
                 resultsEl.classList.add('hidden');
                 modal.querySelector('#jfCompanySearch').value = '';
             });
@@ -296,6 +533,11 @@ async function _handleSave(modal) {
         return;
     }
 
+    if (_importUnmatchedCompanies && _importUnmatchedCompanies.length > 0) {
+        showToast('Please resolve all "Not detected" companies before saving. You can search for them manually or accept suggestions.', 'warning');
+        return;
+    }
+
     const saveBtn = modal.querySelector('#jfSaveBtn');
 
     const payload = {
@@ -333,6 +575,7 @@ async function _handleSave(modal) {
                 eventId: _eventId,
                 eventDate: _eventDate,
                 participants: data.participants ?? _addedCompanies,
+                companyMapping: _companyNameMap
             });
         }, { label: 'Saving…' });
     } catch (err) {
@@ -375,11 +618,15 @@ export function setParticipantsWarning(eventId, eventLabel) {
     const link = warningEl.querySelector('#jfAddCompaniesLink');
     if (link) {
         link.onclick = () => {
-            openAddCompaniesModal(eventId, eventLabel, ({ participants }) => {
+            openAddCompaniesModal(eventId, eventLabel, ({ participants, companyMapping }) => {
                 if (participants && participants.length > 0) {
+                    if (companyMapping) state.jobFairCompanyMapping = companyMapping;
                     warningEl.classList.add('hidden');
                     document.dispatchEvent(new CustomEvent('jfParticipantsResolved', { detail: { eventId } }));
                 }
+            }, {
+                importedCompanies: Array.isArray(state.jobFairImportedCompanies) ? state.jobFairImportedCompanies : [],
+                unmatchedCompanies: Array.isArray(state.jobFairUnmatchedCompanies) ? state.jobFairUnmatchedCompanies : [],
             });
         };
     }
