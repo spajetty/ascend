@@ -198,7 +198,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             </svg>
                         </div>
                         <div>
-                            <p class="font-bold text-base leading-tight">
+                            <p class="font-bold text-base leading-tight" data-section-name>
                                 <?= htmlspecialchars($section['name']) ?>
                             </p>
                             <p class="text-xs text-white/70" data-section-total>
@@ -276,10 +276,14 @@ function dashboardGroupPrograms(programRows) {
     return bySection;
 }
 
-function dashboardRenderPrograms(sectionCard, programs, sectionTotal) {
+function dashboardRenderPrograms(sectionCard, programs, sectionTotal, sectionName) {
     const list = sectionCard.querySelector('[data-program-list]');
     const totalNode = sectionCard.querySelector('[data-section-total]');
+    const nameNode = sectionCard.querySelector('[data-section-name]');
     if (!list || !totalNode) return;
+    if (nameNode && sectionName) {
+        nameNode.textContent = sectionName;
+    }
 
     totalNode.textContent = `Total: ${dashboardNumberFormat.format(sectionTotal)}`;
 
@@ -324,7 +328,16 @@ async function loadDashboardDetails() {
             const sectionId = Number(card.dataset.sectionId ?? 0);
             const sectionPrograms = programGroups.get(sectionId) ?? [];
             const sectionTotal = sectionPrograms.reduce((sum, row) => sum + Number(row.total ?? 0), 0);
-            dashboardRenderPrograms(card, sectionPrograms, sectionTotal);
+            const sectionName =
+                sectionPrograms[0]?.section_name ??
+                `Section ${sectionId}`;
+
+            dashboardRenderPrograms(
+                card,
+                sectionPrograms,
+                sectionTotal,
+                sectionName
+            );
         });
     } catch (error) {
         console.error('[Dashboard] Failed to load live details:', error);
