@@ -98,32 +98,9 @@ if ($method === 'GET') {
             SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
             SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
 
-            -- Referred: SPES beneficiaries with a REFERRAL activity record
-            --           for this company in the same batch month/year
-            COALESCE((
-                SELECT COUNT(*)
-                FROM beneficiary_activity_history bah
-                INNER JOIN spes s2  ON s2.benef_id  = bah.benef_id
-                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
-                INNER JOIN beneficiaries b2   ON b2.benef_id  = bah.benef_id
-                WHERE bah.classification = 'REFERRAL'
-                  AND bah.company_id = se.company_id
-                  AND ib2.month = ib.month
-                  AND ib2.year  = ib.year
-                  AND b2.sex    = 'Male'
-            ), 0) AS ref_m,
-            COALESCE((
-                SELECT COUNT(*)
-                FROM beneficiary_activity_history bah
-                INNER JOIN spes s2  ON s2.benef_id  = bah.benef_id
-                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
-                INNER JOIN beneficiaries b2   ON b2.benef_id  = bah.benef_id
-                WHERE bah.classification = 'REFERRAL'
-                  AND bah.company_id = se.company_id
-                  AND ib2.month = ib.month
-                  AND ib2.year  = ib.year
-                  AND b2.sex    = 'Female'
-            ), 0) AS ref_f,
+            -- Referred: beneficiaries tagged classification = 'Referred' via bulk update
+            SUM(CASE WHEN LOWER(b.classification) = 'referred' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
+            SUM(CASE WHEN LOWER(b.classification) = 'referred' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
 
             -- Placed: has a spes_employment record for this company (contract exists)
             SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS placed_m,
@@ -145,21 +122,9 @@ if ($method === 'GET') {
                   AND jv.year  = ib.year
             ), 0) AS vac_f,
 
-            -- SPES Baby: placed beneficiaries who have appeared in a PRIOR spes batch
-            SUM(CASE WHEN b.sex = 'Male'   AND EXISTS (
-                SELECT 1 FROM spes s2
-                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
-                WHERE s2.benef_id = s.benef_id
-                  AND s2.spes_id  <> s.spes_id
-                  AND (ib2.year < ib.year OR (ib2.year = ib.year AND ib2.month < ib.month))
-            ) THEN 1 ELSE 0 END) AS spes_baby_m,
-            SUM(CASE WHEN b.sex = 'Female' AND EXISTS (
-                SELECT 1 FROM spes s2
-                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
-                WHERE s2.benef_id = s.benef_id
-                  AND s2.spes_id  <> s.spes_id
-                  AND (ib2.year < ib.year OR (ib2.year = ib.year AND ib2.month < ib.month))
-            ) THEN 1 ELSE 0 END) AS spes_baby_f,
+            -- SPES Baby: beneficiaries with spes_status = 'SPES Baby' (independent of classification/referred)
+            SUM(CASE WHEN LOWER(b.spes_status) = 'spes baby' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS spes_baby_m,
+            SUM(CASE WHEN LOWER(b.spes_status) = 'spes baby' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS spes_baby_f,
 
             -- 4Ps: among placed beneficiaries
             SUM(CASE WHEN b.is_4ps = 1 AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS fourps_m,
