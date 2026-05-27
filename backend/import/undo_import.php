@@ -67,12 +67,26 @@ function tableExists(mysqli $conn, string $table): bool {
     return (bool)$stmt->get_result()->fetch_assoc();
 }
 
+function pickExistingTable(mysqli $conn, array $candidates): ?string {
+    foreach ($candidates as $table) {
+        if (tableExists($conn, $table)) {
+            return $table;
+        }
+    }
+    return null;
+}
+
 $conn->begin_transaction();
 
 try {
-    $deletedFirstJobSeek = deleteByIds($conn, 'firstJobSeek', 'jobseek_id', (array)($payload['first_job_seek_ids'] ?? []));
-    $deletedJobFair = deleteByIds($conn, 'jobFair', 'jobfair_id', (array)($payload['jobfair_ids'] ?? []));
-    $deletedActivityHistory = deleteByIds($conn, 'beneficiary_activity_history', 'history_id', (array)($payload['activity_history_ids'] ?? []));
+    $firstJobSeekTable = pickExistingTable($conn, ['firstjobseek']);
+    $deletedFirstJobSeek = $firstJobSeekTable ? deleteByIds($conn, $firstJobSeekTable, 'jobseek_id', (array)($payload['first_job_seek_ids'] ?? [])) : 0;
+
+    $jobFairTable = pickExistingTable($conn, ['jobfair']);
+    $deletedJobFair = $jobFairTable ? deleteByIds($conn, $jobFairTable, 'jobfair_id', (array)($payload['jobfair_ids'] ?? [])) : 0;
+
+    $activityHistoryTable = pickExistingTable($conn, ['emphistory', 'beneficiary_activity_history']);
+    $deletedActivityHistory = $activityHistoryTable ? deleteByIds($conn, $activityHistoryTable, 'history_id', (array)($payload['activity_history_ids'] ?? [])) : 0;
     $deletedSPESEmployment = deleteByIds($conn, 'spes_employment', 'employment_id', (array)($payload['spes_employment_ids'] ?? []));
 
     $deletedSPES = deleteByIds($conn, 'spes', 'spes_id', (array)($payload['spes_ids'] ?? []));
@@ -107,12 +121,7 @@ try {
     if (!empty($wiirpIds)) {
         $wiirpTable = trim((string)($payload['wiirp_table'] ?? ''));
         if ($wiirpTable === '' || !tableExists($conn, $wiirpTable)) {
-            foreach (['wiirp'] as $candidateTable) {
-                if (tableExists($conn, $candidateTable)) {
-                    $wiirpTable = $candidateTable;
-                    break;
-                }
-            }
+            $wiirpTable = pickExistingTable($conn, ['wiirp']);
         }
 
         if ($wiirpTable !== '') {
@@ -147,12 +156,7 @@ try {
     if (!empty($whipIds)) {
         $whipTable = trim((string)($payload['whip_table'] ?? ''));
         if ($whipTable === '' || !tableExists($conn, $whipTable)) {
-            foreach (['whip', 'whip_beneficiaries', 'whipBeneficiaries'] as $candidateTable) {
-                if (tableExists($conn, $candidateTable)) {
-                    $whipTable = $candidateTable;
-                    break;
-                }
-            }
+            $whipTable = pickExistingTable($conn, ['whip', 'whip_beneficiaries']);
         }
 
         if ($whipTable !== '') {
@@ -168,12 +172,7 @@ try {
     if (!empty($projectIds)) {
         $projectTable = trim((string)($payload['project_table'] ?? ''));
         if ($projectTable === '' || !tableExists($conn, $projectTable)) {
-            foreach (['projects', 'whip_projects', 'whipProject', 'whip_project', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects'] as $candidateTable) {
-                if (tableExists($conn, $candidateTable)) {
-                    $projectTable = $candidateTable;
-                    break;
-                }
-            }
+            $projectTable = pickExistingTable($conn, ['projects', 'whip_projects', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects']);
         }
 
         if ($projectTable !== '') {
@@ -185,9 +184,12 @@ try {
     }
 
     $deletedJobMatch = 0;
-    $jobMatchIdCol = findExistingColumn($conn, 'jobMatch', ['jobmatch_id']);
-    if ($jobMatchIdCol !== null) {
-        $deletedJobMatch = deleteByIds($conn, 'jobMatch', $jobMatchIdCol, (array)($payload['jobmatch_ids'] ?? []));
+    $jobMatchTable = pickExistingTable($conn, ['jobmatch']);
+    if ($jobMatchTable !== null) {
+        $jobMatchIdCol = findExistingColumn($conn, $jobMatchTable, ['jobmatch_id']);
+        if ($jobMatchIdCol !== null) {
+            $deletedJobMatch = deleteByIds($conn, $jobMatchTable, $jobMatchIdCol, (array)($payload['jobmatch_ids'] ?? []));
+        }
     }
 
     // Fallback: if id-column-based delete did not run, remove by inserted beneficiary ids.
@@ -196,7 +198,8 @@ try {
         if (!empty($benefIds)) {
             $ph = implode(',', array_fill(0, count($benefIds), '?'));
             $types = str_repeat('i', count($benefIds));
-            $sql = "DELETE FROM jobMatch WHERE benef_id IN ({$ph})";
+            $jobMatchTable = $jobMatchTable ?? 'jobmatch';
+            $sql = "DELETE FROM {$jobMatchTable} WHERE benef_id IN ({$ph})";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param($types, ...$benefIds);
             $stmt->execute();
@@ -214,7 +217,7 @@ try {
     $employerIds = array_values(array_unique(array_filter(array_map('intval', (array)($payload['employer_ids'] ?? [])), static fn($id) => $id > 0)));
     foreach ($employerIds as $employerId) {
         $stillUsed = false;
-        foreach (['jobMatch', 'jobFair', 'firstJobSeek', 'spes_employment', 'projects', 'whip_projects', 'whipProject', 'whip_project', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects'] as $refTable) {
+        foreach (['jobmatch', 'jobfair', 'firstjobseek', 'spes_employment', 'projects', 'whip_projects', 'workers_hiring_projects', 'workers_infra_projects', 'infrastructure_projects'] as $refTable) {
             $companyIdCol = findExistingColumn($conn, $refTable, ['company_id']);
             if ($companyIdCol === null) {
                 continue;
