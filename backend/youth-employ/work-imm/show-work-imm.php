@@ -106,12 +106,13 @@ if ($method === 'GET') {
             SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS inq_m,
             SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS inq_f,
 
-            -- Referred / Interviewed: no data source yet — will be wired in a future update
-            0 AS ref_m,
-            0 AS ref_f,
+            -- Referred: tagged via bulk update classification = 'Referred'
+            SUM(CASE WHEN LOWER(b.classification) = 'referred'    AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
+            SUM(CASE WHEN LOWER(b.classification) = 'referred'    AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
 
-            0 AS int_m,
-            0 AS int_f,
+            -- Interviewed: tagged via bulk update classification = 'Interviewed'
+            SUM(CASE WHEN LOWER(b.classification) = 'interviewed' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS int_m,
+            SUM(CASE WHEN LOWER(b.classification) = 'interviewed' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS int_f,
 
             -- PESO-Accepted = imported with type 'peso-assigned'
             SUM(CASE WHEN w.type = 'peso-assigned'  AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS peso_m,
@@ -121,9 +122,9 @@ if ($method === 'GET') {
             SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
             SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f,
 
-            -- Not Proceeded: no data source yet — will be wired in a future update
-            0 AS notpr_m,
-            0 AS notpr_f
+            -- Not Proceeded: tagged via bulk update classification = 'Not Proceeded'
+            SUM(CASE WHEN LOWER(b.classification) = 'not proceeded' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS notpr_m,
+            SUM(CASE WHEN LOWER(b.classification) = 'not proceeded' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS notpr_f
 
         FROM import_batches ib
 
