@@ -98,26 +98,32 @@ if ($method === 'GET') {
                 ELSE ''
             END AS month_name,
 
-            SUM(CASE WHEN b.classification = 'Participants'       AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS part_m,
-            SUM(CASE WHEN b.classification = 'Participants'       AND b.sex = 'Female' THEN 1 ELSE 0 END) AS part_f,
+            -- Participants = everyone in the batch (grand total)
+            SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS part_m,
+            SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS part_f,
 
-            SUM(CASE WHEN b.classification = 'Inquired'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS inq_m,
-            SUM(CASE WHEN b.classification = 'Inquired'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS inq_f,
+            -- Inquired = imported with type 'inquiry'
+            SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS inq_m,
+            SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS inq_f,
 
-            SUM(CASE WHEN b.classification = 'Referred'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
-            SUM(CASE WHEN b.classification = 'Referred'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
+            -- Referred / Interviewed: no data source yet — will be wired in a future update
+            0 AS ref_m,
+            0 AS ref_f,
 
-            SUM(CASE WHEN b.classification = 'Interviewed'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS int_m,
-            SUM(CASE WHEN b.classification = 'Interviewed'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS int_f,
+            0 AS int_m,
+            0 AS int_f,
 
-            SUM(CASE WHEN b.classification = 'PESO-Accepted'      AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS peso_m,
-            SUM(CASE WHEN b.classification = 'PESO-Accepted'      AND b.sex = 'Female' THEN 1 ELSE 0 END) AS peso_f,
+            -- PESO-Accepted = imported with type 'peso-assigned'
+            SUM(CASE WHEN w.type = 'peso-assigned'  AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS peso_m,
+            SUM(CASE WHEN w.type = 'peso-assigned'  AND b.sex = 'Female' THEN 1 ELSE 0 END) AS peso_f,
 
-            SUM(CASE WHEN b.classification = 'Privately-Accepted' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
-            SUM(CASE WHEN b.classification = 'Privately-Accepted' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f,
+            -- Privately-Accepted = imported with type 'private'
+            SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
+            SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f,
 
-            SUM(CASE WHEN b.classification = 'Not Proceeded'      AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS notpr_m,
-            SUM(CASE WHEN b.classification = 'Not Proceeded'      AND b.sex = 'Female' THEN 1 ELSE 0 END) AS notpr_f
+            -- Not Proceeded: no data source yet — will be wired in a future update
+            0 AS notpr_m,
+            0 AS notpr_f
 
         FROM import_batches ib
 
