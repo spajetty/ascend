@@ -13,11 +13,7 @@ function validateBeneficiaries(mysqli $conn, array $rows, string $program): arra
         $previewRow['_sys_skip'] = false;
 
         if (isWhipBeneficiariesProgram($program)) {
-            foreach ($previewRow as $hk => $hv) {
-                if (strcasecmp((string)$hk, 'Classification') === 0) {
-                    unset($previewRow[$hk]);
-                }
-            }
+            $previewRow['Classification'] = 'Placed';
             
             $companyName = trim((string)getRowVal($row, ['Company']));
             $projectName = trim((string)getRowVal($row, ['Name of Project']));

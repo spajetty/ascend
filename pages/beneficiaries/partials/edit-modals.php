@@ -56,6 +56,72 @@
     </div>
 </div>
 
+<!-- ── Edit WIIRP Assignment Modal ── -->
+<div id="modalEditWiirpAssignment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:640px;">
+        <div class="modal-header">
+            <h3>Edit WIIRP Assignment</h3>
+            <button class="modal-close" onclick="closeEditWiirpAssignmentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="editWiirpAssignmentId" value="">
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Start Date</label>
+                    <input type="date" id="editWiirpAssignmentStart">
+                </div>
+                <div class="modal-field">
+                    <label>End Date</label>
+                    <input type="date" id="editWiirpAssignmentEnd">
+                </div>
+                <div class="modal-field">
+                    <label>Required Hours</label>
+                    <input type="number" id="editWiirpAssignmentRequiredHours" min="0">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label>Office Assignment</label>
+                <input type="text" id="editWiirpAssignmentOffice" placeholder="Office assignment or role">
+            </div>
+
+            <div class="modal-field">
+                <label>Endorsement 1</label>
+                <input type="text" id="editWiirpAssignmentEndorsement1" placeholder="Endorsement 1">
+            </div>
+
+            <div class="modal-field">
+                <label>Endorsement 2</label>
+                <input type="text" id="editWiirpAssignmentEndorsement2" placeholder="Endorsement 2">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditWiirpAssignmentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditWiirpAssignment()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete WIIRP Assignment Modal ── -->
+<div id="modalDeleteWiirpAssignment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Assignment</h3>
+            <button class="modal-close" onclick="closeDeleteWiirpAssignmentModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deleteWiirpAssignmentId" value="">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this assignment?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteWiirpAssignmentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteWiirpAssignment()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Edit Contact Information Modal ── -->
 <div id="modalEditContact" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box">
@@ -166,6 +232,77 @@
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeEditSpesModal()">Cancel</button>
             <button class="btn-confirm" onclick="submitEditSpes()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit SPES OJT Employment Modal ── -->
+<div id="modalEditSpesEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:680px;">
+        <div class="modal-header">
+            <h3>Edit SPES OJT Employment</h3>
+            <button class="modal-close" onclick="closeEditSpesEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="editSpesEmploymentId" value="">
+
+            <div class="modal-field">
+                <label>Company</label>
+                <select id="editSpesEmploymentCompany" style="width:100%;">
+                    <option value="">Loading companies…</option>
+                </select>
+            </div>
+
+            <div class="modal-field">
+                <label>Store Assignment</label>
+                <input type="text" id="editSpesEmploymentStore" placeholder="e.g. Sales Floor, Backroom">
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Start of Contract</label>
+                    <input type="date" id="editSpesEmploymentStart">
+                </div>
+                <div class="modal-field">
+                    <label>End of Contract</label>
+                    <input type="date" id="editSpesEmploymentEnd">
+                </div>
+                <div class="modal-field">
+                    <label>Days</label>
+                    <input type="number" id="editSpesEmploymentDays" min="0">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label>Category</label>
+                <select id="editSpesEmploymentCategory">
+                    <option value="">— Select —</option>
+                    <option value="lgu">LGU</option>
+                    <option value="private">Private</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditSpesEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditSpesEmployment()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete SPES OJT Employment Modal ── -->
+<div id="modalDeleteSpesEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:520px;">
+        <div class="modal-header">
+            <h3>Delete OJT Employment</h3>
+            <button class="modal-close" onclick="closeDeleteSpesEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="deleteSpesEmploymentId" value="">
+            <p>Are you sure you want to delete this OJT employment record? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteSpesEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteSpesEmployment()" style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
@@ -365,7 +502,7 @@
     </div>
 </div>
 
-<!-- ── Edit Issuance Status Modal (First Time Jobseeker) ── -->
+<!-- ── Add/Edit Issuance Status Modal (First Time Jobseeker) ── -->
 <div id="modalEditIssuance" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width:520px;">
         <div class="modal-header">
@@ -594,3 +731,168 @@
         </div>
     </div>
 </div>
+
+<!-- ── Edit Job Fair Modal ── -->
+<div id="modalEditJobFair" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Edit Job Fair Record</h3>
+            <button class="modal-close" onclick="closeEditJobFairModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editJobFairId" value="">
+            <div class="modal-field">
+                <label>Job Fair Event / Venue</label>
+                <select id="editJobFairEvent" onchange="loadJobFairCompanies(this.value)" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">Loading events…</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Company</label>
+                <select id="editJobFairCompany" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">— Select event first —</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Position</label>
+                <input type="text" id="editJobFairPosition" placeholder="Position applied for">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditJobFairModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditJobFair()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add Job Fair Modal ── -->
+<div id="modalAddJobFair" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Add Job Fair Record</h3>
+            <button class="modal-close" onclick="closeAddJobFairModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-field">
+                <label>Job Fair Event / Venue</label>
+                <select id="addJobFairEvent" onchange="loadJobFairCompanies(this.value, '', 'addJobFairCompany')" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">Loading events…</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Company</label>
+                <select id="addJobFairCompany" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">— Select event first —</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Position</label>
+                <input type="text" id="addJobFairPosition" placeholder="Position applied for">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeAddJobFairModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitAddJobFair()">Add Record</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete Job Fair Record Modal ── -->
+<div id="modalDeleteJobFair" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Job Fair Record</h3>
+            <button class="modal-close" onclick="closeDeleteJobFairModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deleteJobFairId" value="">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this job fair record?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteJobFairModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteJobFairRecord()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Add WHIP Assignment Modal ── -->
+<div id="modalAddWhip" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Add Project Assignment</h3>
+            <button class="modal-close" onclick="closeAddWhipModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-field">
+                <label>Project</label>
+                <select id="addWhipProject" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">Loading projects…</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Position</label>
+                <input type="text" id="addWhipPosition" placeholder="Position / Role">
+            </div>
+            <div class="modal-field">
+                <label>Date Hired</label>
+                <input type="date" id="addWhipDateHired">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeAddWhipModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitAddWhip()">Add Assignment</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit WHIP Assignment Modal ── -->
+<div id="modalEditWhip" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Edit Project Assignment</h3>
+            <button class="modal-close" onclick="closeEditWhipModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editWhipId" value="">
+            <div class="modal-field">
+                <label>Project</label>
+                <select id="editWhipProject" style="max-width:100%; text-overflow:ellipsis;">
+                    <option value="">Loading projects…</option>
+                </select>
+            </div>
+            <div class="modal-field">
+                <label>Position</label>
+                <input type="text" id="editWhipPosition" placeholder="Position / Role">
+            </div>
+            <div class="modal-field">
+                <label>Date Hired</label>
+                <input type="date" id="editWhipDateHired">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditWhipModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditWhip()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete WHIP Assignment Modal ── -->
+<div id="modalDeleteWhip" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Project Assignment</h3>
+            <button class="modal-close" onclick="closeDeleteWhipModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deleteWhipId" value="">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this project assignment?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteWhipModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteWhipRecord()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+

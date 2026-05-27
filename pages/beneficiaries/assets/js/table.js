@@ -98,12 +98,19 @@ async function initBeneficiaryFilters() {
 
 /** Map a status string to its badge CSS class. */
 function badgeClass(status) {
+  const normalized = String(status || '').trim().toLowerCase();
   const map = {
-    Hired: 'badge-hired',
-    Registered: 'badge-registered',
-    Referred: 'badge-referred',
+    hired: 'badge-hired',
+    placed: 'badge-hired',
+    registered: 'badge-registered',
+    referred: 'badge-referred',
   };
-  return map[status] || 'badge-registered';
+  return map[normalized] || 'badge-registered';
+}
+
+function upperText(value) {
+  const text = value == null ? '—' : String(value).trim();
+  return text ? text.toUpperCase() : '—';
 }
 
 /** Render the current page of rows into #tableBody. */
@@ -140,13 +147,13 @@ function renderTable() {
             <span class="checkmark"></span>
           </label>
         </td>
-        <td class="td-name">${b.name}</td>
-        <td>${b.gender}</td>
-        <td>${b.section}</td>
-        <td>${b.program}</td>
+        <td class="td-name">${upperText(b.name)}</td>
+        <td>${upperText(b.gender)}</td>
+        <td>${upperText(b.section)}</td>
+        <td>${upperText(b.program)}</td>
         <td><span class="badge ${badgeClass(b.status)}">${b.status}</span></td>
         <td class="td-secondary">${b.email}</td>
-        <td class="td-secondary">${b.contact}</td>
+        <td class="td-secondary">${upperText(b.contact)}</td>
       </tr>`;
     }).join('');
   }

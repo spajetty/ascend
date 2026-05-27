@@ -17,8 +17,7 @@
                         <option value="">Select a section…</option>
                         <option value="employment_facilitation">Employment Facilitation</option>
                         <option value="employers_engagement">Employers Engagement</option>
-                        <option value="youth_employability">Youth Employability</option>
-                        <option value="career_development">Career Development</option>
+                        <!-- Youth Employability removed from resume imports per request -->
                     </select>
                     <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
                 </div>
@@ -86,7 +85,7 @@
 
     <!-- Resume Data Preview (hidden until files selected) -->
     <div id="resumePreview" class="hidden bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-        <div class="flex items-start justify-between mb-4">
+        <div class="flex items-start justify-between mb-6">
             <div>
                 <h2 class="text-base font-bold text-gray-800">Extracted Data Preview</h2>
                 <p id="resumePreviewMeta" class="text-xs text-gray-400 mt-0.5"></p>
@@ -96,28 +95,15 @@
                     class="px-4 py-2 text-sm font-medium text-gray-500 hover:text-gray-700 transition-colors">
                     Cancel
                 </button>
-                <button id="confirmResumeImport"
-                    class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
+                <button id="confirmResumeImport" disabled
+                    class="px-5 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl shadow-sm transition-colors">
                     Import
                 </button>
             </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-gray-100">
-            <table class="w-full text-sm">
-                <thead>
-                    <tr class="border-b border-gray-100">
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Name</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Sex</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Section</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Program</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                        <th class="text-left px-4 py-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Contact</th>
-                    </tr>
-                </thead>
-                <tbody id="resumePreviewBody" class="divide-y divide-gray-50"></tbody>
-            </table>
-        </div>
+        <!-- Cards injected here by JS -->
+        <div id="resumePreviewBody" class="space-y-5"></div>
     </div>
 
 </div>

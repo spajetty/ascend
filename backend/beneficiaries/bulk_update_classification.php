@@ -2,6 +2,7 @@
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../import/helpers/formatting_utils.php';
 
 // ── Parse request ─────────────────────────────────────────────────────────────
 $data = json_decode(file_get_contents('php://input'), true);
@@ -28,7 +29,9 @@ if ($status === '') {
     exit;
 }
 
-// ── IN (?,?,…) placeholder ────────────────────────────────────────────────────
+// ── Normalise status to title case (e.g. "Not Qualified" -> "Not Qualified")
+$status = titleCase($status);
+
 $placeholders = implode(',', array_fill(0, count($ids), '?'));
 $types        = 's' . str_repeat('i', count($ids));
 $params       = array_merge([$status], $ids);

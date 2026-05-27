@@ -81,7 +81,7 @@
                 <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Notes</label>
                 <p id="pNotes"
                     style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0;background:var(--bg);padding:10px;border-radius:7px;">
-                    Still not hired after multiple visits.
+                    No case notes yet.
                 </p>
             </div>
         </div>
@@ -121,23 +121,35 @@
                 </svg>
                 Job Fair Events
             </h4>
+            <button class="edit-btn-icon" onclick="openAddJobFairModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Job Fair Event">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Event Type</th>
                     <th>Venue</th>
                     <th>Date</th>
+                    <th>Company</th>
                     <th>Position</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pJobFairEvents">
                 <tr>
-                    <td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
+                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- First Time Job Seeker issuance status (hidden by default) -->
@@ -157,7 +169,8 @@
                 </svg>
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Occupational Permit</th>
@@ -170,7 +183,8 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- WHIP project assignment (hidden by default) -->
@@ -184,8 +198,17 @@
                 </svg>
                 Project Assignment
             </h4>
+            <button class="edit-btn-icon" onclick="openAddWhipModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Project Assignment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Position</th>
@@ -194,15 +217,17 @@
                     <th>Project</th>
                     <th>Duration</th>
                     <th>Budget</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody id="pWhipProjects">
                 <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
+                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- WIIRP info (hidden by default) -->
@@ -310,8 +335,18 @@
                 </svg>
                 Assignment Details
             </h4>
+            
+            <button class="edit-btn-icon" onclick="openAddWiirpAssignmentModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Wiirp Assignment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Start Date</th>
@@ -328,7 +363,8 @@
                         records.</td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- SPES student info (hidden by default) -->
@@ -377,8 +413,17 @@
                 </svg>
                 OJT Employment
             </h4>
+            <button class="edit-btn-icon" onclick="openAddSpesEmploymentModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add OJT Employment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Company</th>
@@ -387,14 +432,16 @@
                     <th>End</th>
                     <th>Days</th>
                     <th>Category</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody id="pSpesEmployment">
                 <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
+                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- GIP (Government Internship Program) (hidden by default) -->
@@ -500,7 +547,8 @@
                 Add
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Company</th>
@@ -511,6 +559,7 @@
                 </tr>
             </thead>
             <tbody id="pEmployment"></tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>

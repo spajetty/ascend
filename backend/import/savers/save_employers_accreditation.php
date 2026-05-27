@@ -7,6 +7,7 @@ function saveEmployersAccreditationRow(mysqli $conn, array $row, array $ctx, arr
     $city = s(rowValue($row, ['CITY/MUNICIPALITY/PROVINCE', 'City/Municipality/Province', 'City/Municipality', 'city'], '')) ?: null;
     $accStatus = strtolower(s(rowValue($row, ['ACCREDITATION', 'Accreditation', 'accreditation'], 'new')));
     $monthRaw = rowValue($row, ['MONTH', 'Month', 'month'], '');
+    $yearRaw = rowValue($row, ['YEAR', 'Year', 'year'], '');
 
     if ($companyName === '') {
         return 'skipped';
@@ -22,7 +23,7 @@ function saveEmployersAccreditationRow(mysqli $conn, array $row, array $ctx, arr
         return 'skipped';
     }
 
-    $yearInt = (int)$importYearRaw;
+    $yearInt = (int)($yearRaw !== '' ? $yearRaw : $importYearRaw);
     if ($yearInt < 1900 || $yearInt > 3000) {
         return 'skipped';
     }
@@ -36,6 +37,12 @@ function saveEmployersAccreditationRow(mysqli $conn, array $row, array $ctx, arr
         $setClauses = [];
         $bindTypes = '';
         $bindValues = [];
+
+        if ($companyName !== '') {
+            $setClauses[] = 'company_name = ?';
+            $bindTypes .= 's';
+            $bindValues[] = $companyName;
+        }
 
         if ($estType !== null) {
             $setClauses[] = 'est_type = ?';

@@ -4,6 +4,16 @@ function s($val): string {
     return trim((string)($val ?? ''));
 }
 
+/**
+ * Convert text to title case: first char of every word uppercased.
+ * e.g. "not qualified" → "Not Qualified", "placed/hots" → "Placed/Hots"
+ */
+function titleCase(string $val): string {
+    $v = trim((string)$val);
+    if ($v === '') return '';
+    return mb_convert_case($v, MB_CASE_TITLE, 'UTF-8');
+}
+
 function rowValue(array $row, array $keys, $default = '') {
     foreach ($row as $k => $v) {
         foreach ($keys as $expected) {

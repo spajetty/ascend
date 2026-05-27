@@ -53,8 +53,15 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $contact = s(rowValue($row, ['Contact', 'contact'], ''));
         $email = s(rowValue($row, ['Email', 'email'], '')) ?: null;
         $classification = isWhipBeneficiariesProgram((string)($ctx['program'] ?? ''))
-            ? null
+            ? 'Placed'
             : (s(rowValue($row, ['Classification', 'classification'], '')) ?: null);
+        if ($classification !== null && $classification !== '') {
+            $classification = titleCase($classification);
+        }
+        $spesStatus = s(rowValue($row, ['Status', 'status', 'spes_status'], '')) ?: null;
+        if ($spesStatus !== null && $spesStatus !== '') {
+            $spesStatus = titleCase($spesStatus);
+        }
         $houseNo = s(rowValue($row, ['House No.', 'house_no'], '')) ?: null;
         $barangay = s(rowValue($row, ['Barangay', 'barangay'], '')) ?: null;
         $district = s(rowValue($row, ['District', 'district'], '')) ?: null;
@@ -65,13 +72,13 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
             INSERT INTO beneficiaries
                 (first_name, middle_name, last_name, suffix,
                  sex, civil_status, dob, contact, email, program_id, classification,
-                 house_no, barangay, district, city)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                 house_no, barangay, district, city, spes_status)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ');
-        $insBenef->bind_param('sssssssssisssss',
+        $insBenef->bind_param('sssssssssissssss',
             $firstName, $middleName, $lastName, $suffix,
             $sex, $civil, $dob, $contact, $email, $programId, $classification,
-            $houseNo, $barangay, $district, $city
+            $houseNo, $barangay, $district, $city, $spesStatus
         );
         $insBenef->execute();
 

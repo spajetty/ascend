@@ -319,21 +319,7 @@ if (confirmImportBtn) {
                     const createdEmployers = Array.isArray(result.created_employers) ? result.created_employers : [];
                     const followupEmployerFlow = EMPLOYER_AUTO_CREATE_PROGRAMS.has(program) && createdEmployers.length > 0;
 
-                    if (followupEmployerFlow) {
-                        showEmployerAccreditationView({
-                            program,
-                            period: periodLabel,
-                            fileName: importedFileName,
-                            importMonth,
-                            importYear,
-                            batchId: result.batch_id ?? null,
-                            createdEmployers,
-                        });
-                        showToast('Complete employer accreditation to continue.', 'warning');
-                        return;
-                    }
-
-                    showImportResultsView({
+                    const resultsPayload = {
                         processed:    rowsSnapshot.length,
                         added:        Number(result.saved ?? 0),
                         duplicates:   duplicateRows.length,
@@ -350,7 +336,19 @@ if (confirmImportBtn) {
                         createdEmployers,
                         duplicateRows,
                         errorRows,
-                    }, result.undo_token ?? null);
+                        importMonth,
+                        importYear,
+                        batchId: result.batch_id ?? null,
+                        undoToken: result.undo_token ?? null
+                    };
+
+                    if (followupEmployerFlow) {
+                        showEmployerAccreditationView(resultsPayload);
+                        showToast('Complete employer accreditation to continue.', 'warning');
+                        return;
+                    }
+
+                    showImportResultsView(resultsPayload, result.undo_token ?? null);
 
                     showToast(result.message ?? 'Import completed successfully.', 'success');
                 } else {

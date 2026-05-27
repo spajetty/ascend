@@ -6,7 +6,7 @@ function _withModalSaveLoading(label, run) {
   const btn = window.AscendLoading?.getOpenModalConfirmButton?.() ?? null;
   if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, true, { label });
   return Promise.resolve(run()).finally(() => {
-    if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
+      if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
   });
 }
 
@@ -35,18 +35,23 @@ function formatDateForInput(dateStr) {
   return `${year}-${month}-${day}`;
 }
 
+function upperText(value) {
+  const text = value == null ? '—' : String(value).trim();
+  return text ? text.toUpperCase() : '—';
+}
+
 function renderSpesStudentInfo(record) {
   const formatType = (val) => {
     if (val === 'student') return 'Student';
     if (val === 'osy') return 'Out-of-School Youth';
-    return String(val || '—');
+    return upperText(val);
   };
 
   window.currentSpesRecord = record || null;
 
   const setText = (id, value) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = value ?? '—';
+    if (el) el.textContent = upperText(value);
   };
 
   if (!record) {
@@ -69,6 +74,7 @@ async function openProfile(benefId) {
   if (!b) return;
 
   const safeText = (value) => (value && String(value).trim() ? String(value) : '—');
+  const upperSafeText = (value) => upperText(safeText(value));
 
   window.currentBeneficiaryId = b.benef_id;
   window.currentBeneficiaryName = b.name;
@@ -76,11 +82,15 @@ async function openProfile(benefId) {
 
   // ── Header ──
   document.getElementById('profAvatar').textContent    = b.avatar;
-  document.getElementById('profName').textContent      = b.name;
+  document.getElementById('profName').textContent      = upperText(b.name);
   document.getElementById('profAge').textContent       = calculateAge(b.dob);
-  document.getElementById('profProgram').textContent   = `${b.program} • ${b.section}`;
-  document.getElementById('profLastVisit').textContent = safeText(b.lastVisit);
-  document.getElementById('profVisit').textContent     = safeText(b.visit);
+  const programParts = [upperText(b.program), upperText(b.section)];
+  if ((b.program || '').trim() === 'SPES' && b.spes_status && String(b.spes_status).trim()) {
+    programParts.push(upperText(b.spes_status));
+  }
+  document.getElementById('profProgram').textContent   = programParts.join(' • ');
+  document.getElementById('profLastVisit').textContent = upperText(safeText(b.lastVisit));
+  document.getElementById('profVisit').textContent     = upperText(safeText(b.visit));
 
   // Show visit badge and dates only if there's at least one PESO visit record
   const visitBadgeContainer = document.getElementById('visitBadgeContainer');
@@ -105,6 +115,7 @@ async function openProfile(benefId) {
   const statusKey  = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1).toLowerCase();
   const statusMap = {
     Hired:      ['status-hired',      'Hired'],
+    Placed:     ['status-hired',      'Placed'],
     Referred:   ['status-referred',   'Referred'],
     Registered: ['status-registered', 'Registered'],
   };
@@ -114,16 +125,15 @@ async function openProfile(benefId) {
   sb.textContent = lbl;
 
   // ── Overview tab ──
-  document.getElementById('pFullName').textContent  = b.name;
-  document.getElementById('pGender').textContent    = b.gender;
-  document.getElementById('pDob').textContent       = b.dob;
-  document.getElementById('pCivil').textContent     = b.civil;
-  document.getElementById('pAddress').textContent   = b.address;
+  document.getElementById('pFullName').textContent  = upperText(b.name);
+  document.getElementById('pGender').textContent    = upperText(b.gender);
+  document.getElementById('pDob').textContent       = upperText(b.dob);
+  document.getElementById('pCivil').textContent     = upperText(b.civil);
+  document.getElementById('pAddress').textContent   = upperText(b.address);
   document.getElementById('pEmail').textContent     = b.emailAddr;
   document.getElementById('pEmail').href            = `mailto:${b.emailAddr}`;
-  document.getElementById('pPhone').textContent     = b.phone;
-  // Notes column removed from database; leave overview notes empty
-  document.getElementById('pNotes').textContent     = '';
+  document.getElementById('pPhone').textContent     = upperText(b.phone);
+  document.getElementById('pNotes').textContent     = (b.notes && String(b.notes).trim()) ? b.notes : 'No case notes yet.';
   // Education & Skills are shown for most programs. For Job Fair, Job Matching,
   // First Time Job Seeker, WHIP, SPES, and WIIRP,
   // hide the education card and show program-specific overview content instead.
@@ -156,26 +166,32 @@ async function openProfile(benefId) {
 
     const eventsEl = document.getElementById('pJobFairEvents');
     
-    if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+    if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_jobfair.php?benef_id=${encodeURIComponent(b.benef_id)}`)
       .then(r => r.json())
       .then(j => {
         if (!eventsEl) return;
         if (j && j.success && Array.isArray(j.records) && j.records.length) {
-          eventsEl.innerHTML = j.records.map(r => `
+          window.currentJobFairRecords = j.records;
+          eventsEl.innerHTML = j.records.map((r, idx) => `
             <tr>
-              <td>${r.job_fair_type || '—'}</td>
-              <td style="font-weight:500;">${r.venue || '—'}</td>
-              <td>${r.date_start ? (r.date_start + (r.date_end ? ` — ${r.date_end}` : '')) : '—'}</td>
-              <td style="color:var(--text-secondary);font-size:12.5px;">${r.position || '—'}</td>
+              <td>${upperText(r.job_fair_type)}</td>
+              <td style="font-weight:500;">${upperText(r.venue)}</td>
+              <td>${r.date_start ? (upperText(r.date_start) + (r.date_end ? ` — ${upperText(r.date_end)}` : '')) : '—'}</td>
+              <td style="font-weight:500;">${upperText(r.company_name)}</td>
+              <td style="color:var(--text-secondary);font-size:12.5px;">${upperText(r.position)}</td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                  <button onclick="openEditJobFairModal(${idx})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
+                  <button onclick="deleteJobFairRecord(${r.jobfair_id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
+              </td>
             </tr>
           `).join('');
         } else {
-          eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>`;
+          eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.</td></tr>`;
         }
       }).catch(err => {
-        if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="4" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+        if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
       });
   } else {
     if (jobFairCard) jobFairCard.style.display = 'none';
@@ -255,7 +271,7 @@ async function openProfile(benefId) {
       if (el) el.textContent = 'Loading…';
     });
 
-    fetch(`../../backend/beneficiaries/get_wiirp.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+    fetch(`../../backend/beneficiaries/get_wiirp.php?benef_id=${encodeURIComponent(b.benef_id)}&t=${Date.now()}`)
       .then(r => r.json())
       .then(j => {
         const record = j && j.success ? j.record : null;
@@ -282,18 +298,18 @@ async function openProfile(benefId) {
             : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
         };
 
-        setText('pWiirpContractPeriod', record?.contract_period || '—');
-        setText('pWiirpSchool', record?.school || '—');
-        setText('pWiirpCourse', record?.course || '—');
+        setText('pWiirpContractPeriod', upperText(record?.contract_period));
+        setText('pWiirpSchool', upperText(record?.school));
+        setText('pWiirpCourse', upperText(record?.course));
         setText('pWiirpRequiredHours', record?.required_hours != null ? String(record.required_hours) : '—');
-        setText('pWiirpInquiryType', record?.inquiry_type || '—');
-        setText('pWiirpPreferredOrgType', record?.preferred_org_type || '—');
-        setText('pWiirpPreferredIndustry', record?.preferred_industry || '—');
+        setText('pWiirpInquiryType', upperText(record?.inquiry_type));
+        setText('pWiirpPreferredOrgType', upperText(record?.preferred_org_type));
+        setText('pWiirpPreferredIndustry', upperText(record?.preferred_industry));
         setText('pWiirpWillingOutside', record ? formatBool(record.is_willing_outside) : '—');
-        setText('pWiirpInternshipSched', record?.internship_sched || '—');
-        setText('pWiirpStartDate', record ? formatDate(record.start) : '—');
-        setText('pWiirpYearLevel', record?.year_level || '—');
-        setText('pWiirpType', formatWiirpType(record?.type));
+        setText('pWiirpInternshipSched', upperText(record?.internship_sched));
+        setText('pWiirpStartDate', record ? upperText(formatDate(record.start)) : '—');
+        setText('pWiirpYearLevel', upperText(record?.year_level));
+        setText('pWiirpType', upperText(formatWiirpType(record?.type)));
 
         const showAssignment = record && ['peso-assigned', 'private'].includes(String(record.type || '').trim().toLowerCase());
         const showEndorsements = record && String(record.type || '').trim().toLowerCase() === 'private';
@@ -305,25 +321,38 @@ async function openProfile(benefId) {
         if (assignmentCard) assignmentCard.style.display = showAssignment ? 'block' : 'none';
 
         if (assignmentsEl) {
-          if (showAssignment && assignments.length) {
-            const latest = assignments[0];
+          if (showAssignment) {
+            // keep assignments array for editing/deleting
+            window.currentWiirpAssignments = assignments;
             if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
             if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
 
-            assignmentsEl.innerHTML = `
-              <tr>
-                <td>${formatDate(latest.start_date)}</td>
-                <td>${formatDate(latest.end_date)}</td>
-                <td>${latest.required_hours != null ? String(latest.required_hours) : '—'}</td>
-                <td style="font-weight:500;">${latest.office_assignment || '—'}</td>
-                ${showEndorsements ? `<td>${latest.endorsement_1 || '—'}</td><td>${latest.endorsement_2 || '—'}</td>` : ''}
-              </tr>
-            `;
-          } else if (showAssignment) {
+            if (assignments.length) {
+              const rows = assignments.map(a => `
+                <tr>
+                  <td>${upperText(formatDate(a.start_date))}</td>
+                  <td>${upperText(formatDate(a.end_date))}</td>
+                  <td>${a.required_hours != null ? String(a.required_hours) : '—'}</td>
+                  <td style="font-weight:500;">${upperText(a.office_assignment)}</td>
+                  ${showEndorsements ? `<td>${upperText(a.endorsement_1)}</td><td>${upperText(a.endorsement_2)}</td>` : ''}
+                  <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                    <button type="button" class="edit-btn-icon" onclick="openEditWiirpAssignmentModal(${a.id})" title="Edit Assignment">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button type="button" class="delete-btn-icon" onclick="deleteWiirpAssignment(${a.id})" title="Delete Assignment" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    </button>
+                  </td>
+                </tr>
+              `).join('');
+
+              assignmentsEl.innerHTML = rows;
+            } else {
+              assignmentsEl.innerHTML = `<tr><td colspan="${showEndorsements ? 6 : 4}" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
+            }
+          } else {
             if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
             if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
-            assignmentsEl.innerHTML = `<tr><td colspan="${showEndorsements ? 6 : 4}" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
-          } else {
             assignmentsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
           }
         }
@@ -354,7 +383,7 @@ async function openProfile(benefId) {
     if (wiirpCard) wiirpCard.style.display = 'none';
 
     const whipEl = document.getElementById('pWhipProjects');
-    if (whipEl) whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
+    if (whipEl) whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_whip.php?benef_id=${encodeURIComponent(b.benef_id)}`)
       .then(r => r.json())
@@ -363,6 +392,7 @@ async function openProfile(benefId) {
 
         const rows = Array.isArray(j?.records) ? j.records : [];
         if (j && j.success && rows.length) {
+          window.currentWhipRecords = rows;
           const formatDate = (value) => {
             if (!value) return '—';
             const date = new Date(value);
@@ -377,7 +407,7 @@ async function openProfile(benefId) {
               : '—';
           };
 
-          whipEl.innerHTML = rows.map(r => `
+          whipEl.innerHTML = rows.map((r, idx) => `
             <tr>
               <td style="font-weight:500;">${r.position || '—'}</td>
               <td>${formatDate(r.date_hired)}</td>
@@ -385,15 +415,19 @@ async function openProfile(benefId) {
               <td>${r.project_title || '—'}</td>
               <td>${r.duration || '—'}</td>
               <td>${formatBudget(r.budget)}</td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                  <button onclick="openEditWhipModal(${idx})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
+                  <button onclick="deleteWhipRecord(${r.whip_id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
+              </td>
             </tr>
           `).join('');
         } else {
-          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>`;
+          whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.</td></tr>`;
         }
       })
       .catch(() => {
         if (whipEl) {
-          whipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
+          whipEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
         }
       });
   } else if (whipCard) {
@@ -441,18 +475,40 @@ async function openProfile(benefId) {
               : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
           };
 
+          const formatSpesCategory = (val) => {
+            if (!val) return '—';
+            const v = String(val).trim().toLowerCase();
+            if (v === 'lgu') return 'LGU';
+            if (v === 'dole') return 'DOLE';
+            return upperText(val);
+          };
+
+          // keep a copy of the records for editing
+          window.currentSpesEmploymentRecords = rows;
+
           empEl.innerHTML = rows.map(r => `
-            <tr>
+            <tr data-employment-id="${r.employment_id}">
               <td style="font-weight:500;">${r.company_name || '—'}</td>
               <td>${r.store_assignment || '—'}</td>
               <td>${formatDate(r.start_of_contract)}</td>
               <td>${formatDate(r.end_of_contract)}</td>
               <td>${r.days || '—'}</td>
-              <td><span class="badge badge-registered">${r.category || '—'}</span></td>
+              <td><span class="badge badge-registered">${formatSpesCategory(r.category)}</span></td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                <button type="button" class="edit-btn-icon" onclick="editSpesEmployment(${r.employment_id})" title="Edit OJT">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+                  </svg>
+                </button>
+                <button type="button" class="delete-btn-icon" onclick="deleteSpesEmployment(${r.employment_id})" title="Delete OJT" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                </button>
+              </td>
             </tr>
           `).join('');
         } else {
-          empEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>`;
+          empEl.innerHTML = `<tr><td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td></tr>`;
         }
       })
       .catch(() => {
@@ -464,6 +520,159 @@ async function openProfile(benefId) {
     if (spesStudentCard) spesStudentCard.style.display = 'none';
     if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
   }
+
+// ---------------- SPES Employment Edit Handlers ----------------
+window.editSpesEmployment = function (employmentId) {
+  const recs = Array.isArray(window.currentSpesEmploymentRecords) ? window.currentSpesEmploymentRecords : [];
+  const record = recs.find(r => String(r.employment_id) === String(employmentId));
+  if (!record) {
+    _showEditToast('Could not load the selected OJT record.', 'error');
+    return;
+  }
+  openEditSpesEmploymentModal(record);
+};
+
+window.openEditSpesEmploymentModal = function (record) {
+  if (!record) return;
+  window.currentSpesEmploymentMode = 'edit';
+  document.getElementById('editSpesEmploymentId').value = record.employment_id || '';
+  document.getElementById('editSpesEmploymentStore').value = record.store_assignment || '';
+  document.getElementById('editSpesEmploymentStart').value = record.start_of_contract || '';
+  document.getElementById('editSpesEmploymentEnd').value = record.end_of_contract || '';
+  document.getElementById('editSpesEmploymentDays').value = record.days || '';
+  document.getElementById('editSpesEmploymentCategory').value = record.category || '';
+  _loadEmploymentCompanies('editSpesEmploymentCompany', record.company_id || '');
+  _toggleEditModal('modalEditSpesEmployment', 'flex');
+};
+
+window.closeEditSpesEmploymentModal = function () {
+  _toggleEditModal('modalEditSpesEmployment', 'none');
+};
+
+window.submitEditSpesEmployment = function () {
+  const employmentId = document.getElementById('editSpesEmploymentId').value;
+  if (!employmentId || window.currentSpesEmploymentMode === 'add') {
+    return window.submitAddSpesEmployment();
+  }
+
+  const formData = new FormData();
+  formData.append('employment_id', employmentId);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment updated successfully.', 'success');
+        closeEditSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error updating OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error updating OJT employment.', 'error');
+    })
+  );
+};
+
+// ---------------- SPES Employment Add/Delete Handlers ----------------
+window.openAddSpesEmploymentModal = function () {
+  window.currentSpesEmploymentMode = 'add';
+  document.getElementById('editSpesEmploymentId').value = '';
+  document.getElementById('editSpesEmploymentStore').value = '';
+  document.getElementById('editSpesEmploymentStart').value = '';
+  document.getElementById('editSpesEmploymentEnd').value = '';
+  document.getElementById('editSpesEmploymentDays').value = '';
+  document.getElementById('editSpesEmploymentCategory').value = '';
+  _loadEmploymentCompanies('editSpesEmploymentCompany', '');
+  const header = document.querySelector('#modalEditSpesEmployment .modal-header h3');
+  if (header) header.textContent = 'Add SPES OJT Employment';
+  const confirmBtn = document.querySelector('#modalEditSpesEmployment .btn-confirm');
+  if (confirmBtn) {
+    confirmBtn.textContent = 'Add';
+    confirmBtn.onclick = submitAddSpesEmployment;
+  }
+  _toggleEditModal('modalEditSpesEmployment', 'flex');
+};
+
+window.submitAddSpesEmployment = function () {
+  const formData = new FormData();
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment added successfully.', 'success');
+        closeEditSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error adding OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error adding OJT employment.', 'error');
+    })
+  );
+};
+
+function deleteSpesEmployment(employmentId) {
+  if (!employmentId) return;
+  document.getElementById('deleteSpesEmploymentId').value = employmentId;
+  _toggleEditModal('modalDeleteSpesEmployment', 'flex');
+}
+
+window.closeDeleteSpesEmploymentModal = function () {
+  _toggleEditModal('modalDeleteSpesEmployment', 'none');
+  document.getElementById('deleteSpesEmploymentId').value = '';
+};
+
+window.confirmDeleteSpesEmployment = function () {
+  const id = document.getElementById('deleteSpesEmploymentId').value;
+  if (!id) return;
+  const formData = new FormData();
+  formData.append('employment_id', id);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment deleted.', 'success');
+        closeDeleteSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error deleting OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error deleting OJT employment.', 'error');
+    })
+  );
+};
+
+window.deleteSpesEmployment = deleteSpesEmployment;
+window.closeDeleteSpesEmploymentModal = window.closeDeleteSpesEmploymentModal;
+window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
 
   if (programName === 'Government Internship Program') {
     if (educationCard) educationCard.style.display = 'none';
@@ -526,34 +735,34 @@ async function openProfile(benefId) {
           };
 
           if (document.getElementById('pGipContractPeriod')) {
-            document.getElementById('pGipContractPeriod').textContent = r.contract_period || '—';
+            document.getElementById('pGipContractPeriod').textContent = upperText(r.contract_period);
           }
           if (document.getElementById('pGipSchool')) {
-            document.getElementById('pGipSchool').textContent = r.school || '—';
+            document.getElementById('pGipSchool').textContent = upperText(r.school);
           }
           if (document.getElementById('pGipCourse')) {
-            document.getElementById('pGipCourse').textContent = r.course || '—';
+            document.getElementById('pGipCourse').textContent = upperText(r.course);
           }
           if (document.getElementById('pGipRequiredHours')) {
             document.getElementById('pGipRequiredHours').textContent = r.required_hours != null ? String(r.required_hours) : '—';
           }
           if (document.getElementById('pGipCollegeOrShs')) {
-            document.getElementById('pGipCollegeOrShs').textContent = formatEdLevel(r.college_or_shs);
+            document.getElementById('pGipCollegeOrShs').textContent = upperText(formatEdLevel(r.college_or_shs));
           }
           if (document.getElementById('pGipPreferredOrgType')) {
-            document.getElementById('pGipPreferredOrgType').textContent = r.preferred_org_type || '—';
+            document.getElementById('pGipPreferredOrgType').textContent = upperText(r.preferred_org_type);
           }
           if (document.getElementById('pGipPreferredIndustry')) {
-            document.getElementById('pGipPreferredIndustry').textContent = r.preferred_industry || '—';
+            document.getElementById('pGipPreferredIndustry').textContent = upperText(r.preferred_industry);
           }
           if (document.getElementById('pGipWillingOutside')) {
-            document.getElementById('pGipWillingOutside').textContent = formatBool(r.is_willing_outside);
+            document.getElementById('pGipWillingOutside').textContent = upperText(formatBool(r.is_willing_outside));
           }
           if (document.getElementById('pGipOfficeAssignment')) {
-            document.getElementById('pGipOfficeAssignment').textContent = r.office_assignment || '—';
+            document.getElementById('pGipOfficeAssignment').textContent = upperText(r.office_assignment);
           }
           if (document.getElementById('pGipType')) {
-            document.getElementById('pGipType').textContent = formatType(r.type);
+            document.getElementById('pGipType').textContent = upperText(formatType(r.type));
           }
         } else {
           window.currentGipRecord = null;
@@ -579,8 +788,8 @@ async function openProfile(benefId) {
   }
 
   if (!hideEducationCard) {
-    document.getElementById('pEducation').textContent = b.education;
-    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${s}</span>`).join('');
+    document.getElementById('pEducation').textContent = upperText(b.education);
+    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${upperText(s)}</span>`).join('');
   }
 
   // ── Employment: show spinner then lazy-load from API ──
@@ -594,10 +803,10 @@ async function openProfile(benefId) {
     empEl.innerHTML = history.length
       ? history.map((e, idx) => `
           <tr>
-            <td style="font-weight:500;">${e.co}</td>
+            <td style="font-weight:500;">${upperText(e.co)}</td>
             <td><span class="badge ${badgeClass(e.st)}">${e.st}</span></td>
-            <td>${e.dt}</td>
-            <td style="color:var(--text-secondary);font-size:12.5px;">${e.note}</td>
+            <td>${upperText(e.dt)}</td>
+            <td style="color:var(--text-secondary);font-size:12.5px;">${upperText(e.note)}</td>
             <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
               <button onclick="editEmploymentRecord(${e.id})" style="padding:4px 8px;background:var(--accent);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Edit</button>
               <button onclick="deleteEmploymentRecord(${e.id})" style="padding:4px 8px;background:var(--danger,#ef4444);color:white;border:none;border-radius:4px;cursor:pointer;font-size:12px;font-weight:500;">Delete</button>
@@ -760,6 +969,10 @@ function openEditPersonalModal() {
     if (cityEl) cityEl.value = '';
   }
   _toggleEditModal('modalEditPersonal', 'flex');
+}
+
+function closeEditPersonalModal() {
+  _toggleEditModal('modalEditPersonal', 'none');
 }
 
 function _loadEmploymentCompanies(selectId, selectedCompanyId = '') {
@@ -1040,8 +1253,35 @@ function closeEditNotesModal() {
 }
 
 function submitEditNotes() {
-  _showEditToast('Case notes saved.', 'success');
-  closeEditNotesModal();
+  const notes = document.getElementById('editNotesText')?.value ?? '';
+  const b = window.currentBeneficiary || {};
+  const benefId = b.benef_id || window.currentBeneficiaryId || 0;
+  if (!benefId) {
+    _showEditToast('No beneficiary selected.', 'error');
+    return;
+  }
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_notes.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ benef_id: Number(benefId), notes }),
+  }))
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      // Update UI
+      const pNotes = document.getElementById('pNotes');
+      if (pNotes) pNotes.textContent = notes || '';
+      if (window.currentBeneficiary) window.currentBeneficiary.notes = notes;
+      _showEditToast('Case notes saved.', 'success');
+      closeEditNotesModal();
+    } else {
+      _showEditToast(j.message || 'Failed to save case notes.', 'error');
+    }
+  }).catch(err => {
+    console.error('[profile.js] submitEditNotes error', err);
+    _showEditToast('Failed to save case notes.', 'error');
+  });
 }
 
 // ── Education & Skills ───────────────────────────────────────────────────────
@@ -1384,6 +1624,186 @@ function submitEditWiirp() {
     });
 }
 
+// ---------------- WIIRP Assignment Edit/Delete Handlers ----------------
+function openEditWiirpAssignmentModal(assignmentId) {
+  const recs = Array.isArray(window.currentWiirpAssignments) ? window.currentWiirpAssignments : [];
+  const record = recs.find(r => String(r.id) === String(assignmentId));
+  if (!record) {
+    _showEditToast('Could not load the selected assignment.', 'error');
+    return;
+  }
+  document.getElementById('editWiirpAssignmentId').value = record.id || '';
+  document.getElementById('editWiirpAssignmentStart').value = formatDateForInput(record.start_date) || '';
+  document.getElementById('editWiirpAssignmentEnd').value = formatDateForInput(record.end_date) || '';
+  document.getElementById('editWiirpAssignmentRequiredHours').value = record.required_hours != null ? String(record.required_hours) : '';
+  document.getElementById('editWiirpAssignmentOffice').value = record.office_assignment || '';
+  document.getElementById('editWiirpAssignmentEndorsement1').value = record.endorsement_1 || '';
+  document.getElementById('editWiirpAssignmentEndorsement2').value = record.endorsement_2 || '';
+  // ensure modal shows Edit mode
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Edit WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Save Changes';
+      confirm.onclick = submitEditWiirpAssignment;
+    }
+  }
+  _toggleEditModal('modalEditWiirpAssignment', 'flex');
+}
+
+function closeEditWiirpAssignmentModal() {
+  _toggleEditModal('modalEditWiirpAssignment', 'none');
+  // restore default edit button behavior
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Edit WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Save Changes';
+      confirm.onclick = submitEditWiirpAssignment;
+    }
+  }
+}
+
+function submitEditWiirpAssignment() {
+  const assignmentId = document.getElementById('editWiirpAssignmentId').value;
+  if (!assignmentId) {
+    _showEditToast('No assignment selected.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('assignment_id', assignmentId);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('start_date', document.getElementById('editWiirpAssignmentStart').value || '');
+  formData.append('end_date', document.getElementById('editWiirpAssignmentEnd').value || '');
+  formData.append('required_hours', document.getElementById('editWiirpAssignmentRequiredHours').value || '');
+  formData.append('office_assignment', document.getElementById('editWiirpAssignmentOffice').value.trim());
+  formData.append('endorsement_1', document.getElementById('editWiirpAssignmentEndorsement1').value.trim());
+  formData.append('endorsement_2', document.getElementById('editWiirpAssignmentEndorsement2').value.trim());
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_wiirp_assignment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment updated successfully.', 'success');
+        closeEditWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error updating assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error updating assignment.', 'error');
+    })
+  );
+}
+
+// ---------------- WIIRP Assignment Add Handlers ----------------
+function openAddWiirpAssignmentModal() {
+  // Clear fields
+  document.getElementById('editWiirpAssignmentId').value = '';
+  document.getElementById('editWiirpAssignmentStart').value = '';
+  document.getElementById('editWiirpAssignmentEnd').value = '';
+  document.getElementById('editWiirpAssignmentRequiredHours').value = '';
+  document.getElementById('editWiirpAssignmentOffice').value = '';
+  document.getElementById('editWiirpAssignmentEndorsement1').value = '';
+  document.getElementById('editWiirpAssignmentEndorsement2').value = '';
+
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Add WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Add Assignment';
+      confirm.onclick = submitAddWiirpAssignment;
+    }
+  }
+
+  _toggleEditModal('modalEditWiirpAssignment', 'flex');
+}
+
+function submitAddWiirpAssignment() {
+  // require a loaded WIIRP record and current beneficiary
+  const wiirp = window.currentWiirpRecord || null;
+  if (!wiirp || !wiirp.work_immersion_id) {
+    _showEditToast('No WIIRP record selected for assignment.', 'error');
+    return;
+  }
+  if (!window.currentBeneficiaryId) {
+    _showEditToast('No beneficiary selected.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('work_immersion_id', wiirp.work_immersion_id);
+  formData.append('benef_id', window.currentBeneficiaryId);
+  formData.append('start_date', document.getElementById('editWiirpAssignmentStart').value || '');
+  formData.append('end_date', document.getElementById('editWiirpAssignmentEnd').value || '');
+  formData.append('required_hours', document.getElementById('editWiirpAssignmentRequiredHours').value || '');
+  formData.append('office_assignment', document.getElementById('editWiirpAssignmentOffice').value.trim());
+  formData.append('endorsement_1', document.getElementById('editWiirpAssignmentEndorsement1').value.trim());
+  formData.append('endorsement_2', document.getElementById('editWiirpAssignmentEndorsement2').value.trim());
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_wiirp_assignment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment added successfully.', 'success');
+        closeEditWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error adding assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error adding assignment.', 'error');
+    })
+  );
+}
+
+function deleteWiirpAssignment(assignmentId) {
+  document.getElementById('deleteWiirpAssignmentId').value = assignmentId;
+  _toggleEditModal('modalDeleteWiirpAssignment', 'flex');
+}
+
+function closeDeleteWiirpAssignmentModal() {
+  _toggleEditModal('modalDeleteWiirpAssignment', 'none');
+  document.getElementById('deleteWiirpAssignmentId').value = '';
+}
+
+function confirmDeleteWiirpAssignment() {
+  const id = document.getElementById('deleteWiirpAssignmentId').value;
+  if (!id) return;
+
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_wiirp_assignment.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ assignment_id: id, benef_id: window.currentBeneficiaryId })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment deleted.', 'success');
+        closeDeleteWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Failed to delete assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error deleting assignment.', 'error');
+    })
+  );
+}
+
 function openEditGipModal() {
   const record = window.currentGipRecord;
   if (!record) {
@@ -1457,9 +1877,19 @@ function submitEditGip() {
 function openEditIssuanceModal() {
   const rec = window.currentFirstTimeIssuanceRecord;
   console.log('Opening issuance edit modal with record:', rec);
+  const titleEl = document.querySelector('#modalEditIssuance .modal-header h3');
+  const submitBtn = document.querySelector('#modalEditIssuance .btn-confirm');
+  const jobseekIdEl = document.getElementById('editIssuanceJobseekId');
+  const occEl = document.getElementById('editIssuanceOccPermit');
+  const healthEl = document.getElementById('editIssuanceHealthCard');
   
   if (!rec) {
-    _showEditToast('No issuance record to edit.', 'error');
+    jobseekIdEl.value = '';
+    occEl.value = '0';
+    healthEl.value = '0';
+    if (titleEl) titleEl.textContent = 'Add Issuance Record';
+    if (submitBtn) submitBtn.textContent = 'Add Record';
+    _toggleEditModal('modalEditIssuance', 'flex');
     return;
   }
   
@@ -1469,9 +1899,11 @@ function openEditIssuanceModal() {
   
   console.log('Setting form values:', { jobseekId, occValue, healthValue });
   
-  document.getElementById('editIssuanceJobseekId').value = jobseekId;
-  document.getElementById('editIssuanceOccPermit').value = occValue;
-  document.getElementById('editIssuanceHealthCard').value = healthValue;
+  jobseekIdEl.value = jobseekId;
+  occEl.value = occValue;
+  healthEl.value = healthValue;
+  if (titleEl) titleEl.textContent = 'Edit Issuance Status';
+  if (submitBtn) submitBtn.textContent = 'Save Changes';
   
   _toggleEditModal('modalEditIssuance', 'flex');
 }
@@ -1481,7 +1913,7 @@ function closeEditIssuanceModal() {
 }
 
 function submitUpdateIssuance() {
-  const jobseek_id = document.getElementById('editIssuanceJobseekId').value;
+  const jobseek_id = document.getElementById('editIssuanceJobseekId').value.trim();
   const occVal = document.getElementById('editIssuanceOccPermit').value;
   const healthVal = document.getElementById('editIssuanceHealthCard').value;
   
@@ -1492,8 +1924,8 @@ function submitUpdateIssuance() {
     healthEl: document.getElementById('editIssuanceHealthCard')
   });
   
-  if (!jobseek_id || jobseek_id === '') {
-    _showEditToast('No issuance record selected.', 'error');
+  if (!window.currentBeneficiaryId) {
+    _showEditToast('No beneficiary selected.', 'error');
     return;
   }
 
@@ -1503,8 +1935,10 @@ function submitUpdateIssuance() {
   console.log('Parsed values for submission:', { jobseek_id, occInt, healthInt });
 
   const formData = new FormData();
-  formData.append('jobseek_id', jobseek_id);
   formData.append('benef_id', window.currentBeneficiaryId);
+  if (jobseek_id) {
+    formData.append('jobseek_id', jobseek_id);
+  }
   formData.append('occ_permit', occInt);
   formData.append('health_card', healthInt);
 
@@ -1521,7 +1955,7 @@ function submitUpdateIssuance() {
     .then(j => {
       console.log('Update response:', j);
       if (j && j.success) {
-        _showEditToast('Issuance status updated.', 'success');
+        _showEditToast(j.message || 'Issuance record saved.', 'success');
         closeEditIssuanceModal();
         if (window.currentBeneficiaryId) {
           openProfile(window.currentBeneficiaryId);
@@ -1566,9 +2000,458 @@ window.confirmDeleteEmploymentRecord = confirmDeleteEmploymentRecord;
 window.openEditWiirpModal = openEditWiirpModal;
 window.closeEditWiirpModal = closeEditWiirpModal;
 window.submitEditWiirp = submitEditWiirp;
+window.openEditWiirpAssignmentModal = openEditWiirpAssignmentModal;
+window.closeEditWiirpAssignmentModal = closeEditWiirpAssignmentModal;
+window.submitEditWiirpAssignment = submitEditWiirpAssignment;
+window.openAddWiirpAssignmentModal = openAddWiirpAssignmentModal;
+window.submitAddWiirpAssignment = submitAddWiirpAssignment;
+window.deleteWiirpAssignment = deleteWiirpAssignment;
+window.closeDeleteWiirpAssignmentModal = closeDeleteWiirpAssignmentModal;
+window.confirmDeleteWiirpAssignment = confirmDeleteWiirpAssignment;
 window.openEditGipModal = openEditGipModal;
 window.closeEditGipModal = closeEditGipModal;
-window.submitEditGip = submitEditGip;
+
+// ── Edit Job Fair ────────────────────────────────────────────────────────────
+
+function loadJobFairCompanies(eventId, selectedCompanyId = '', targetSelectId = 'editJobFairCompany') {
+  const compSelect = document.getElementById(targetSelectId);
+  if (!eventId) {
+    compSelect.innerHTML = '<option value="">— Select event first —</option>';
+    return;
+  }
+  
+  compSelect.innerHTML = '<option value="">Loading companies…</option>';
+  fetch(`../../backend/beneficiaries/get_jobfair_companies.php?event_id=${eventId}`)
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success && j.companies.length) {
+        compSelect.innerHTML = '<option value="">— Select company —</option>';
+        j.companies.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.company_id;
+          const fullText = c.company_name;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(c.company_id) === String(selectedCompanyId)) {
+            opt.selected = true;
+          }
+          compSelect.appendChild(opt);
+        });
+      } else {
+        compSelect.innerHTML = '<option value="">No companies available</option>';
+      }
+    })
+    .catch(() => {
+      compSelect.innerHTML = '<option value="">Error loading companies</option>';
+    });
+}
+
+function openEditJobFairModal(index) {
+  const r = window.currentJobFairRecords[index];
+  if (!r) return;
+  
+  document.getElementById('editJobFairId').value = r.jobfair_id;
+  document.getElementById('editJobFairPosition').value = r.position || '';
+  
+  const evtSelect = document.getElementById('editJobFairEvent');
+  evtSelect.innerHTML = '<option value="">Loading events…</option>';
+  
+  fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.events.length) {
+        evtSelect.innerHTML = '<option value="">— Select Event / Venue —</option>';
+        j.events.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.jobfairevent_id;
+          const fullText = `${e.job_fair_type} - ${e.venue} (${e.date_start})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(e.jobfairevent_id) === String(r.jobfairevent_id)) {
+            opt.selected = true;
+          }
+          evtSelect.appendChild(opt);
+        });
+        loadJobFairCompanies(r.jobfairevent_id, r.company_id, 'editJobFairCompany');
+      } else {
+        evtSelect.innerHTML = '<option value="">No events available</option>';
+      }
+    })
+    .catch(() => {
+      evtSelect.innerHTML = '<option value="">Error loading events</option>';
+    });
+    
+  _toggleEditModal('modalEditJobFair', 'flex');
+}
+
+function closeEditJobFairModal() {
+  _toggleEditModal('modalEditJobFair', 'none');
+}
+
+function submitEditJobFair() {
+  const jobfair_id = document.getElementById('editJobFairId').value;
+  const jobfairevent_id = document.getElementById('editJobFairEvent').value;
+  const company_id = document.getElementById('editJobFairCompany').value;
+  const position = document.getElementById('editJobFairPosition').value.trim();
+  
+  if (!jobfairevent_id || !company_id) {
+    _showEditToast('Event and Company are required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      jobfair_id: jobfair_id,
+      jobfairevent_id: jobfairevent_id,
+      company_id: company_id,
+      position: position
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Job fair updated.', 'success');
+        closeEditJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to update job fair.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error updating job fair.', 'error');
+    });
+}
+
+window.openEditJobFairModal = openEditJobFairModal;
+window.closeEditJobFairModal = closeEditJobFairModal;
+window.submitEditJobFair = submitEditJobFair;
+window.loadJobFairCompanies = loadJobFairCompanies;
+
+// ── Add Job Fair ─────────────────────────────────────────────────────────────
+
+function openAddJobFairModal() {
+  document.getElementById('addJobFairPosition').value = '';
+  document.getElementById('addJobFairCompany').innerHTML = '<option value="">— Select event first —</option>';
+  
+  const evtSelect = document.getElementById('addJobFairEvent');
+  evtSelect.innerHTML = '<option value="">Loading events…</option>';
+  
+  fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.events.length) {
+        evtSelect.innerHTML = '<option value="">— Select Event / Venue —</option>';
+        j.events.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.jobfairevent_id;
+          const fullText = `${e.job_fair_type} - ${e.venue} (${e.date_start})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          evtSelect.appendChild(opt);
+        });
+      } else {
+        evtSelect.innerHTML = '<option value="">No events available</option>';
+      }
+    })
+    .catch(() => {
+      evtSelect.innerHTML = '<option value="">Error loading events</option>';
+    });
+    
+  _toggleEditModal('modalAddJobFair', 'flex');
+}
+
+function closeAddJobFairModal() {
+  _toggleEditModal('modalAddJobFair', 'none');
+}
+
+function submitAddJobFair() {
+  const jobfairevent_id = document.getElementById('addJobFairEvent').value;
+  const company_id = document.getElementById('addJobFairCompany').value;
+  const position = document.getElementById('addJobFairPosition').value.trim();
+  
+  if (!jobfairevent_id || !company_id) {
+    _showEditToast('Event and Company are required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: window.currentBeneficiaryId,
+      jobfairevent_id: jobfairevent_id,
+      company_id: company_id,
+      position: position
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Job fair record added.', 'success');
+        closeAddJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to add job fair.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error adding job fair.', 'error');
+    });
+}
+
+window.openAddJobFairModal = openAddJobFairModal;
+window.closeAddJobFairModal = closeAddJobFairModal;
+window.submitAddJobFair = submitAddJobFair;
+
+// ── Delete Job Fair ──────────────────────────────────────────────────────────
+
+function deleteJobFairRecord(jobfair_id) {
+  document.getElementById('deleteJobFairId').value = jobfair_id;
+  _toggleEditModal('modalDeleteJobFair', 'flex');
+}
+
+function closeDeleteJobFairModal() {
+  _toggleEditModal('modalDeleteJobFair', 'none');
+  document.getElementById('deleteJobFairId').value = '';
+}
+
+function confirmDeleteJobFairRecord() {
+  const id = document.getElementById('deleteJobFairId').value;
+  if (!id) return;
+  
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_jobfair.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jobfair_id: id })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Job fair record deleted.', 'success');
+        closeDeleteJobFairModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to delete record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error deleting record.', 'error');
+    });
+}
+
+window.deleteJobFairRecord = deleteJobFairRecord;
+window.closeDeleteJobFairModal = closeDeleteJobFairModal;
+window.confirmDeleteJobFairRecord = confirmDeleteJobFairRecord;
+
+// ── Add WHIP Assignment ──────────────────────────────────────────────────────
+
+function openAddWhipModal() {
+  document.getElementById('addWhipPosition').value = '';
+  document.getElementById('addWhipDateHired').value = '';
+  
+  const projSelect = document.getElementById('addWhipProject');
+  projSelect.innerHTML = '<option value="">Loading projects…</option>';
+  
+  fetch('../../backend/beneficiaries/get_projects_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.projects.length) {
+        projSelect.innerHTML = '<option value="">— Select Project —</option>';
+        j.projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.project_id;
+          const fullText = `${p.project_title} (Contractor: ${p.contractor || 'N/A'})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          projSelect.appendChild(opt);
+        });
+      } else {
+        projSelect.innerHTML = '<option value="">No projects available</option>';
+      }
+    })
+    .catch(() => {
+      projSelect.innerHTML = '<option value="">Error loading projects</option>';
+    });
+    
+  _toggleEditModal('modalAddWhip', 'flex');
+}
+
+function closeAddWhipModal() {
+  _toggleEditModal('modalAddWhip', 'none');
+}
+
+function submitAddWhip() {
+  const project_id = document.getElementById('addWhipProject').value;
+  const position = document.getElementById('addWhipPosition').value.trim();
+  const date_hired = document.getElementById('addWhipDateHired').value;
+  
+  if (!project_id) {
+    _showEditToast('Project is required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      benef_id: window.currentBeneficiaryId,
+      project_id: project_id,
+      position: position,
+      date_hired: date_hired
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Project assignment added.', 'success');
+        closeAddWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to add project assignment.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error adding project assignment.', 'error');
+    });
+}
+
+window.openAddWhipModal = openAddWhipModal;
+window.closeAddWhipModal = closeAddWhipModal;
+window.submitAddWhip = submitAddWhip;
+
+function openEditWhipModal(index) {
+  const r = window.currentWhipRecords[index];
+  if (!r) return;
+  
+  document.getElementById('editWhipId').value = r.whip_id;
+  document.getElementById('editWhipPosition').value = r.position || '';
+  document.getElementById('editWhipDateHired').value = formatDateForInput(r.date_hired) || '';
+  
+  const projSelect = document.getElementById('editWhipProject');
+  projSelect.innerHTML = '<option value="">Loading projects…</option>';
+  
+  fetch('../../backend/beneficiaries/get_projects_options.php')
+    .then(res => res.json())
+    .then(j => {
+      if (j && j.success && j.projects.length) {
+        projSelect.innerHTML = '<option value="">— Select Project —</option>';
+        j.projects.forEach(p => {
+          const opt = document.createElement('option');
+          opt.value = p.project_id;
+          const fullText = `${p.project_title} (Contractor: ${p.contractor || 'N/A'})`;
+          opt.textContent = fullText.length > 70 ? fullText.substring(0, 70) + '...' : fullText;
+          opt.title = fullText;
+          if (String(p.project_id) === String(r.project_id)) {
+            opt.selected = true;
+          }
+          projSelect.appendChild(opt);
+        });
+      } else {
+        projSelect.innerHTML = '<option value="">No projects available</option>';
+      }
+    })
+    .catch(() => {
+      projSelect.innerHTML = '<option value="">Error loading projects</option>';
+    });
+    
+  _toggleEditModal('modalEditWhip', 'flex');
+}
+
+function closeEditWhipModal() {
+  _toggleEditModal('modalEditWhip', 'none');
+}
+
+function submitEditWhip() {
+  const whip_id = document.getElementById('editWhipId').value;
+  const project_id = document.getElementById('editWhipProject').value;
+  const position = document.getElementById('editWhipPosition').value.trim();
+  const date_hired = document.getElementById('editWhipDateHired').value;
+  
+  if (!project_id) {
+    _showEditToast('Project is required.', 'error');
+    return;
+  }
+  
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      whip_id: whip_id,
+      project_id: project_id,
+      position: position,
+      date_hired: date_hired
+    })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast(j.message || 'Project assignment updated.', 'success');
+        closeEditWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to update project assignment.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error updating project assignment.', 'error');
+    });
+}
+
+function deleteWhipRecord(whip_id) {
+  document.getElementById('deleteWhipId').value = whip_id;
+  _toggleEditModal('modalDeleteWhip', 'flex');
+}
+
+function closeDeleteWhipModal() {
+  _toggleEditModal('modalDeleteWhip', 'none');
+  document.getElementById('deleteWhipId').value = '';
+}
+
+function confirmDeleteWhipRecord() {
+  const id = document.getElementById('deleteWhipId').value;
+  if (!id) return;
+  
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_whip.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ whip_id: id })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Project assignment deleted.', 'success');
+        closeDeleteWhipModal();
+        if (window.currentBeneficiaryId) {
+          openProfile(window.currentBeneficiaryId);
+        }
+      } else {
+        _showEditToast(j.error || 'Failed to delete record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error deleting record.', 'error');
+    });
+}
+
+window.openEditWhipModal = openEditWhipModal;
+window.closeEditWhipModal = closeEditWhipModal;
+window.submitEditWhip = submitEditWhip;
+window.deleteWhipRecord = deleteWhipRecord;
+window.closeDeleteWhipModal = closeDeleteWhipModal;
+window.confirmDeleteWhipRecord = confirmDeleteWhipRecord;
+
 // Issuance handlers
 window.openEditIssuanceModal = openEditIssuanceModal;
 window.closeEditIssuanceModal = closeEditIssuanceModal;

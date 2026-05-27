@@ -31,45 +31,45 @@ export const programs = {
 // ─── Statuses (= Classification) per program ────────────────────────────────
 export const statusesByProgram = {
     'Job Matching and Referral': [
-        'registered',
-        'referred',
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview',
+        'Registered',
+        'Referred',
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview',
     ],
     'First Time Jobseeker': [
-        'issued',
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview',
+        'Issued',
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview',
     ],
     'Job Fair': [
-        'interviewed',
-        'qualified',
-        'not qualified',
-        'placed/hots',
-        'for further interview',
+        'Interviewed',
+        'Qualified',
+        'Not Qualified',
+        'Placed/Hots',
+        'For Further Interview',
     ],
     'SPES': [
-        'registered',
-        'referred',
-        'placed',
+        'Registered',
+        'Referred',
+        'Placed',
     ],
     'Government Internship Program': [
-        'peso-accepted',
-        'dole-accepted',
+        'Peso-Accepted',
+        'Dole-Accepted',
     ],
     'Work Immersion and Internship Referral Program': [
-        'inquired',
-        'referred',
-        'interviewed',
-        'peso-accepted',
-        'private-accepted',
-        'not proceeded',
+        'Inquired',
+        'Referred',
+        'Interviewed',
+        'Peso-Accepted',
+        'Private-Accepted',
+        'Not Proceeded',
     ],
 };
 
@@ -106,32 +106,33 @@ export const importStatusStyles = {
 // WHIP) won't have this column in their Excel so the cell will just be empty.
 export const classificationColors = {
     // ── Job Matching & Referral ──────────────────────────────────────────────
-    'registered': 'bg-blue-100 text-blue-700',
-    'referred': 'bg-orange-100 text-orange-600',
-    'interviewed': 'bg-purple-100 text-purple-700',
-    'qualified': 'bg-emerald-100 text-emerald-700',
-    'not qualified': 'bg-red-100 text-red-600',
-    'placed/hots': 'bg-teal-100 text-teal-700',
-    'for further interview': 'bg-yellow-100 text-yellow-700',
+    'Registered': 'bg-blue-100 text-blue-700',
+    'Referred': 'bg-orange-100 text-orange-600',
+    'Interviewed': 'bg-purple-100 text-purple-700',
+    'Qualified': 'bg-emerald-100 text-emerald-700',
+    'Not Qualified': 'bg-red-100 text-red-600',
+    'Placed/Hots': 'bg-teal-100 text-teal-700',
+    'For Further Interview': 'bg-yellow-100 text-yellow-700',
 
     // ── First Time Job Seekers (shares most with Job Matching) ───────────────
-    'first-time job seeker': 'bg-blue-100 text-blue-700',
-    'issued': 'bg-indigo-100 text-indigo-700',
-    // referred, interviewed, qualified, not qualified, placed/hots,
-    // for further interview — already defined above, reused automatically
+    'First-Time Job Seeker': 'bg-blue-100 text-blue-700',
+    'Issued': 'bg-indigo-100 text-indigo-700',
+    // Referred, Interviewed, Qualified, Not Qualified, Placed/Hots,
+    // For Further Interview — already defined above, reused automatically
 
     // ── SPES ─────────────────────────────────────────────────────────────────
-    'placed': 'bg-teal-100 text-teal-700',
-    // registered, referred — already defined above
+    'Placed': 'bg-teal-100 text-teal-700',
+    // Registered, Referred — already defined above
 
     // ── Government Internship Program and Work Immersion ────────────────────────────────────────
-    'peso-accepted': 'bg-emerald-100 text-emerald-700',
-    'private-accepted': 'bg-teal-100 text-teal-700',
+    'Peso-Accepted': 'bg-emerald-100 text-emerald-700',
+    'Private-Accepted': 'bg-teal-100 text-teal-700',
 
     // ── Work Immersion ───────────────────────────────────────────────────────
-    'inquired': 'bg-blue-100 text-blue-700',
-    'not proceeded': 'bg-red-100 text-red-600',
-    // referred, interviewed, peso-accepted, private-accepted — already defined above
+    'Inquired': 'bg-blue-100 text-blue-700',
+    'Not Proceeded': 'bg-red-100 text-red-600',
+    // Referred, Interviewed, Peso-Accepted, Private-Accepted — already defined above
+    'Dole-Accepted': 'bg-emerald-100 text-emerald-700',
 };
 
 export const statusColors = {
@@ -377,6 +378,7 @@ export const programHeaders = {
         'Student/OSY', 
         'Program', 
         'Classification', 
+        'Status',
         'School', 
         'Highest Educ. Attainment', 
         'Course', 

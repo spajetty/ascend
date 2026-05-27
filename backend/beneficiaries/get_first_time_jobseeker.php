@@ -9,8 +9,8 @@ if ($benef_id <= 0) {
 }
 
 try {
-    $sql = "SELECT jobseek_id, benef_id, company_id, occ_permit, health_card
-            FROM firstJobSeek
+        $sql = "SELECT jobseek_id, benef_id, company_id, occ_permit, health_card
+            FROM firstjobseek
             WHERE benef_id = ?
             ORDER BY jobseek_id DESC";
 
