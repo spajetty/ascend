@@ -192,7 +192,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 // ─── Config ────────────────────────────────────────────────────────────────
-const API_URL = '/backend/emp-facilitation/show-job-match.php';
+const API_URL = '/backend/emp-facilitation/job-match/show-job-match.php';
 const ROWS_PER_PAGE = 9;
 
 // ─── State ─────────────────────────────────────────────────────────────────

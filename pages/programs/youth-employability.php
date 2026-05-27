@@ -228,9 +228,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 // ─── API paths ────────────────────────────────────────────────────────────────
 // FIX: point to the actual show-*.php files under /backend/youth-employ/
 const YEAR     = new Date().getFullYear();
-const SPES_API = `/backend/youth-employ/show-spes.php?year=${YEAR}`;
-const GIP_API  = `/backend/youth-employ/show-gip.php?year=${YEAR}`;
-const WIMM_API = `/backend/youth-employ/show-work-imm.php?year=${YEAR}`;
+const SPES_API = `/backend/youth-employ/spes/show-spes.php?year=${YEAR}`;
+const GIP_API  = `/backend/youth-employ/gip/show-gip.php?year=${YEAR}`;
+const WIMM_API = `/backend/youth-employ/work-imm/show-work-imm.php?year=${YEAR}`;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;

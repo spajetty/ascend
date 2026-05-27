@@ -206,9 +206,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script>
 // ─── API paths ────────────────────────────────────────────────────────────────
 const YEAR           = new Date().getFullYear();
-const JOB_MATCH_API  = `/backend/emp-facilitation/show-job-match.php?year=${YEAR}`;
-const FIRST_TIME_API = `/backend/emp-facilitation/show-first-time.php?year=${YEAR}`;
-const JOB_FAIR_API   = `/backend/emp-facilitation/show-job-fair.php?year=${YEAR}`;
+const JOB_MATCH_API  = `/backend/emp-facilitation/job-match/show-job-match.php?year=${YEAR}`;
+const FIRST_TIME_API = `/backend/emp-facilitation/first-time/show-first-time.php?year=${YEAR}`;
+const JOB_FAIR_API   = `/backend/emp-facilitation/job-fair/show-job-fair.php?year=${YEAR}`;
 
 // Preview shows only the last N rows (most recent months)
 const PREVIEW_ROWS = 3;

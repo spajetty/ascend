@@ -98,9 +98,32 @@ if ($method === 'GET') {
             SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
             SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
 
-            -- Referred: not used in current Excel format, always 0
-            0 AS ref_m,
-            0 AS ref_f,
+            -- Referred: SPES beneficiaries with a REFERRAL activity record
+            --           for this company in the same batch month/year
+            COALESCE((
+                SELECT COUNT(*)
+                FROM beneficiary_activity_history bah
+                INNER JOIN spes s2  ON s2.benef_id  = bah.benef_id
+                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
+                INNER JOIN beneficiaries b2   ON b2.benef_id  = bah.benef_id
+                WHERE bah.classification = 'REFERRAL'
+                  AND bah.company_id = se.company_id
+                  AND ib2.month = ib.month
+                  AND ib2.year  = ib.year
+                  AND b2.sex    = 'Male'
+            ), 0) AS ref_m,
+            COALESCE((
+                SELECT COUNT(*)
+                FROM beneficiary_activity_history bah
+                INNER JOIN spes s2  ON s2.benef_id  = bah.benef_id
+                INNER JOIN import_batches ib2 ON ib2.batch_id = s2.batch_id
+                INNER JOIN beneficiaries b2   ON b2.benef_id  = bah.benef_id
+                WHERE bah.classification = 'REFERRAL'
+                  AND bah.company_id = se.company_id
+                  AND ib2.month = ib.month
+                  AND ib2.year  = ib.year
+                  AND b2.sex    = 'Female'
+            ), 0) AS ref_f,
 
             -- Placed: has a spes_employment record for this company (contract exists)
             SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS placed_m,

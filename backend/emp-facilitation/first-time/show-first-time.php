@@ -1,9 +1,10 @@
 <?php
-require_once __DIR__ . '/../../includes/auth-check.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+$require_auth = __DIR__ . '/../../../includes/auth-check.php';
+require_once $require_auth;
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// .env lives at C:\laragon\www\ascend\api\
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../api');
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../api');
 $dotenv->load();
 
 $host = $_ENV['DB_HOST'] ?? 'localhost';
