@@ -152,19 +152,17 @@ try {
 
     // Server-side validation: Employers Accreditation follow-up must have all required fields
     if ($program === 'Employers Accreditation') {
-        $required = ['Company', 'Month', 'Year', 'Accreditation', 'Est. Type', 'Industry', 'City/Municipality/Province'];
+        $required = ['Company', 'Accreditation', 'Est. Type', 'Industry', 'City/Municipality/Province'];
         foreach ($rows as $i => $r) {
             $missing = [];
-            $company = trim((string)($r['Company'] ?? $r['company_name'] ?? ''));
-            $month = trim((string)($r['Month'] ?? $r['month'] ?? ''));
-            $year = trim((string)($r['Year'] ?? $r['year'] ?? ''));
-            $status = trim((string)($r['Accreditation'] ?? $r['status'] ?? ''));
-            $est = trim((string)($r['Est. Type'] ?? $r['est_type'] ?? ''));
-            $industry = trim((string)($r['Industry'] ?? $r['industry'] ?? ''));
-            $city = trim((string)($r['City/Municipality/Province'] ?? $r['city'] ?? ''));
+            $company = s(rowValue($r, ['Company', 'company_name', 'COMPANY'], ''));
+            $month = s(rowValue($r, ['Month', 'month', 'MONTH'], ''));
+            $year = s(rowValue($r, ['Year', 'year', 'YEAR'], ''));
+            $status = s(rowValue($r, ['Accreditation', 'status', 'ACCREDITATION'], ''));
+            $est = s(rowValue($r, ['Est. Type', 'est_type', 'EST. TYPE', 'Establishment Type'], ''));
+            $industry = s(rowValue($r, ['Industry', 'industry', 'INDUSTRY'], ''));
+            $city = s(rowValue($r, ['City/Municipality/Province', 'city', 'CITY/MUNICIPALITY/PROVINCE', 'City/Municipality'], ''));
             if ($company === '') $missing[] = 'Company';
-            if ($month === '') $missing[] = 'Month';
-            if ($year === '') $missing[] = 'Year';
             if ($status === '') $missing[] = 'Accreditation';
             if ($est === '') $missing[] = 'Est. Type';
             if ($industry === '') $missing[] = 'Industry';
