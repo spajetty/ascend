@@ -31,6 +31,9 @@
 /* ─── Page Views ────────────────────────────────────────── */
 #listView, #profileView {
   transition: opacity .18s ease, transform .18s ease;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 #listView.view-exit {
   opacity: 0;
@@ -110,6 +113,12 @@
   background-repeat: no-repeat; background-position: right 10px center;
 }
 
+@media(max-width:640px){
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .search-wrap { width: 100%; min-width: 100%; }
+  .filter-bar select { width: 100%; }
+}
+
 /* ─── Table ─────────────────────────────────────────────── */
 .table-card {
   background: var(--card);
@@ -117,14 +126,40 @@
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
   overflow: hidden;
+  width: 100%;
+  max-width: 100%;
 }
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; }
+.table-wrap { 
+  overflow-x: auto; 
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+.table-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+.table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.table-wrap::-webkit-scrollbar-thumb {
+  background-color: #cbd5e1;
+  border-radius: 10px;
+}
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background-color: #94a3b8;
+}
+table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  min-width: 900px; /* Force horizontal scroll on smaller screens */
+}
 thead th {
   text-align: left; padding: 13px 16px;
   font-size: 11.5px; font-weight: 600; letter-spacing: .06em;
   text-transform: uppercase; color: var(--text-secondary);
   border-bottom: 1px solid var(--border); background: #fafbfc;
+  white-space: nowrap;
 }
 tbody tr {
   border-bottom: 1px solid var(--border);
@@ -164,6 +199,25 @@ tbody td { padding: 14px 16px; font-size: 13.5px; color: var(--text-primary); ve
   font-size: 13px; color: var(--text-secondary); transition: all .12s;
 }
 .page-btn:hover, .page-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+@media(max-width: 640px) {
+  .table-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .table-footer > div:first-child {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+    width: 100%;
+  }
+  .pagination {
+    align-self: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
 
 /* ─── Profile Page ──────────────────────────────────────── */
 .profile-back-bar {
@@ -758,6 +812,15 @@ tbody tr.row-selected:hover { background: #dbeafe; }
   border: 1px solid #fecaca;
 }
 .bulk-btn-delete:hover { background: #fecaca; }
+
+@media(max-width: 640px) {
+  .bulk-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bulk-action-left { justify-content: space-between; }
+  .bulk-action-right { justify-content: flex-end; flex-wrap: wrap; }
+}
 
 /* ── Bulk Classify Modal ─────────────────────────────────── */
 .bulk-classify-info {

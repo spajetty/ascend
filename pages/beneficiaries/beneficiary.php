@@ -27,10 +27,10 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 
 <link rel="stylesheet" href="assets/css/beneficiaries.css">
 
-<main id="mainContent" class="flex-1 md:ml-56 min-h-screen">
+<main id="mainContent" class="flex-1 min-w-0 md:ml-56 min-h-screen">
     <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>
 
-    <div class="px-6 md:px-8 py-6" style="background:var(--bg,#f4f6f9); min-height:100vh;">
+    <div class="px-6 md:px-8 pt-6 pb-24 md:py-6 max-w-full" style="background:var(--bg,#f4f6f9); min-height:100vh;">
 
         <?php if ($pendingEmployerAccreditation): ?>
         <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-900 shadow-sm">

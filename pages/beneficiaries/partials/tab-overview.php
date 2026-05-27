@@ -130,7 +130,8 @@
                 Add
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Event Type</th>
@@ -147,7 +148,8 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- First Time Job Seeker issuance status (hidden by default) -->
@@ -167,7 +169,8 @@
                 </svg>
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Occupational Permit</th>
@@ -180,7 +183,8 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- WHIP project assignment (hidden by default) -->
@@ -203,7 +207,8 @@
                 Add
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Position</th>
@@ -221,7 +226,8 @@
                     </td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- WIIRP info (hidden by default) -->
@@ -330,7 +336,8 @@
                 Assignment Details
             </h4>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Start Date</th>
@@ -347,7 +354,8 @@
                         records.</td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- SPES student info (hidden by default) -->
@@ -397,7 +405,8 @@
                 OJT Employment
             </h4>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Company</th>
@@ -414,7 +423,8 @@
                     <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
                 </tr>
             </tbody>
-        </table>
+            </table>
+        </div>
     </div>
 
     <!-- GIP (Government Internship Program) (hidden by default) -->
@@ -520,7 +530,8 @@
                 Add
             </button>
         </div>
-        <table class="emp-table">
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
             <thead>
                 <tr>
                     <th>Company</th>
@@ -531,6 +542,7 @@
                 </tr>
             </thead>
             <tbody id="pEmployment"></tbody>
-        </table>
+            </table>
+        </div>
     </div>
 </div>
