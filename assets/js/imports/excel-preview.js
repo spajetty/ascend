@@ -42,6 +42,48 @@ function ensurePaginationContainer() {
     return container;
 }
 
+function collectJobFairCompanySeeds(rows = []) {
+    const imported = [];
+    const unmatched = [];
+    const seenImported = new Set();
+    const seenUnmatched = new Set();
+
+    for (const row of rows) {
+        const rawName = String(
+            row?.suggested_company_name
+            ?? row?.Company
+            ?? row?.CompanyName
+            ?? row?.Employer
+            ?? row?.company_name
+            ?? row?.company
+            ?? row?.employer_name
+            ?? row?.employer
+            ?? ''
+        ).trim();
+
+        if (!rawName) continue;
+
+        const normalized = rawName.toLowerCase().replace(/\s+/g, ' ');
+        if (!seenImported.has(normalized)) {
+            seenImported.add(normalized);
+            imported.push(rawName);
+        }
+
+        const statusMessage = String(row?.status_message ?? '').toLowerCase();
+        const isUnmatched = (row?.badge_status ?? '').toLowerCase() === 'invalid'
+            || statusMessage.includes('not a participant')
+            || statusMessage.includes('not found')
+            || statusMessage.includes('did you mean');
+
+        if (isUnmatched && !seenUnmatched.has(normalized)) {
+            seenUnmatched.add(normalized);
+            unmatched.push(rawName);
+        }
+    }
+
+    return { imported, unmatched };
+}
+
 function buildPageWindow(totalPages, currentPage) {
     if (totalPages <= 7) {
         return Array.from({ length: totalPages }, (_, index) => index + 1);
@@ -176,6 +218,14 @@ export async function revalidateCurrentPreview(options = {}) {
 
         state.parsedExcelData = result.data;
         state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
+        if (program === 'Job Fair') {
+            const seeds = collectJobFairCompanySeeds(result.data);
+            state.jobFairImportedCompanies = seeds.imported;
+            state.jobFairUnmatchedCompanies = seeds.unmatched;
+        } else {
+            state.jobFairImportedCompanies = [];
+            state.jobFairUnmatchedCompanies = [];
+        }
         showExcelPreview(result.data, result.summary, previewRequiredCols, previewExtraCols);
     } finally {
         if (confirmBtn && !options.skipButtonLoading) setButtonLoading(confirmBtn, false);

@@ -12,4 +12,6 @@ export const state = {
     latestUndoToken: null,
     pendingEmployerAccreditation: null,
     currentEventParticipants: [],  // participants for the currently selected job fair event
+    jobFairImportedCompanies: [],
+    jobFairUnmatchedCompanies: [],
 };
