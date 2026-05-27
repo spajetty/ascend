@@ -273,6 +273,11 @@ function _renderImportedSeedPanel(modal, seedCompanies = [], unmatchedCompanies 
 
     if (!panel || !seedList || !unmatchedWrap || !unmatchedList) return;
 
+    if (seedCompanies.length === 0 && unmatchedCompanies.length === 0) {
+        panel.classList.add('hidden');
+        return;
+    }
+
     const hasSeeds = Array.isArray(seedCompanies) && seedCompanies.length > 0;
     const hasUnmatched = Array.isArray(unmatchedCompanies) && unmatchedCompanies.length > 0;
 
