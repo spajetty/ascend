@@ -56,6 +56,72 @@
     </div>
 </div>
 
+<!-- ── Edit WIIRP Assignment Modal ── -->
+<div id="modalEditWiirpAssignment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:640px;">
+        <div class="modal-header">
+            <h3>Edit WIIRP Assignment</h3>
+            <button class="modal-close" onclick="closeEditWiirpAssignmentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="editWiirpAssignmentId" value="">
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Start Date</label>
+                    <input type="date" id="editWiirpAssignmentStart">
+                </div>
+                <div class="modal-field">
+                    <label>End Date</label>
+                    <input type="date" id="editWiirpAssignmentEnd">
+                </div>
+                <div class="modal-field">
+                    <label>Required Hours</label>
+                    <input type="number" id="editWiirpAssignmentRequiredHours" min="0">
+                </div>
+            </div>
+
+            <div class="modal-field">
+                <label>Office Assignment</label>
+                <input type="text" id="editWiirpAssignmentOffice" placeholder="Office assignment or role">
+            </div>
+
+            <div class="modal-field">
+                <label>Endorsement 1</label>
+                <input type="text" id="editWiirpAssignmentEndorsement1" placeholder="Endorsement 1">
+            </div>
+
+            <div class="modal-field">
+                <label>Endorsement 2</label>
+                <input type="text" id="editWiirpAssignmentEndorsement2" placeholder="Endorsement 2">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditWiirpAssignmentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="submitEditWiirpAssignment()">Save Changes</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete WIIRP Assignment Modal ── -->
+<div id="modalDeleteWiirpAssignment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete Assignment</h3>
+            <button class="modal-close" onclick="closeDeleteWiirpAssignmentModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="deleteWiirpAssignmentId" value="">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this assignment?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteWiirpAssignmentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteWiirpAssignment()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Edit Contact Information Modal ── -->
 <div id="modalEditContact" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box">

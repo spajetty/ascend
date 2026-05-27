@@ -335,6 +335,15 @@
                 </svg>
                 Assignment Details
             </h4>
+            
+            <button class="edit-btn-icon" onclick="openAddWiirpAssignmentModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add Wiirp Assignment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add
+            </button>
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">

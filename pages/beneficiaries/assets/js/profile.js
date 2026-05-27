@@ -6,7 +6,7 @@ function _withModalSaveLoading(label, run) {
   const btn = window.AscendLoading?.getOpenModalConfirmButton?.() ?? null;
   if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, true, { label });
   return Promise.resolve(run()).finally(() => {
-    if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
+      if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
   });
 }
 
@@ -268,7 +268,7 @@ async function openProfile(benefId) {
       if (el) el.textContent = 'Loading…';
     });
 
-    fetch(`../../backend/beneficiaries/get_wiirp.php?benef_id=${encodeURIComponent(b.benef_id)}`)
+    fetch(`../../backend/beneficiaries/get_wiirp.php?benef_id=${encodeURIComponent(b.benef_id)}&t=${Date.now()}`)
       .then(r => r.json())
       .then(j => {
         const record = j && j.success ? j.record : null;
@@ -318,25 +318,38 @@ async function openProfile(benefId) {
         if (assignmentCard) assignmentCard.style.display = showAssignment ? 'block' : 'none';
 
         if (assignmentsEl) {
-          if (showAssignment && assignments.length) {
-            const latest = assignments[0];
+          if (showAssignment) {
+            // keep assignments array for editing/deleting
+            window.currentWiirpAssignments = assignments;
             if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
             if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
 
-            assignmentsEl.innerHTML = `
-              <tr>
-                <td>${upperText(formatDate(latest.start_date))}</td>
-                <td>${upperText(formatDate(latest.end_date))}</td>
-                <td>${latest.required_hours != null ? String(latest.required_hours) : '—'}</td>
-                <td style="font-weight:500;">${upperText(latest.office_assignment)}</td>
-                ${showEndorsements ? `<td>${upperText(latest.endorsement_1)}</td><td>${upperText(latest.endorsement_2)}</td>` : ''}
-              </tr>
-            `;
-          } else if (showAssignment) {
+            if (assignments.length) {
+              const rows = assignments.map(a => `
+                <tr>
+                  <td>${upperText(formatDate(a.start_date))}</td>
+                  <td>${upperText(formatDate(a.end_date))}</td>
+                  <td>${a.required_hours != null ? String(a.required_hours) : '—'}</td>
+                  <td style="font-weight:500;">${upperText(a.office_assignment)}</td>
+                  ${showEndorsements ? `<td>${upperText(a.endorsement_1)}</td><td>${upperText(a.endorsement_2)}</td>` : ''}
+                  <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                    <button type="button" class="edit-btn-icon" onclick="openEditWiirpAssignmentModal(${a.id})" title="Edit Assignment">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button type="button" class="delete-btn-icon" onclick="deleteWiirpAssignment(${a.id})" title="Delete Assignment" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    </button>
+                  </td>
+                </tr>
+              `).join('');
+
+              assignmentsEl.innerHTML = rows;
+            } else {
+              assignmentsEl.innerHTML = `<tr><td colspan="${showEndorsements ? 6 : 4}" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
+            }
+          } else {
             if (endorsement1Header) endorsement1Header.style.display = showEndorsements ? '' : 'none';
             if (endorsement2Header) endorsement2Header.style.display = showEndorsements ? '' : 'none';
-            assignmentsEl.innerHTML = `<tr><td colspan="${showEndorsements ? 6 : 4}" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
-          } else {
             assignmentsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment records.</td></tr>`;
           }
         }
@@ -1488,6 +1501,186 @@ function submitEditWiirp() {
     });
 }
 
+// ---------------- WIIRP Assignment Edit/Delete Handlers ----------------
+function openEditWiirpAssignmentModal(assignmentId) {
+  const recs = Array.isArray(window.currentWiirpAssignments) ? window.currentWiirpAssignments : [];
+  const record = recs.find(r => String(r.id) === String(assignmentId));
+  if (!record) {
+    _showEditToast('Could not load the selected assignment.', 'error');
+    return;
+  }
+  document.getElementById('editWiirpAssignmentId').value = record.id || '';
+  document.getElementById('editWiirpAssignmentStart').value = formatDateForInput(record.start_date) || '';
+  document.getElementById('editWiirpAssignmentEnd').value = formatDateForInput(record.end_date) || '';
+  document.getElementById('editWiirpAssignmentRequiredHours').value = record.required_hours != null ? String(record.required_hours) : '';
+  document.getElementById('editWiirpAssignmentOffice').value = record.office_assignment || '';
+  document.getElementById('editWiirpAssignmentEndorsement1').value = record.endorsement_1 || '';
+  document.getElementById('editWiirpAssignmentEndorsement2').value = record.endorsement_2 || '';
+  // ensure modal shows Edit mode
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Edit WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Save Changes';
+      confirm.onclick = submitEditWiirpAssignment;
+    }
+  }
+  _toggleEditModal('modalEditWiirpAssignment', 'flex');
+}
+
+function closeEditWiirpAssignmentModal() {
+  _toggleEditModal('modalEditWiirpAssignment', 'none');
+  // restore default edit button behavior
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Edit WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Save Changes';
+      confirm.onclick = submitEditWiirpAssignment;
+    }
+  }
+}
+
+function submitEditWiirpAssignment() {
+  const assignmentId = document.getElementById('editWiirpAssignmentId').value;
+  if (!assignmentId) {
+    _showEditToast('No assignment selected.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('assignment_id', assignmentId);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('start_date', document.getElementById('editWiirpAssignmentStart').value || '');
+  formData.append('end_date', document.getElementById('editWiirpAssignmentEnd').value || '');
+  formData.append('required_hours', document.getElementById('editWiirpAssignmentRequiredHours').value || '');
+  formData.append('office_assignment', document.getElementById('editWiirpAssignmentOffice').value.trim());
+  formData.append('endorsement_1', document.getElementById('editWiirpAssignmentEndorsement1').value.trim());
+  formData.append('endorsement_2', document.getElementById('editWiirpAssignmentEndorsement2').value.trim());
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_wiirp_assignment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment updated successfully.', 'success');
+        closeEditWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error updating assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error updating assignment.', 'error');
+    })
+  );
+}
+
+// ---------------- WIIRP Assignment Add Handlers ----------------
+function openAddWiirpAssignmentModal() {
+  // Clear fields
+  document.getElementById('editWiirpAssignmentId').value = '';
+  document.getElementById('editWiirpAssignmentStart').value = '';
+  document.getElementById('editWiirpAssignmentEnd').value = '';
+  document.getElementById('editWiirpAssignmentRequiredHours').value = '';
+  document.getElementById('editWiirpAssignmentOffice').value = '';
+  document.getElementById('editWiirpAssignmentEndorsement1').value = '';
+  document.getElementById('editWiirpAssignmentEndorsement2').value = '';
+
+  const modal = document.getElementById('modalEditWiirpAssignment');
+  if (modal) {
+    const title = modal.querySelector('.modal-header h3');
+    if (title) title.textContent = 'Add WIIRP Assignment';
+    const confirm = modal.querySelector('.modal-footer .btn-confirm');
+    if (confirm) {
+      confirm.textContent = 'Add Assignment';
+      confirm.onclick = submitAddWiirpAssignment;
+    }
+  }
+
+  _toggleEditModal('modalEditWiirpAssignment', 'flex');
+}
+
+function submitAddWiirpAssignment() {
+  // require a loaded WIIRP record and current beneficiary
+  const wiirp = window.currentWiirpRecord || null;
+  if (!wiirp || !wiirp.work_immersion_id) {
+    _showEditToast('No WIIRP record selected for assignment.', 'error');
+    return;
+  }
+  if (!window.currentBeneficiaryId) {
+    _showEditToast('No beneficiary selected.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('work_immersion_id', wiirp.work_immersion_id);
+  formData.append('benef_id', window.currentBeneficiaryId);
+  formData.append('start_date', document.getElementById('editWiirpAssignmentStart').value || '');
+  formData.append('end_date', document.getElementById('editWiirpAssignmentEnd').value || '');
+  formData.append('required_hours', document.getElementById('editWiirpAssignmentRequiredHours').value || '');
+  formData.append('office_assignment', document.getElementById('editWiirpAssignmentOffice').value.trim());
+  formData.append('endorsement_1', document.getElementById('editWiirpAssignmentEndorsement1').value.trim());
+  formData.append('endorsement_2', document.getElementById('editWiirpAssignmentEndorsement2').value.trim());
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_wiirp_assignment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment added successfully.', 'success');
+        closeEditWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error adding assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error adding assignment.', 'error');
+    })
+  );
+}
+
+function deleteWiirpAssignment(assignmentId) {
+  document.getElementById('deleteWiirpAssignmentId').value = assignmentId;
+  _toggleEditModal('modalDeleteWiirpAssignment', 'flex');
+}
+
+function closeDeleteWiirpAssignmentModal() {
+  _toggleEditModal('modalDeleteWiirpAssignment', 'none');
+  document.getElementById('deleteWiirpAssignmentId').value = '';
+}
+
+function confirmDeleteWiirpAssignment() {
+  const id = document.getElementById('deleteWiirpAssignmentId').value;
+  if (!id) return;
+
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_wiirp_assignment.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ assignment_id: id, benef_id: window.currentBeneficiaryId })
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('Assignment deleted.', 'success');
+        closeDeleteWiirpAssignmentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Failed to delete assignment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error deleting assignment.', 'error');
+    })
+  );
+}
+
 function openEditGipModal() {
   const record = window.currentGipRecord;
   if (!record) {
@@ -1684,6 +1877,14 @@ window.confirmDeleteEmploymentRecord = confirmDeleteEmploymentRecord;
 window.openEditWiirpModal = openEditWiirpModal;
 window.closeEditWiirpModal = closeEditWiirpModal;
 window.submitEditWiirp = submitEditWiirp;
+window.openEditWiirpAssignmentModal = openEditWiirpAssignmentModal;
+window.closeEditWiirpAssignmentModal = closeEditWiirpAssignmentModal;
+window.submitEditWiirpAssignment = submitEditWiirpAssignment;
+window.openAddWiirpAssignmentModal = openAddWiirpAssignmentModal;
+window.submitAddWiirpAssignment = submitAddWiirpAssignment;
+window.deleteWiirpAssignment = deleteWiirpAssignment;
+window.closeDeleteWiirpAssignmentModal = closeDeleteWiirpAssignmentModal;
+window.confirmDeleteWiirpAssignment = confirmDeleteWiirpAssignment;
 window.openEditGipModal = openEditGipModal;
 window.closeEditGipModal = closeEditGipModal;
 
