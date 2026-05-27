@@ -90,6 +90,23 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                 <select id="yearSelect"
                     class="text-sm border border-gray-200 rounded-lg px-3 py-1.5">
                 </select>
+                <select id="monthFilter"
+                    onchange="applyFilters()"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
             </div>
 
             <!-- Row 2: Search + Establishment Type on same line -->
@@ -272,6 +289,7 @@ async function loadData(year) {
         allRows = rows;
         document.getElementById('searchCompany').value = '';
         document.getElementById('filterEstType').value = '';
+        document.getElementById('monthFilter').value = '';
         applyFilters();
 
         return json.data;
@@ -287,11 +305,13 @@ async function loadData(year) {
 function applyFilters() {
     const query   = document.getElementById('searchCompany').value.toLowerCase().trim();
     const estType = document.getElementById('filterEstType').value.toLowerCase().trim();
+    const monthFilter = document.getElementById('monthFilter').value;
 
     filteredRows = allRows.filter(r => {
         const companyMatch = !query   || (r.company_name || '').toLowerCase().includes(query);
         const estTypeMatch = !estType || (r.est_type || '').toLowerCase() === estType;
-        return companyMatch && estTypeMatch;
+        const monthMatch   = !monthFilter || String(getMonthNumber(r.month)) === monthFilter;
+        return companyMatch && estTypeMatch && monthMatch;
     });
     currentPage = 1;
     renderPage();
@@ -314,6 +334,8 @@ function renderPage() {
     } else {
         slice.forEach(row => tbody.insertAdjacentHTML('beforeend', buildRow(row)));
     }
+
+    document.getElementById('tableTotal').textContent = total + ' Total';
 
     // Pagination info
     document.getElementById('paginationInfo').textContent =
@@ -367,6 +389,15 @@ function estTypeBadge(type) {
 
 const MONTH_NAMES = ['January','February','March','April','May','June',
                      'July','August','September','October','November','December'];
+
+function getMonthNumber(value) {
+    if (value === null || value === undefined || value === '') return null;
+    const raw = String(value).trim();
+    const numeric = Number(raw);
+    if (Number.isInteger(numeric) && numeric >= 1 && numeric <= 12) return numeric;
+    const idx = MONTH_NAMES.findIndex(month => month.toLowerCase() === raw.toLowerCase());
+    return idx >= 0 ? idx + 1 : null;
+}
 
 function buildRow(r) {
     const id        = r.accreditation_id;

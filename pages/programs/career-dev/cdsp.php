@@ -85,10 +85,27 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
         <!-- Filter -->
         <div class="flex flex-col gap-2 mb-4">
             <!-- Row 1: Year filter -->
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
                 <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
                 <select id="yearSelect"
                     class="text-sm border border-gray-200 rounded-lg px-3 py-1.5">
+                </select>
+                <select id="monthFilter"
+                    onchange="applyFilters()"
+                    class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white">
+                    <option value="">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
                 </select>
             </div>
 
@@ -469,6 +486,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 const API_URL = '/backend/career-dev/cdsp/show-cdsp.php';
 const CACHE_URL = '/cache/fetch-cdsp.json';
 const ROWS_PER_PAGE = 9;
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 let allRows      = [];   // raw data from API
 let filteredRows = [];   // after search filter
@@ -486,6 +504,12 @@ function fmt(dateStr) {
 
 function num(n) {
     return Number(n || 0).toLocaleString();
+}
+
+function getMonthNumber(dateStr) {
+    if (!dateStr) return null;
+    const dt = new Date(`${dateStr}T00:00:00`);
+    return Number.isNaN(dt.getTime()) ? null : dt.getMonth() + 1;
 }
 
 // ─── Load data from API ───────────────────────────────────────────────────────
@@ -548,6 +572,7 @@ async function loadData(year) {
 
         allRows = rows;
         document.getElementById('searchSchool').value = '';
+        document.getElementById('monthFilter').value = '';
         applyFilters();
 
     } catch (err) {
@@ -559,8 +584,10 @@ async function loadData(year) {
 // ─── Filter + Render ──────────────────────────────────────────────────────────
 function applyFilters() {
     const query = document.getElementById('searchSchool').value.toLowerCase().trim();
+    const monthFilter = document.getElementById('monthFilter').value;
     filteredRows = allRows.filter(r =>
-        !query || (r.school_name || '').toLowerCase().includes(query)
+        (!query || (r.school_name || '').toLowerCase().includes(query)) &&
+        (!monthFilter || String(getMonthNumber(r.date_of_conduct)) === monthFilter)
     );
     currentPage = 1;
     renderPage();
@@ -584,6 +611,8 @@ function renderPage() {
     } else {
         slice.forEach(row => tbody.insertAdjacentHTML('beforeend', buildRow(row)));
     }
+
+    document.getElementById('tableTotal').textContent = num(total) + ' Total';
 
     // Total row
     const totM = filteredRows.reduce(
