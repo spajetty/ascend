@@ -142,38 +142,56 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
             <div class="bg-gradient-to-r from-teal-50 to-cyan-50 px-4 md:px-6 py-4 border-b border-gray-100 flex items-center justify-between gap-2">
                 <h2 class="font-bold text-gray-800 text-sm md:text-base leading-tight">Government Internship Program (GIP)</h2>
             </div>
-            <div class="overflow-x-auto [&::-webkit-scrollbar]:h-[4px] [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
-                <table class="w-full text-xs">
-                    <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">CONTRACT PERIOD</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">SCHOOL</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COLLEGE / SHS</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">COURSE</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">OFFICE ASSIGNMENT</th>
-                            <th class="text-left px-4 py-2 text-gray-500 font-medium" rowspan="2">REQ. HRS</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-blue-500 font-semibold border-l border-gray-100">INQUIRED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-teal-500 font-semibold border-l border-gray-100">REFERRED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-purple-500 font-semibold border-l border-gray-100">INTERVIEWED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-pink-500 font-semibold border-l border-gray-100">PESO-ACCEPTED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold border-l border-gray-100">PRIVATE-ACCEPTED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold border-l border-gray-100">NOT PROCEEDED</th>
-                        </tr>
-                        <tr class="border-b border-gray-100 bg-gray-50">
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-teal-600">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-blue-500">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-teal-500">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-purple-500">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-pink-500">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-green-500">T</th>
-                            <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-red-400">T</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gip-tbody">
-                        <tr><td colspan="27" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
-                    </tbody>
-                </table>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Left: DOLE -->
+                <div class="overflow-x-auto bg-white rounded-xl shadow-sm">
+                    <div class="px-4 py-3 border-b border-gray-100 bg-white">
+                        <h3 class="font-semibold text-sm text-gray-700">DOLE</h3>
+                    </div>
+                    <div class="overflow-x-auto" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">MONTH</th>
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">OFFICE</th>
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">SCHOOL</th>
+                                    <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
+                                </tr>
+                                <tr class="border-b border-gray-100 bg-gray-50">
+                                    <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-teal-600">T</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gipLeftBody">
+                                <tr><td colspan="6" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Right: LGU -->
+                <div class="overflow-x-auto bg-white rounded-xl shadow-sm">
+                    <div class="px-4 py-3 border-b border-gray-100 bg-white">
+                        <h3 class="font-semibold text-sm text-gray-700">LGU</h3>
+                    </div>
+                    <div class="overflow-x-auto" style="scrollbar-width: thin; scrollbar-color: #d1d5db #f3f4f6;">
+                        <table class="w-full text-xs">
+                            <thead>
+                                <tr class="border-b border-gray-100">
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">MONTH</th>
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">OFFICE</th>
+                                    <th class="text-left px-4 py-2 text-gray-500 font-medium">SCHOOL</th>
+                                    <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold border-l border-gray-100">PARTICIPANTS</th>
+                                </tr>
+                                <tr class="border-b border-gray-100 bg-gray-50">
+                                    <th class="px-2 py-1 text-center text-gray-400 font-medium border-l border-gray-100">M</th><th class="px-2 py-1 text-center text-gray-400 font-medium">F</th><th class="px-2 py-1 text-center font-semibold text-teal-600">T</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gipRightBody">
+                                <tr><td colspan="6" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <div class="flex justify-end px-4 md:px-6 py-3 border-t border-gray-100">
                 <a href="/pages/programs/youth-emp/gip.php" class="text-sm text-teal-600 hover:text-teal-800 font-medium">See More →</a>
@@ -228,12 +246,14 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 // ─── API paths ────────────────────────────────────────────────────────────────
 // FIX: point to the actual show-*.php files under /backend/youth-employ/
 const YEAR     = new Date().getFullYear();
-const SPES_API = `/backend/youth-employ/show-spes.php?year=${YEAR}`;
-const GIP_API  = `/backend/youth-employ/show-gip.php?year=${YEAR}`;
-const WIMM_API = `/backend/youth-employ/show-work-imm.php?year=${YEAR}`;
+const SPES_API = `/backend/youth-employ/spes/show-spes.php?year=${YEAR}`;
+const GIP_API  = `/backend/youth-employ/gip/show-gip.php?year=${YEAR}`;
+const WIMM_API = `/backend/youth-employ/work-imm/show-work-imm.php?year=${YEAR}`;
 
 // Preview shows only the last N rows
 const PREVIEW_ROWS = 3;
+// Month labels used by GIP preview
+const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 // ─── Helper: clear a stuck "Loading…" tbody ───────────────────────────────────
 function clearLoading(tbodyId, colspan, msg = 'No data available.') {
@@ -265,9 +285,35 @@ document.addEventListener('DOMContentLoaded', () => {
         // ── Summary Cards ──────────────────────────────────────────────────────
         const spesPart   = spesData ? spesData.totals.registered    : 0;
         const spesPlaced = spesData ? spesData.totals.placed        : 0;
-        const gipPart    = gipData  ? (gipData.totals.participants.m + gipData.totals.participants.f) : 0;
-        const gipPlaced  = gipData  ? (gipData.totals.peso.m + gipData.totals.peso.f
-                                     + gipData.totals.private.m + gipData.totals.private.f) : 0;
+        // GIP totals: tolerant to new API shape.
+        const sumMF = obj => { if (!obj) return 0; return (+obj.m || 0) + (+obj.f || 0); };
+        const gipTotalsFromData = d => {
+            const totals = d && d.totals ? d.totals : {};
+            const result = { participants: 0, placed: 0 };
+
+            if (totals.participants) {
+                result.participants = sumMF(totals.participants);
+            } else if (totals.lgu || totals.dole) {
+                result.participants = sumMF(totals.lgu && totals.lgu.participants) + sumMF(totals.dole && totals.dole.participants);
+            } else if (Array.isArray(d && d.rows)) {
+                result.participants = (d.rows || []).reduce((s, r) => s + (+r.part_m || 0) + (+r.part_f || 0), 0);
+            }
+
+            if (totals.peso || totals.private) {
+                result.placed = sumMF(totals.peso) + sumMF(totals.private);
+            } else if (totals.lgu || totals.dole) {
+                result.placed = sumMF(totals.lgu && totals.lgu.peso) + sumMF(totals.lgu && totals.lgu.private)
+                              + sumMF(totals.dole && totals.dole.peso) + sumMF(totals.dole && totals.dole.private);
+            } else if (Array.isArray(d && d.rows)) {
+                result.placed = (d.rows || []).reduce((s, r) => s + (+r.peso_m || 0) + (+r.peso_f || 0) + (+r.priv_m || 0) + (+r.priv_f || 0), 0);
+            }
+
+            return result;
+        };
+
+        const gipSummary = gipData ? gipTotalsFromData(gipData) : { participants: 0, placed: 0 };
+        const gipPart    = gipSummary.participants;
+        const gipPlaced  = gipSummary.placed;
         const wimmPart   = wimmData ? wimmData.totals.part_total    : 0;
         const wimmPlaced = wimmData ? (wimmData.totals.peso_total + wimmData.totals.priv_total) : 0;
 
@@ -352,59 +398,56 @@ function renderSpes(data) {
 // ─── GIP ──────────────────────────────────────────────────────────────────────
 function renderGip(data) {
     const tbody = document.getElementById('gip-tbody');
-    if (!data || !data.rows.length) { clearLoading('gip-tbody', 27); return; }
-
-    const rows   = data.rows.slice(-PREVIEW_ROWS);
-    const totals = data.totals;
+    if (!data || !data.rows || !data.rows.length) { clearLoading('gip-tbody', 8); return; }
+    const rows = data.rows.slice(-PREVIEW_ROWS);
     let html = '';
 
-    rows.forEach(r => {
-        const partT = +r.part_m  + +r.part_f;
-        const inqT  = +r.inq_m   + +r.inq_f;
-        const refT  = +r.ref_m   + +r.ref_f;
-        const intT  = +r.int_m   + +r.int_f;
-        const pesoT = +r.peso_m  + +r.peso_f;
-        const privT = +r.priv_m  + +r.priv_f;
-        const notpT = +r.notp_m  + +r.notp_f;
+    // group rows by type across all returned rows
+    const allRows = data.rows || [];
+    const lguRows = allRows.filter(r => String((r.gip_type || r.type || '')).toLowerCase() !== 'dole');
+    const doleRows = allRows.filter(r => String((r.gip_type || r.type || '')).toLowerCase() === 'dole');
 
-        html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-4 py-2 text-gray-700 font-semibold">${escHtml(r.contract_period)}</td>
-            <td class="px-4 py-2 text-gray-600">${escHtml(r.school)}</td>
-            <td class="px-4 py-2">${badge(r.college_or_shs)}</td>
-            <td class="px-4 py-2 text-gray-600">${escHtml(r.course)}</td>
-            <td class="px-4 py-2 text-gray-600">${escHtml(r.office_assignment)}</td>
-            <td class="px-4 py-2 font-semibold text-gray-700">${r.required_hours ?? '—'}</td>
-            ${tL(r.part_m)}${t(r.part_f)}${tTotal(partT, 'text-teal-600', 'bg-teal-50')}
-            ${tL(r.inq_m)}${t(r.inq_f)}${tTotal(inqT,   'text-blue-500', 'bg-blue-50')}
-            ${tL(r.ref_m)}${t(r.ref_f)}${tTotal(refT,   'text-teal-500', 'bg-teal-50')}
-            ${tL(r.int_m)}${t(r.int_f)}${tTotal(intT,   'text-purple-500','bg-purple-50')}
-            ${tL(r.peso_m)}${t(r.peso_f)}${tTotal(pesoT,'text-pink-500', 'bg-pink-50')}
-            ${tL(r.priv_m)}${t(r.priv_f)}${tTotal(privT,'text-green-500','bg-green-50')}
-            ${tL(r.notp_m)}${t(r.notp_f)}${tTotal(notpT,'text-red-400',  'bg-red-50')}
-        </tr>`;
-    });
+    const buildRowsHtml = list => {
+        if (!list.length) return `<tr><td colspan="6" class="text-center py-6 text-gray-400 text-sm">No data</td></tr>`;
+        return list.map(r => {
+            const partT = (+r.part_m || 0) + (+r.part_f || 0);
+            const monthLabel = MONTH_NAMES[+r.month_num || +r.month || 0] || '—';
+            return `<tr class="border-b border-gray-50 hover:bg-gray-50">
+                <td class="px-4 py-2 text-gray-700 font-semibold">${escHtml(monthLabel)}</td>
+                <td class="px-4 py-2 text-gray-600">${escHtml(r.office_assignment || '—')}</td>
+                <td class="px-4 py-2 text-gray-600">${escHtml(r.school || '—')}</td>
+                ${tL(r.part_m)}${t(r.part_f)}${tTotal(partT, 'text-teal-600', 'bg-teal-50')}
+            </tr>`;
+        }).join('');
+    };
 
-    const tp   = totals.participants;
-    const ti   = totals.inquired;
-    const tr2  = totals.referred;
-    const tint = totals.interviewed;
-    const tpe  = totals.peso;
-    const tpr  = totals.private;
-    const tnp  = totals.not_proceeded;
+    // show the last PREVIEW_ROWS per section
+    const dolePreview = doleRows.slice(-PREVIEW_ROWS);
+    const lguPreview = lguRows.slice(-PREVIEW_ROWS);
 
-    html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
-        <td class="px-4 py-2 text-gray-800 font-bold" colspan="5">TOTAL</td>
-        <td class="px-4 py-2 font-bold text-gray-700">—</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${tp.m + tp.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${ti.m + ti.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-teal-500 bg-teal-100 border-l border-gray-100">${tr2.m + tr2.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-purple-500 bg-purple-100 border-l border-gray-100">${tint.m + tint.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${tpe.m + tpe.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">${tpr.m + tpr.f}</td>
-        <td colspan="3" class="px-2 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">${tnp.m + tnp.f}</td>
+    document.getElementById('gipLeftBody').innerHTML = buildRowsHtml(dolePreview);
+    document.getElementById('gipRightBody').innerHTML = buildRowsHtml(lguPreview);
+
+    // per-section totals (use backend totals when available)
+    const lt = data.totals && data.totals.lgu ? data.totals.lgu : lguRows.reduce((s,r)=>({ m: s.m + (+r.part_m||0), f: s.f + (+r.part_f||0) }), { m:0,f:0 });
+    const dt = data.totals && data.totals.dole ? data.totals.dole : doleRows.reduce((s,r)=>({ m: s.m + (+r.part_m||0), f: s.f + (+r.part_f||0) }), { m:0,f:0 });
+
+    // append totals row to each tbody
+    const leftTotalRow = `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+        <td class="px-4 py-2 text-gray-800 font-bold" colspan="3">TOTAL</td>
+        <td class="px-1.5 py-3 text-center text-gray-700 border-l border-gray-100">${dt.m}</td>
+        <td class="px-1.5 py-3 text-center text-gray-700">${dt.f}</td>
+        <td class="px-1.5 py-3 text-center font-bold text-teal-600">${dt.m + dt.f}</td>
+    </tr>`;
+    const rightTotalRow = `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
+        <td class="px-4 py-2 text-gray-800 font-bold" colspan="3">TOTAL</td>
+        <td class="px-1.5 py-3 text-center text-gray-700 border-l border-gray-100">${lt.m}</td>
+        <td class="px-1.5 py-3 text-center text-gray-700">${lt.f}</td>
+        <td class="px-1.5 py-3 text-center font-bold text-teal-600">${lt.m + lt.f}</td>
     </tr>`;
 
-    tbody.innerHTML = html;
+    document.getElementById('gipLeftBody').innerHTML += leftTotalRow;
+    document.getElementById('gipRightBody').innerHTML += rightTotalRow;
 }
 
 // ─── Work Immersion ───────────────────────────────────────────────────────────

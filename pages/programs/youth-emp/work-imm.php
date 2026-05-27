@@ -255,7 +255,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <script>
-const API_URL       = '/backend/youth-employ/show-work-imm.php';
+const API_URL       = '/backend/youth-employ/work-imm/show-work-imm.php';
 const ROWS_PER_PAGE = 12;
 
 let allRows      = [];

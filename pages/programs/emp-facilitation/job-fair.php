@@ -274,7 +274,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 // ─── Config ───────────────────────────────────────────────────────────────────
-const API_URL        = '/backend/emp-facilitation/show-job-fair.php';
+const API_URL        = '/backend/emp-facilitation/job-fair/show-job-fair.php';
 const ROWS_PER_PAGE  = 20;
 
 // ─── State ────────────────────────────────────────────────────────────────────

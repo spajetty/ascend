@@ -1,9 +1,10 @@
 <?php
-require_once __DIR__ . '/../../includes/auth-check.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+$require_auth = __DIR__ . '/../../../includes/auth-check.php';
+require_once $require_auth;
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-// .env lives at C:\laragon\www\ascend\api\
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../api');
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../api');
 $dotenv->load();
 
 $host = $_ENV['DB_HOST'] ?? 'localhost';
@@ -50,19 +51,18 @@ function json_ok(mixed $data = null): void {
 // ───────────────────────────────────────────────────────────────────
 // GET  ?year=2026
 // One row per import batch (month + year).
-// Counts beneficiaries by classification x sex via jobmatch.
-//
-// NOTE: sex stored as 'Male'/'Female', classification as 'Placed/Hots' etc.
+// Counts beneficiaries by classification x sex via firstjobseek.
+// occ_permit and health_card are summed per batch from firstjobseek.
 // ───────────────────────────────────────────────────────────────────
 if ($method === 'GET') {
 
     $year = isset($_GET['year']) ? (int) $_GET['year'] : (int) date('Y');
 
-    // Available years that actually have jobmatch data
+    // Available years that actually have firstjobseek data
     $res = $conn->query("
         SELECT DISTINCT ib.year
         FROM import_batches ib
-        INNER JOIN jobmatch jm ON jm.batch_id = ib.batch_id
+        INNER JOIN firstjobseek fj ON fj.batch_id = ib.batch_id
         ORDER BY ib.year DESC
     ");
 
@@ -71,42 +71,42 @@ if ($method === 'GET') {
         $years[] = (int) $row['year'];
     }
 
-    // Always include the current year and the requested year in the filter options
+    // Always include current year and the requested year
     $currentYear = (int) date('Y');
     $years = array_merge($years, [$currentYear, $year]);
     $years = array_unique($years);
     rsort($years);
 
-    // LPAD ensures '11' not '11' causes issues; STR_TO_DATE needs zero-padded month
-    // sex values: 'Male' / 'Female'
-    // classification values from Excel: Registered, Referred, Interviewed,
-    //   Qualified, Not Qualified, Placed/Hots, For Further Interview
+    // One row per batch, counts from beneficiaries joined via firstjobseek
+    // occ_permit and health_card are stored per-row in firstjobseek and summed
     $sql = "
         SELECT
             ib.batch_id,
             ib.month,
             ib.year,
             CASE ib.month
-                WHEN 1 THEN 'January'
-                WHEN 2 THEN 'February'
-                WHEN 3 THEN 'March'
-                WHEN 4 THEN 'April'
-                WHEN 5 THEN 'May'
-                WHEN 6 THEN 'June'
-                WHEN 7 THEN 'July'
-                WHEN 8 THEN 'August'
-                WHEN 9 THEN 'September'
+                WHEN 1  THEN 'January'
+                WHEN 2  THEN 'February'
+                WHEN 3  THEN 'March'
+                WHEN 4  THEN 'April'
+                WHEN 5  THEN 'May'
+                WHEN 6  THEN 'June'
+                WHEN 7  THEN 'July'
+                WHEN 8  THEN 'August'
+                WHEN 9  THEN 'September'
                 WHEN 10 THEN 'October'
                 WHEN 11 THEN 'November'
                 WHEN 12 THEN 'December'
                 ELSE ''
             END AS month_name,
 
-            SUM(CASE WHEN b.classification = 'Registered'            AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
-            SUM(CASE WHEN b.classification = 'Registered'            AND b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
+            -- occ_permit and health_card are flags (0/1) per firstjobseek row
+            SUM(fj.occ_permit)  AS occ_permit,
+            SUM(fj.health_card) AS health_card,
 
-            SUM(CASE WHEN b.classification = 'Referred'              AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
-            SUM(CASE WHEN b.classification = 'Referred'              AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
+            -- Classification x sex counts from beneficiaries
+            SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
+            SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
 
             SUM(CASE WHEN b.classification = 'Interviewed'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS int_m,
             SUM(CASE WHEN b.classification = 'Interviewed'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS int_f,
@@ -125,11 +125,11 @@ if ($method === 'GET') {
 
         FROM import_batches ib
 
-        INNER JOIN jobmatch jm
-            ON jm.batch_id = ib.batch_id
+        INNER JOIN firstjobseek fj
+            ON fj.batch_id = ib.batch_id
 
         INNER JOIN beneficiaries b
-            ON b.benef_id = jm.benef_id
+            ON b.benef_id = fj.benef_id
 
         WHERE ib.year = ?
 
@@ -147,68 +147,97 @@ if ($method === 'GET') {
 
     $rows = [];
     while ($row = $result->fetch_assoc()) {
-        $row['jobmatch_id'] = (int) $row['batch_id'];
-        $row['month']       = $row['month_name'] . ' ' . $row['year'];
+        // Match the field names expected by first-time.php frontend
+        $row['jobseek_id'] = (int) $row['batch_id'];
+        $row['month']      = $row['month_name'];
         $rows[] = $row;
     }
     $stmt->close();
 
     // Summary card totals
-    $totals = ['registered' => 0, 'referred' => 0, 'interviewed' => 0, 'placed' => 0];
+    $totals = ['jobseekers' => 0, 'occ_permit' => 0, 'health_card' => 0, 'placed' => 0];
     foreach ($rows as $r) {
-        $totals['registered']  += $r['reg_m']    + $r['reg_f'];
-        $totals['referred']    += $r['ref_m']    + $r['ref_f'];
-        $totals['interviewed'] += $r['int_m']    + $r['int_f'];
-        $totals['placed']      += $r['placed_m'] + $r['placed_f'];
+        $totals['jobseekers'] += (int)$r['reg_m']    + (int)$r['reg_f'];
+        $totals['occ_permit'] += (int)$r['occ_permit'];
+        $totals['health_card']+= (int)$r['health_card'];
+        $totals['placed']     += (int)$r['placed_m'] + (int)$r['placed_f'];
     }
 
     json_ok(['rows' => $rows, 'totals' => $totals, 'years' => $years]);
 }
 
 // ───────────────────────────────────────────────────────────────────
-// PUT  — update batch month/year
-// Body: { jobmatch_id: <batch_id>, month: N, year: N }
+// PUT  — update occ_permit / health_card on all firstjobseek rows
+//         belonging to the given batch, OR update batch month/year.
+// Body: { jobseek_id: <batch_id>, occ_permit: N, health_card: N }
+//   or: { jobseek_id: <batch_id>, month: N, year: N }
 // ───────────────────────────────────────────────────────────────────
 if ($method === 'PUT') {
 
     $body     = json_decode(file_get_contents('php://input'), true);
-    $batch_id = isset($body['jobmatch_id']) ? (int) $body['jobmatch_id'] : 0;
-    if (!$batch_id) json_error('Missing jobmatch_id');
+    $batch_id = isset($body['jobseek_id']) ? (int) $body['jobseek_id'] : 0;
+    if (!$batch_id) json_error('Missing jobseek_id');
 
-    $allowed = ['month', 'year'];
-    $sets    = [];
-    $types   = '';
-    $values  = [];
+    $affected = 0;
 
-    foreach ($allowed as $col) {
+    // Update occ_permit / health_card on all firstjobseek rows for this batch
+    $fjAllowed = ['occ_permit', 'health_card'];
+    $fjSets = []; $fjTypes = ''; $fjValues = [];
+
+    foreach ($fjAllowed as $col) {
         if (array_key_exists($col, $body)) {
-            $sets[]   = "$col = ?";
-            $types   .= 'i';
-            $values[] = (int) $body[$col];
+            $fjSets[]   = "$col = ?";
+            $fjTypes   .= 'i';
+            $fjValues[] = (int) $body[$col];
         }
     }
 
-    if (empty($sets)) json_error('Nothing to update');
+    if (!empty($fjSets)) {
+        $fjTypes   .= 'i';
+        $fjValues[] = $batch_id;
+        $stmt = $conn->prepare(
+            "UPDATE firstjobseek SET " . implode(', ', $fjSets) . " WHERE batch_id = ?"
+        );
+        if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
+        $stmt->bind_param($fjTypes, ...$fjValues);
+        $stmt->execute();
+        $affected = $stmt->affected_rows;
+        $stmt->close();
+    }
 
-    $types   .= 'i';
-    $values[] = $batch_id;
+    // Update month/year on import_batches if provided
+    $ibAllowed = ['month', 'year'];
+    $ibSets = []; $ibTypes = ''; $ibValues = [];
 
-    $stmt = $conn->prepare(
-        "UPDATE import_batches SET " . implode(', ', $sets) . " WHERE batch_id = ?"
-    );
-    if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
+    foreach ($ibAllowed as $col) {
+        if (array_key_exists($col, $body)) {
+            $ibSets[]   = "$col = ?";
+            $ibTypes   .= 'i';
+            $ibValues[] = (int) $body[$col];
+        }
+    }
 
-    $stmt->bind_param($types, ...$values);
-    $stmt->execute();
-    $affected = $stmt->affected_rows;
-    $stmt->close();
+    if (!empty($ibSets)) {
+        $ibTypes   .= 'i';
+        $ibValues[] = $batch_id;
+        $stmt = $conn->prepare(
+            "UPDATE import_batches SET " . implode(', ', $ibSets) . " WHERE batch_id = ?"
+        );
+        if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
+        $stmt->bind_param($ibTypes, ...$ibValues);
+        $stmt->execute();
+        $affected += $stmt->affected_rows;
+        $stmt->close();
+    }
+
+    if (empty($fjSets) && empty($ibSets)) json_error('Nothing to update');
 
     json_ok(['updated' => $affected]);
 }
 
 // ───────────────────────────────────────────────────────────────────
 // DELETE  ?id=<batch_id>
-// Nulls jobmatch.batch_id first (no cascade FK), then deletes batch.
+// Nulls firstjobseek.batch_id first, then deletes the batch.
 // ───────────────────────────────────────────────────────────────────
 if ($method === 'DELETE') {
 
@@ -217,7 +246,7 @@ if ($method === 'DELETE') {
 
     $conn->begin_transaction();
     try {
-        $s1 = $conn->prepare("UPDATE jobmatch SET batch_id = NULL WHERE batch_id = ?");
+        $s1 = $conn->prepare("UPDATE firstjobseek SET batch_id = NULL WHERE batch_id = ?");
         $s1->bind_param('i', $id);
         $s1->execute();
         $s1->close();

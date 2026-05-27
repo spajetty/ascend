@@ -1,8 +1,8 @@
 <?php
-require_once __DIR__ . '/../../includes/auth-check.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../../../includes/auth-check.php';
+require_once __DIR__ . '/../../../vendor/autoload.php';
 
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../api');
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/../../../api');
 $dotenv->load();
 
 $host = $_ENV['DB_HOST'] ?? 'localhost';
@@ -50,7 +50,7 @@ if ($method === 'GET') {
     $year   = isset($_GET['year'])   ? (int) $_GET['year']   : (int) date('Y');
     $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-    // Available years from import_batches linked to spes
+    // Available years
     $res = $conn->query("
         SELECT DISTINCT ib.year
         FROM import_batches ib
@@ -59,23 +59,26 @@ if ($method === 'GET') {
     ");
     $years = [];
     while ($row = $res->fetch_assoc()) $years[] = (int) $row['year'];
-
     $currentYear = (int) date('Y');
     $years = array_unique(array_merge($years, [$currentYear, $year]));
     rsort($years);
 
     // ── Main SPES rows ───────────────────────────────────────────────────────
-    // Count by beneficiaries.classification (same logic as job-match).
-    // SPES classification values: Registered, Referred, Placed.
-    // SPES Baby = student_type = 'student'.
-    // 4Ps / PWD from beneficiaries flags.
-    // Employer / contract dates from spes_employment.
-    // Job vacancies from jobvacancies table for matching month/year.
+    //
+    // GROUP BY employer (company) + month so each row = one employer per month,
+    // matching the screenshot table format.
+    //
+    // Registered  = beneficiaries with classification = 'Registered' for this employer/month
+    // Referred    = beneficiaries with classification = 'Referred'
+    // Placed      = beneficiaries who have a spes_employment record (have a contract)
+    // Job Vac     = from jobvacancies table for that company/month/year
+    // SPES Baby   = beneficiaries who appear in a PREVIOUS batch of spes (repeat availees)
+    // 4Ps / PWD   = from beneficiaries flags, counted among Placed
     // ─────────────────────────────────────────────────────────────────────────
 
     $sql = "
         SELECT
-            ib.batch_id                                                 AS spes_id,
+            se.company_id,
             ib.month,
             ib.year,
             CASE ib.month
@@ -86,69 +89,67 @@ if ($method === 'GET') {
                 ELSE ''
             END                                                         AS month_reported,
 
-            -- Most common employer in this batch
-            (
-                SELECT e2.company_name
-                FROM spes_employment se2
-                INNER JOIN spes s2 ON s2.spes_id = se2.spes_id
-                INNER JOIN employers e2 ON e2.company_id = se2.company_id
-                WHERE s2.batch_id = ib.batch_id
-                GROUP BY e2.company_name
-                ORDER BY COUNT(*) DESC
-                LIMIT 1
-            )                                                           AS employer,
-
-            -- Contract dates from spes_employment
+            e.company_name                                              AS employer,
             MIN(se.start_of_contract)                                   AS start_of_contract,
             MAX(se.end_of_contract)                                     AS end_of_contract,
             MAX(se.days)                                                AS days,
 
-            -- Registered — classification = 'Registered'
-            SUM(CASE WHEN b.classification = 'Registered' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
-            SUM(CASE WHEN b.classification = 'Registered' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
+            -- Registered: everyone in this batch for this company (total applicants/registrants)
+            SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS reg_m,
+            SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS reg_f,
 
-            -- Referred — classification = 'Referred'
-            SUM(CASE WHEN b.classification = 'Referred'   AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
-            SUM(CASE WHEN b.classification = 'Referred'   AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
+            -- Referred: beneficiaries tagged classification = 'Referred' via bulk update
+            SUM(CASE WHEN LOWER(b.classification) = 'referred' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
+            SUM(CASE WHEN LOWER(b.classification) = 'referred' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
 
-            -- Placed — classification = 'Placed' or 'Placed/Hots'
-            SUM(CASE WHEN b.classification IN ('Placed','Placed/Hots') AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS placed_m,
-            SUM(CASE WHEN b.classification IN ('Placed','Placed/Hots') AND b.sex = 'Female' THEN 1 ELSE 0 END) AS placed_f,
+            -- Placed: has a spes_employment record for this company (contract exists)
+            SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS placed_m,
+            SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS placed_f,
 
-            -- Job Vacancies from jobvacancies table for same month/year
+            -- Job Vacancies: from jobvacancies table for this company + month + year
             COALESCE((
                 SELECT SUM(jv.vacancy_male)
                 FROM jobvacancies jv
-                WHERE jv.month = ib.month AND jv.year = ib.year
-            ), 0)                                                       AS vac_m,
+                WHERE jv.company_id = se.company_id
+                  AND jv.month = ib.month
+                  AND jv.year  = ib.year
+            ), 0) AS vac_m,
             COALESCE((
                 SELECT SUM(jv.vacancy_female)
                 FROM jobvacancies jv
-                WHERE jv.month = ib.month AND jv.year = ib.year
-            ), 0)                                                       AS vac_f,
+                WHERE jv.company_id = se.company_id
+                  AND jv.month = ib.month
+                  AND jv.year  = ib.year
+            ), 0) AS vac_f,
 
-            -- SPES Baby = student_type = 'student'
-            SUM(CASE WHEN s.student_type = 'student' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS spes_baby_m,
-            SUM(CASE WHEN s.student_type = 'student' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS spes_baby_f,
+            -- SPES Baby: beneficiaries with spes_status = 'SPES Baby' (independent of classification/referred)
+            SUM(CASE WHEN LOWER(b.spes_status) = 'spes baby' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS spes_baby_m,
+            SUM(CASE WHEN LOWER(b.spes_status) = 'spes baby' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS spes_baby_f,
 
-            -- 4Ps from beneficiaries.is_4ps
+            -- 4Ps: among placed beneficiaries
             SUM(CASE WHEN b.is_4ps = 1 AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS fourps_m,
             SUM(CASE WHEN b.is_4ps = 1 AND b.sex = 'Female' THEN 1 ELSE 0 END) AS fourps_f,
 
-            -- PWD from beneficiaries.is_pwd
+            -- PWD: among placed beneficiaries
             SUM(CASE WHEN b.is_pwd = 1 AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS pwd_m,
-            SUM(CASE WHEN b.is_pwd = 1 AND b.sex = 'Female' THEN 1 ELSE 0 END) AS pwd_f
+            SUM(CASE WHEN b.is_pwd = 1 AND b.sex = 'Female' THEN 1 ELSE 0 END) AS pwd_f,
 
-        FROM import_batches ib
+            -- Use company_id + month as the row identifier for edit/delete
+            CONCAT(se.company_id, '_', ib.month, '_', ib.year)         AS spes_id
+
+        FROM spes_employment se
 
         INNER JOIN spes s
-            ON s.batch_id = ib.batch_id
+            ON s.spes_id = se.spes_id
+
+        INNER JOIN import_batches ib
+            ON ib.batch_id = s.batch_id
 
         INNER JOIN beneficiaries b
             ON b.benef_id = s.benef_id
 
-        LEFT JOIN spes_employment se
-            ON se.spes_id = s.spes_id
+        INNER JOIN employers e
+            ON e.company_id = se.company_id
 
         WHERE ib.year = ?
     ";
@@ -157,23 +158,14 @@ if ($method === 'GET') {
     $types  = 'i';
 
     if ($search !== '') {
-        $sql .= "
-            AND (
-                SELECT e3.company_name
-                FROM spes_employment se3
-                INNER JOIN spes s3 ON s3.spes_id = se3.spes_id
-                INNER JOIN employers e3 ON e3.company_id = se3.company_id
-                WHERE s3.batch_id = ib.batch_id
-                LIMIT 1
-            ) LIKE ?
-        ";
+        $sql   .= " AND e.company_name LIKE ?";
         $types   .= 's';
         $params[] = "%$search%";
     }
 
     $sql .= "
-        GROUP BY ib.batch_id, ib.month, ib.year
-        ORDER BY ib.month ASC
+        GROUP BY se.company_id, e.company_name, ib.month, ib.year
+        ORDER BY ib.month ASC, e.company_name ASC
     ";
 
     $stmt = $conn->prepare($sql);
@@ -189,25 +181,28 @@ if ($method === 'GET') {
     $stmt->close();
 
     // ── Monthly LGU / Private placed summary ────────────────────────────────
+    // Groups by month only (not batch_id) to avoid duplicate month rows.
+    // category comes from spes_employment.category ('lgu' or 'private').
     $sumSql = "
         SELECT
+            ib.month,
             CASE ib.month
                 WHEN 1  THEN 'January'   WHEN 2  THEN 'February'  WHEN 3  THEN 'March'
                 WHEN 4  THEN 'April'     WHEN 5  THEN 'May'        WHEN 6  THEN 'June'
                 WHEN 7  THEN 'July'      WHEN 8  THEN 'August'     WHEN 9  THEN 'September'
                 WHEN 10 THEN 'October'   WHEN 11 THEN 'November'   WHEN 12 THEN 'December'
                 ELSE ''
-            END                                                             AS month_reported,
+            END AS month_reported,
             SUM(CASE WHEN se.category = 'lgu'     AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS lgu_m,
             SUM(CASE WHEN se.category = 'lgu'     AND b.sex = 'Female' THEN 1 ELSE 0 END) AS lgu_f,
             SUM(CASE WHEN se.category = 'private' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
             SUM(CASE WHEN se.category = 'private' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f
         FROM import_batches ib
-        INNER JOIN spes s          ON s.batch_id  = ib.batch_id
-        INNER JOIN beneficiaries b ON b.benef_id  = s.benef_id
-        INNER JOIN spes_employment se ON se.spes_id = s.spes_id
+        INNER JOIN spes s             ON s.batch_id   = ib.batch_id
+        INNER JOIN beneficiaries b    ON b.benef_id   = s.benef_id
+        INNER JOIN spes_employment se ON se.spes_id   = s.spes_id
         WHERE ib.year = ?
-        GROUP BY ib.batch_id, ib.month
+        GROUP BY ib.month
         ORDER BY ib.month ASC
     ";
     $stmt2 = $conn->prepare($sumSql);
@@ -221,8 +216,8 @@ if ($method === 'GET') {
 
     // ── Card totals ──────────────────────────────────────────────────────────
     $totals = [
-        'registered' => 0, 'referred' => 0, 'placed'    => 0,
-        'vacancies'  => 0, 'spes_baby' => 0, 'fourps'   => 0, 'pwd' => 0,
+        'registered' => 0, 'referred' => 0, 'placed'   => 0,
+        'vacancies'  => 0, 'spes_baby' => 0, 'fourps'  => 0, 'pwd' => 0,
     ];
     foreach ($rows as $r) {
         $totals['registered'] += (int)$r['reg_m']       + (int)$r['reg_f'];
@@ -237,32 +232,37 @@ if ($method === 'GET') {
     json_ok(['rows' => $rows, 'summary' => $summary, 'totals' => $totals, 'years' => $years]);
 }
 
-// ─── PUT — edit batch month/year ─────────────────────────────────────────────
+// ─── PUT — edit row (month/year only, since employer rows are derived) ────────
 if ($method === 'PUT') {
 
     $body = json_decode(file_get_contents('php://input'), true);
-    $id   = isset($body['spes_id']) ? (int) $body['spes_id'] : 0;
-    if (!$id) json_error('Missing spes_id');
 
-    $allowed = ['month', 'year'];
-    $sets = []; $types = ''; $values = [];
+    // spes_id is now "company_id_month_year" composite key
+    $raw = $body['spes_id'] ?? '';
+    if (!$raw) json_error('Missing spes_id');
 
-    foreach ($allowed as $col) {
-        if (array_key_exists($col, $body)) {
-            $sets[]   = "$col = ?";
-            $types   .= 'i';
-            $values[] = (int) $body[$col];
-        }
-    }
+    $parts = explode('_', $raw);
+    if (count($parts) !== 3) json_error('Invalid spes_id format');
+    [$company_id, $old_month, $old_year] = [(int)$parts[0], (int)$parts[1], (int)$parts[2]];
 
-    if (empty($sets)) json_error('Nothing to update');
+    $new_month = isset($body['month']) ? (int)$body['month'] : $old_month;
+    $new_year  = isset($body['year'])  ? (int)$body['year']  : $old_year;
 
-    $types   .= 'i';
-    $values[] = $id;
+    if ($new_month < 1 || $new_month > 12) json_error('Invalid month');
+    if ($new_year  < 2000)                  json_error('Invalid year');
 
-    $stmt = $conn->prepare("UPDATE import_batches SET " . implode(', ', $sets) . " WHERE batch_id = ?");
+    // Update the import_batch month/year for all batches linked to this company + old month/year
+    $stmt = $conn->prepare("
+        UPDATE import_batches ib
+        INNER JOIN spes s ON s.batch_id = ib.batch_id
+        INNER JOIN spes_employment se ON se.spes_id = s.spes_id
+        SET ib.month = ?, ib.year = ?
+        WHERE se.company_id = ?
+          AND ib.month = ?
+          AND ib.year  = ?
+    ");
     if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
-    $stmt->bind_param($types, ...$values);
+    $stmt->bind_param('iiiii', $new_month, $new_year, $company_id, $old_month, $old_year);
     $stmt->execute();
     $affected = $stmt->affected_rows;
     $stmt->close();
@@ -270,24 +270,56 @@ if ($method === 'PUT') {
     json_ok(['updated' => $affected]);
 }
 
-// ─── DELETE ?id=<batch_id> ───────────────────────────────────────────────────
+// ─── DELETE ?company_id=X&month=Y&year=Z ─────────────────────────────────────
 if ($method === 'DELETE') {
 
-    $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-    if (!$id) json_error('Missing id');
+    // Accept either composite id string or separate params
+    $idStr = isset($_GET['id']) ? trim($_GET['id']) : '';
+    if ($idStr && strpos($idStr, '_') !== false) {
+        $parts      = explode('_', $idStr);
+        $company_id = (int)($parts[0] ?? 0);
+        $month      = (int)($parts[1] ?? 0);
+        $year       = (int)($parts[2] ?? 0);
+    } else {
+        $company_id = isset($_GET['company_id']) ? (int)$_GET['company_id'] : 0;
+        $month      = isset($_GET['month'])      ? (int)$_GET['month']      : 0;
+        $year       = isset($_GET['year'])       ? (int)$_GET['year']       : 0;
+    }
+
+    if (!$company_id || !$month || !$year) json_error('Missing or invalid id');
 
     $conn->begin_transaction();
     try {
-        $s1 = $conn->prepare("UPDATE spes SET batch_id = NULL WHERE batch_id = ?");
-        $s1->bind_param('i', $id);
-        $s1->execute();
-        $s1->close();
+        // Find all batch_ids that have spes records placed at this company for this month/year
+        $find = $conn->prepare("
+            SELECT DISTINCT ib.batch_id
+            FROM import_batches ib
+            INNER JOIN spes s ON s.batch_id = ib.batch_id
+            INNER JOIN spes_employment se ON se.spes_id = s.spes_id
+            WHERE se.company_id = ? AND ib.month = ? AND ib.year = ?
+        ");
+        $find->bind_param('iii', $company_id, $month, $year);
+        $find->execute();
+        $res      = $find->get_result();
+        $batchIds = [];
+        while ($r = $res->fetch_assoc()) $batchIds[] = (int)$r['batch_id'];
+        $find->close();
 
-        $s2 = $conn->prepare("DELETE FROM import_batches WHERE batch_id = ?");
-        $s2->bind_param('i', $id);
-        $s2->execute();
-        $affected = $s2->affected_rows;
-        $s2->close();
+        if (empty($batchIds)) json_error('No matching records found', 404);
+
+        $affected = 0;
+        foreach ($batchIds as $bid) {
+            $s1 = $conn->prepare("UPDATE spes SET batch_id = NULL WHERE batch_id = ?");
+            $s1->bind_param('i', $bid);
+            $s1->execute();
+            $s1->close();
+
+            $s2 = $conn->prepare("DELETE FROM import_batches WHERE batch_id = ?");
+            $s2->bind_param('i', $bid);
+            $s2->execute();
+            $affected += $s2->affected_rows;
+            $s2->close();
+        }
 
         $conn->commit();
     } catch (Exception $e) {
