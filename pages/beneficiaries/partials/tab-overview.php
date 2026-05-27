@@ -81,7 +81,7 @@
                 <label style="font-size:11.5px;color:var(--text-muted);display:block;margin-bottom:5px;">Notes</label>
                 <p id="pNotes"
                     style="font-size:13px;color:var(--text-secondary);line-height:1.6;margin:0;background:var(--bg);padding:10px;border-radius:7px;">
-                    Still not hired after multiple visits.
+                    No case notes yet.
                 </p>
             </div>
         </div>

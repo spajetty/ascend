@@ -131,6 +131,7 @@ try {
             b.barangay,
             b.district,
             b.city,
+            b.notes,
             b.created_at,
             b.is_4ps,
             b.is_pwd,

@@ -129,8 +129,7 @@ async function openProfile(benefId) {
   document.getElementById('pEmail').textContent     = b.emailAddr;
   document.getElementById('pEmail').href            = `mailto:${b.emailAddr}`;
   document.getElementById('pPhone').textContent     = upperText(b.phone);
-  // Notes column removed from database; leave overview notes empty
-  document.getElementById('pNotes').textContent     = '';
+  document.getElementById('pNotes').textContent     = (b.notes && String(b.notes).trim()) ? b.notes : 'No case notes yet.';
   // Education & Skills are shown for most programs. For Job Fair, Job Matching,
   // First Time Job Seeker, WHIP, SPES, and WIIRP,
   // hide the education card and show program-specific overview content instead.
@@ -1157,8 +1156,35 @@ function closeEditNotesModal() {
 }
 
 function submitEditNotes() {
-  _showEditToast('Case notes saved.', 'success');
-  closeEditNotesModal();
+  const notes = document.getElementById('editNotesText')?.value ?? '';
+  const b = window.currentBeneficiary || {};
+  const benefId = b.benef_id || window.currentBeneficiaryId || 0;
+  if (!benefId) {
+    _showEditToast('No beneficiary selected.', 'error');
+    return;
+  }
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_notes.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ benef_id: Number(benefId), notes }),
+  }))
+  .then(r => r.json())
+  .then(j => {
+    if (j && j.success) {
+      // Update UI
+      const pNotes = document.getElementById('pNotes');
+      if (pNotes) pNotes.textContent = notes || '';
+      if (window.currentBeneficiary) window.currentBeneficiary.notes = notes;
+      _showEditToast('Case notes saved.', 'success');
+      closeEditNotesModal();
+    } else {
+      _showEditToast(j.message || 'Failed to save case notes.', 'error');
+    }
+  }).catch(err => {
+    console.error('[profile.js] submitEditNotes error', err);
+    _showEditToast('Failed to save case notes.', 'error');
+  });
 }
 
 // ── Education & Skills ───────────────────────────────────────────────────────
