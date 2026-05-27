@@ -88,6 +88,23 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             <select id="yearSelect"
                 class="text-sm border border-gray-200 rounded-lg px-3 py-1.5">
             </select>
+            <select id="monthFilter"
+                onchange="buildGrouped(); currentPage = 1; renderPage();"
+                class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 bg-white">
+                <option value="">All Months</option>
+                <option value="1">January</option>
+                <option value="2">February</option>
+                <option value="3">March</option>
+                <option value="4">April</option>
+                <option value="5">May</option>
+                <option value="6">June</option>
+                <option value="7">July</option>
+                <option value="8">August</option>
+                <option value="9">September</option>
+                <option value="10">October</option>
+                <option value="11">November</option>
+                <option value="12">December</option>
+            </select>
         </div>
 
         <!-- Table -->
@@ -194,6 +211,11 @@ let groupedRows  = [];   // aggregated month+project rows
 let currentPage  = 1;
 let deletingKey  = null; // { month_key, project_id }
 
+function getMonthNumber(value) {
+    const numeric = Number(value);
+    return Number.isInteger(numeric) && numeric >= 1 && numeric <= 12 ? numeric : null;
+}
+
 // ─── Load data from cache/API ────────────────────────────────────────────────
 async function loadData(year) {
     document.getElementById('loadingRow').style.display = '';
@@ -250,6 +272,7 @@ async function loadData(year) {
         console.log('[WHIP] cache refreshed at:', json.data.cache_refreshed_at ?? '—');
 
         allRows = rows;
+        document.getElementById('monthFilter').value = '';
         buildGrouped();
         currentPage = 1;
         renderPage();
@@ -266,11 +289,13 @@ async function loadData(year) {
 // ─── Group raw rows into month+project buckets ────────────────────────────────
 function buildGrouped() {
     const map = new Map();
+    const monthFilter = document.getElementById('monthFilter').value;
 
     allRows.forEach(r => {
         if (!r.date_hired) return;
         const d   = new Date(r.date_hired);
         const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}_${r.project_id || 'none'}`;
+        if (monthFilter && String(d.getMonth() + 1) !== monthFilter) return;
 
         if (!map.has(key)) {
             map.set(key, {
@@ -329,6 +354,8 @@ function renderPage() {
     } else {
         slice.forEach(g => tbody.insertAdjacentHTML('beforeend', buildRow(g)));
     }
+
+    document.getElementById('tableTotal').textContent = total + ' Total';
 
     // Pagination info
     document.getElementById('paginationInfo').textContent =

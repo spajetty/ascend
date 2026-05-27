@@ -11,6 +11,23 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <style>
     body.modal-open { overflow: hidden; }
+
+    /* Bulk fill modal input cells */
+    .vac-input {
+        width: 52px;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 3px 4px;
+        font-size: 12px;
+        outline: none;
+        transition: border-color .15s;
+    }
+    .vac-input:focus { border-color: #14b8a6; box-shadow: 0 0 0 2px rgba(20,184,166,.15); }
+    .company-match-row { transition: background .15s; }
+    .match-badge-ok   { background:#dcfce7; color:#166534; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
+    .match-badge-warn { background:#fef9c3; color:#854d0e; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
+    .match-badge-err  { background:#fee2e2; color:#991b1b; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
 </style>
 
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen min-w-0 overflow-hidden">
@@ -89,9 +106,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
             </div>
         </div>
 
-        <!-- Filters + Import button -->
+        <!-- Filters + Fill Vacancies button -->
         <div class="flex flex-col gap-2 mb-4">
-            <!-- Row 1: Year + Month + Type filters -->
+            <!-- Row 1: Year + Month + Type filters + Fill Vacancies button -->
             <div class="flex flex-wrap items-center gap-2">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500 whitespace-nowrap">Year:</span>
@@ -126,6 +143,14 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         <button id="filterOverseas" onclick="setTypeFilter('OVERSEAS')" class="px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors border-l border-gray-200">Overseas</button>
                     </div>
                 </div>
+                <!-- Fill Vacancies button -->
+                <button id="fillVacBtn" onclick="openFillVacModal()"
+                        class="ml-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium shadow-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    Fill Vacancies
+                </button>
             </div>
             <!-- Row 2: Search -->
             <div class="flex items-center gap-2">
@@ -227,9 +252,10 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </main>
 
-<!-- ─── Backdrop ──────────────────────────────────────────────────────────── -->
-<div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40"
-     onclick="closeAllModals()"></div>
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  SHARED BACKDROP                                                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40"></div>
 
 <!-- ─── Delete Modal ─────────────────────────────────────────────────────── -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
@@ -269,22 +295,207 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
-<!-- ─── Error Toast ──────────────────────────────────────────────────────── -->
-<div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  UNFILLED WARNING MODAL                                                    -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div id="unfilledModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-yellow-50">
+            <div class="flex items-start gap-3">
+                <div class="bg-amber-100 p-3 rounded-xl shrink-0">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-lg font-bold text-gray-900">Job Vacancy data is incomplete</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="unfilledModalDetail">Some events have companies with no vacancy data entered yet.</p>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <p class="text-sm text-gray-600 leading-relaxed" id="unfilledModalBody">You can fill the missing values now, or dismiss this reminder and continue browsing.</p>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-100 flex flex-wrap items-center justify-end gap-2">
+            <button onclick="closeUnfilledModal()" class="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors">Dismiss</button>
+            <button onclick="openFillVacFromWarning()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold shadow-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Fill in Data
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<!--  FILL VACANCIES MODAL                                                      -->
+<!-- ═══════════════════════════════════════════════════════════════════════════ -->
+<div id="fillVacModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-teal-100 p-2 rounded-xl">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-gray-900">Fill Vacancies</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Enter job vacancy counts per company for each event. You can also import from Excel.</p>
+                </div>
+            </div>
+            <button onclick="closeFillVacModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Event Tabs -->
+        <div class="px-6 pt-4 shrink-0">
+            <div id="eventTabsContainer" class="flex flex-wrap gap-2 mb-4">
+                <!-- tabs rendered by JS -->
+            </div>
+
+            <!-- Mode switcher -->
+            <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-4">
+                <button id="tabManual" onclick="switchMode('manual')"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm">
+                    ✏️ Manual Entry
+                </button>
+                <button id="tabExcel" onclick="switchMode('excel')"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700">
+                    📊 Import from Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="flex-1 overflow-y-auto px-6 pb-2">
+
+            <!-- ── MANUAL MODE ── -->
+            <div id="manualMode">
+                <p class="text-xs text-gray-400 mb-3">
+                    Showing companies for <strong id="activeEventLabel" class="text-gray-700"></strong>.
+                    Rows highlighted in yellow still have all zeros for vacancies.
+                </p>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-xs min-w-[600px]">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b border-gray-100">
+                                <th class="text-left px-4 py-2.5 text-gray-500 font-medium">COMPANY</th>
+                                <th class="px-3 py-2.5 text-center text-blue-500 font-semibold" colspan="2">JOB VACANCIES</th>
+                            </tr>
+                            <tr class="border-b border-gray-100 bg-gray-50/50">
+                                <th></th>
+                                <th class="px-3 py-1.5 text-center text-gray-400 font-medium text-[11px]">MALE</th>
+                                <th class="px-3 py-1.5 text-center text-gray-400 font-medium text-[11px]">FEMALE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manualTableBody">
+                            <tr><td colspan="3" class="px-4 py-6 text-center text-gray-400">Select an event above to load companies.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── EXCEL IMPORT MODE ── -->
+            <div id="excelMode" class="hidden">
+                <!-- Step 1: Upload -->
+                <div id="excelStep1">
+                    <div class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-teal-300 transition-colors cursor-pointer"
+                         id="excelDropZone" onclick="document.getElementById('excelFileInput').click()">
+                        <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <p class="text-sm font-semibold text-gray-600">Drop your Excel file here</p>
+                        <p class="text-xs text-gray-400 mt-1">or click to browse — .xlsx or .xls</p>
+                        <p class="text-xs text-gray-300 mt-3">Expected columns:
+                            <span class="font-mono bg-gray-100 px-1 rounded">COMPANY</span>
+                            <span class="font-mono bg-gray-100 px-1 rounded">VACANCY MALE</span>
+                            <span class="font-mono bg-gray-100 px-1 rounded">VACANCY FEMALE</span>
+                        </p>
+                    </div>
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls" class="hidden" onchange="handleExcelUpload(this)"/>
+                    <p id="excelUploadError" class="text-xs text-red-500 mt-2 hidden"></p>
+                </div>
+
+                <!-- Step 2: Review & Match -->
+                <div id="excelStep2" class="hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Review &amp; Match Companies</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Companies from your Excel are matched to the system. Fix any mismatches below.</p>
+                        </div>
+                        <button onclick="resetExcelImport()" class="text-xs text-gray-400 hover:text-gray-600 underline">Upload different file</button>
+                    </div>
+                    <!-- Legend -->
+                    <div class="flex flex-wrap gap-3 mb-3 text-xs">
+                        <span class="flex items-center gap-1.5"><span class="match-badge-ok">Matched</span> Exact match found</span>
+                        <span class="flex items-center gap-1.5"><span class="match-badge-warn">Review</span> Close match — please confirm</span>
+                        <span class="flex items-center gap-1.5"><span class="match-badge-err">Not Found</span> Select manually</span>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-100">
+                        <table class="w-full text-xs min-w-[700px]">
+                            <thead class="bg-gray-50 border-b border-gray-100">
+                                <tr>
+                                    <th class="text-left px-4 py-2.5 text-gray-500 font-medium">COMPANY IN EXCEL</th>
+                                    <th class="text-left px-4 py-2.5 text-gray-500 font-medium">MATCHED TO</th>
+                                    <th class="px-3 py-2.5 text-center text-gray-500 font-medium">VAC M</th>
+                                    <th class="px-3 py-2.5 text-center text-gray-500 font-medium">VAC F</th>
+                                    <th class="px-3 py-2.5 text-center text-gray-500 font-medium">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excelMatchBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex items-center justify-between gap-3 shrink-0">
+            <span id="fillVacStatus" class="text-xs text-gray-400"></span>
+            <div class="flex items-center gap-2">
+                <button onclick="closeFillVacModal()" class="px-4 py-2 rounded-lg border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors">Cancel</button>
+                <button id="saveFillBtn" onclick="saveFillData()"
+                        class="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    Save All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Toasts ────────────────────────────────────────────────────────────── -->
+<div id="errorToast"   class="fixed bottom-6 right-6 bg-red-500   text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+<div id="successToast" class="fixed bottom-6 right-6 bg-green-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+
+<!-- SheetJS for Excel import -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
 // ─── Config ───────────────────────────────────────────────────────────────────
-const API_URL        = '/backend/emp-facilitation/job-fair/show-job-fair.php';
-const ROWS_PER_PAGE  = 20;
+const API_URL       = '/backend/emp-facilitation/job-fair/show-job-fair.php';
+const ENTRY_API_URL = '/backend/emp-facilitation/job-fair/entry-job-fair.php';
+const ROWS_PER_PAGE = 20;
 
 // ─── State ────────────────────────────────────────────────────────────────────
-let allRows      = [];
-let filteredRows = [];
-let currentPage  = 1;
-let activeType   = '';
-let deletingId   = null;  // batch_id
-let savingId     = null;  // batch_id
-let editSnapshot = {};    // { batch_id: { month, year } }
+let allRows         = [];
+let filteredRows    = [];
+let currentPage     = 1;
+let activeType      = '';
+let deletingId      = null;
+let savingId        = null;
+let editSnapshot    = {};
+
+// Fill Vacancies modal state
+let unfilledEvents    = [];       // [{jobfairevent_id, job_fair_type, date_start, venue, …}]
+let activeEventId     = null;     // currently selected event in the modal
+let fillCompanies     = [];       // companies loaded for activeEventId
+let currentMode       = 'manual'; // 'manual' | 'excel'
+let excelImportRows   = [];       // parsed rows from Excel upload
+let unfilledModalShown = false;
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -332,6 +543,7 @@ async function loadData() {
         allRows     = rows;
         currentPage = 1;
         applyFilters();
+        checkUnfilledData(year);
     } catch (err) {
         tbody.innerHTML = `<tr><td colspan="29" class="text-center py-8 text-red-400 text-sm">Error: ${escHtml(err.message)}</td></tr>`;
     }
@@ -466,7 +678,6 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
     tr.className = 'border-b border-gray-50 hover:bg-gray-50';
     tr.dataset.employer = (r.company_name || '').toLowerCase();
 
-    // Use a composite key (always available) so getRowEl works even without a batch
     const rowKey = `${r.jobfairevent_id}_${r.company_id}`;
     tr.dataset.id = rowKey;
     if (r.batch_id) tr.dataset.batchId = r.batch_id;
@@ -504,16 +715,9 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
 
     const batchId = r.batch_id || '';
 
-    // Edit: always visible; greyed out with tooltip when no batch data yet
-    const editBtn = batchId
-        ? `<button onclick="startEdit('${rowKey}')" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
-               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-           </button>`
-        : `<button class="edit-btn text-gray-300 cursor-not-allowed" title="No imported data to edit" disabled>
-               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-           </button>`;
+    // Edit button removed per UX request; keep variable for template compatibility
+    const editBtn = '';
 
-    // Delete is always available (removes participant record)
     const actions = `
         <div class="flex items-center justify-center gap-2">
             ${editBtn}
@@ -548,7 +752,7 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
 }
 
 // ─── Delete ───────────────────────────────────────────────────────────────────
-let deletingMeta = null; // { rowKey, batchId, eventId, companyId }
+let deletingMeta = null;
 
 function promptDelete(rowKey, batchId, eventId, companyId) {
     deletingId   = rowKey;
@@ -571,7 +775,6 @@ async function confirmDelete() {
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        // Remove all rows for this event+company from local data
         allRows = allRows.filter(r =>
             !(String(r.jobfairevent_id) === String(meta.eventId) &&
               String(r.company_id)      === String(meta.companyId))
@@ -585,11 +788,6 @@ async function confirmDelete() {
 }
 
 // ─── Edit ─────────────────────────────────────────────────────────────────────
-// Editable M/F columns (skip vacancy cols 0-2 which are from jobvacancies, and total cols)
-// Row cells after month+type+date+company: vacancy_m, vacancy_f, vacancy_t,
-//   reg_m, reg_f, reg_t, ref_m, ref_f, ref_t, int_m, int_f, int_t,
-//   qual_m, qual_f, qual_t, nqual_m, nqual_f, nqual_t, placed_m, placed_f, placed_t, ffi_m, ffi_f, ffi_t
-// Cell index 0 = company, 1-3 = vacancy, 4+ = stats. Edit only stats M/F (idx 4,5, 7,8, 10,11 …)
 const EDIT_FIELDS = [
     'reg_m','reg_f', 'ref_m','ref_f', 'int_m','int_f',
     'qual_m','qual_f', 'nqual_m','nqual_f', 'placed_m','placed_f', 'ffi_m','ffi_f'
@@ -604,8 +802,6 @@ function startEdit(id) {
     if (!row) return;
     row.classList.add('editing', 'bg-yellow-50');
 
-    // Cells: company(0), vac_m(1), vac_f(2), vac_t(3), then groups of 3 (m,f,t) × 7
-    // Skip company (idx 0) and vacancies (idx 1-3); edit stat M/F cells only (every idx%3 != 2, starting at idx 4)
     const cells = [...row.querySelectorAll('td:not([rowspan])')];
     const snap  = [];
     cells.forEach((cell, idx) => {
@@ -618,15 +814,14 @@ function startEdit(id) {
     });
     editSnapshot[id] = snap;
 
-    row.querySelector('.edit-btn').classList.add('hidden');
-    row.querySelector('.delete-btn').classList.add('hidden');
-    row.querySelector('.save-btn').classList.remove('hidden');
-    row.querySelector('.cancel-btn').classList.remove('hidden');
+    const editBtnEl = row.querySelector('.edit-btn'); if (editBtnEl) editBtnEl.classList.add('hidden');
+    const deleteBtnEl = row.querySelector('.delete-btn'); if (deleteBtnEl) deleteBtnEl.classList.add('hidden');
+    const saveBtnEl = row.querySelector('.save-btn'); if (saveBtnEl) saveBtnEl.classList.remove('hidden');
+    const cancelBtnEl = row.querySelector('.cancel-btn'); if (cancelBtnEl) cancelBtnEl.classList.remove('hidden');
 }
 
 function recalcTotalsInRow(row) {
     const cells = [...row.querySelectorAll('td:not([rowspan])')];
-    // Stat groups start at cell index 4, groups of 3 (m, f, total)
     for (let i = 4; i < cells.length - 1; i += 3) {
         const m = parseInt(cells[i]?.textContent) || 0;
         const f = parseInt(cells[i + 1]?.textContent) || 0;
@@ -645,10 +840,10 @@ function cancelEdit(id) {
         cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'outline-none');
     });
     row.classList.remove('editing', 'bg-yellow-50');
-    row.querySelector('.edit-btn').classList.remove('hidden');
-    row.querySelector('.delete-btn').classList.remove('hidden');
-    row.querySelector('.save-btn').classList.add('hidden');
-    row.querySelector('.cancel-btn').classList.add('hidden');
+    const editBtnEl2 = row.querySelector('.edit-btn'); if (editBtnEl2) editBtnEl2.classList.remove('hidden');
+    const deleteBtnEl2 = row.querySelector('.delete-btn'); if (deleteBtnEl2) deleteBtnEl2.classList.remove('hidden');
+    const saveBtnEl2 = row.querySelector('.save-btn'); if (saveBtnEl2) saveBtnEl2.classList.add('hidden');
+    const cancelBtnEl2 = row.querySelector('.cancel-btn'); if (cancelBtnEl2) cancelBtnEl2.classList.add('hidden');
     delete editSnapshot[id];
 }
 
@@ -663,11 +858,9 @@ async function confirmSave() {
     closeAllModals();
     if (!row || !rowKey) return;
 
-    // Retrieve the actual batch_id from the row's data attribute
     const batchId = row.dataset.batchId;
     if (!batchId) { showError('No batch data to save.'); savingId = null; return; }
 
-    // Build payload: stat M/F cells starting at index 4, skipping totals
     const cells   = [...row.querySelectorAll('td:not([rowspan])')];
     const payload = { batch_id: batchId };
     let fi = 0;
@@ -686,24 +879,21 @@ async function confirmSave() {
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        // Commit edit styles
         cells.forEach(cell => {
             cell.contentEditable = 'false';
             cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'outline-none');
         });
         row.classList.remove('editing', 'bg-yellow-50');
-        row.querySelector('.edit-btn').classList.remove('hidden');
-        row.querySelector('.delete-btn').classList.remove('hidden');
-        row.querySelector('.save-btn').classList.add('hidden');
-        row.querySelector('.cancel-btn').classList.add('hidden');
+        const editBtnEl3 = row.querySelector('.edit-btn'); if (editBtnEl3) editBtnEl3.classList.remove('hidden');
+        const deleteBtnEl3 = row.querySelector('.delete-btn'); if (deleteBtnEl3) deleteBtnEl3.classList.remove('hidden');
+        const saveBtnEl3 = row.querySelector('.save-btn'); if (saveBtnEl3) saveBtnEl3.classList.add('hidden');
+        const cancelBtnEl3 = row.querySelector('.cancel-btn'); if (cancelBtnEl3) cancelBtnEl3.classList.add('hidden');
         delete editSnapshot[rowKey];
 
-        // Flash green
         row.style.transition = 'background-color 0.3s';
         row.style.backgroundColor = '#dcfce7';
         setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
 
-        // Update local data so card totals stay correct
         const record = allRows.find(r => String(r.batch_id) === String(batchId));
         if (record) Object.assign(record, payload);
 
@@ -720,10 +910,12 @@ function showModal(id) {
 }
 function closeAllModals() {
     document.getElementById('modalBackdrop').classList.add('hidden');
-    ['deleteModal','saveModal'].forEach(id =>
-        document.getElementById(id).classList.add('hidden')
-    );
+    ['deleteModal','saveModal','unfilledModal','fillVacModal'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
     deletingId = null; savingId = null;
+    document.body.classList.remove('modal-open');
 }
 
 // ─── Misc ─────────────────────────────────────────────────────────────────────
@@ -739,12 +931,446 @@ function showError(msg) {
     toast.classList.remove('hidden');
     setTimeout(() => toast.classList.add('hidden'), 4000);
 }
+function showSuccess(msg) {
+    const toast = document.getElementById('successToast');
+    toast.textContent = msg;
+    toast.classList.remove('hidden');
+    setTimeout(() => toast.classList.add('hidden'), 3000);
+}
 
 function escHtml(str) {
     return String(str ?? '')
         .replace(/&/g,'&amp;').replace(/</g,'&lt;')
         .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  UNFILLED CHECK + FILL VACANCIES MODAL
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ─── Check for events with missing vacancy data ───────────────────────────────
+async function checkUnfilledData(year) {
+    try {
+        const res  = await fetch(`${ENTRY_API_URL}?action=unfilled&year=${year}`);
+        const json = await res.json();
+        if (!json.success) return;
+        unfilledEvents = json.data;
+        updateFillVacButtonState();
+
+        if (!unfilledEvents.length) {
+            // All data is filled — close the warning if it's open
+            document.getElementById('unfilledModal').classList.add('hidden');
+            if (document.getElementById('fillVacModal').classList.contains('hidden')) {
+                document.getElementById('modalBackdrop').classList.add('hidden');
+            }
+            return;
+        }
+
+        const names = unfilledEvents.map(e => {
+            const d = e.date_start ? new Date(e.date_start).toLocaleDateString('en-PH', { month:'short', day:'numeric' }) : '';
+            return d ? `${d} (${e.venue?.split(',')[0] ?? 'Event'})` : (e.venue?.split(',')[0] ?? 'Event');
+        });
+        document.getElementById('unfilledModalDetail').textContent =
+            `${unfilledEvents.length} event(s) have missing vacancy data: ${names.join(', ')}.`;
+        document.getElementById('unfilledModalBody').textContent =
+            'Fill the missing vacancy counts now, or dismiss this reminder and continue browsing.';
+
+        if (!unfilledModalShown) {
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+            document.getElementById('unfilledModal').classList.remove('hidden');
+            unfilledModalShown = true;
+        }
+    } catch (e) { /* silent */ }
+}
+
+function updateFillVacButtonState() {
+    const btn = document.getElementById('fillVacBtn');
+    if (!btn) return;
+    const hasMissing = unfilledEvents.length > 0;
+    btn.disabled = !hasMissing;
+    btn.classList.toggle('opacity-50',       !hasMissing);
+    btn.classList.toggle('cursor-not-allowed', !hasMissing);
+    btn.title = hasMissing
+        ? 'Fill in missing vacancy data'
+        : 'All vacancy data is already saved';
+    btn.innerHTML = hasMissing
+        ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Fill Vacancies'
+        : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> All Data Saved';
+}
+
+function closeUnfilledModal() {
+    document.getElementById('unfilledModal').classList.add('hidden');
+    if (document.getElementById('fillVacModal').classList.contains('hidden')) {
+        document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+}
+function openFillVacFromWarning() {
+    closeUnfilledModal();
+    openFillVacModal();
+}
+
+// ─── Open / Close Fill Vacancies Modal ───────────────────────────────────────
+function openFillVacModal() {
+    if (!unfilledEvents.length) {
+        showSuccess('All vacancy data is already saved for this year.');
+        return;
+    }
+    document.getElementById('fillVacModal').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    renderEventTabs();
+    // Auto-select first unfilled event
+    if (unfilledEvents.length) selectEvent(unfilledEvents[0].jobfairevent_id);
+}
+
+function closeFillVacModal() {
+    document.getElementById('fillVacModal').classList.add('hidden');
+    if (document.getElementById('unfilledModal').classList.contains('hidden')) {
+        document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+    document.body.classList.remove('modal-open');
+    resetExcelImport();
+}
+
+// ─── Event Tabs ───────────────────────────────────────────────────────────────
+function renderEventTabs() {
+    // Build tab list: all events that appear in allRows + any unfilled events
+    const eventMap = new Map();
+    allRows.forEach(r => {
+        if (!eventMap.has(r.jobfairevent_id)) {
+            const d = r.date_start
+                ? new Date(r.date_start).toLocaleDateString('en-PH', { month:'short', day:'numeric' })
+                : '';
+            const label = d
+                ? `${d} – ${(r.venue || '').split(',')[0]}`
+                : ((r.venue || '').split(',')[0] || `Event ${r.jobfairevent_id}`);
+            eventMap.set(r.jobfairevent_id, label);
+        }
+    });
+    // Also include unfilled events not yet in allRows
+    unfilledEvents.forEach(e => {
+        if (!eventMap.has(e.jobfairevent_id)) {
+            const d = e.date_start
+                ? new Date(e.date_start).toLocaleDateString('en-PH', { month:'short', day:'numeric' })
+                : '';
+            const label = d
+                ? `${d} – ${(e.venue || '').split(',')[0]}`
+                : ((e.venue || '').split(',')[0] || `Event ${e.jobfairevent_id}`);
+            eventMap.set(e.jobfairevent_id, label);
+        }
+    });
+
+    const container = document.getElementById('eventTabsContainer');
+    if (!eventMap.size) {
+        container.innerHTML = '<span class="text-xs text-gray-400">No events available.</span>';
+        return;
+    }
+
+    container.innerHTML = [...eventMap.entries()].map(([eid, label]) => {
+        const isUnfilled = unfilledEvents.some(u => +u.jobfairevent_id === +eid);
+        const isActive   = +activeEventId === +eid;
+        return `<button
+            onclick="selectEvent(${eid})"
+            class="event-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border
+                ${isActive
+                    ? 'bg-teal-500 text-white border-teal-500'
+                    : isUnfilled
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}"
+            data-event="${eid}">
+            ${escHtml(label)}${isUnfilled ? ' ⚠️' : ''}
+        </button>`;
+    }).join('');
+}
+
+async function selectEvent(eventId) {
+    activeEventId = +eventId;
+    renderEventTabs(); // re-render to update active tab
+
+    // Build a readable label for the selected event
+    const ev = unfilledEvents.find(e => +e.jobfairevent_id === +eventId)
+            || allRows.find(r => +r.jobfairevent_id === +eventId);
+    let label = `Event ${eventId}`;
+    if (ev) {
+        const d = (ev.date_start || ev.date_start)
+            ? new Date(ev.date_start).toLocaleDateString('en-PH', { month:'long', day:'numeric', year:'numeric' })
+            : '';
+        const venue = (ev.venue || '').split(',')[0];
+        label = [d, venue].filter(Boolean).join(' — ');
+    }
+    document.getElementById('activeEventLabel').textContent = label;
+    document.getElementById('fillVacStatus').textContent = 'Loading companies…';
+
+    try {
+        const res  = await fetch(`${ENTRY_API_URL}?action=companies&event_id=${eventId}`);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+        fillCompanies = json.data;
+        renderManualTable();
+        document.getElementById('fillVacStatus').textContent = `${fillCompanies.length} companies loaded.`;
+    } catch (e) {
+        showError('Failed to load companies: ' + e.message);
+        document.getElementById('fillVacStatus').textContent = '';
+    }
+}
+
+// ─── Manual table ─────────────────────────────────────────────────────────────
+function renderManualTable() {
+    const tbody = document.getElementById('manualTableBody');
+    if (!fillCompanies.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-6 text-center text-gray-400">No companies found for this event.</td></tr>`;
+        return;
+    }
+    tbody.innerHTML = fillCompanies.map(c => {
+        const allZero = +c.vac_m === 0 && +c.vac_f === 0;
+        const rowBg   = allZero ? 'bg-amber-50' : '';
+        return `<tr class="company-match-row border-b border-gray-50 hover:bg-gray-50 ${rowBg}" data-company-id="${c.company_id}">
+            <td class="px-4 py-2 text-gray-700 font-medium">${escHtml(c.company_name)}</td>
+            <td class="px-3 py-2 text-center">
+                <input type="number" min="0" class="vac-input" data-field="vac_m" value="${c.vac_m}" placeholder="0"/>
+            </td>
+            <td class="px-3 py-2 text-center">
+                <input type="number" min="0" class="vac-input" data-field="vac_f" value="${c.vac_f}" placeholder="0"/>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// ─── Mode switch ──────────────────────────────────────────────────────────────
+function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById('manualMode').classList.toggle('hidden', mode !== 'manual');
+    document.getElementById('excelMode').classList.toggle('hidden',  mode !== 'excel');
+    document.getElementById('tabManual').className = mode === 'manual'
+        ? 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm'
+        : 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700';
+    document.getElementById('tabExcel').className = mode === 'excel'
+        ? 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm'
+        : 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700';
+}
+
+// ─── Excel Import ─────────────────────────────────────────────────────────────
+function resetExcelImport() {
+    const inp = document.getElementById('excelFileInput');
+    if (inp) inp.value = '';
+    document.getElementById('excelStep1').classList.remove('hidden');
+    document.getElementById('excelStep2').classList.add('hidden');
+    document.getElementById('excelUploadError').classList.add('hidden');
+    excelImportRows = [];
+}
+
+function handleExcelUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const wb      = XLSX.read(e.target.result, { type: 'array' });
+            const ws      = wb.Sheets[wb.SheetNames[0]];
+            const rawRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            if (!rawRows.length) throw new Error('The file appears to be empty.');
+
+            const norm = v => v.toString().trim().toUpperCase().replace(/\s+/g, ' ');
+
+            // Find header row
+            const COMPANY_KEYWORDS = ['COMPANY', 'COMPANY NAME', 'EMPLOYER', 'ESTABLISHMENT'];
+            let headerIdx = -1, colMap = {};
+            for (let i = 0; i < Math.min(rawRows.length, 15); i++) {
+                const cells = rawRows[i].map(norm);
+                const cidx  = cells.findIndex(c => COMPANY_KEYWORDS.includes(c));
+                if (cidx === -1) continue;
+                const vmIdx = cells.findIndex(c => c.includes('MALE') || c === 'VAC M' || c === 'VACANCY M');
+                const vfIdx = cells.findIndex(c => c.includes('FEMALE') || c === 'VAC F' || c === 'VACANCY F');
+                if (vmIdx === -1 && vfIdx === -1) continue;
+                headerIdx = i;
+                colMap = { company: cidx, vac_m: vmIdx, vac_f: vfIdx };
+                break;
+            }
+
+            if (headerIdx === -1) throw new Error('Could not find header row. Expected columns: COMPANY, VACANCY MALE, VACANCY FEMALE.');
+
+            const dataRows = rawRows.slice(headerIdx + 1)
+                .filter(r => r.some(c => c.toString().trim() !== ''))
+                .map(r => ({
+                    excel_name:   (r[colMap.company] ?? '').toString().trim(),
+                    vac_m:        Math.max(0, parseInt(r[colMap.vac_m] ?? 0) || 0),
+                    vac_f:        Math.max(0, parseInt(r[colMap.vac_f] ?? 0) || 0),
+                    matched_id:   null,
+                    match_type:   'none',
+                    suggestions:  [],
+                }))
+                .filter(r => r.excel_name);
+
+            if (!dataRows.length) throw new Error('No data rows found after the header.');
+
+            // Match each company name against DB
+            await Promise.all(dataRows.map(async row => {
+                const res  = await fetch(`${ENTRY_API_URL}?action=search_companies&q=${encodeURIComponent(row.excel_name)}`);
+                const json = await res.json();
+                if (!json.success || !json.data.length) return;
+                row.suggestions = json.data;
+
+                const exactIdx = json.data.findIndex(
+                    s => s.company_name.toUpperCase() === row.excel_name.toUpperCase()
+                );
+                if (exactIdx !== -1) {
+                    row.matched_id  = json.data[exactIdx].company_id;
+                    row.match_type  = 'exact';
+                } else {
+                    row.matched_id  = json.data[0].company_id;
+                    row.match_type  = 'fuzzy';
+                }
+            }));
+
+            excelImportRows = dataRows;
+            document.getElementById('excelStep1').classList.add('hidden');
+            document.getElementById('excelStep2').classList.remove('hidden');
+            renderExcelMatchTable();
+
+        } catch (err) {
+            const errEl = document.getElementById('excelUploadError');
+            errEl.textContent = err.message;
+            errEl.classList.remove('hidden');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function searchAndAssign(idx, query) {
+    if (query.length < 2) return;
+    const res  = await fetch(`${ENTRY_API_URL}?action=search_companies&q=${encodeURIComponent(query)}`);
+    const json = await res.json();
+    if (!json.success || !json.data.length) return;
+    excelImportRows[idx].suggestions  = json.data;
+    excelImportRows[idx].matched_id   = json.data[0].company_id;
+    excelImportRows[idx].match_type   = 'fuzzy';
+    renderExcelMatchTable();
+}
+
+function renderExcelMatchTable() {
+    const tbody    = document.getElementById('excelMatchBody');
+    const notFound = excelImportRows.filter(r => r.match_type === 'none').length;
+
+    let banner = document.getElementById('excelSkipWarning');
+    if (!banner) {
+        banner = document.createElement('p');
+        banner.id = 'excelSkipWarning';
+        banner.className = 'text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2';
+        tbody.closest('table').before(banner);
+    }
+    banner.textContent = notFound
+        ? `⚠️ ${notFound} row${notFound > 1 ? 's' : ''} could not be matched and will be skipped on save.`
+        : '';
+    banner.style.display = notFound ? '' : 'none';
+
+    tbody.innerHTML = excelImportRows.map((row, idx) => {
+        const badge = row.match_type === 'exact' ? `<span class="match-badge-ok">Matched</span>`
+                    : row.match_type === 'fuzzy' ? `<span class="match-badge-warn">Review</span>`
+                    : `<span class="match-badge-err">Not Found</span>`;
+
+        const selectOpts = row.suggestions.map(s =>
+            `<option value="${s.company_id}" ${s.company_id == row.matched_id ? 'selected' : ''}>${escHtml(s.company_name)}</option>`
+        ).join('');
+
+        const matchCell = row.match_type === 'none'
+            ? `<input type="text" placeholder="Type to search…"
+                class="text-xs border border-amber-300 bg-amber-50 rounded-lg px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-teal-300"
+                oninput="searchAndAssign(${idx}, this.value)"/>`
+            : `<select class="text-xs border border-gray-200 rounded-lg px-2 py-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-300 max-w-[220px]"
+                onchange="excelImportRows[${idx}].matched_id = +this.value">
+                ${selectOpts}
+               </select>`;
+
+        const rowClass = row.match_type === 'none'
+            ? 'border-b border-amber-100 bg-amber-50'
+            : 'border-b border-gray-50 hover:bg-gray-50';
+
+        return `<tr class="${rowClass}">
+            <td class="px-4 py-2.5 text-gray-700 font-medium text-xs">${escHtml(row.excel_name)}</td>
+            <td class="px-4 py-2.5">${matchCell}</td>
+            <td class="px-3 py-2.5 text-center text-gray-700 font-medium">${row.vac_m}</td>
+            <td class="px-3 py-2.5 text-center text-gray-700 font-medium">${row.vac_f}</td>
+            <td class="px-3 py-2.5 text-center">${badge}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ─── Save fill data ───────────────────────────────────────────────────────────
+async function saveFillData() {
+    if (!activeEventId) { showError('Please select an event first.'); return; }
+
+    let entries = [];
+
+    if (currentMode === 'manual') {
+        document.querySelectorAll('#manualTableBody tr[data-company-id]').forEach(row => {
+            const companyId = +row.dataset.companyId;
+            const inputs    = row.querySelectorAll('.vac-input');
+            entries.push({
+                company_id: companyId,
+                vac_m: parseInt(inputs[0]?.value) || 0,
+                vac_f: parseInt(inputs[1]?.value) || 0,
+            });
+        });
+    } else {
+        entries = excelImportRows
+            .filter(r => r.matched_id)
+            .map(r => ({ company_id: r.matched_id, vac_m: r.vac_m, vac_f: r.vac_f }));
+    }
+
+    if (!entries.length) { showError('No entries to save.'); return; }
+
+    const btn = document.getElementById('saveFillBtn');
+    btn.disabled    = true;
+    btn.textContent = 'Saving…';
+    document.getElementById('fillVacStatus').textContent = 'Saving…';
+
+    try {
+        const res  = await fetch(ENTRY_API_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ event_id: activeEventId, entries }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        showSuccess(`✓ Saved ${json.data.saved} companies for this event.`);
+        closeFillVacModal();
+        loadData(); // refresh table + re-check unfilled
+    } catch (e) {
+        showError('Save failed: ' + e.message);
+        document.getElementById('fillVacStatus').textContent = 'Save failed.';
+    } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Save All';
+    }
+}
+
+// ─── Drag-and-drop for Excel zone ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    const dropZone = document.getElementById('excelDropZone');
+    if (dropZone) {
+        dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('border-teal-400','bg-teal-50'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-teal-400','bg-teal-50'));
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('border-teal-400','bg-teal-50');
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                const dt = new DataTransfer();
+                dt.items.add(file);
+                const input = document.getElementById('excelFileInput');
+                input.files = dt.files;
+                handleExcelUpload(input);
+            }
+        });
+    }
+
+    // Close modals on backdrop click
+    document.getElementById('modalBackdrop').addEventListener('click', () => {
+        if (!document.getElementById('fillVacModal').classList.contains('hidden')) return; // don't close if fill modal is open
+        closeAllModals();
+    });
+});
 </script>
 
 <?php require_once __DIR__ . '/../../../includes/layout/footer.php'; ?>

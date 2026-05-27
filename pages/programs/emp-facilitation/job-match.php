@@ -288,9 +288,7 @@ function buildRow(r, idx) {
         ${total3(nm.ffi_m,   nm.ffi_f,   'text-purple-400', 'bg-purple-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2">
-                <button onclick="startEdit(${id})" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                </button>
+                <!-- edit button removed per UX request -->
                 <button onclick="promptDelete(${id})" class="delete-btn text-red-400 hover:text-red-600" title="Delete">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
@@ -408,10 +406,10 @@ function startEdit(id) {
     });
     editSnapshot[id] = snap;
 
-    row.querySelector('.edit-btn').classList.add('hidden');
-    row.querySelector('.delete-btn').classList.add('hidden');
-    row.querySelector('.save-btn').classList.remove('hidden');
-    row.querySelector('.cancel-btn').classList.remove('hidden');
+    const editBtnEl = row.querySelector('.edit-btn'); if (editBtnEl) editBtnEl.classList.add('hidden');
+    const deleteBtnEl = row.querySelector('.delete-btn'); if (deleteBtnEl) deleteBtnEl.classList.add('hidden');
+    const saveBtnEl = row.querySelector('.save-btn'); if (saveBtnEl) saveBtnEl.classList.remove('hidden');
+    const cancelBtnEl = row.querySelector('.cancel-btn'); if (cancelBtnEl) cancelBtnEl.classList.remove('hidden');
 }
 
 function recalcTotalsInRow(row) {
@@ -435,10 +433,10 @@ function cancelEdit(id) {
         cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'outline-none');
     });
     row.classList.remove('editing', 'bg-yellow-50');
-    row.querySelector('.edit-btn').classList.remove('hidden');
-    row.querySelector('.delete-btn').classList.remove('hidden');
-    row.querySelector('.save-btn').classList.add('hidden');
-    row.querySelector('.cancel-btn').classList.add('hidden');
+    const editBtnEl2 = row.querySelector('.edit-btn'); if (editBtnEl2) editBtnEl2.classList.remove('hidden');
+    const deleteBtnEl2 = row.querySelector('.delete-btn'); if (deleteBtnEl2) deleteBtnEl2.classList.remove('hidden');
+    const saveBtnEl2 = row.querySelector('.save-btn'); if (saveBtnEl2) saveBtnEl2.classList.add('hidden');
+    const cancelBtnEl2 = row.querySelector('.cancel-btn'); if (cancelBtnEl2) cancelBtnEl2.classList.add('hidden');
     delete editSnapshot[id];
 }
 
@@ -471,10 +469,10 @@ async function confirmSave() {
             cell.classList.remove('border', 'border-yellow-300', 'bg-white', 'outline-none');
         });
         row.classList.remove('editing', 'bg-yellow-50');
-        row.querySelector('.edit-btn').classList.remove('hidden');
-        row.querySelector('.delete-btn').classList.remove('hidden');
-        row.querySelector('.save-btn').classList.add('hidden');
-        row.querySelector('.cancel-btn').classList.add('hidden');
+        const editBtnEl3 = row.querySelector('.edit-btn'); if (editBtnEl3) editBtnEl3.classList.remove('hidden');
+        const deleteBtnEl3 = row.querySelector('.delete-btn'); if (deleteBtnEl3) deleteBtnEl3.classList.remove('hidden');
+        const saveBtnEl3 = row.querySelector('.save-btn'); if (saveBtnEl3) saveBtnEl3.classList.add('hidden');
+        const cancelBtnEl3 = row.querySelector('.cancel-btn'); if (cancelBtnEl3) cancelBtnEl3.classList.add('hidden');
         delete editSnapshot[id];
 
         // Flash green
