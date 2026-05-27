@@ -48,6 +48,7 @@ function validateSPES(mysqli $conn, array $rows, string $program): array {
         $school = s(rowValue($row, ['School', 'school'], ''));
         $studentType = s(rowValue($row, ['Student/OSY', 'student_type'], ''));
         $company = s(rowValue($row, ['Company', 'company'], ''));
+        $spesStatus = s(rowValue($row, ['Status', 'status', 'spes_status'], ''));
 
         if (empty($school)) {
             $previewRow['status_message'] = 'Missing School';
@@ -59,6 +60,14 @@ function validateSPES(mysqli $conn, array $rows, string $program): array {
 
         if (empty($studentType)) {
             $previewRow['status_message'] = 'Missing Student/OSY classification';
+            $previewRow['badge_status'] = 'invalid';
+            $previewRow['_sys_skip'] = true;
+            $validatedData[] = $previewRow;
+            continue;
+        }
+
+        if (empty($spesStatus)) {
+            $previewRow['status_message'] = 'Missing Status';
             $previewRow['badge_status'] = 'invalid';
             $previewRow['_sys_skip'] = true;
             $validatedData[] = $previewRow;
@@ -86,6 +95,8 @@ function validateSPES(mysqli $conn, array $rows, string $program): array {
         if (!empty($endOfContract)) {
             $previewRow['_parsed_end_of_contract'] = $endOfContract;
         }
+
+        $previewRow['_spes_status'] = titleCase($spesStatus);
 
         // Check for duplicates within Excel
         $excelDupKey = buildExcelDuplicateKey($fname, $lname, $dob);

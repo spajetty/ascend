@@ -378,6 +378,7 @@ export const programHeaders = {
         'Student/OSY', 
         'Program', 
         'Classification', 
+        'Status',
         'School', 
         'Highest Educ. Attainment', 
         'Course', 

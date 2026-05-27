@@ -47,6 +47,7 @@ function mapRow(b) {
     gender:      b.sex        || '—',
     section:     b.section_name || '—',
     program:     b.program_name || '—',
+    spes_status: b.spes_status || '',
     status:      b.classification || '—',
     email:       b.email     || '—',
     contact:     b.contact   || '—',

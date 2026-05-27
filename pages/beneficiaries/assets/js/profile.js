@@ -84,7 +84,11 @@ async function openProfile(benefId) {
   document.getElementById('profAvatar').textContent    = b.avatar;
   document.getElementById('profName').textContent      = upperText(b.name);
   document.getElementById('profAge').textContent       = calculateAge(b.dob);
-  document.getElementById('profProgram').textContent   = `${upperText(b.program)} • ${upperText(b.section)}`;
+  const programParts = [upperText(b.program), upperText(b.section)];
+  if ((b.program || '').trim() === 'SPES' && b.spes_status && String(b.spes_status).trim()) {
+    programParts.push(upperText(b.spes_status));
+  }
+  document.getElementById('profProgram').textContent   = programParts.join(' • ');
   document.getElementById('profLastVisit').textContent = upperText(safeText(b.lastVisit));
   document.getElementById('profVisit').textContent     = upperText(safeText(b.visit));
 
