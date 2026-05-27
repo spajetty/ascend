@@ -43,14 +43,14 @@ function json_ok(mixed $data = null): void {
     exit;
 }
 
-// ─── GET ?year=2026&type=college&search=davao ─────────────────────────────
+// ─── GET ?year=2026&month=3&type=college&search=school ───────────────────────
 if ($method === 'GET') {
 
-    $year   = isset($_GET['year'])   ? (int)   $_GET['year']   : (int) date('Y');
-    $type   = isset($_GET['type'])   ? trim($_GET['type'])     : '';   // 'college' | 'shs' | ''
-    $search = isset($_GET['search']) ? trim($_GET['search'])   : '';
+    $year   = isset($_GET['year'])   ? (int)  $_GET['year']   : (int) date('Y');
+    $month  = isset($_GET['month'])  ? (int)  $_GET['month']  : 0;
+    $search = isset($_GET['search']) ? trim($_GET['search'])  : '';
 
-    // Available years derived from import_batches linked to gip rows
+    // Available years
     $res   = $conn->query("
         SELECT DISTINCT ib.year
         FROM import_batches ib
@@ -65,63 +65,38 @@ if ($method === 'GET') {
     $years = array_unique(array_merge($years, [$currentYear, $year]));
     rsort($years);
 
-    // Each gip row = one beneficiary. We join beneficiaries to get:
-    //   - sex (M/F) for the M/F columns
-    //   - classification to determine which count column gets the 1
-    //
-    // classification values stored in beneficiaries.classification:
-    //   Participants, Inquired, Referred, Interviewed,
-    //   PESO-Accepted, Privately-Accepted, Not Proceeded
+    // Base query — one row per grouped GIP bucket.
     $sql = "
         SELECT
-            g.gip_id,
-            g.contract_period,
+            SHA1(CONCAT(
+                ib.year, '|', ib.month,
+                '|', LOWER(COALESCE(g.school, '')),
+                '|', LOWER(COALESCE(g.office_assignment, '')),
+                '|', LOWER(COALESCE(g.type, ''))
+            )) AS group_key,
+            GROUP_CONCAT(g.gip_id ORDER BY g.gip_id SEPARATOR ',') AS gip_ids,
+            ib.month,
+            ib.year,
             g.school,
-            g.college_or_shs,
-            g.course,
             g.office_assignment,
-            g.required_hours,
+            LOWER(g.type) AS gip_type,
 
-            -- Participants
-            SUM(CASE WHEN b.classification = 'Participants'       AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS part_m,
-            SUM(CASE WHEN b.classification = 'Participants'       AND b.sex = 'Female' THEN 1 ELSE 0 END) AS part_f,
-            -- Inquired
-            SUM(CASE WHEN b.classification = 'Inquired'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS inq_m,
-            SUM(CASE WHEN b.classification = 'Inquired'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS inq_f,
-            -- Referred
-            SUM(CASE WHEN b.classification = 'Referred'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
-            SUM(CASE WHEN b.classification = 'Referred'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
-            -- Interviewed
-            SUM(CASE WHEN b.classification = 'Interviewed'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS int_m,
-            SUM(CASE WHEN b.classification = 'Interviewed'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS int_f,
-            -- PESO-Accepted
-            SUM(CASE WHEN b.classification = 'PESO-Accepted'      AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS peso_m,
-            SUM(CASE WHEN b.classification = 'PESO-Accepted'      AND b.sex = 'Female' THEN 1 ELSE 0 END) AS peso_f,
-            -- Privately-Accepted
-            SUM(CASE WHEN b.classification = 'Privately-Accepted' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
-            SUM(CASE WHEN b.classification = 'Privately-Accepted' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f,
-            -- Not Proceeded
-            SUM(CASE WHEN b.classification = 'Not Proceeded'      AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS notp_m,
-            SUM(CASE WHEN b.classification = 'Not Proceeded'      AND b.sex = 'Female' THEN 1 ELSE 0 END) AS notp_f
+            SUM(CASE WHEN LOWER(COALESCE(b.sex, '')) = 'male'   THEN 1 ELSE 0 END) AS part_m,
+            SUM(CASE WHEN LOWER(COALESCE(b.sex, '')) = 'female' THEN 1 ELSE 0 END) AS part_f
 
         FROM gip g
-
-        INNER JOIN import_batches ib
-            ON ib.batch_id = g.batch_id
-
-        INNER JOIN beneficiaries b
-            ON b.benef_id = g.benef_id
-
+        INNER JOIN import_batches ib ON ib.batch_id = g.batch_id
+        INNER JOIN beneficiaries b   ON b.benef_id  = g.benef_id
         WHERE ib.year = ?
     ";
 
     $params = [$year];
     $types  = 'i';
 
-    if ($type !== '') {
-        $sql    .= " AND LOWER(g.college_or_shs) = ?";
-        $types  .= 's';
-        $params[] = strtolower($type);
+    if ($month > 0) {
+        $sql    .= " AND ib.month = ?";
+        $types  .= 'i';
+        $params[] = $month;
     }
 
     if ($search !== '') {
@@ -132,16 +107,12 @@ if ($method === 'GET') {
 
     $sql .= "
         GROUP BY
-            g.gip_id,
-            g.contract_period,
-            g.school,
-            g.college_or_shs,
-            g.course,
-            g.office_assignment,
-            g.required_hours,
+            ib.year,
             ib.month,
-            ib.year
-        ORDER BY ib.month ASC, g.school ASC
+            g.school,
+            g.office_assignment,
+            g.type
+        ORDER BY ib.month ASC, g.school ASC, g.office_assignment ASC, g.type ASC
     ";
 
     $stmt = $conn->prepare($sql);
@@ -152,54 +123,64 @@ if ($method === 'GET') {
 
     $rows = [];
     while ($row = $result->fetch_assoc()) {
+        $row['month_num'] = (int) $row['month'];
         $rows[] = $row;
     }
     $stmt->close();
 
-    // Card totals
+    // Summary cards for the simplified view
     $totals = [
-        'participants'  => ['m' => 0, 'f' => 0],
-        'inquired'      => ['m' => 0, 'f' => 0],
-        'referred'      => ['m' => 0, 'f' => 0],
-        'interviewed'   => ['m' => 0, 'f' => 0],
-        'peso'          => ['m' => 0, 'f' => 0],
-        'private'       => ['m' => 0, 'f' => 0],
-        'not_proceeded' => ['m' => 0, 'f' => 0],
+        'participants' => ['m' => 0, 'f' => 0],
+        'records'      => 0,
+        'lgu'          => ['m' => 0, 'f' => 0, 'records' => 0],
+        'dole'         => ['m' => 0, 'f' => 0, 'records' => 0],
     ];
     foreach ($rows as $r) {
         $totals['participants']['m']  += (int) $r['part_m']; $totals['participants']['f']  += (int) $r['part_f'];
-        $totals['inquired']['m']      += (int) $r['inq_m'];  $totals['inquired']['f']      += (int) $r['inq_f'];
-        $totals['referred']['m']      += (int) $r['ref_m'];  $totals['referred']['f']      += (int) $r['ref_f'];
-        $totals['interviewed']['m']   += (int) $r['int_m'];  $totals['interviewed']['f']   += (int) $r['int_f'];
-        $totals['peso']['m']          += (int) $r['peso_m']; $totals['peso']['f']          += (int) $r['peso_f'];
-        $totals['private']['m']       += (int) $r['priv_m']; $totals['private']['f']       += (int) $r['priv_f'];
-        $totals['not_proceeded']['m'] += (int) $r['notp_m']; $totals['not_proceeded']['f'] += (int) $r['notp_f'];
+        $totals['records']++;
+        $bucket = strtolower(trim((string) ($r['gip_type'] ?? '')));
+        if ($bucket === 'lgu') {
+            $totals['lgu']['m'] += (int) $r['part_m'];
+            $totals['lgu']['f'] += (int) $r['part_f'];
+            $totals['lgu']['records']++;
+        } elseif ($bucket === 'dole') {
+            $totals['dole']['m'] += (int) $r['part_m'];
+            $totals['dole']['f'] += (int) $r['part_f'];
+            $totals['dole']['records']++;
+        }
     }
 
     json_ok(['rows' => $rows, 'totals' => $totals, 'years' => $years]);
 }
 
-// ─── PUT — edit a gip row ─────────────────────────────────────────────────
+// ─── PUT — edit visible GIP row fields and batch month/year ─────────────────
 if ($method === 'PUT') {
 
     $body = json_decode(file_get_contents('php://input'), true);
     $id   = isset($body['gip_id']) ? (int) $body['gip_id'] : 0;
     if (!$id) json_error('Missing gip_id');
 
-    $allowed = ['contract_period', 'school', 'college_or_shs', 'course', 'office_assignment', 'required_hours'];
-    $sets = []; $types = ''; $values = [];
+    $allowed = ['month', 'year', 'school', 'office_assignment'];
+    $sets = [];
+    $types = '';
+    $values = [];
 
     foreach ($allowed as $col) {
         if (array_key_exists($col, $body)) {
-            $sets[]   = "$col = ?";
-            $types   .= ($col === 'required_hours') ? 'i' : 's';
-            $values[] = $body[$col];
+            $sets[] = "$col = ?";
+            if ($col === 'month' || $col === 'year') {
+                $types .= 'i';
+                $values[] = (int) $body[$col];
+            } else {
+                $types .= 's';
+                $values[] = trim((string) $body[$col]);
+            }
         }
     }
 
     if (empty($sets)) json_error('Nothing to update');
 
-    $types   .= 'i';
+    $types .= 'i';
     $values[] = $id;
 
     $stmt = $conn->prepare("UPDATE gip SET " . implode(', ', $sets) . " WHERE gip_id = ?");
@@ -215,12 +196,17 @@ if ($method === 'PUT') {
 // ─── DELETE ?id=5 ─────────────────────────────────────────────────────────
 if ($method === 'DELETE') {
 
-    $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-    if (!$id) json_error('Missing id');
+    $ids = $_GET['ids'] ?? '';
+    $ids = is_array($ids) ? $ids : explode(',', (string) $ids);
+    $ids = array_values(array_filter(array_map('intval', $ids)));
+    if (empty($ids)) json_error('Missing ids');
 
-    $stmt = $conn->prepare("DELETE FROM gip WHERE gip_id = ?");
+    $placeholders = implode(',', array_fill(0, count($ids), '?'));
+    $bindTypes = str_repeat('i', count($ids));
+
+    $stmt = $conn->prepare("DELETE FROM gip WHERE gip_id IN ($placeholders)");
     if (!$stmt) json_error('Query prepare failed: ' . $conn->error);
-    $stmt->bind_param('i', $id);
+    $stmt->bind_param($bindTypes, ...$ids);
     $stmt->execute();
     $affected = $stmt->affected_rows;
     $stmt->close();
