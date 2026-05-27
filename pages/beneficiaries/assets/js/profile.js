@@ -490,12 +490,15 @@ async function openProfile(benefId) {
               <td>${formatDate(r.end_of_contract)}</td>
               <td>${r.days || '—'}</td>
               <td><span class="badge badge-registered">${formatSpesCategory(r.category)}</span></td>
-              <td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
                 <button type="button" class="edit-btn-icon" onclick="editSpesEmployment(${r.employment_id})" title="Edit OJT">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5" />
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
                   </svg>
+                </button>
+                <button type="button" class="delete-btn-icon" onclick="deleteSpesEmployment(${r.employment_id})" title="Delete OJT" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
                 </button>
               </td>
             </tr>
@@ -527,6 +530,7 @@ window.editSpesEmployment = function (employmentId) {
 
 window.openEditSpesEmploymentModal = function (record) {
   if (!record) return;
+  window.currentSpesEmploymentMode = 'edit';
   document.getElementById('editSpesEmploymentId').value = record.employment_id || '';
   document.getElementById('editSpesEmploymentStore').value = record.store_assignment || '';
   document.getElementById('editSpesEmploymentStart').value = record.start_of_contract || '';
@@ -543,9 +547,8 @@ window.closeEditSpesEmploymentModal = function () {
 
 window.submitEditSpesEmployment = function () {
   const employmentId = document.getElementById('editSpesEmploymentId').value;
-  if (!employmentId) {
-    _showEditToast('No OJT record selected.', 'error');
-    return;
+  if (!employmentId || window.currentSpesEmploymentMode === 'add') {
+    return window.submitAddSpesEmployment();
   }
 
   const formData = new FormData();
@@ -576,6 +579,96 @@ window.submitEditSpesEmployment = function () {
     })
   );
 };
+
+// ---------------- SPES Employment Add/Delete Handlers ----------------
+window.openAddSpesEmploymentModal = function () {
+  window.currentSpesEmploymentMode = 'add';
+  document.getElementById('editSpesEmploymentId').value = '';
+  document.getElementById('editSpesEmploymentStore').value = '';
+  document.getElementById('editSpesEmploymentStart').value = '';
+  document.getElementById('editSpesEmploymentEnd').value = '';
+  document.getElementById('editSpesEmploymentDays').value = '';
+  document.getElementById('editSpesEmploymentCategory').value = '';
+  _loadEmploymentCompanies('editSpesEmploymentCompany', '');
+  const header = document.querySelector('#modalEditSpesEmployment .modal-header h3');
+  if (header) header.textContent = 'Add SPES OJT Employment';
+  const confirmBtn = document.querySelector('#modalEditSpesEmployment .btn-confirm');
+  if (confirmBtn) {
+    confirmBtn.textContent = 'Add';
+    confirmBtn.onclick = submitAddSpesEmployment;
+  }
+  _toggleEditModal('modalEditSpesEmployment', 'flex');
+};
+
+window.submitAddSpesEmployment = function () {
+  const formData = new FormData();
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment added successfully.', 'success');
+        closeEditSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error adding OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error adding OJT employment.', 'error');
+    })
+  );
+};
+
+function deleteSpesEmployment(employmentId) {
+  if (!employmentId) return;
+  document.getElementById('deleteSpesEmploymentId').value = employmentId;
+  _toggleEditModal('modalDeleteSpesEmployment', 'flex');
+}
+
+window.closeDeleteSpesEmploymentModal = function () {
+  _toggleEditModal('modalDeleteSpesEmployment', 'none');
+  document.getElementById('deleteSpesEmploymentId').value = '';
+};
+
+window.confirmDeleteSpesEmployment = function () {
+  const id = document.getElementById('deleteSpesEmploymentId').value;
+  if (!id) return;
+  const formData = new FormData();
+  formData.append('employment_id', id);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_spes_employment.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('OJT employment deleted.', 'success');
+        closeDeleteSpesEmploymentModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error deleting OJT employment.', 'error');
+      }
+    }).catch(() => {
+      _showEditToast('Error deleting OJT employment.', 'error');
+    })
+  );
+};
+
+window.deleteSpesEmployment = deleteSpesEmployment;
+window.closeDeleteSpesEmploymentModal = window.closeDeleteSpesEmploymentModal;
+window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
 
   if (programName === 'Government Internship Program') {
     if (educationCard) educationCard.style.display = 'none';

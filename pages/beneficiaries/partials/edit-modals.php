@@ -289,6 +289,24 @@
     </div>
 </div>
 
+<!-- ── Delete SPES OJT Employment Modal ── -->
+<div id="modalDeleteSpesEmployment" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:520px;">
+        <div class="modal-header">
+            <h3>Delete OJT Employment</h3>
+            <button class="modal-close" onclick="closeDeleteSpesEmploymentModal()">✕</button>
+        </div>
+        <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
+            <input type="hidden" id="deleteSpesEmploymentId" value="">
+            <p>Are you sure you want to delete this OJT employment record? This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteSpesEmploymentModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteSpesEmployment()" style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Edit Government Internship Program Modal ── -->
 <div id="modalEditGip" class="timeline-modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width:860px;">
