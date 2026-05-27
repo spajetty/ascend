@@ -74,20 +74,6 @@ function shouldShowEmployerResultsTab(data) {
     return true;
 }
 
-function getProceedButtonLabel(program) {
-    const p = String(program || '').trim();
-    if (!p) return 'Proceed';
-    const ACRONYMS = {
-        'First Time Jobseeker': 'FTJS',
-        'Work Immersion and Internship Referral Program': 'WIIRP',
-        'Workers Hiring for Infrastructure Projects - Beneficiaries': 'WHIP',
-        'Workers Hiring for Infrastructure Projects - Projects': 'Projects',
-        'Government Internship Program': 'GIP',
-    };
-    const abbr = ACRONYMS[p] || null;
-    return `Proceed to ${abbr || p}`;
-}
-
 function isEmployerAccreditationFollowupProgram(program) {
     return EMPLOYER_ACCRUAL_PROGRAMS.has(String(program || '').trim());
 }
@@ -487,16 +473,12 @@ export function renderImportResultsView(data) {
     const proceedBtn = document.getElementById('proceedToJobFairBtn');
     const employerTabBtn = document.querySelector('[data-results-tab="new-employers"]');
     const employerTabPanel = document.getElementById('resultsPanelNewEmployers');
-    const reviewEmployersBtn = document.getElementById('reviewEmployersBtn');
-    const addAccreditationBtn = document.getElementById('addAccreditationBtn');
 
     if (employerTabBtn) employerTabBtn.classList.toggle('hidden', !showEmployerTab);
     if (employerTabPanel) employerTabPanel.classList.toggle('hidden', !showEmployerTab);
-    if (reviewEmployersBtn) reviewEmployersBtn.classList.toggle('hidden', !showEmployerTab);
-    if (addAccreditationBtn) addAccreditationBtn.classList.toggle('hidden', !showEmployerTab);
 
     if (proceedBtn) {
-        proceedBtn.textContent = getProceedButtonLabel(data.program || '');
+        proceedBtn.textContent = 'Proceed to Beneficiaries';
     }
 
     if (labelNE) labelNE.textContent = primaryLabel;
@@ -698,14 +680,12 @@ export function initImportResultsUi() {
 
     document.getElementById('downloadErrorReportBtn')?.addEventListener('click', downloadErrorReportCsv);
 
-    document.getElementById('proceedToJobFairBtn')?.addEventListener('click',
-        () => showToast('You can now continue with the next import.', 'success'));
+    document.getElementById('proceedToJobFairBtn')?.addEventListener('click', () => {
+        // Redirect to the Beneficiaries menu
+        window.location.href = '/pages/beneficiaries/beneficiary.php';
+    });
 
-    document.getElementById('addAccreditationBtn')?.addEventListener('click',
-        () => showToast('Use Employers section to add accreditation details.', 'warning'));
-
-    document.getElementById('reviewEmployersBtn')?.addEventListener('click',
-        () => showToast('Review newly created employers in the Employers module.', 'success'));
+    // 'Add Accreditation' and 'Review Employers' buttons removed — no handlers.
 
     document.getElementById('submitEmployerAccreditationBtn')?.addEventListener('click', submitEmployerAccreditationFollowup);
     document.getElementById('backToResultsBtn')?.addEventListener('click', () => {

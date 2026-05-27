@@ -392,24 +392,7 @@
                     </svg>
                     Proceed to Job Fair
                 </button>
-                <button id="addAccreditationBtn" type="button"
-                    class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-700 hover:bg-amber-100 transition-colors">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="8" r="6" />
-                        <path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11" />
-                    </svg>
-                    Add Accreditation
-                </button>
-                <button id="reviewEmployersBtn" type="button"
-                    class="inline-flex items-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-100 transition-colors">
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-                        <circle cx="9" cy="7" r="4" />
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-                    </svg>
-                    Review Employers
-                </button>
+                <!-- Removed Add Accreditation and Review Employers buttons per request -->
 
                 <!-- Rollback button — only visible when an undo token exists -->
                 <button id="rollbackImportBtn" type="button"
