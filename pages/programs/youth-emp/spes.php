@@ -13,6 +13,23 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     body.modal-open { overflow: hidden; }
     #mainContent { box-sizing: border-box; width: 100%; }
     #mainContent * { box-sizing: border-box; }
+
+    /* Bulk fill modal input cells */
+    .vac-ref-input {
+        width: 52px;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        padding: 3px 4px;
+        font-size: 12px;
+        outline: none;
+        transition: border-color .15s;
+    }
+    .vac-ref-input:focus { border-color: #14b8a6; box-shadow: 0 0 0 2px rgba(20,184,166,.15); }
+    .company-match-row { transition: background .15s; }
+    .match-badge-ok   { background:#dcfce7; color:#166534; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
+    .match-badge-warn { background:#fef9c3; color:#854d0e; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
+    .match-badge-err  { background:#fee2e2; color:#991b1b; border-radius:9999px; padding:1px 8px; font-size:11px; font-weight:600; }
 </style>
 
 <main id="mainContent" class="flex-1 md:ml-56 min-h-screen" style="max-width:100%;">
@@ -90,7 +107,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
         <!-- Filter Bar -->
         <div class="flex flex-col gap-2 mb-4">
-            <!-- Row 1: Year + month filters -->
             <div class="flex flex-wrap items-center gap-2">
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-gray-500 whitespace-nowrap">Filter by year:</span>
@@ -100,8 +116,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                     <span class="text-sm text-gray-500 whitespace-nowrap">Filter by month:</span>
                     <select id="monthFilter" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 text-gray-700 bg-white focus:outline-none focus:ring-2 focus:ring-teal-300"></select>
                 </div>
+                <!-- Fill Vacancies button in filter bar too -->
+                <button id="bulkFillBtn" onclick="openBulkFillModal()" class="ml-auto inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-600 text-white text-sm font-medium shadow-sm transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    Fill Vacancies
+                </button>
             </div>
-            <!-- Row 2: Search + loading indicator -->
             <div class="flex items-center gap-2">
                 <div class="relative flex-1">
                     <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +219,170 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </main>
 
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
+<!--  BULK FILL MODAL                                                          -->
+<!-- ══════════════════════════════════════════════════════════════════════════ -->
 <div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40"></div>
+
+<!-- Unfilled Data Modal -->
+<div id="unfilledModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+        <div class="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-yellow-50">
+            <div class="flex items-start gap-3">
+                <div class="bg-amber-100 p-3 rounded-xl shrink-0">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-lg font-bold text-gray-900">Job Vacancies &amp; Referred data is incomplete</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="unfilledModalDetail">Some months have companies with no vacancy or referral data entered yet.</p>
+                </div>
+            </div>
+        </div>
+        <div class="px-6 py-4">
+            <p class="text-sm text-gray-600 leading-relaxed" id="unfilledModalBody">You can fill the missing values now, or dismiss this reminder and continue browsing.</p>
+        </div>
+        <div class="px-6 py-4 border-t border-gray-100 flex flex-wrap items-center justify-end gap-2">
+            <button onclick="closeUnfilledModal()" class="px-4 py-2 rounded-xl border border-gray-200 text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors">Dismiss</button>
+            <button onclick="openBulkFillFromWarning()" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-semibold shadow-sm transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                Fill in Data
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk Fill Modal -->
+<div id="bulkFillModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="bg-teal-100 p-2 rounded-xl">
+                    <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-gray-900">Fill Vacancies</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Enter counts per company. You can also import from Excel.</p>
+                </div>
+            </div>
+            <button onclick="closeBulkFillModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <!-- Month Tabs -->
+        <div class="px-6 pt-4 shrink-0">
+            <div id="monthTabsContainer" class="flex flex-wrap gap-2 mb-4">
+                <!-- tabs rendered by JS -->
+            </div>
+
+            <!-- Tab: Mode switcher (Manual / Excel Import) -->
+            <div class="flex items-center gap-1 bg-gray-100 rounded-xl p-1 w-fit mb-4">
+                <button id="tabManual" onclick="switchMode('manual')"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm">
+                    ✏️ Manual Entry
+                </button>
+                <button id="tabExcel" onclick="switchMode('excel')"
+                    class="px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700">
+                    📊 Import from Excel
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="flex-1 overflow-y-auto px-6 pb-2">
+
+            <!-- ── MANUAL MODE ─────────────────────────────────────────────── -->
+            <div id="manualMode">
+                <p class="text-xs text-gray-400 mb-3">
+                    Showing companies for <strong id="activeMonthLabel" class="text-gray-700"></strong>.
+                    Rows highlighted in yellow still have all zeros for vacancies.
+                </p>
+                <div class="overflow-x-auto rounded-xl border border-gray-100">
+                    <table class="w-full text-xs min-w-[600px]">
+                        <thead class="bg-gray-50">
+                            <tr class="border-b border-gray-100">
+                                <th class="text-left px-4 py-2.5 text-gray-500 font-medium">COMPANY</th>
+                                <th class="px-3 py-2.5 text-center text-orange-500 font-semibold" colspan="2">JOB VACANCIES</th>
+                            </tr>
+                            <tr class="border-b border-gray-100 bg-gray-50/50">
+                                <th></th>
+                                <th class="px-3 py-1.5 text-center text-gray-400 font-medium text-[11px]">MALE</th>
+                                <th class="px-3 py-1.5 text-center text-gray-400 font-medium text-[11px]">FEMALE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="manualTableBody">
+                            <tr><td colspan="3" class="px-4 py-6 text-center text-gray-400">Select a month above to load companies.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── EXCEL IMPORT MODE ───────────────────────────────────────── -->
+            <div id="excelMode" class="hidden">
+                <!-- Step 1: Upload -->
+                <div id="excelStep1">
+                    <div class="border-2 border-dashed border-gray-200 rounded-2xl p-8 text-center hover:border-teal-300 transition-colors cursor-pointer" id="excelDropZone" onclick="document.getElementById('excelFileInput').click()">
+                        <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        <p class="text-sm font-semibold text-gray-600">Drop your Excel file here</p>
+                        <p class="text-xs text-gray-400 mt-1">or click to browse — .xlsx or .xls</p>
+                        <p class="text-xs text-gray-300 mt-3">Expected columns: <span class="font-mono bg-gray-100 px-1 rounded">COMPANY</span> <span class="font-mono bg-gray-100 px-1 rounded">VACANCY MALE</span> <span class="font-mono bg-gray-100 px-1 rounded">VACANCY FEMALE</span> </p>
+                    </div>
+                    <input type="file" id="excelFileInput" accept=".xlsx,.xls" class="hidden" onchange="handleExcelUpload(this)"/>
+                    <p id="excelUploadError" class="text-xs text-red-500 mt-2 hidden"></p>
+                </div>
+
+                <!-- Step 2: Review & Match -->
+                <div id="excelStep2" class="hidden">
+                    <div class="flex items-center justify-between mb-3">
+                        <div>
+                            <p class="text-sm font-semibold text-gray-800">Review &amp; Match Companies</p>
+                            <p class="text-xs text-gray-500 mt-0.5">Companies from your Excel are matched to the system. Fix any mismatches below.</p>
+                        </div>
+                        <button onclick="resetExcelImport()" class="text-xs text-gray-400 hover:text-gray-600 underline">Upload different file</button>
+                    </div>
+
+                    <!-- Legend -->
+                    <div class="flex flex-wrap gap-3 mb-3 text-xs">
+                        <span class="flex items-center gap-1.5"><span class="match-badge-ok">Matched</span> Exact match found</span>
+                        <span class="flex items-center gap-1.5"><span class="match-badge-warn">Review</span> Close match — please confirm</span>
+                        <span class="flex items-center gap-1.5"><span class="match-badge-err">Not Found</span> Select manually</span>
+                    </div>
+
+                    <div class="overflow-x-auto rounded-xl border border-gray-100">
+                        <table class="w-full text-xs min-w-[700px]">
+                            <thead class="bg-gray-50 border-b border-gray-100">
+                                <tr>
+                                    <th class="text-left px-4 py-2.5 text-gray-500 font-medium">COMPANY IN EXCEL</th>
+                                    <th class="text-left px-4 py-2.5 text-gray-500 font-medium">MATCHED TO (SYSTEM)</th>
+                                    <th class="px-3 py-2.5 text-center text-orange-500 font-semibold">VAC M</th>
+                                    <th class="px-3 py-2.5 text-center text-orange-400 font-semibold">VAC F</th>
+                                    <th class="px-3 py-2.5 text-center text-gray-400 font-medium">STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="excelMatchBody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-6 py-4 border-t border-gray-100 flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <span class="text-xs text-gray-400" id="bulkFillStatus"></span>
+            <div class="flex gap-2">
+                <button onclick="closeBulkFillModal()" class="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50 transition-colors">Cancel</button>
+                <button onclick="saveBulkData()" id="saveBulkBtn" class="px-5 py-2 rounded-xl bg-teal-500 hover:bg-teal-600 text-white text-sm font-semibold shadow-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                    Save All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Delete Modal -->
 <div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
@@ -233,11 +416,16 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <!-- Error Toast -->
 <div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+<!-- Success Toast -->
+<div id="successToast" class="fixed bottom-6 right-6 bg-teal-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
+
+<!-- SheetJS for Excel parsing client-side -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script>
-// API points to the correct backend file
-const API_URL       = '/backend/youth-employ/spes/show-spes.php';
-const ROWS_PER_PAGE = 9;
+const API_URL        = '/backend/youth-employ/spes/show-spes.php';
+const ENTRY_API_URL  = '/backend/youth-employ/spes/entry-spes.php';
+const ROWS_PER_PAGE  = 9;
 
 let allRows      = [];
 let currentPage  = 1;
@@ -248,21 +436,23 @@ let deletingId   = null;
 let savingId     = null;
 let editSnapshot = {};
 let searchTimer  = null;
+let unfilledModalShown = false;
+
+// Bulk fill state
+let unfilledMonths   = [];   // [{ month, month_name, total_companies, unfilled_vac, unfilled_ref }]
+let activeMonth      = null; // currently selected month number in modal
+let bulkCompanies    = [];   // companies loaded for activeMonth
+let currentMode      = 'manual';
+let excelImportRows  = [];   // parsed + matched rows from Excel
 
 const MONTH_OPTIONS = [
     { value: '', label: 'All months' },
-    { value: '1', label: 'January' },
-    { value: '2', label: 'February' },
-    { value: '3', label: 'March' },
-    { value: '4', label: 'April' },
-    { value: '5', label: 'May' },
-    { value: '6', label: 'June' },
-    { value: '7', label: 'July' },
-    { value: '8', label: 'August' },
-    { value: '9', label: 'September' },
-    { value: '10', label: 'October' },
-    { value: '11', label: 'November' },
-    { value: '12', label: 'December' },
+    { value: '1',  label: 'January'   }, { value: '2',  label: 'February'  },
+    { value: '3',  label: 'March'     }, { value: '4',  label: 'April'     },
+    { value: '5',  label: 'May'       }, { value: '6',  label: 'June'      },
+    { value: '7',  label: 'July'      }, { value: '8',  label: 'August'    },
+    { value: '9',  label: 'September' }, { value: '10', label: 'October'   },
+    { value: '11', label: 'November'  }, { value: '12', label: 'December'  },
 ];
 
 // ─── API ───────────────────────────────────────────────────────────────────
@@ -271,8 +461,8 @@ async function fetchData(year, search = '') {
     try {
         const params = new URLSearchParams({ year, search });
         if (selectedMonth !== '') params.set('month', selectedMonth);
-        const res    = await fetch(`${API_URL}?${params}`);
-        const json   = await res.json();
+        const res  = await fetch(`${API_URL}?${params}`);
+        const json = await res.json();
         if (!json.success) throw new Error(json.error);
         return json.data;
     } catch (e) {
@@ -331,16 +521,16 @@ function buildRow(r) {
         ${mft(r.pwd_m,       r.pwd_f,       'text-cyan-500',   'bg-cyan-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2">
-                <button onclick="startEdit(${id})" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
+                <button onclick="startEdit('${id}')" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 </button>
-                <button onclick="promptDelete(${id})" class="delete-btn text-red-400 hover:text-red-600" title="Delete">
+                <button onclick="promptDelete('${id}')" class="delete-btn text-red-400 hover:text-red-600" title="Delete">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
-                <button onclick="promptSave(${id})" class="save-btn hidden text-green-500 hover:text-green-600" title="Save">
+                <button onclick="promptSave('${id}')" class="save-btn hidden text-green-500 hover:text-green-600" title="Save">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 </button>
-                <button onclick="cancelEdit(${id})" class="cancel-btn hidden text-gray-400 hover:text-gray-600" title="Cancel">
+                <button onclick="cancelEdit('${id}')" class="cancel-btn hidden text-gray-400 hover:text-gray-600" title="Cancel">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
@@ -483,6 +673,7 @@ async function load(year, search = '') {
     populateMonthFilter();
     renderTable();
     document.getElementById('summaryBody').innerHTML = buildSummaryBody(data.summary);
+    checkUnfilledData(year);
 }
 
 // ─── Search (debounced) ────────────────────────────────────────────────────
@@ -616,12 +807,29 @@ function changePage(dir) {
     renderTable();
 }
 
-// ─── Modals ────────────────────────────────────────────────────────────────
-function showModal(id) { document.getElementById('modalBackdrop').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); }
-function closeModal(id) { document.getElementById('modalBackdrop').classList.add('hidden'); document.getElementById(id).classList.add('hidden'); }
+// ─── Modals (generic) ──────────────────────────────────────────────────────
+function showModal(id)  { document.getElementById('modalBackdrop').classList.remove('hidden'); document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id) { document.getElementById('modalBackdrop').classList.add('hidden');    document.getElementById(id).classList.add('hidden'); }
 function closeDeleteModal() { closeModal('deleteModal'); deletingId = null; }
 function closeSaveModal()   { closeModal('saveModal');   savingId   = null; }
-document.addEventListener('click', e => { if (e.target.id === 'modalBackdrop') { closeDeleteModal(); closeSaveModal(); } });
+function showUnfilledModal() {
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('unfilledModal').classList.remove('hidden');
+    unfilledModalShown = true;
+}
+function closeUnfilledModal() {
+    document.getElementById('unfilledModal').classList.add('hidden');
+    if (document.getElementById('bulkFillModal').classList.contains('hidden')) {
+        document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+}
+function openBulkFillFromWarning() {
+    closeUnfilledModal();
+    openBulkFillModal();
+}
+document.addEventListener('click', e => {
+    if (e.target.id === 'modalBackdrop') { closeDeleteModal(); closeSaveModal(); closeBulkFillModal(); closeUnfilledModal(); }
+});
 
 // ─── UI helpers ────────────────────────────────────────────────────────────
 function showLoading(state) { document.getElementById('loadingIndicator').classList.toggle('hidden', !state); }
@@ -630,17 +838,450 @@ function showError(msg) {
     t.textContent = msg; t.classList.remove('hidden');
     setTimeout(() => t.classList.add('hidden'), 4000);
 }
+function showSuccess(msg) {
+    const t = document.getElementById('successToast');
+    t.textContent = msg; t.classList.remove('hidden');
+    setTimeout(() => t.classList.add('hidden'), 3000);
+}
 
-// ─── Year filter ───────────────────────────────────────────────────────────
+function updateBulkFillButtonState() {
+    const btn = document.getElementById('bulkFillBtn');
+    if (!btn) return;
+
+    const hasMissingData = unfilledMonths.length > 0;
+    btn.disabled = !hasMissingData;
+    btn.classList.toggle('opacity-50', !hasMissingData);
+    btn.classList.toggle('cursor-not-allowed', !hasMissingData);
+    btn.classList.toggle('hover:bg-teal-600', hasMissingData);
+    btn.classList.toggle('hover:bg-teal-500', !hasMissingData);
+    btn.title = hasMissingData ? 'Fill in missing vacancy and referral data' : 'All vacancy and referral data are already saved';
+    btn.innerHTML = hasMissingData
+        ? '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg> Fill Vacancies'
+        : '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> All Data Saved';
+}
+
+// ─── Year / Month filter ───────────────────────────────────────────────────
 document.getElementById('yearFilter').addEventListener('change', function () {
     selectedYear = +this.value;
     load(selectedYear, searchQuery);
 });
-
 document.getElementById('monthFilter').addEventListener('change', function () {
     selectedMonth = this.value;
     load(selectedYear, searchQuery);
 });
+
+// ════════════════════════════════════════════════════════════════════════════
+//  UNFILLED DATA PROMPT
+// ════════════════════════════════════════════════════════════════════════════
+async function checkUnfilledData(year) {
+    try {
+        const res  = await fetch(`${ENTRY_API_URL}?action=unfilled&year=${year}`);
+        const json = await res.json();
+        if (!json.success) return;
+        unfilledMonths = json.data;
+        updateBulkFillButtonState();
+
+        if (!unfilledMonths.length) {
+            closeUnfilledModal();
+            return;
+        }
+
+        document.getElementById('unfilledModalDetail').textContent =
+            `${unfilledMonths.length} month(s) have missing data: ${unfilledMonths.map(m => m.month_name).join(', ')}.`;
+        document.getElementById('unfilledModalBody').textContent =
+            'Fill the missing vacancy and referral counts now, or dismiss this reminder and continue browsing.';
+
+        if (!unfilledModalShown) showUnfilledModal();
+    } catch (e) { /* silent */ }
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+//  BULK FILL MODAL
+// ════════════════════════════════════════════════════════════════════════════
+function openBulkFillModal() {
+    if (!unfilledMonths.length) {
+        showSuccess('All vacancy and referred data is already saved for this year.');
+        return;
+    }
+
+    document.getElementById('bulkFillModal').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.body.classList.add('modal-open');
+    renderMonthTabs();
+    // Auto-select first unfilled month if any
+    if (unfilledMonths.length) {
+        selectMonth(unfilledMonths[0].month);
+    } else {
+        // no unfilled — load current month from all months in data
+        const months = [...new Set(allRows.map(r => r.month))].sort((a,b)=>a-b);
+        if (months.length) selectMonth(months[0]);
+    }
+}
+
+function closeBulkFillModal() {
+    document.getElementById('bulkFillModal').classList.add('hidden');
+    if (document.getElementById('unfilledModal').classList.contains('hidden')) {
+        document.getElementById('modalBackdrop').classList.add('hidden');
+    }
+    document.body.classList.remove('modal-open');
+    resetExcelImport();
+}
+
+function renderMonthTabs() {
+    // Build tab list from all months present in allRows + unfilled months
+    const monthSet = new Map();
+    allRows.forEach(r => {
+        if (!monthSet.has(+r.month)) {
+            monthSet.set(+r.month, r.month_reported);
+        }
+    });
+    // Also include unfilled months even if no rows yet
+    unfilledMonths.forEach(m => {
+        if (!monthSet.has(+m.month)) monthSet.set(+m.month, m.month_name);
+    });
+
+    const sorted = [...monthSet.entries()].sort((a,b) => a[0]-b[0]);
+
+    const container = document.getElementById('monthTabsContainer');
+    if (!sorted.length) {
+        container.innerHTML = '<span class="text-xs text-gray-400">No months available for the selected year.</span>';
+        return;
+    }
+
+    container.innerHTML = sorted.map(([monthNum, monthName]) => {
+        const isUnfilled = unfilledMonths.some(u => +u.month === +monthNum);
+        const isActive   = activeMonth === +monthNum;
+        return `<button
+            onclick="selectMonth(${monthNum})"
+            class="month-tab px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border
+                ${isActive
+                    ? 'bg-teal-500 text-white border-teal-500'
+                    : isUnfilled
+                        ? 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
+                        : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'}"
+            data-month="${monthNum}">
+            ${monthName}${isUnfilled ? ' ⚠️' : ''}
+        </button>`;
+    }).join('');
+}
+
+async function selectMonth(monthNum) {
+    activeMonth = +monthNum;
+    renderMonthTabs(); // re-render to update active tab
+
+    const monthLabel = MONTH_OPTIONS.find(m => +m.value === +monthNum)?.label ?? monthNum;
+    document.getElementById('activeMonthLabel').textContent = `${monthLabel} ${selectedYear}`;
+    document.getElementById('bulkFillStatus').textContent = 'Loading companies…';
+
+    try {
+        const res  = await fetch(`${ENTRY_API_URL}?action=companies&month=${monthNum}&year=${selectedYear}`);
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+        bulkCompanies = json.data;
+        renderManualTable();
+        document.getElementById('bulkFillStatus').textContent = `${bulkCompanies.length} companies loaded.`;
+    } catch (e) {
+        showError('Failed to load companies: ' + e.message);
+        document.getElementById('bulkFillStatus').textContent = '';
+    }
+}
+
+function renderManualTable() {
+    const tbody = document.getElementById('manualTableBody');
+    if (!bulkCompanies.length) {
+        tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-6 text-center text-gray-400">No companies found for this month.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = bulkCompanies.map(c => {
+        const allZero = +c.vac_m === 0 && +c.vac_f === 0;
+        const rowBg   = allZero ? 'bg-amber-50' : '';
+        return `<tr class="company-match-row border-b border-gray-50 hover:bg-gray-50 ${rowBg}" data-company-id="${c.company_id}">
+            <td class="px-4 py-2 text-gray-700 font-medium">${c.company_name}</td>
+            <td class="px-3 py-2 text-center">
+                <input type="number" min="0" class="vac-ref-input" data-field="vac_m" value="${c.vac_m}" placeholder="0"/>
+            </td>
+            <td class="px-3 py-2 text-center">
+                <input type="number" min="0" class="vac-ref-input" data-field="vac_f" value="${c.vac_f}" placeholder="0"/>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+// ─── Mode switch (Manual / Excel) ──────────────────────────────────────────
+function switchMode(mode) {
+    currentMode = mode;
+    document.getElementById('manualMode').classList.toggle('hidden', mode !== 'manual');
+    document.getElementById('excelMode').classList.toggle('hidden',  mode !== 'excel');
+    document.getElementById('tabManual').className = mode === 'manual'
+        ? 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm'
+        : 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700';
+    document.getElementById('tabExcel').className = mode === 'excel'
+        ? 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors bg-white text-gray-800 shadow-sm'
+        : 'px-4 py-1.5 rounded-lg text-sm font-medium transition-colors text-gray-500 hover:text-gray-700';
+}
+
+// ─── Excel Import ───────────────────────────────────────────────────────────
+function resetExcelImport() {
+    document.getElementById('excelFileInput').value = '';
+    document.getElementById('excelStep1').classList.remove('hidden');
+    document.getElementById('excelStep2').classList.add('hidden');
+    document.getElementById('excelUploadError').classList.add('hidden');
+    excelImportRows = [];
+}
+
+function handleExcelUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+        try {
+            const wb      = XLSX.read(e.target.result, { type: 'array' });
+            const ws      = wb.Sheets[wb.SheetNames[0]];
+            // header:1 = raw arrays, works regardless of merged cells or title rows
+            const allRows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            if (!allRows.length) throw new Error('The file appears to be empty.');
+
+            const norm = v => v.toString().trim().toUpperCase().replace(/\s+/g, ' ');
+
+            // ── 1. Find header row: first row whose cells include "COMPANY" / "EMPLOYER" ──
+            // Also skip rows where most cells are numbers (sub-header rows like MALE/FEMALE labels)
+            const COMPANY_KEYWORDS = ['COMPANY', 'COMPANY NAME', 'EMPLOYER', 'ESTABLISHMENT'];
+            let headerIdx = -1, colMap = {};
+
+            for (let i = 0; i < Math.min(allRows.length, 15); i++) {
+                const row = allRows[i].map(norm);
+                // Skip rows that are mostly numeric (data rows or sub-header rows with M/F labels)
+                const nonEmpty = row.filter(v => v !== '');
+                const numericCount = nonEmpty.filter(v => !isNaN(v) && v !== '').length;
+                if (nonEmpty.length > 0 && numericCount / nonEmpty.length > 0.5) continue;
+
+                const compCol = row.findIndex(v => COMPANY_KEYWORDS.includes(v));
+                if (compCol === -1) continue;
+
+                headerIdx      = i;
+                colMap.company = compCol;
+
+                // Map numeric columns by keyword matching
+                for (let c = 0; c < row.length; c++) {
+                    if (c === compCol) continue;
+                    const cell     = row[c];
+                    const isVac    = cell.includes('VAC');
+                    const isRef    = cell.includes('REF') || cell.includes('REFER');
+                    const isMale   = cell.includes('MALE') && !cell.includes('FEMALE');
+                    const isFemale = cell.includes('FEMALE');
+                    if (isVac && isMale   && colMap.vac_m == null) colMap.vac_m = c;
+                    if (isVac && isFemale && colMap.vac_f == null) colMap.vac_f = c;
+                    if (isRef && isMale   && colMap.ref_m == null) colMap.ref_m = c;
+                    if (isRef && isFemale && colMap.ref_f == null) colMap.ref_f = c;
+                }
+
+                // Positional fallback if names didn't resolve
+                if (colMap.vac_m == null) colMap.vac_m = compCol + 1;
+                if (colMap.vac_f == null) colMap.vac_f = compCol + 2;
+                if (colMap.ref_m == null) colMap.ref_m = compCol + 3;
+                if (colMap.ref_f == null) colMap.ref_f = compCol + 4;
+                break;
+            }
+
+            if (headerIdx === -1) throw new Error(
+                'Could not find a header row with a "COMPANY" or "EMPLOYER" column in the first 15 rows.'
+            );
+
+            // ── 2. Parse data rows, skip blanks, totals, and pure-label rows ──
+            const isLikelyLabel = name => {
+                const u = name.toUpperCase();
+                return ['MALE', 'FEMALE', 'M', 'F', 'TOTAL', 'GRAND TOTAL', 'SUB-TOTAL', 'SUBTOTAL'].includes(u);
+            };
+
+            const parsed = allRows.slice(headerIdx + 1).map(row => ({
+                excel_name: row[colMap.company]?.toString().trim() ?? '',
+                vac_m: Math.max(0, parseInt(row[colMap.vac_m]) || 0),
+                vac_f: Math.max(0, parseInt(row[colMap.vac_f]) || 0),
+
+            })).filter(r => r.excel_name && !isLikelyLabel(r.excel_name));
+
+            if (!parsed.length) throw new Error(
+                'No company rows found after the header. Check that company names are in the "COMPANY" column.'
+            );
+
+            // ── 3. Match each row to system companies ────────────────────────
+            // searchCompanies already does LIKE %query% so capitalization/spacing is fine
+            excelImportRows = await Promise.all(parsed.map(async (row, idx) => {
+                const suggestions = await searchCompanies(row.excel_name);
+                // Exact match: normalize both sides (trim + upper) before comparing
+                const normName = n => n.trim().toUpperCase().replace(/\s+/g, ' ');
+                const exact    = suggestions.find(s => normName(s.company_name) === normName(row.excel_name));
+                return {
+                    ...row,
+                    _idx:         idx,
+                    matched_id:   exact ? exact.company_id   : (suggestions[0]?.company_id   ?? null),
+                    matched_name: exact ? exact.company_name : (suggestions[0]?.company_name ?? null),
+                    match_type:   exact ? 'exact' : (suggestions.length ? 'fuzzy' : 'none'),
+                    suggestions,
+                };
+            }));
+
+            renderExcelMatchTable();
+            document.getElementById('excelStep1').classList.add('hidden');
+            document.getElementById('excelStep2').classList.remove('hidden');
+
+            const notFound = excelImportRows.filter(r => r.match_type === 'none').length;
+            const status   = notFound
+                ? `${excelImportRows.length} rows parsed — ⚠️ ${notFound} not matched (search below to fix)`
+                : `${excelImportRows.length} rows parsed and matched.`;
+            document.getElementById('bulkFillStatus').textContent = status;
+
+        } catch (err) {
+            const errEl = document.getElementById('excelUploadError');
+            errEl.textContent = 'Error reading file: ' + err.message;
+            errEl.classList.remove('hidden');
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+async function searchCompanies(query) {
+    if (!query || query.trim().length < 2) return [];
+    try {
+        const res  = await fetch(`${ENTRY_API_URL}?action=search_companies&q=${encodeURIComponent(query.trim())}`);
+        const json = await res.json();
+        return json.success ? json.data : [];
+    } catch { return []; }
+}
+
+// Called when user types in the search box on a "Not Found" row
+async function searchAndAssign(idx, query) {
+    if (!query || query.trim().length < 2) return;
+    const results = await searchCompanies(query);
+    if (!results.length) return;
+    excelImportRows[idx].suggestions  = results;
+    excelImportRows[idx].matched_id   = results[0].company_id;
+    excelImportRows[idx].matched_name = results[0].company_name;
+    excelImportRows[idx].match_type   = 'fuzzy';
+    renderExcelMatchTable();
+}
+
+function renderExcelMatchTable() {
+    const tbody    = document.getElementById('excelMatchBody');
+    const notFound = excelImportRows.filter(r => r.match_type === 'none').length;
+
+    // Show/hide the "X rows will be skipped" warning banner
+    let banner = document.getElementById('excelSkipWarning');
+    if (!banner) {
+        banner = document.createElement('p');
+        banner.id = 'excelSkipWarning';
+        banner.className = 'text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mb-2';
+        tbody.closest('table').before(banner);
+    }
+    banner.textContent = notFound
+        ? `⚠️ ${notFound} row${notFound > 1 ? 's' : ''} could not be matched and will be skipped on save. Use the search box in those rows to fix them.`
+        : '';
+    banner.style.display = notFound ? '' : 'none';
+
+    tbody.innerHTML = excelImportRows.map((row, idx) => {
+        const badge = row.match_type === 'exact' ? `<span class="match-badge-ok">Matched</span>`
+                    : row.match_type === 'fuzzy' ? `<span class="match-badge-warn">Review</span>`
+                    : `<span class="match-badge-err">Not Found</span>`;
+
+        const selectOpts = row.suggestions.map(s =>
+            `<option value="${s.company_id}" ${s.company_id == row.matched_id ? 'selected' : ''}>${s.company_name}</option>`
+        ).join('');
+
+        // Not Found: show a live search input so user can correct it inline
+        const matchCell = row.match_type === 'none'
+            ? `<input type="text" placeholder="Type to search…"
+                class="text-xs border border-amber-300 bg-amber-50 rounded-lg px-2 py-1 w-48 focus:outline-none focus:ring-2 focus:ring-teal-300"
+                oninput="searchAndAssign(${idx}, this.value)"/>`
+            : `<select class="text-xs border border-gray-200 rounded-lg px-2 py-1 text-gray-700 focus:outline-none focus:ring-2 focus:ring-teal-300 max-w-[220px]"
+                onchange="excelImportRows[${idx}].matched_id = +this.value">
+                ${selectOpts}
+               </select>`;
+
+        const rowClass = row.match_type === 'none'
+            ? 'border-b border-amber-100 bg-amber-50'
+            : 'border-b border-gray-50 hover:bg-gray-50';
+
+        return `<tr class="${rowClass}">
+            <td class="px-4 py-2.5 text-gray-700 font-medium text-xs">${row.excel_name}</td>
+            <td class="px-4 py-2.5">${matchCell}</td>
+            <td class="px-3 py-2.5 text-center text-gray-700 font-medium">${row.vac_m}</td>
+            <td class="px-3 py-2.5 text-center text-gray-700 font-medium">${row.vac_f}</td>
+            <td class="px-3 py-2.5 text-center">${badge}</td>
+        </tr>`;
+    }).join('');
+}
+
+// ─── Save bulk data ─────────────────────────────────────────────────────────
+async function saveBulkData() {
+    if (!activeMonth) { showError('Please select a month first.'); return; }
+
+    let entries = [];
+
+    if (currentMode === 'manual') {
+        // Read from manual table inputs
+        document.querySelectorAll('#manualTableBody tr[data-company-id]').forEach(row => {
+            const companyId = +row.dataset.companyId;
+            const inputs    = row.querySelectorAll('.vac-ref-input');
+            entries.push({
+                company_id: companyId,
+                vac_m: parseInt(inputs[0]?.value) || 0,
+                vac_f: parseInt(inputs[1]?.value) || 0,
+            });
+        });
+    } else {
+        // Read from Excel import matched rows
+        entries = excelImportRows
+            .filter(r => r.matched_id)
+            .map(r => ({ company_id: r.matched_id, vac_m: r.vac_m, vac_f: r.vac_f }));
+    }
+
+    if (!entries.length) { showError('No entries to save.'); return; }
+
+    const btn = document.getElementById('saveBulkBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving…';
+    document.getElementById('bulkFillStatus').textContent = 'Saving…';
+
+    try {
+        const res  = await fetch(ENTRY_API_URL, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ month: activeMonth, year: selectedYear, entries }),
+        });
+        const json = await res.json();
+        if (!json.success) throw new Error(json.error);
+
+        showSuccess(`✓ Saved ${json.data.saved} companies for ${MONTH_OPTIONS.find(m=>+m.value===activeMonth)?.label}.`);
+        closeBulkFillModal();
+        load(selectedYear, searchQuery); // refresh table + re-check unfilled
+    } catch (e) {
+        showError('Save failed: ' + e.message);
+        document.getElementById('bulkFillStatus').textContent = 'Save failed.';
+    } finally {
+        btn.disabled    = false;
+        btn.textContent = 'Save All';
+    }
+}
+
+// Drag-and-drop for Excel drop zone
+const dropZone = document.getElementById('excelDropZone');
+if (dropZone) {
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-teal-400','bg-teal-50'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-teal-400','bg-teal-50'));
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('border-teal-400','bg-teal-50');
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            const input = document.getElementById('excelFileInput');
+            input.files = dt.files;
+            handleExcelUpload(input);
+        }
+    });
+}
 
 // ─── Init ──────────────────────────────────────────────────────────────────
 populateMonthFilter();
