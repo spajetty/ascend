@@ -46,7 +46,7 @@ function json_ok(mixed $data = null): void {
 }
 
 // ─── GET ?year=2026 ──────────────────────────────────────────────────────────
-// One row per import batch (month + year).
+// One row per month/year.
 // Counts wiirp beneficiaries by classification x sex.
 //
 // classification values (on beneficiaries table):
@@ -97,34 +97,9 @@ if ($method === 'GET') {
                 WHEN 12 THEN 'December'
                 ELSE ''
             END AS month_name,
-
-            -- Participants = everyone in the batch (grand total)
-            SUM(CASE WHEN b.sex = 'Male'   THEN 1 ELSE 0 END) AS part_m,
-            SUM(CASE WHEN b.sex = 'Female' THEN 1 ELSE 0 END) AS part_f,
-
-            -- Inquired = imported with type 'inquiry'
-            SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS inq_m,
-            SUM(CASE WHEN w.type = 'inquiry'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS inq_f,
-
-            -- Referred: tagged via bulk update classification = 'Referred'
-            SUM(CASE WHEN LOWER(b.classification) = 'referred'    AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ref_m,
-            SUM(CASE WHEN LOWER(b.classification) = 'referred'    AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ref_f,
-
-            -- Interviewed: tagged via bulk update classification = 'Interviewed'
-            SUM(CASE WHEN LOWER(b.classification) = 'interviewed' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS int_m,
-            SUM(CASE WHEN LOWER(b.classification) = 'interviewed' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS int_f,
-
-            -- PESO-Accepted = imported with type 'peso-assigned'
-            SUM(CASE WHEN w.type = 'peso-assigned'  AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS peso_m,
-            SUM(CASE WHEN w.type = 'peso-assigned'  AND b.sex = 'Female' THEN 1 ELSE 0 END) AS peso_f,
-
-            -- Privately-Accepted = imported with type 'private'
-            SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS priv_m,
-            SUM(CASE WHEN w.type = 'private'        AND b.sex = 'Female' THEN 1 ELSE 0 END) AS priv_f,
-
-            -- Not Proceeded: tagged via bulk update classification = 'Not Proceeded'
-            SUM(CASE WHEN LOWER(b.classification) = 'not proceeded' AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS notpr_m,
-            SUM(CASE WHEN LOWER(b.classification) = 'not proceeded' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS notpr_f
+            w.type,
+            LOWER(COALESCE(b.sex, '')) AS sex,
+            LOWER(COALESCE(b.classification, '')) AS classification
 
         FROM import_batches ib
 
@@ -136,9 +111,7 @@ if ($method === 'GET') {
 
         WHERE ib.year = ?
 
-        GROUP BY ib.batch_id, ib.month, ib.year
-
-        ORDER BY ib.month ASC
+        ORDER BY ib.month ASC, ib.batch_id ASC
     ";
 
     $stmt = $conn->prepare($sql);
@@ -150,22 +123,108 @@ if ($method === 'GET') {
 
     $rows = [];
     while ($row = $result->fetch_assoc()) {
-        // Compute totals
-        $row['part_total']  = (int)$row['part_m']  + (int)$row['part_f'];
-        $row['inq_total']   = (int)$row['inq_m']   + (int)$row['inq_f'];
-        $row['ref_total']   = (int)$row['ref_m']   + (int)$row['ref_f'];
-        $row['int_total']   = (int)$row['int_m']   + (int)$row['int_f'];
-        $row['peso_total']  = (int)$row['peso_m']  + (int)$row['peso_f'];
-        $row['priv_total']  = (int)$row['priv_m']  + (int)$row['priv_f'];
-        $row['notpr_total'] = (int)$row['notpr_m'] + (int)$row['notpr_f'];
+        $groupKey = sprintf('%04d-%02d', (int)$row['year'], (int)$row['month']);
 
-        // Friendly label for the month column
-        $row['wiirp_id'] = (int) $row['batch_id'];
-        $row['period']   = $row['month_name'] . ' ' . $row['year'];
+        if (!isset($rows[$groupKey])) {
+            $rows[$groupKey] = [
+                'group_key'   => $groupKey,
+                'batch_ids'   => [],
+                'batch_ids_csv' => '',
+                'month'       => (int) $row['month'],
+                'year'        => (int) $row['year'],
+                'month_name'  => $row['month_name'],
+                'period'      => $row['month_name'] . ' ' . $row['year'],
+                'wiirp_id'    => $groupKey,
+                'part_m'      => 0,
+                'part_f'      => 0,
+                'inq_m'       => 0,
+                'inq_f'       => 0,
+                'ref_m'       => 0,
+                'ref_f'       => 0,
+                'int_m'       => 0,
+                'int_f'       => 0,
+                'peso_m'      => 0,
+                'peso_f'      => 0,
+                'priv_m'      => 0,
+                'priv_f'      => 0,
+                'notpr_m'     => 0,
+                'notpr_f'     => 0,
+            ];
+        }
 
-        $rows[] = $row;
+        $group =& $rows[$groupKey];
+        $group['batch_ids'][(int) $row['batch_id']] = (int) $row['batch_id'];
+
+        if ($row['sex'] === 'male') {
+            $group['part_m']++;
+        } elseif ($row['sex'] === 'female') {
+            $group['part_f']++;
+        }
+
+        if ($row['type'] === 'inquiry') {
+            if ($row['sex'] === 'male') {
+                $group['inq_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['inq_f']++;
+            }
+        }
+
+        if ($row['type'] === 'peso-assigned') {
+            if ($row['sex'] === 'male') {
+                $group['peso_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['peso_f']++;
+            }
+        }
+
+        if ($row['type'] === 'private') {
+            if ($row['sex'] === 'male') {
+                $group['priv_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['priv_f']++;
+            }
+        }
+
+        if ($row['classification'] === 'referred') {
+            if ($row['sex'] === 'male') {
+                $group['ref_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['ref_f']++;
+            }
+        }
+
+        if ($row['classification'] === 'interviewed') {
+            if ($row['sex'] === 'male') {
+                $group['int_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['int_f']++;
+            }
+        }
+
+        if ($row['classification'] === 'not proceeded') {
+            if ($row['sex'] === 'male') {
+                $group['notpr_m']++;
+            } elseif ($row['sex'] === 'female') {
+                $group['notpr_f']++;
+            }
+        }
     }
     $stmt->close();
+
+    $rows = array_values($rows);
+
+    foreach ($rows as &$row) {
+        $row['batch_ids'] = array_values($row['batch_ids']);
+        $row['batch_ids_csv'] = implode(',', $row['batch_ids']);
+        $row['part_total']  = (int) $row['part_m']  + (int) $row['part_f'];
+        $row['inq_total']   = (int) $row['inq_m']   + (int) $row['inq_f'];
+        $row['ref_total']   = (int) $row['ref_m']   + (int) $row['ref_f'];
+        $row['int_total']   = (int) $row['int_m']   + (int) $row['int_f'];
+        $row['peso_total']  = (int) $row['peso_m']  + (int) $row['peso_f'];
+        $row['priv_total']  = (int) $row['priv_m']  + (int) $row['priv_f'];
+        $row['notpr_total'] = (int) $row['notpr_m'] + (int) $row['notpr_f'];
+    }
+    unset($row);
 
     // Card totals (summed across all batches in the year)
     $totals = [
@@ -229,18 +288,28 @@ if ($method === 'PUT') {
 // Nulls wiirp.batch_id first, then deletes the batch.
 if ($method === 'DELETE') {
 
-    $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
-    if (!$id) json_error('Missing id');
+    $batchIds = [];
+
+    if (!empty($_GET['batch_ids'])) {
+        $batchIds = array_values(array_filter(array_map('intval', explode(',', (string) $_GET['batch_ids']))));
+    } elseif (!empty($_GET['id'])) {
+        $batchIds = [(int) $_GET['id']];
+    }
+
+    if (!$batchIds) json_error('Missing batch_ids');
+
+    $placeholders = implode(',', array_fill(0, count($batchIds), '?'));
+    $types = str_repeat('i', count($batchIds));
 
     $conn->begin_transaction();
     try {
-        $s1 = $conn->prepare("UPDATE wiirp SET batch_id = NULL WHERE batch_id = ?");
-        $s1->bind_param('i', $id);
+        $s1 = $conn->prepare("UPDATE wiirp SET batch_id = NULL WHERE batch_id IN ($placeholders)");
+        $s1->bind_param($types, ...$batchIds);
         $s1->execute();
         $s1->close();
 
-        $s2 = $conn->prepare("DELETE FROM import_batches WHERE batch_id = ?");
-        $s2->bind_param('i', $id);
+        $s2 = $conn->prepare("DELETE FROM import_batches WHERE batch_id IN ($placeholders)");
+        $s2->bind_param($types, ...$batchIds);
         $s2->execute();
         $affected = $s2->affected_rows;
         $s2->close();

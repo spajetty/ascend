@@ -321,7 +321,13 @@ function escHtml(s) {
 }
 
 function buildRow(r) {
-    const id = r.wiirp_id;
+    const id = r.group_key || r.wiirp_id;
+    const deleteKey = encodeURIComponent(JSON.stringify({
+        group_key: id,
+        batch_ids: r.batch_ids || [],
+        month: r.month,
+        year: r.year,
+    }));
 
     const td  = v => `<td class="px-2 py-3 text-center text-gray-600">${v}</td>`;
     const tdL = v => `<td class="px-2 py-3 text-center text-gray-600 border-l border-gray-100">${v}</td>`;
@@ -342,7 +348,7 @@ function buildRow(r) {
         ${tdL(r.notpr_m)}${td(r.notpr_f)}${tdT(r.notpr_total,'text-red-400',   'bg-red-50')}
         <td class="px-3 py-3 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2">
-                <button onclick="deleteRow(${id})" class="text-red-400 hover:text-red-600" title="Delete batch">
+                <button onclick="deleteRow('${deleteKey}')" class="text-red-400 hover:text-red-600" title="Delete month batch group">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
@@ -415,19 +421,20 @@ function changePage(dir) {
 
 // ─── Delete ───────────────────────────────────────────────────────────────────
 function deleteRow(id) {
-    deletingId = id;
+    deletingId = JSON.parse(decodeURIComponent(id));
     document.getElementById('modalBackdrop').classList.remove('hidden');
     document.getElementById('deleteModal').classList.remove('hidden');
 }
 
 async function confirmDelete() {
     try {
-        const res  = await fetch(`${API_URL}?id=${deletingId}`, { method: 'DELETE' });
+        const batchIds = (deletingId?.batch_ids || []).join(',');
+        const res  = await fetch(`${API_URL}?batch_ids=${encodeURIComponent(batchIds)}`, { method: 'DELETE' });
         const json = await res.json();
         if (!json.success) throw new Error(json.error);
 
-        allRows      = allRows.filter(r => r.wiirp_id != deletingId);
-        filteredRows = filteredRows.filter(r => r.wiirp_id != deletingId);
+        allRows      = allRows.filter(r => r.group_key !== deletingId.group_key);
+        filteredRows = filteredRows.filter(r => r.group_key !== deletingId.group_key);
 
         closeDeleteModal();
         renderPage();
