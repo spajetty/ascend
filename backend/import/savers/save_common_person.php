@@ -6,12 +6,12 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
     $program = (string)($ctx['program'] ?? '');
 
     $buildJobFairIdentityKey = static function (array $inputRow): string {
-        $email = strtolower(trim((string)rowValue($inputRow, ['Email', 'email'], '')));
+        $email = strtolower(trim((string)rowValue($inputRow, ['Email', 'email', 'Email address', 'Email Address'], '')));
         if ($email !== '') {
             return 'email:' . $email;
         }
 
-        $contact = preg_replace('/\D+/', '', trim((string)rowValue($inputRow, ['Contact', 'contact'], '')));
+        $contact = preg_replace('/\D+/', '', trim((string)rowValue($inputRow, ['Contact', 'contact', 'Contact Number'], '')));
         if ($contact !== '') {
             return 'contact:' . $contact;
         }
@@ -39,7 +39,7 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         $firstName  = s(rowValue($row, ['First Name', 'FirstName', 'first_name', 'Firstname'], '')) ?: null;
         $middleName = s(rowValue($row, ['Middle Name', 'MiddleName', 'middle_name', 'Middlename'], '')) ?: null;
         $lastName   = s(rowValue($row, ['Last Name', 'LastName', 'last_name', 'Lastname', 'Surname', 'surname'], '')) ?: null;
-        $suffix     = s(rowValue($row, ['Suffix', 'suffix'], '')) ?: null;
+        $suffix     = s(rowValue($row, ['Suffix', 'suffix', 'Extension Name', 'extension_name'], '')) ?: null;
         $sex = s(rowValue($row, ['Sex', 'sex'], ''));
         $civil = s(rowValue($row, ['Civil Status', 'CivilStatus', 'civil_status'], ''));
         // If _parsed_dob exists (from validation), use it; otherwise parse raw DOB
@@ -50,8 +50,8 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
             $dobRaw = rowValue($row, ['DOB', 'Birthday'], '');
             $dob = parseDateNullable($dobRaw);
         }
-        $contact = s(rowValue($row, ['Contact', 'contact'], ''));
-        $email = s(rowValue($row, ['Email', 'email'], '')) ?: null;
+        $contact = s(rowValue($row, ['Contact', 'contact', 'Contact Number'], ''));
+        $email = s(rowValue($row, ['Email', 'email', 'Email address', 'Email Address'], '')) ?: null;
         $classification = isWhipBeneficiariesProgram((string)($ctx['program'] ?? ''))
             ? 'Placed'
             : (s(rowValue($row, ['Classification', 'classification'], '')) ?: null);
@@ -62,7 +62,7 @@ function ensurePersonBeneficiaryAndDocs(mysqli $conn, array $row, array $ctx, ar
         if ($spesStatus !== null && $spesStatus !== '') {
             $spesStatus = titleCase($spesStatus);
         }
-        $houseNo = s(rowValue($row, ['House No.', 'house_no'], '')) ?: null;
+        $houseNo = s(rowValue($row, ['House No.', 'house_no', 'House/Block No./Street'], '')) ?: null;
         $barangay = s(rowValue($row, ['Barangay', 'barangay'], '')) ?: null;
         $district = s(rowValue($row, ['District', 'district'], '')) ?: null;
         $city = s(rowValue($row, ['City', 'city'], '')) ?: null;
