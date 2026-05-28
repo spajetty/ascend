@@ -42,7 +42,7 @@ function ensurePaginationContainer() {
     return container;
 }
 
-function collectJobFairCompanySeeds(rows = []) {
+export function collectJobFairCompanySeeds(rows = []) {
     const imported = [];
     const unmatched = [];
     const seenImported = new Set();

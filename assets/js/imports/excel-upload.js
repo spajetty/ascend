@@ -13,6 +13,7 @@ import {
     applyDetectedPeriod,
     showExcelPreview,
     resetPreviewPaginationState,
+    collectJobFairCompanySeeds,
 } from './excel-preview.js';
 import { openProgramMismatchModal } from './excel-modals.js';
 import {
@@ -432,7 +433,15 @@ function getImportedJobFairCompanies() {
     const unique = [];
     const seen = new Set();
 
-    const companyKeys = ['suggested_company_name', 'company', 'companyname', 'employer'];
+    const companyKeys = [
+        'suggested_company_name',
+        'company',
+        'companyname',
+        'company_name',
+        'employer',
+        'employername',
+        'employer_name'
+    ];
 
     for (const row of rows) {
         if (!row) continue;
@@ -572,11 +581,17 @@ export function handleFile(file) {
 
     if (!isSameSelectedFile) {
         state.jobFairMismatchMode = '';
+        state.jobFairImportedCompanies = [];
+        state.jobFairUnmatchedCompanies = [];
+        state.jobFairCompanyMapping = {};
     }
 
     const resetFileSelectionForRetry = () => {
         state.selectedFile = null;
         state.excelFileData = null;
+        state.jobFairImportedCompanies = [];
+        state.jobFairUnmatchedCompanies = [];
+        state.jobFairCompanyMapping = {};
         if (fileInput) fileInput.value = '';
     };
 
@@ -608,9 +623,19 @@ export function handleFile(file) {
         const workbook = XLSX.read(data, { type: 'array', cellDates: false });
         const sheet    = workbook.Sheets[workbook.SheetNames[0]];
         const json     = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+        
+        state.excelFileData = json;
 
         if (state.jobFairCompanyMapping && Object.keys(state.jobFairCompanyMapping).length > 0) {
-            const companyKeys = ['suggested_company_name', 'company', 'companyname', 'employer'];
+            const companyKeys = [
+                'suggested_company_name',
+                'company',
+                'companyname',
+                'company_name',
+                'employer',
+                'employername',
+                'employer_name'
+            ];
             for (const row of json) {
                 for (const [key, value] of Object.entries(row)) {
                     if (companyKeys.includes(key.toLowerCase().replace(/\s+/g, ''))) {
@@ -828,6 +853,16 @@ export function handleFile(file) {
                     if (result.success) {
                         state.parsedExcelData = result.data;
                         state.unknownEmployers = Array.isArray(result.unknownEmployers) ? result.unknownEmployers : [];
+                        
+                        if (program === 'Job Fair') {
+                            const seeds = collectJobFairCompanySeeds(result.data);
+                            state.jobFairImportedCompanies = seeds.imported;
+                            state.jobFairUnmatchedCompanies = seeds.unmatched;
+                        } else {
+                            state.jobFairImportedCompanies = [];
+                            state.jobFairUnmatchedCompanies = [];
+                        }
+
                         const firstPreviewRowKeys = Object.keys((result.data && result.data[0]) || {});
                         const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
                         const resolvedPesoCols = resolveWiirpPesoPreviewCols(firstPreviewRowKeys);
@@ -916,6 +951,11 @@ if (removeFile) {
         if (monthWrapper) monthWrapper.classList.remove('hidden');
         const yearWrapper = document.getElementById('importYear')?.closest('div');
         if (yearWrapper) yearWrapper.classList.remove('hidden');
+        state.parsedExcelData = [];
+        state.unknownEmployers = [];
+        state.jobFairImportedCompanies = [];
+        state.jobFairUnmatchedCompanies = [];
+        state.jobFairCompanyMapping = {};
         document.getElementById('dataPreview').classList.add('hidden');
         setProgramSelectorsLocked(false);
         resetPreviewPaginationState();
