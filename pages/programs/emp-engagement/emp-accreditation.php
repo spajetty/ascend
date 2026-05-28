@@ -222,7 +222,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 const API_URL = '/backend/emp-engagement/emp-accred/show-employers.php';
-const CACHE_URL = '/cache/fetch-employers.json';
 const ROWS_PER_PAGE = 9;
 
 let allRows      = [];
@@ -238,24 +237,8 @@ async function loadData(year) {
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        let json = null;
-
-        try {
-            const cacheRes = await fetch(CACHE_URL, { cache: 'no-store' });
-            if (cacheRes.ok) {
-                const cacheJson = await cacheRes.json();
-                if (cacheJson.success && (parseInt(cacheJson.data?.year, 10) === parseInt(year, 10))) {
-                    json = cacheJson;
-                }
-            }
-        } catch (cacheErr) {
-            console.warn('[Employers Accreditation] cache fetch failed:', cacheErr);
-        }
-
-        if (!json) {
-            const res = await fetch(`${API_URL}?year=${year}`);
-            json = await res.json();
-        }
+        const res = await fetch(`${API_URL}?year=${year}`);
+        const json = await res.json();
 
         if (!json.success) throw new Error(json.error);
 
@@ -282,9 +265,6 @@ async function loadData(year) {
         document.querySelectorAll('.active-year-label').forEach(el => {
             el.textContent = `Active Employers (${year})`;
         });
-
-        console.log('[Employers Accreditation] cache refresh count:', json.data.cache_refresh_count ?? 0);
-        console.log('[Employers Accreditation] cache refreshed at:', json.data.cache_refreshed_at ?? '—');
 
         allRows = rows;
         document.getElementById('searchCompany').value = '';

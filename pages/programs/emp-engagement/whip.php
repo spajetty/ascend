@@ -203,7 +203,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 
 <script>
 const API_URL = '/backend/emp-engagement/whip/show-whip.php';
-const CACHE_URL = '/cache/fetch-whip.json';
 const ROWS_PER_PAGE = 10;
 
 let allRows      = [];   // raw worker rows from API
@@ -222,25 +221,9 @@ async function loadData(year) {
     document.getElementById('tableBody').querySelectorAll('tr:not(#loadingRow)').forEach(r => r.remove());
 
     try {
-        let json = null;
-
-        try {
-            const cacheRes = await fetch(CACHE_URL, { cache: 'no-store' });
-            if (cacheRes.ok) {
-                const cacheJson = await cacheRes.json();
-                if (cacheJson.success && String(cacheJson.data?.year) === String(year)) {
-                    json = cacheJson;
-                }
-            }
-        } catch (cacheErr) {
-            console.warn('[WHIP] cache fetch failed:', cacheErr);
-        }
-
-        if (!json) {
-            const url = year === 'all' ? API_URL : `${API_URL}?year=${year}`;
-            const res = await fetch(url);
-            json = await res.json();
-        }
+        const url = year === 'all' ? API_URL : `${API_URL}?year=${year}`;
+        const res = await fetch(url);
+        const json = await res.json();
 
         if (!json.success) throw new Error(json.error);
 
@@ -267,9 +250,6 @@ async function loadData(year) {
         document.getElementById('cardFemale').textContent   = totals.female;
         document.getElementById('cardProjects').textContent = totals.projects;
         document.getElementById('tableTotal').textContent   = totals.total + ' Total';
-
-        console.log('[WHIP] cache refresh count:', json.data.cache_refresh_count ?? 0);
-        console.log('[WHIP] cache refreshed at:', json.data.cache_refreshed_at ?? '—');
 
         allRows = rows;
         document.getElementById('monthFilter').value = '';
