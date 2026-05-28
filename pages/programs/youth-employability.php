@@ -397,11 +397,11 @@ function renderSpes(data) {
 
 // ─── GIP ──────────────────────────────────────────────────────────────────────
 function renderGip(data) {
-    const tbody = document.getElementById('gip-tbody');
-    if (!data || !data.rows || !data.rows.length) { clearLoading('gip-tbody', 8); return; }
-    const rows = data.rows.slice(-PREVIEW_ROWS);
-    let html = '';
-
+    if (!data || !data.rows || !data.rows.length) {
+        clearLoading('gipLeftBody', 6);
+        clearLoading('gipRightBody', 6);
+        return;
+    }
     // group rows by type across all returned rows
     const allRows = data.rows || [];
     const lguRows = allRows.filter(r => String((r.gip_type || r.type || '')).toLowerCase() !== 'dole');
