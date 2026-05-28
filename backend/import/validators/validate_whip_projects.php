@@ -15,10 +15,10 @@ function validateWhipProjects(mysqli $conn, array $rows): array {
 
         $fields = whipProjectRowFields($row);
 
-        $previewRow['fname'] = $fields['title'] !== '' ? $fields['title'] : '(missing project title)';
-        $previewRow['lname'] = $fields['contractor'];
-        $previewRow['sex'] = $fields['nature'];
-        $previewRow['contact'] = $fields['budget'];
+        $previewRow['Project Title'] = $fields['title'] !== '' ? $fields['title'] : '(missing project title)';
+        $previewRow['Contractor'] = $fields['contractor'];
+        $previewRow['Nature of Project'] = $fields['nature'];
+        $previewRow['Budget'] = $fields['budget'];
 
         if ($fields['title'] === '' || $fields['contractor'] === '') {
             $previewRow['status_message'] = 'Missing Project Title or Project Contractor';
