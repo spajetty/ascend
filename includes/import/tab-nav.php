@@ -23,7 +23,6 @@
             Import from Resume
         </button>
 
-        <!--
         <button data-tab="manual"
             class="tab-btn flex items-center gap-2 px-6 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent -mb-px hover:text-gray-600 transition-colors">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -31,7 +30,7 @@
                 <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
             </svg>
             Manual Entry
-        </button>-->
+        </button>
 
     </div>
 </div>
