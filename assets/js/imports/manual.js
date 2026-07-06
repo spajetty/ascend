@@ -1,6 +1,28 @@
 import { programs, programFields } from './config.js';
 import { showToast } from '../toast.js';
 
+// Local refs with dynamic fallback — we don't reassign imported bindings
+let programsLocal = (typeof programs !== 'undefined') ? programs : {};
+let programFieldsLocal = (typeof programFields !== 'undefined') ? programFields : {};
+
+async function ensureProgramsLoaded() {
+    if (programsLocal && Object.keys(programsLocal).length) return;
+
+    if (typeof window !== 'undefined' && window.__beneficiariesConfig) {
+        programsLocal = window.__beneficiariesConfig.programsBySection || programsLocal;
+        programFieldsLocal = window.__beneficiariesConfig.programFields || programFieldsLocal;
+        return;
+    }
+
+    try {
+        const mod = await import('/pages/beneficiaries/assets/js/beneficiaries-config.js');
+        programsLocal = mod.programsBySection || mod.programs || programsLocal;
+        programFieldsLocal = mod.programFields || programFieldsLocal;
+    } catch (e) {
+        // ignore — keep fallbacks
+    }
+}
+
 // ─── MANUAL ENTRY TAB ─────────────────────────────────────────────────────────
 
 // Input class reused across dynamic fields
@@ -40,8 +62,8 @@ function renderDynamicFields(program) {
     const wrapper = document.getElementById('dynamicFields');
     const inner   = document.getElementById('dynamicFieldsInner');
     const label   = document.getElementById('dynamicFieldsLabel');
-    // programFields is defined in config.js
-    const fields  = programFields[program];
+    // programFields is defined in config.js (or provided by a fallback)
+    const fields  = programFieldsLocal[program];
 
     if (!fields || fields.length === 0) {
         wrapper.classList.add('hidden');
@@ -80,9 +102,9 @@ if (manualSection) {
         const prog = document.getElementById('manualProgram');
         const val  = this.value;
 
-        if (val && typeof programs !== 'undefined' && programs[val]) {
+        if (val && programsLocal && programsLocal[val]) {
             prog.innerHTML = '<option value="">Select a program…</option>' +
-                programs[val].map(p => `<option value="${p}">${p}</option>`).join('');
+                programsLocal[val].map(p => `<option value="${p}">${p}</option>`).join('');
             prog.disabled = false;
         } else {
             prog.innerHTML = '<option value="">Select a section first…</option>';
@@ -98,6 +120,20 @@ if (manualSection) {
         }
     });
 }
+
+// Initialize programs on load in case section is preselected (and ensure config loaded)
+document.addEventListener('DOMContentLoaded', async () => {
+    await ensureProgramsLoaded();
+    if (manualSection && manualSection.value) {
+        const ev = new Event('change');
+        manualSection.dispatchEvent(ev);
+        // if a program is already selected, render its dynamic fields
+        const manualProgramEl = document.getElementById('manualProgram');
+        if (manualProgramEl && manualProgramEl.value) {
+            renderDynamicFields(manualProgramEl.value);
+        }
+    }
+});
 
 // Program → render dynamic fields
 const manualProgram = document.getElementById('manualProgram');

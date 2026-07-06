@@ -54,5 +54,4 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <script type="module" src="../../assets/js/loading.js?v=<?= time() ?>"></script>
 <script type="module" src="../../assets/js/imports/excel.js?v=<?= time() ?>"></script>
 <script type="module" src="../../assets/js/imports/resume.js?v=<?= time() ?>"></script>
-<script type="module" src="../../assets/js/imports/manual.js?v=<?= time() ?>"></script>
 <?php require_once __DIR__ . '/../../includes/layout/footer.php'; ?>
