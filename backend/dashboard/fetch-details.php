@@ -159,7 +159,7 @@ try {
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
-                JOIN firstJobSeek fjs ON fjs.benef_id = b.benef_id
+                JOIN firstjobseek fjs ON fjs.benef_id = b.benef_id
                 JOIN import_batches ib ON ib.batch_id = fjs.batch_id
                 WHERE b.classification IS NOT NULL
                 GROUP BY ib.year, ib.month
