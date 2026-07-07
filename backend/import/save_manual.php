@@ -20,7 +20,7 @@ require_once __DIR__ . '/savers/save_job_matching.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -119,6 +119,7 @@ try {
         'jobFairBeneficiaryMap' => [],
         'insertedDocIds' => [],
         'insertedJobMatchIds' => [],
+        'insertedJobFairIds' => [],
         'createdEmployerIds' => [],
         'warnings' => [],
     ];
@@ -128,9 +129,61 @@ try {
         throw new RuntimeException("Failed to save beneficiary.");
     }
 
-    $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
-    if ($result !== 'saved') {
-        throw new RuntimeException("Failed to save job match record.");
+    if ($program === 'Job Fair') {
+        if (!tableExists($conn, 'jobfair')) {
+            throw new RuntimeException('jobfair table does not exist.');
+        }
+
+        $position = s((string)($_POST['position'] ?? '')) ?: 'N/A';
+
+        $eventIdsRaw = $_POST['jobfairevent_ids'] ?? [];
+        if (!is_array($eventIdsRaw)) {
+            $eventIdsRaw = [$eventIdsRaw];
+        }
+
+        $eventIds = array_values(array_unique(array_filter(array_map(static function ($v) {
+            return is_numeric($v) ? (int)$v : 0;
+        }, $eventIdsRaw))));
+
+        if (empty($eventIds)) {
+            throw new RuntimeException('Please select at least one Job Fair event.');
+        }
+
+        $companyMapRaw = $_POST['jf_company_ids'] ?? [];
+        if (!is_array($companyMapRaw)) {
+            $companyMapRaw = [];
+        }
+
+        $insertedRows = 0;
+        $ins = $conn->prepare('INSERT INTO jobfair (benef_id, company_id, position, batch_id, jobfairevent_id) VALUES (?, ?, ?, ?, ?)');
+
+        foreach ($eventIds as $eventId) {
+            $eventKey = (string)$eventId;
+            $companyIdsRaw = $companyMapRaw[$eventKey] ?? [];
+            if (!is_array($companyIdsRaw)) {
+                $companyIdsRaw = [$companyIdsRaw];
+            }
+
+            $companyIds = array_values(array_unique(array_filter(array_map(static function ($v) {
+                return is_numeric($v) ? (int)$v : 0;
+            }, $companyIdsRaw))));
+
+            foreach ($companyIds as $companyId) {
+                $ins->bind_param('iisii', $benefId, $companyId, $position, $batchId, $eventId);
+                $ins->execute();
+                $insertedRows++;
+                $state['insertedJobFairIds'][] = (int)$ins->insert_id;
+            }
+        }
+
+        if ($insertedRows === 0) {
+            throw new RuntimeException('Please select at least one participating company for each chosen event.');
+        }
+    } else {
+        $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save job match record.");
+        }
     }
 
     $conn->commit();
