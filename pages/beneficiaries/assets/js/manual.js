@@ -217,6 +217,7 @@ function bindAddressDropdowns() {
 
 function updateBadge() {
   const badge = $('mf-prog-badge');
+  if (!badge) return;
   if (selectedProgram) {
     const p = (PROGRAMS[selectedSection] || []).find(x => x.val === selectedProgram);
     badge.textContent = p ? p.label : '—';
