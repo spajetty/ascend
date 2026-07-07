@@ -37,7 +37,9 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
 <?php endif; ?>
 
 <main id="mainContent" class="flex-1 min-w-0 md:ml-56 min-h-screen">
-    <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?>  
+    <?php require_once __DIR__ . '/../../includes/layout/topbar.php'; ?> 
+    <?php require_once __DIR__ . '/../../includes/import/tab-nav.php'; ?>
+
     <div class="px-6 md:px-8 pt-6 pb-24 md:py-6 space-y-6">
 
         <?php require_once __DIR__ . '/../../includes/import/tab-excel.php'; ?>
