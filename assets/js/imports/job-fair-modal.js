@@ -95,16 +95,15 @@ export function openCreateEventModal(onDone, seedData = {}) {
     _resetState('create');
     _companyNameMap = {};
     _activeSearchOriginal = null;
-    _importSeedCompanies = Array.isArray(seedData.importedCompanies) && seedData.importedCompanies.length
-        ? seedData.importedCompanies
-        : Array.isArray(state.jobFairImportedCompanies)
-            ? state.jobFairImportedCompanies
-            : [];
-    _importUnmatchedCompanies = Array.isArray(seedData.unmatchedCompanies) && seedData.unmatchedCompanies.length
-        ? seedData.unmatchedCompanies
-        : Array.isArray(state.jobFairUnmatchedCompanies)
-            ? state.jobFairUnmatchedCompanies
-            : [];
+    const hasImportedSeed = Object.prototype.hasOwnProperty.call(seedData, 'importedCompanies');
+    const hasUnmatchedSeed = Object.prototype.hasOwnProperty.call(seedData, 'unmatchedCompanies');
+
+    _importSeedCompanies = hasImportedSeed
+        ? (Array.isArray(seedData.importedCompanies) ? seedData.importedCompanies : [])
+        : (Array.isArray(state.jobFairImportedCompanies) ? state.jobFairImportedCompanies : []);
+    _importUnmatchedCompanies = hasUnmatchedSeed
+        ? (Array.isArray(seedData.unmatchedCompanies) ? seedData.unmatchedCompanies : [])
+        : (Array.isArray(state.jobFairUnmatchedCompanies) ? state.jobFairUnmatchedCompanies : []);
     const modal = ensureJobFairModal();
     _bindModalEvents(modal);
     _configureModal(modal);
@@ -123,16 +122,15 @@ export function openAddCompaniesModal(eventId, eventLabel, onDone, seedData = {}
     _resetState('participants', parseInt(eventId, 10));
     _companyNameMap = {};
     _activeSearchOriginal = null;
-    _importSeedCompanies = Array.isArray(seedData.importedCompanies) && seedData.importedCompanies.length
-        ? seedData.importedCompanies
-        : Array.isArray(state.jobFairImportedCompanies)
-            ? state.jobFairImportedCompanies
-            : [];
-    _importUnmatchedCompanies = Array.isArray(seedData.unmatchedCompanies) && seedData.unmatchedCompanies.length
-        ? seedData.unmatchedCompanies
-        : Array.isArray(state.jobFairUnmatchedCompanies)
-            ? state.jobFairUnmatchedCompanies
-            : [];
+    const hasImportedSeed = Object.prototype.hasOwnProperty.call(seedData, 'importedCompanies');
+    const hasUnmatchedSeed = Object.prototype.hasOwnProperty.call(seedData, 'unmatchedCompanies');
+
+    _importSeedCompanies = hasImportedSeed
+        ? (Array.isArray(seedData.importedCompanies) ? seedData.importedCompanies : [])
+        : (Array.isArray(state.jobFairImportedCompanies) ? state.jobFairImportedCompanies : []);
+    _importUnmatchedCompanies = hasUnmatchedSeed
+        ? (Array.isArray(seedData.unmatchedCompanies) ? seedData.unmatchedCompanies : [])
+        : (Array.isArray(state.jobFairUnmatchedCompanies) ? state.jobFairUnmatchedCompanies : []);
     const modal = ensureJobFairModal();
     _bindModalEvents(modal);
     _loadExistingParticipants(modal, eventId, () => {

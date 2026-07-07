@@ -78,7 +78,13 @@
                             </div>
 
                             <div class="mf-field mf-col2" style="position: relative;">
-                                <label for="mf-jfevent-input">Event(s) <span class="mf-req">*</span></label>
+                                <div class="flex items-center justify-between gap-3 mb-1">
+                                    <label for="mf-jfevent-input" class="mb-0">Event(s) <span class="mf-req">*</span></label>
+                                    <button type="button" id="mf-add-jfevent" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+                                        <i class="fa-solid fa-plus"></i>
+                                        Add New Event
+                                    </button>
+                                </div>
                                 <div id="mf-jfevent-chips" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
                                 <input type="text" id="mf-jfevent-input" placeholder="Search and select events...">
                                 <div id="mf-jfevent-dropdown"
