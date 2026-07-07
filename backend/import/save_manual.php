@@ -20,7 +20,7 @@ require_once __DIR__ . '/savers/save_job_matching.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if ($program !== 'Job Matching and Referral') {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -48,6 +48,8 @@ try {
         // Employer Info
         'Company' => $_POST['company_name'] ?? '',
         'Position' => $_POST['position'] ?? '',
+        'Occupational Permit' => $_POST['occ_permit'] ?? 0,
+        'Health Card' => $_POST['health_card'] ?? 0,
         
         // Documents
         'Proof of Residency' => $_POST['proof_of_residency'] ?? '',
