@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet" href="../../pages/imports/assets/css/manual-form.css?v=<?= time() ?>">
+<script type="module" src="../../assets/js/toast.js?v=<?= time() ?>"></script>
 <script type="module" src="../../pages/beneficiaries/assets/js/manual.js?v=<?= time() ?>"></script>
 
 <!-- ─── TAB CONTENT: MANUAL ─── -->

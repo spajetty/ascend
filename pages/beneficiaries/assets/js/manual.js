@@ -165,8 +165,12 @@ function onProgramChange() {
   // Refresh detail sections if already on step 2
   if (currentPanel === 2) applyProgramSections();
 
-  // Auto-advance from placeholder on first selection
-  if (currentPanel === 0 && selectedProgram) goPanel(1);
+  // Show the first form immediately once a valid program exists.
+  if (selectedProgram) {
+    goPanel(1);
+  } else {
+    goPanel(0);
+  }
 }
 
 function bindAddressDropdowns() {
@@ -213,6 +217,7 @@ function bindAddressDropdowns() {
 
 function updateBadge() {
   const badge = $('mf-prog-badge');
+  if (!badge) return;
   if (selectedProgram) {
     const p = (PROGRAMS[selectedSection] || []).find(x => x.val === selectedProgram);
     badge.textContent = p ? p.label : '—';
@@ -958,14 +963,21 @@ function submitForm() {
   .then(data => {
     if (data.success) {
       $('mf-success-id').textContent = `Benef #${data.beneficiary_id}`;
+      if (typeof window.showToast === 'function') {
+        window.showToast('Manual entry saved successfully.', 'success');
+      }
       goPanel(5);
     } else {
-      alert("Error saving manual entry: " + data.error);
+      if (typeof window.showToast === 'function') {
+        window.showToast(data.error || 'Error saving manual entry.', 'error');
+      }
     }
   })
   .catch(err => {
     console.error(err);
-    alert("Network error. Please try again.");
+    if (typeof window.showToast === 'function') {
+      window.showToast('Network error. Please try again.', 'error');
+    }
   })
   .finally(() => {
     if (typeof hideLoading === 'function') hideLoading();
