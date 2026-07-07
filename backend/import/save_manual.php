@@ -26,6 +26,55 @@ try {
 
     $programId = resolveProgramId($conn, $program);
 
+    // Construct synthetic $row from POST data
+    $row = [
+        // Beneficiary Info
+        'First Name' => $_POST['first_name'] ?? '',
+        'Middle Name' => $_POST['middle_name'] ?? '',
+        'Last Name' => $_POST['last_name'] ?? '',
+        'Suffix' => $_POST['suffix'] ?? '',
+        'Sex' => $_POST['sex'] ?? '',
+        'Civil Status' => $_POST['civil_status'] ?? '',
+        'DOB' => $_POST['dob'] ?? '',
+        'Contact' => $_POST['contact'] ?? '',
+        'Email' => $_POST['email'] ?? '',
+        'Classification' => $_POST['classification'] ?? '',
+        'Status' => $_POST['spes_status'] ?? '',
+        'House No.' => $_POST['house_no'] ?? '',
+        'Barangay' => $_POST['barangay'] ?? '',
+        'District' => $_POST['district'] ?? '',
+        'City' => $_POST['city'] ?? '',
+        
+        // Employer Info
+        'Company' => $_POST['company_name'] ?? '',
+        'Position' => $_POST['position'] ?? '',
+        
+        // Documents
+        'Proof of Residency' => $_POST['proof_of_residency'] ?? '',
+        'Latest Credentials' => $_POST['latest_credential'] ?? '',
+        'Letter of Intent' => $_POST['letter_of_intent'] ?? '',
+        'Reco Letter' => $_POST['reco_letter'] ?? '',
+        'Resume' => $_POST['resume'] ?? '',
+        'TOR' => $_POST['tor'] ?? '',
+        'Brgy Clearance' => $_POST['brgy_clearance'] ?? '',
+        'NBI Clearance' => $_POST['nbi_clearance'] ?? '',
+        'Birth Cert' => $_POST['birth_cert'] ?? '',
+        'TESDA Cert' => $_POST['tesda_cert'] ?? ''
+    ];
+
+    $duplicate = checkDuplicate(
+        $conn,
+        (string)$row['First Name'],
+        (string)$row['Last Name'],
+        $row['DOB'] !== '' ? (string)$row['DOB'] : null,
+        (string)$row['Contact'],
+        (string)$row['Email']
+    );
+
+    if (!empty($duplicate['found'])) {
+        throw new RuntimeException('Duplicate beneficiary already exists in the database.');
+    }
+
     $conn->begin_transaction();
 
     // Resolve Batch ID
@@ -70,42 +119,6 @@ try {
         'insertedJobMatchIds' => [],
         'createdEmployerIds' => [],
         'warnings' => [],
-    ];
-
-    // Construct synthetic $row from POST data
-    $row = [
-        // Beneficiary Info
-        'First Name' => $_POST['first_name'] ?? '',
-        'Middle Name' => $_POST['middle_name'] ?? '',
-        'Last Name' => $_POST['last_name'] ?? '',
-        'Suffix' => $_POST['suffix'] ?? '',
-        'Sex' => $_POST['sex'] ?? '',
-        'Civil Status' => $_POST['civil_status'] ?? '',
-        'DOB' => $_POST['dob'] ?? '',
-        'Contact' => $_POST['contact'] ?? '',
-        'Email' => $_POST['email'] ?? '',
-        'Classification' => $_POST['classification'] ?? '',
-        'Status' => $_POST['spes_status'] ?? '',
-        'House No.' => $_POST['house_no'] ?? '',
-        'Barangay' => $_POST['barangay'] ?? '',
-        'District' => $_POST['district'] ?? '',
-        'City' => $_POST['city'] ?? '',
-        
-        // Employer Info
-        'Company' => $_POST['company_name'] ?? '',
-        'Position' => $_POST['position'] ?? '',
-        
-        // Documents
-        'Proof of Residency' => $_POST['proof_of_residency'] ?? '',
-        'Latest Credentials' => $_POST['latest_credential'] ?? '',
-        'Letter of Intent' => $_POST['letter_of_intent'] ?? '',
-        'Reco Letter' => $_POST['reco_letter'] ?? '',
-        'Resume' => $_POST['resume'] ?? '',
-        'TOR' => $_POST['tor'] ?? '',
-        'Brgy Clearance' => $_POST['brgy_clearance'] ?? '',
-        'NBI Clearance' => $_POST['nbi_clearance'] ?? '',
-        'Birth Cert' => $_POST['birth_cert'] ?? '',
-        'TESDA Cert' => $_POST['tesda_cert'] ?? ''
     ];
 
     $benefId = ensurePersonBeneficiaryAndDocs($conn, $row, $ctx, $state);
