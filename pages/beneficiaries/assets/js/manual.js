@@ -165,8 +165,12 @@ function onProgramChange() {
   // Refresh detail sections if already on step 2
   if (currentPanel === 2) applyProgramSections();
 
-  // Auto-advance from placeholder on first selection
-  if (currentPanel === 0 && selectedProgram) goPanel(1);
+  // Show the first form immediately once a valid program exists.
+  if (selectedProgram) {
+    goPanel(1);
+  } else {
+    goPanel(0);
+  }
 }
 
 function bindAddressDropdowns() {
