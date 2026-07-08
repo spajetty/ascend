@@ -106,7 +106,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-4 py-2 text-gray-500 font-medium w-28" rowspan="2">MONTH</th>
                             <th colspan="3" class="px-2 py-2 text-center text-teal-600 font-semibold tracking-wide border-l border-gray-100">FIRST-TIME JOBSEEKERS</th>
-                            <th colspan="2" class="px-2 py-2 text-center text-indigo-500 font-semibold tracking-wide border-l border-gray-100">ISSUED</th>
+                            <th colspan="2" class="px-2 py-2 text-center text-indigo-500 font-semibold tracking-wide border-l border-gray-100">ID ISSUED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>

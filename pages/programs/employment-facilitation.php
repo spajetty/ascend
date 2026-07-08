@@ -128,8 +128,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         <tr class="border-b border-gray-100">
                             <th class="text-left px-4 py-2 text-gray-500 font-medium w-28" rowspan="2">MONTH</th>
                             <th colspan="3" class="px-2 py-2 text-center text-pink-500 font-semibold tracking-wide border-l border-gray-100">JOB SEEKERS</th>
-                            <th class="px-2 py-2 text-center text-teal-500 font-semibold tracking-wide border-l border-gray-100" rowspan="2">OCC. PERMIT</th>
-                            <th class="px-2 py-2 text-center text-blue-500 font-semibold tracking-wide border-l border-gray-100" rowspan="2">HEALTH CARD</th>
+                            <th colspan="2" class="px-2 py-2 text-center text-indigo-500 font-semibold tracking-wide border-l border-gray-100">ID ISSUED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
@@ -138,8 +137,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-pink-500">T</th>
-                            <th class="px-3 py-1 border-l border-gray-100"></th><!-- spacer for OCC PERMIT rowspan -->
-                            <th class="px-3 py-1 border-l border-gray-100"></th><!-- spacer for HEALTH CARD rowspan -->
+                            <th class="px-3 py-1 text-center font-semibold text-pink-500 border-l border-gray-100">Occ. Permit</th>
+                            <th class="px-3 py-1 text-center font-semibold text-green-500">Health Card</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-cyan-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-green-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-red-400">T</th>
