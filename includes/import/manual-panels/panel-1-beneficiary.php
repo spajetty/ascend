@@ -63,7 +63,7 @@
                                 </select>
                             </div>
                             <div class="mf-field mf-col2" id="mf-classification-wrap" style="display:none;">
-                                <label for="mf-classification">Classification</label>
+                                <label for="mf-classification">Classification <span class="mf-req">*</span></label>
                                 <select id="mf-classification" name="classification" disabled>
                                     <option value="">— select a program first —</option>
                                 </select>
