@@ -10,7 +10,7 @@
             </svg>
             Import from Excel
         </button>
-
+        <!--
         <button data-tab="resume"
             class="tab-btn flex items-center gap-2 px-6 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent -mb-px hover:text-gray-600 transition-colors">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -21,7 +21,7 @@
                 <polyline points="10 9 9 9 8 9"/>
             </svg>
             Import from Resume
-        </button>
+        </button> -->
 
         <button data-tab="manual"
             class="tab-btn flex items-center gap-2 px-6 py-4 text-sm font-medium text-gray-400 border-b-2 border-transparent -mb-px hover:text-gray-600 transition-colors">

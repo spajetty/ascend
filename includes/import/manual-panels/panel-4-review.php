@@ -39,7 +39,7 @@
                                     <dt>Sex</dt>
                                     <dd id="mf-rv-sex">—</dd>
                                 </dl>
-                                <dl class="mf-rv-item">
+                                <dl class="mf-rv-item" id="mf-rv-class-item">
                                     <dt>Classification</dt>
                                     <dd id="mf-rv-class">—</dd>
                                 </dl>

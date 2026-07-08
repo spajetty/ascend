@@ -62,15 +62,10 @@
                                     <option>Separated</option>
                                 </select>
                             </div>
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field mf-col2" id="mf-classification-wrap" style="display:none;">
                                 <label for="mf-classification">Classification</label>
-                                <select id="mf-classification" name="classification">
-                                    <option value="">— select —</option>
-                                    <option>New Applicant</option>
-                                    <option>Displaced Worker</option>
-                                    <option>School Leaver</option>
-                                    <option>Underemployed</option>
-                                    <option>Returning OFW</option>
+                                <select id="mf-classification" name="classification" disabled>
+                                    <option value="">— select a program first —</option>
                                 </select>
                             </div>
                             <div class="mf-field">

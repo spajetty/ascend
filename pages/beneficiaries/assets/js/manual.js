@@ -1,5 +1,7 @@
 import { openCreateEventModal } from '../../../../assets/js/imports/job-fair-modal.js';
 
+import { statusesByProgram } from '../../../../assets/js/imports/config.js';
+
 // Populate Program select based on the local PROGRAMS constants below
 function loadProgramsConfig() {
   const sectionEl = document.getElementById('manualSection');
@@ -31,7 +33,9 @@ function loadProgramsConfig() {
   }
 
   sectionEl.addEventListener('change', (e) => setProgramsForSection(e.target.value));
+  programEl.addEventListener('change', syncClassificationOptions);
   setProgramsForSection(sectionEl.value);
+  syncClassificationOptions();
 }
 
 document.addEventListener('DOMContentLoaded', loadProgramsConfig);
@@ -154,11 +158,13 @@ function onSectionChange() {
   }
 
   updateBadge();
+  syncClassificationOptions();
 }
 
 function onProgramChange() {
   selectedProgram = $('mf-sel-program').value;
   updateBadge();
+  syncClassificationOptions();
 
   // SPES status panel only shown for SPES
   const spesPanel = $('mf-cond-spes-status');
@@ -172,6 +178,32 @@ function onProgramChange() {
     goPanel(1);
   } else {
     goPanel(0);
+  }
+}
+
+function syncClassificationOptions() {
+  const classificationEl = $('mf-classification');
+  const classificationWrap = $('mf-classification-wrap');
+  const reviewItem = $('mf-rv-class-item');
+  const programEl = $('mf-sel-program');
+  if (!classificationEl) return;
+
+  const programLabel = programEl?.selectedOptions?.[0]?.textContent?.trim() || '';
+  const statuses = programLabel ? (statusesByProgram[programLabel] || []) : [];
+  const currentValue = classificationEl.value;
+  const shouldShow = statuses.length > 0;
+
+  classificationEl.innerHTML = '<option value="">— select —</option>' +
+    statuses.map(status => `<option value="${status}">${status}</option>`).join('');
+  classificationEl.disabled = !shouldShow;
+  classificationEl.required = shouldShow;
+  if (classificationWrap) classificationWrap.style.display = shouldShow ? '' : 'none';
+  if (reviewItem) reviewItem.style.display = shouldShow ? '' : 'none';
+
+  if (shouldShow && currentValue && statuses.includes(currentValue)) {
+    classificationEl.value = currentValue;
+  } else {
+    classificationEl.value = '';
   }
 }
 
@@ -992,7 +1024,8 @@ function buildReview() {
   const sexChip = document.querySelector('[data-group="sex"].on');
   $('mf-rv-sex').textContent = sexChip?.dataset.val || '—';
 
-  $('mf-rv-class').textContent    = $('mf-classification')?.value || '—';
+  const classificationWrap = $('mf-classification-wrap');
+  $('mf-rv-class').textContent    = classificationWrap?.style.display === 'none' ? '—' : ($('mf-classification')?.value || '—');
   $('mf-rv-district').textContent = $('mf-district')?.value ? `District ${$('mf-district').value}` : '—';
   $('mf-rv-barangay').textContent = $('mf-barangay')?.value || '—';
 
