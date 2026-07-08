@@ -52,7 +52,7 @@ export const statusesByProgram = {
         'Qualified',
         'Not Qualified',
         'Placed',
-        'HOTS',
+        'Hired',
         'For Further Interview',
     ],
     'SPES': [

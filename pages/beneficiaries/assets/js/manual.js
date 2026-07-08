@@ -702,6 +702,9 @@ function validatePanel(idx) {
     }
 
     const req1 = ['mf-lname', 'mf-fname', 'mf-dob', 'mf-barangay', 'mf-city'];
+    const programLabel = $('mf-sel-program')?.selectedOptions?.[0]?.textContent?.trim() || '';
+    const needsClassification = Boolean(programLabel && (statusesByProgram[programLabel] || []).length);
+    if (needsClassification) req1.push('mf-classification');
     const is4ps = document.getElementById('mf-flag-4ps')?.classList.contains('on');
     if (is4ps) req1.push('mf-4psid');
 
