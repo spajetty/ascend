@@ -51,7 +51,8 @@ export const statusesByProgram = {
         'Interviewed',
         'Qualified',
         'Not Qualified',
-        'Placed/Hots',
+        'Placed',
+        'HOTS',
         'For Further Interview',
     ],
     'SPES': [
