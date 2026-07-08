@@ -107,7 +107,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                             <th class="px-2 py-2 text-center text-gray-400 font-semibold tracking-wide border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
@@ -333,7 +333,8 @@ function renderTable() {
     const pageRows = allRows.slice(start, end);
 
     if (total === 0) {
-        tbody.innerHTML = `<tr><td colspan="22" class="px-4 py-8 text-center text-gray-400 text-sm">No data found for this year.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="22" class="px-4 py-8 text-center text-gray-400 text-sm">No data found for this year.</td></tr>` +
+                          buildTotalHTMLRow(buildTotalRow(allRows));
     } else {
         tbody.innerHTML = pageRows.map((r, i) => buildRow(r, start + i)).join('') +
                           buildTotalHTMLRow(buildTotalRow(allRows));

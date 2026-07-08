@@ -47,7 +47,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     <div class="px-4 md:px-8 pt-6 pb-24 md:pb-6 space-y-6">
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 md:gap-4">
+        <div class="grid grid-cols-2 lg:grid-cols-6 gap-3 md:gap-4">
             <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-blue-400">
                 <div class="flex items-center justify-between">
                     <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-vacancies">—</span>
@@ -102,7 +102,18 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                         </svg>
                     </div>
                 </div>
-                <span class="text-xs text-gray-500 leading-tight">Placed / HOTS</span>
+                <span class="text-xs text-gray-500 leading-tight">Placed</span>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm p-4 md:p-5 flex flex-col gap-2 border-l-4 border-amber-400">
+                <div class="flex items-center justify-between">
+                    <span class="text-xl md:text-2xl font-bold text-gray-800" id="card-hots">—</span>
+                    <div class="bg-amber-100 p-2 rounded-lg">
+                        <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                </div>
+                <span class="text-xs text-gray-500 leading-tight">HOTS</span>
             </div>
         </div>
 
@@ -184,7 +195,8 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-amber-500 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                             <th class="px-2 py-2 text-center text-gray-400 font-semibold tracking-wide border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
@@ -196,11 +208,12 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-green-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-red-400">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-orange-400">T</th>
+                            <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-amber-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
                     <tbody id="jobFairTbody">
-                        <tr><td colspan="29" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>
+                        <tr><td colspan="32" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>
                     </tbody>
                     <tfoot id="jobFairTfoot" class="hidden">
                         <tr class="bg-gray-50 border-t-2 border-gray-200 font-semibold text-xs">
@@ -226,6 +239,9 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <td id="ft-pm"    class="px-3 py-2 text-center text-orange-500 border-l border-gray-100"></td>
                             <td id="ft-pf"    class="px-3 py-2 text-center text-orange-500"></td>
                             <td id="ft-pt"    class="px-3 py-2 text-center text-orange-600 font-bold bg-orange-50"></td>
+                            <td id="ft-hm"    class="px-3 py-2 text-center text-amber-500 border-l border-gray-100"></td>
+                            <td id="ft-hf"    class="px-3 py-2 text-center text-amber-500"></td>
+                            <td id="ft-ht"    class="px-3 py-2 text-center text-amber-600 font-bold bg-amber-50"></td>
                             <td id="ft-fm"    class="px-3 py-2 text-center text-purple-500 border-l border-gray-100"></td>
                             <td id="ft-ff"    class="px-3 py-2 text-center text-purple-500"></td>
                             <td id="ft-ft"    class="px-3 py-2 text-center text-purple-600 font-bold bg-purple-50"></td>
@@ -527,7 +543,7 @@ function setTypeFilter(type) {
 async function loadData() {
     const year  = document.getElementById('yearFilter').value || new Date().getFullYear();
     const tbody = document.getElementById('jobFairTbody');
-    tbody.innerHTML = `<tr><td colspan="29" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="32" class="text-center py-8 text-gray-400 text-sm">Loading…</td></tr>`;
     document.getElementById('jobFairTfoot').classList.add('hidden');
     try {
         const res  = await fetch(`${API_URL}?year=${year}`);
@@ -540,12 +556,13 @@ async function loadData() {
         document.getElementById('card-interviewed').textContent = totals.interviewed;
         document.getElementById('card-qualified').textContent   = totals.qualified;
         document.getElementById('card-placed').textContent      = totals.placed;
+        document.getElementById('card-hots').textContent        = totals.hots;
         allRows     = rows;
         currentPage = 1;
         applyFilters();
         checkUnfilledData(year);
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="29" class="text-center py-8 text-red-400 text-sm">Error: ${escHtml(err.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="32" class="text-center py-8 text-red-400 text-sm">Error: ${escHtml(err.message)}</td></tr>`;
     }
 }
 
@@ -585,6 +602,7 @@ function computeTotals(rows) {
                   'qual_m','qual_f','qual_total',
                   'nqual_m','nqual_f','nqual_total',
                   'placed_m','placed_f','placed_total',
+                  'hots_m','hots_f','hots_total',
                   'ffi_m','ffi_f','ffi_total'];
     const t = {};
     keys.forEach(k => { t[k] = rows.reduce((s, r) => s + (parseInt(r[k]) || 0), 0); });
@@ -600,13 +618,14 @@ function updateFooter(gt) {
         'ft-qm':gt.qual_m,        'ft-qf':gt.qual_f,         'ft-qt':gt.qual_total,
         'ft-nm':gt.nqual_m,       'ft-nf':gt.nqual_f,        'ft-nt':gt.nqual_total,
         'ft-pm':gt.placed_m,      'ft-pf':gt.placed_f,       'ft-pt':gt.placed_total,
+        'ft-hm':gt.hots_m,        'ft-hf':gt.hots_f,         'ft-ht':gt.hots_total,
         'ft-fm':gt.ffi_m,         'ft-ff':gt.ffi_f,          'ft-ft':gt.ffi_total,
     };
     Object.entries(map).forEach(([id, val]) => {
         const el = document.getElementById(id);
         if (el) el.textContent = val ?? 0;
     });
-    document.getElementById('jobFairTfoot').classList.toggle('hidden', filteredRows.length === 0);
+    document.getElementById('jobFairTfoot').classList.remove('hidden');
 }
 
 // ─── Group: Month → Event → Employers ────────────────────────────────────────
@@ -635,7 +654,7 @@ function renderPage() {
     tbody.innerHTML = '';
 
     if (pageRows.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="29" class="text-center py-8 text-gray-400 text-sm">No entries found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="32" class="text-center py-8 text-gray-400 text-sm">No entries found.</td></tr>`;
     } else {
         const monthMap = groupRows(pageRows);
         monthMap.forEach((monthData, monthKey) => {
@@ -745,6 +764,7 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
         ${td(r.qual_m,   'border-l border-gray-100')}${td(r.qual_f)}${tdB(r.qual_total,  'text-green-500',  'bg-green-50')}
         ${td(r.nqual_m,  'border-l border-gray-100')}${td(r.nqual_f)}${tdB(r.nqual_total, 'text-red-400',    'bg-red-50')}
         ${td(r.placed_m, 'border-l border-gray-100')}${td(r.placed_f)}${tdB(r.placed_total,'text-orange-400', 'bg-orange-50')}
+        ${td(r.hots_m,   'border-l border-gray-100')}${td(r.hots_f)}${tdB(r.hots_total,  'text-amber-500',  'bg-amber-50')}
         ${td(r.ffi_m,    'border-l border-gray-100')}${td(r.ffi_f)}${tdB(r.ffi_total,   'text-purple-400', 'bg-purple-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">${actions}</td>
     `;
@@ -790,7 +810,7 @@ async function confirmDelete() {
 // ─── Edit ─────────────────────────────────────────────────────────────────────
 const EDIT_FIELDS = [
     'reg_m','reg_f', 'ref_m','ref_f', 'int_m','int_f',
-    'qual_m','qual_f', 'nqual_m','nqual_f', 'placed_m','placed_f', 'ffi_m','ffi_f'
+    'qual_m','qual_f', 'nqual_m','nqual_f', 'placed_m','placed_f', 'hots_m','hots_f', 'ffi_m','ffi_f'
 ];
 
 function getRowEl(id) {
