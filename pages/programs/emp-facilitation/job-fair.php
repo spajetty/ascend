@@ -274,7 +274,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <div id="modalBackdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden z-40"></div>
 
 <!-- ─── Delete Modal ─────────────────────────────────────────────────────── -->
-<div id="deleteModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+<div id="deleteModal" class="fixed inset-0 items-center justify-center hidden z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-red-100 p-3 rounded-lg">
@@ -293,7 +293,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 </div>
 
 <!-- ─── Save Modal ───────────────────────────────────────────────────────── -->
-<div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
+<div id="saveModal" class="fixed inset-0 items-center justify-center hidden z-50">
     <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
         <div class="flex items-center gap-3 mb-4">
             <div class="bg-green-100 p-3 rounded-lg">
@@ -314,7 +314,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <!--  UNFILLED WARNING MODAL                                                    -->
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="unfilledModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+<div id="unfilledModal" class="fixed inset-0 items-center justify-center hidden z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100 bg-gradient-to-r from-amber-50 to-yellow-50">
             <div class="flex items-start gap-3">
@@ -345,7 +345,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
 <!--  FILL VACANCIES MODAL                                                      -->
 <!-- ═══════════════════════════════════════════════════════════════════════════ -->
-<div id="fillVacModal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+<div id="fillVacModal" class="fixed inset-0 items-center justify-center hidden z-50 p-4">
     <div class="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
 
         <!-- Header -->
@@ -513,6 +513,25 @@ let currentMode       = 'manual'; // 'manual' | 'excel'
 let excelImportRows   = [];       // parsed rows from Excel upload
 let unfilledModalShown = false;
 
+// ─── Modal show/hide helpers (centralized so every modal toggles the same way) ─
+// NOTE: these modal divs use Tailwind's `items-center justify-center` utilities,
+// which only take effect when the element's display is `flex`. Removing `hidden`
+// alone leaves it at `display: block`, which is why the modal rendered pinned to
+// the top-left instead of centered. We now explicitly toggle the `flex` class
+// alongside `hidden` everywhere a modal is opened or closed.
+function openModalEl(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.remove('hidden');
+    el.classList.add('flex');
+}
+function closeModalEl(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('hidden');
+    el.classList.remove('flex');
+}
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     loadData();
@@ -556,7 +575,7 @@ async function loadData() {
         document.getElementById('card-interviewed').textContent = totals.interviewed;
         document.getElementById('card-qualified').textContent   = totals.qualified;
         document.getElementById('card-placed').textContent      = totals.placed;
-        document.getElementById('card-hots').textContent        = totals.hots;
+        document.getElementById('card-hots').textContent        = totals.hired;
         allRows     = rows;
         currentPage = 1;
         applyFilters();
@@ -602,7 +621,7 @@ function computeTotals(rows) {
                   'qual_m','qual_f','qual_total',
                   'nqual_m','nqual_f','nqual_total',
                   'placed_m','placed_f','placed_total',
-                  'hots_m','hots_f','hots_total',
+                  'hired_m','hired_f','hired_total',
                   'ffi_m','ffi_f','ffi_total'];
     const t = {};
     keys.forEach(k => { t[k] = rows.reduce((s, r) => s + (parseInt(r[k]) || 0), 0); });
@@ -618,7 +637,7 @@ function updateFooter(gt) {
         'ft-qm':gt.qual_m,        'ft-qf':gt.qual_f,         'ft-qt':gt.qual_total,
         'ft-nm':gt.nqual_m,       'ft-nf':gt.nqual_f,        'ft-nt':gt.nqual_total,
         'ft-pm':gt.placed_m,      'ft-pf':gt.placed_f,       'ft-pt':gt.placed_total,
-        'ft-hm':gt.hots_m,        'ft-hf':gt.hots_f,         'ft-ht':gt.hots_total,
+        'ft-hm':gt.hired_m,       'ft-hf':gt.hired_f,        'ft-ht':gt.hired_total,
         'ft-fm':gt.ffi_m,         'ft-ff':gt.ffi_f,          'ft-ft':gt.ffi_total,
     };
     Object.entries(map).forEach(([id, val]) => {
@@ -764,7 +783,7 @@ function buildRow(r, monthRowspan, eventRowspan, monthKey) {
         ${td(r.qual_m,   'border-l border-gray-100')}${td(r.qual_f)}${tdB(r.qual_total,  'text-green-500',  'bg-green-50')}
         ${td(r.nqual_m,  'border-l border-gray-100')}${td(r.nqual_f)}${tdB(r.nqual_total, 'text-red-400',    'bg-red-50')}
         ${td(r.placed_m, 'border-l border-gray-100')}${td(r.placed_f)}${tdB(r.placed_total,'text-orange-400', 'bg-orange-50')}
-        ${td(r.hots_m,   'border-l border-gray-100')}${td(r.hots_f)}${tdB(r.hots_total,  'text-amber-500',  'bg-amber-50')}
+        ${td(r.hired_m,   'border-l border-gray-100')}${td(r.hired_f)}${tdB(r.hired_total,  'text-amber-500',  'bg-amber-50')}
         ${td(r.ffi_m,    'border-l border-gray-100')}${td(r.ffi_f)}${tdB(r.ffi_total,   'text-purple-400', 'bg-purple-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">${actions}</td>
     `;
@@ -810,7 +829,7 @@ async function confirmDelete() {
 // ─── Edit ─────────────────────────────────────────────────────────────────────
 const EDIT_FIELDS = [
     'reg_m','reg_f', 'ref_m','ref_f', 'int_m','int_f',
-    'qual_m','qual_f', 'nqual_m','nqual_f', 'placed_m','placed_f', 'hots_m','hots_f', 'ffi_m','ffi_f'
+    'qual_m','qual_f', 'nqual_m','nqual_f', 'placed_m','placed_f', 'hired_m','hired_f', 'ffi_m','ffi_f'
 ];
 
 function getRowEl(id) {
@@ -925,15 +944,13 @@ async function confirmSave() {
 
 // ─── Modal helpers ────────────────────────────────────────────────────────────
 function showModal(id) {
+    openModalEl('modalBackdrop'); // backdrop is a plain overlay div, but keep behavior consistent
     document.getElementById('modalBackdrop').classList.remove('hidden');
-    document.getElementById(id).classList.remove('hidden');
+    openModalEl(id);
 }
 function closeAllModals() {
     document.getElementById('modalBackdrop').classList.add('hidden');
-    ['deleteModal','saveModal','unfilledModal','fillVacModal'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.classList.add('hidden');
-    });
+    ['deleteModal','saveModal','unfilledModal','fillVacModal'].forEach(id => closeModalEl(id));
     deletingId = null; savingId = null;
     document.body.classList.remove('modal-open');
 }
@@ -979,7 +996,7 @@ async function checkUnfilledData(year) {
 
         if (!unfilledEvents.length) {
             // All data is filled — close the warning if it's open
-            document.getElementById('unfilledModal').classList.add('hidden');
+            closeModalEl('unfilledModal');
             if (document.getElementById('fillVacModal').classList.contains('hidden')) {
                 document.getElementById('modalBackdrop').classList.add('hidden');
             }
@@ -997,7 +1014,7 @@ async function checkUnfilledData(year) {
 
         if (!unfilledModalShown) {
             document.getElementById('modalBackdrop').classList.remove('hidden');
-            document.getElementById('unfilledModal').classList.remove('hidden');
+            openModalEl('unfilledModal');
             unfilledModalShown = true;
         }
     } catch (e) { /* silent */ }
@@ -1019,7 +1036,7 @@ function updateFillVacButtonState() {
 }
 
 function closeUnfilledModal() {
-    document.getElementById('unfilledModal').classList.add('hidden');
+    closeModalEl('unfilledModal');
     if (document.getElementById('fillVacModal').classList.contains('hidden')) {
         document.getElementById('modalBackdrop').classList.add('hidden');
     }
@@ -1035,7 +1052,7 @@ function openFillVacModal() {
         showSuccess('All vacancy data is already saved for this year.');
         return;
     }
-    document.getElementById('fillVacModal').classList.remove('hidden');
+    openModalEl('fillVacModal');
     document.getElementById('modalBackdrop').classList.remove('hidden');
     document.body.classList.add('modal-open');
     renderEventTabs();
@@ -1044,7 +1061,7 @@ function openFillVacModal() {
 }
 
 function closeFillVacModal() {
-    document.getElementById('fillVacModal').classList.add('hidden');
+    closeModalEl('fillVacModal');
     if (document.getElementById('unfilledModal').classList.contains('hidden')) {
         document.getElementById('modalBackdrop').classList.add('hidden');
     }

@@ -131,8 +131,11 @@ if ($method === 'GET') {
             SUM(CASE WHEN b.classification = 'Not Qualified'           AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS nqual_m,
             SUM(CASE WHEN b.classification = 'Not Qualified'           AND b.sex = 'Female' THEN 1 ELSE 0 END) AS nqual_f,
 
-            SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed') AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS placed_m,
+            SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed') AND b.sex = 'Male' THEN 1 ELSE 0 END) AS placed_m,
             SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed') AND b.sex = 'Female' THEN 1 ELSE 0 END) AS placed_f,
+
+            SUM(CASE WHEN b.classification = 'Hired' AND b.sex = 'Male' THEN 1 ELSE 0 END) AS hired_m,
+            SUM(CASE WHEN b.classification = 'Hired' AND b.sex = 'Female' THEN 1 ELSE 0 END) AS hired_f,
 
             SUM(CASE WHEN b.classification = 'For Further Interview'   AND b.sex = 'Male'   THEN 1 ELSE 0 END) AS ffi_m,
             SUM(CASE WHEN b.classification = 'For Further Interview'   AND b.sex = 'Female' THEN 1 ELSE 0 END) AS ffi_f
@@ -205,7 +208,8 @@ if ($method === 'GET') {
         $row['int_total']     = (int)$row['int_m']         + (int)$row['int_f'];
         $row['qual_total']    = (int)$row['qual_m']        + (int)$row['qual_f'];
         $row['nqual_total']   = (int)$row['nqual_m']       + (int)$row['nqual_f'];
-        $row['placed_total']  = (int)$row['placed_m']      + (int)$row['placed_f'];
+        $row['placed_total'] = (int)$row['placed_m'] + (int)$row['placed_f'];
+        $row['hired_total']  = (int)$row['hired_m'] + (int)$row['hired_f'];
         $row['ffi_total']     = (int)$row['ffi_m']         + (int)$row['ffi_f'];
 
         $rows[] = $row;
@@ -213,13 +217,21 @@ if ($method === 'GET') {
     $stmt->close();
 
     // ── Summary card totals ────────────────────────────────────────────────
-    $totals = ['job_vacancies'=>0,'employers'=>0,'interviewed'=>0,'qualified'=>0,'placed'=>0];
+    $totals = [
+        'job_vacancies' => 0,
+        'employers'     => 0,
+        'interviewed'   => 0,
+        'qualified'     => 0,
+        'placed'        => 0,
+        'hired'         => 0,
+    ];
     $uniqueEmployers = [];
     foreach ($rows as $r) {
         $totals['job_vacancies'] += (int)$r['vacancy_total'];
         $totals['interviewed']   += (int)$r['int_total'];
         $totals['qualified']     += (int)$r['qual_total'];
-        $totals['placed']        += (int)$r['placed_total'];
+        $totals['placed'] += (int)$r['placed_total'];
+        $totals['hired']  += (int)$r['hired_total'];
         $uniqueEmployers[$r['company_id']] = true;
     }
     $totals['employers'] = count($uniqueEmployers);
@@ -233,6 +245,7 @@ if ($method === 'GET') {
         'qual_m','qual_f','qual_total',
         'nqual_m','nqual_f','nqual_total',
         'placed_m','placed_f','placed_total',
+        'hired_m', 'hired_f', 'hired_total',
         'ffi_m','ffi_f','ffi_total',
     ];
     $grandTotals = [];

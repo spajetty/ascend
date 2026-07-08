@@ -123,6 +123,7 @@ try {
             DATE_FORMAT(b.created_at, '%M') AS month,
             YEAR(b.created_at)              AS year,
             SUM(CASE WHEN b.classification = 'Registered'                        THEN 1 ELSE 0 END) AS total_registered,
+            0 AS total_placed,
             SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired')   THEN 1 ELSE 0 END) AS total_hired
         FROM beneficiaries b
         JOIN programs p ON p.program_id = b.program_id
@@ -138,12 +139,14 @@ try {
                 x.year_num,
                 x.month_num,
                 SUM(x.total_registered) AS total_registered,
+                SUM(x.total_placed) AS total_placed,
                 SUM(x.total_hired)      AS total_hired
             FROM (
                 SELECT
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN jobmatch jm ON jm.benef_id = b.benef_id
@@ -157,6 +160,7 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN firstjobseek fjs ON fjs.benef_id = b.benef_id
@@ -170,7 +174,8 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
-                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
+                    SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed') THEN 1 ELSE 0 END) AS total_placed, 
+                    SUM(CASE WHEN b.classification = 'Hired' THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN jobfair jf ON jf.benef_id = b.benef_id
                 JOIN import_batches ib ON ib.batch_id = jf.batch_id
@@ -183,6 +188,7 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN whip w ON w.benef_id = b.benef_id
@@ -196,6 +202,7 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN spes s ON s.benef_id = b.benef_id
@@ -209,6 +216,7 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN gip g ON g.benef_id = b.benef_id
@@ -222,6 +230,7 @@ try {
                     ib.year  AS year_num,
                     ib.month AS month_num,
                     SUM(CASE WHEN b.classification = 'Registered' THEN 1 ELSE 0 END) AS total_registered,
+                    0 AS total_placed,
                     SUM(CASE WHEN b.classification IN ('Placed/Hots','Placed','Hired') THEN 1 ELSE 0 END) AS total_hired
                 FROM beneficiaries b
                 JOIN wiirp w ON w.benef_id = b.benef_id
@@ -248,11 +257,13 @@ try {
                     'year'             => $yearNum,
                     'month_label'      => $monthName . ' ' . $yearNum,
                     'total_registered' => 0,
+                    'total_placed'     => 0,
                     'total_hired'      => 0,
                 ];
             }
 
             $monthTotals[$key]['total_registered'] += (int) $row['total_registered'];
+            $monthTotals[$key]['total_placed'] += (int) $row['total_placed'];
             $monthTotals[$key]['total_hired']      += (int) $row['total_hired'];
         }
 

@@ -560,9 +560,9 @@ function renderJobFair(data) {
                         ${t(r.placed_f)}
                         ${tTotal(r.placed_total,'text-orange-400','bg-orange-50')}
 
-                        ${tL(r.hots_m)}
-                        ${t(r.hots_f)}
-                        ${tTotal(r.hots_total,'text-amber-500','bg-amber-50')}
+                        ${tL(r.hired_m)}
+                        ${t(r.hired_f)}
+                        ${tTotal(r.hired_total,'text-amber-500','bg-amber-50')}
 
                         ${tL(r.ffi_m)}
                         ${t(r.ffi_f)}
@@ -609,7 +609,7 @@ function renderJobFair(data) {
         </td>
 
         <td colspan="3" class="px-3 py-2 text-center font-bold text-amber-500 bg-amber-100 border-l border-gray-100">
-            ${data.grandTotals.hots_total}
+            ${data.grandTotals.hired_total}
         </td>
 
         <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">
