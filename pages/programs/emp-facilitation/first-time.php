@@ -110,7 +110,7 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                             <th class="px-2 py-2 text-center text-gray-400 font-semibold tracking-wide border-l border-gray-100" rowspan="2">ACTIONS</th>
                         </tr>
@@ -184,25 +184,6 @@ require_once __DIR__ . '/../../../includes/layout/sidebar.php';
     </div>
 </div>
 
-<!-- Save Modal -->
-<div id="saveModal" class="fixed inset-0 flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-sm mx-4">
-        <div class="flex items-center gap-3 mb-4">
-            <div class="bg-green-100 p-3 rounded-lg">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900">Save Changes</h3>
-        </div>
-        <p class="text-gray-600 mb-6">Do you want to save the changes to this entry?</p>
-        <div class="flex gap-3">
-            <button onclick="closeSaveModal()" class="flex-1 px-4 py-2 rounded-lg border border-gray-200 text-gray-700 font-medium hover:bg-gray-50">Cancel</button>
-            <button onclick="confirmSave()" class="flex-1 px-4 py-2 rounded-lg bg-green-500 text-white font-medium hover:bg-green-600">Save</button>
-        </div>
-    </div>
-</div>
-
 <!-- Error Toast -->
 <div id="errorToast" class="fixed bottom-6 right-6 bg-red-500 text-white px-5 py-3 rounded-xl shadow-lg text-sm hidden z-50"></div>
 
@@ -214,8 +195,6 @@ let allRows      = [];
 let currentPage  = 1;
 let selectedYear = new Date().getFullYear();
 let deletingId   = null;
-let savingId     = null;
-let editSnapshot = {};
 
 // ─── API ───────────────────────────────────────────────────────────────────
 async function fetchData(year) {
@@ -239,16 +218,6 @@ async function deleteRecord(id) {
     if (!json.success) throw new Error(json.error);
 }
 
-async function updateRecord(id, payload) {
-    const res  = await fetch(API_URL, {
-        method:  'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ jobseek_id: id, ...payload }),
-    });
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error);
-}
-
 // ─── Row builder ───────────────────────────────────────────────────────────
 function mft(m, f, tc, bg) {
     // M cell | F cell | Total cell
@@ -263,8 +232,8 @@ function buildRow(r) {
     <tr class="border-b border-gray-50 hover:bg-gray-50" data-id="${id}">
         <td class="px-4 py-2 text-gray-700 font-medium">${r.month} ${r.year}</td>
         ${mft(r.reg_m, r.reg_f, 'text-teal-600', 'bg-teal-50')}
-        <td class="px-3 py-2 text-center font-semibold text-pink-500 border-l border-gray-100 editable-permit">${r.occ_permit}</td>
-        <td class="px-3 py-2 text-center font-semibold text-green-500 editable-health">${r.health_card}</td>
+        <td class="px-3 py-2 text-center font-semibold text-pink-500 border-l border-gray-100">${r.occ_permit}</td>
+        <td class="px-3 py-2 text-center font-semibold text-green-500">${r.health_card}</td>
         ${mft(r.int_m,   r.int_f,   'text-cyan-500',   'bg-cyan-50')}
         ${mft(r.qual_m,  r.qual_f,  'text-green-500',  'bg-green-50')}
         ${mft(r.nqual_m, r.nqual_f, 'text-red-400',    'bg-red-50')}
@@ -272,17 +241,8 @@ function buildRow(r) {
         ${mft(r.ffi_m,   r.ffi_f,   'text-purple-400', 'bg-purple-50')}
         <td class="px-3 py-2 text-center border-l border-gray-100">
             <div class="flex items-center justify-center gap-2">
-                <button onclick="startEdit(${id})" class="edit-btn text-yellow-500 hover:text-yellow-600" title="Edit">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                </button>
                 <button onclick="promptDelete(${id})" class="delete-btn text-red-400 hover:text-red-600" title="Delete">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                </button>
-                <button onclick="promptSave(${id})" class="save-btn hidden text-green-500 hover:text-green-600" title="Save">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                </button>
-                <button onclick="cancelEdit(${id})" class="cancel-btn hidden text-gray-400 hover:text-gray-600" title="Cancel">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
         </td>
@@ -332,7 +292,8 @@ function renderTable() {
     const end     = Math.min(start + ROWS_PER_PAGE, total);
 
     if (total === 0) {
-        tbody.innerHTML = `<tr><td colspan="22" class="px-4 py-8 text-center text-gray-400 text-sm">No data found for this year.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="22" class="px-4 py-8 text-center text-gray-400 text-sm">No data found for this year.</td></tr>` +
+                          buildTotalRow(allRows);
     } else {
         tbody.innerHTML = allRows.slice(start, end).map(buildRow).join('') + buildTotalRow(allRows);
     }
@@ -384,85 +345,6 @@ function getRowEl(id) {
     return document.querySelector(`tr[data-id="${id}"]`);
 }
 
-function startEdit(id) {
-    const row = getRowEl(id);
-    if (!row) return;
-    row.classList.add('bg-yellow-50');
-
-    // Only Occ. Permit and Health Card are directly editable
-    // (M/F counts come from beneficiaries table)
-    const permit = row.querySelector('.editable-permit');
-    const health = row.querySelector('.editable-health');
-    editSnapshot[id] = { permit: permit.textContent.trim(), health: health.textContent.trim() };
-
-    [permit, health].forEach(cell => {
-        cell.contentEditable = 'true';
-        cell.classList.add('border', 'border-yellow-300', 'bg-white', 'outline-none');
-    });
-
-    row.querySelector('.edit-btn').classList.add('hidden');
-    row.querySelector('.delete-btn').classList.add('hidden');
-    row.querySelector('.save-btn').classList.remove('hidden');
-    row.querySelector('.cancel-btn').classList.remove('hidden');
-}
-
-function cancelEdit(id) {
-    const row = getRowEl(id);
-    if (!row) return;
-    const snap = editSnapshot[id] || {};
-    const permit = row.querySelector('.editable-permit');
-    const health = row.querySelector('.editable-health');
-    if (permit) { permit.contentEditable = 'false'; permit.textContent = snap.permit ?? permit.textContent; permit.classList.remove('border','border-yellow-300','bg-white','outline-none'); }
-    if (health) { health.contentEditable = 'false'; health.textContent = snap.health ?? health.textContent; health.classList.remove('border','border-yellow-300','bg-white','outline-none'); }
-    row.classList.remove('bg-yellow-50');
-    row.querySelector('.edit-btn').classList.remove('hidden');
-    row.querySelector('.delete-btn').classList.remove('hidden');
-    row.querySelector('.save-btn').classList.add('hidden');
-    row.querySelector('.cancel-btn').classList.add('hidden');
-    delete editSnapshot[id];
-}
-
-function promptSave(id) { savingId = id; showModal('saveModal'); }
-
-async function confirmSave() {
-    const id  = savingId;
-    const row = getRowEl(id);
-    closeModal('saveModal');
-    if (!row || !id) return;
-
-    const permit = row.querySelector('.editable-permit');
-    const health = row.querySelector('.editable-health');
-    const payload = {
-        occ_permit:  parseInt(permit.textContent.trim()) || 0,
-        health_card: parseInt(health.textContent.trim()) || 0,
-    };
-
-    try {
-        await updateRecord(id, payload);
-        [permit, health].forEach(cell => {
-            cell.contentEditable = 'false';
-            cell.classList.remove('border','border-yellow-300','bg-white','outline-none');
-        });
-        row.classList.remove('bg-yellow-50');
-        row.querySelector('.edit-btn').classList.remove('hidden');
-        row.querySelector('.delete-btn').classList.remove('hidden');
-        row.querySelector('.save-btn').classList.add('hidden');
-        row.querySelector('.cancel-btn').classList.add('hidden');
-        delete editSnapshot[id];
-
-        row.style.transition = 'background-color 0.3s';
-        row.style.backgroundColor = '#dcfce7';
-        setTimeout(() => { row.style.backgroundColor = ''; row.style.transition = ''; }, 1500);
-
-        const record = allRows.find(r => r.jobseek_id == id);
-        if (record) Object.assign(record, payload);
-        updateCards(buildSummaryTotals());
-    } catch (e) {
-        showError('Save failed: ' + e.message);
-    }
-    savingId = null;
-}
-
 function buildSummaryTotals() {
     let jobseekers = 0, occ = 0, hc = 0, placed = 0;
     allRows.forEach(r => {
@@ -509,10 +391,9 @@ function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
 }
 function closeDeleteModal() { closeModal('deleteModal'); deletingId = null; }
-function closeSaveModal()   { closeModal('saveModal');   savingId   = null; }
 
 document.addEventListener('click', e => {
-    if (e.target.id === 'modalBackdrop') { closeDeleteModal(); closeSaveModal(); }
+    if (e.target.id === 'modalBackdrop') { closeDeleteModal(); }
 });
 
 // ─── UI helpers ────────────────────────────────────────────────────────────

@@ -94,7 +94,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -133,7 +133,7 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -176,7 +176,8 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th colspan="3" class="px-2 py-2 text-center text-cyan-500 font-semibold tracking-wide border-l border-gray-100">INTERVIEWED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-green-500 font-semibold tracking-wide border-l border-gray-100">QUALIFIED</th>
                             <th colspan="3" class="px-2 py-2 text-center text-red-400 font-semibold tracking-wide border-l border-gray-100">NOT QUALIFIED</th>
-                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED / HOTS</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-orange-400 font-semibold tracking-wide border-l border-gray-100">PLACED</th>
+                            <th colspan="3" class="px-2 py-2 text-center text-amber-500 font-semibold tracking-wide border-l border-gray-100">HOTS</th>
                             <th colspan="3" class="px-2 py-2 text-center text-purple-400 font-semibold tracking-wide border-l border-gray-100">FOR FURTHER INTERVIEW</th>
                         </tr>
                         <tr class="border-b border-gray-100 bg-gray-50">
@@ -187,11 +188,12 @@ require_once __DIR__ . '/../../includes/layout/sidebar.php';
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-green-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-red-400">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-orange-400">T</th>
+                            <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-amber-500">T</th>
                             <th class="px-3 py-1 text-center text-gray-500 font-medium border-l border-gray-100">M</th><th class="px-3 py-1 text-center text-gray-500 font-medium">F</th><th class="px-3 py-1 text-center font-semibold text-purple-400">T</th>
                         </tr>
                     </thead>
                     <tbody id="jobfair-tbody">
-                        <tr><td colspan="28" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
+                        <tr><td colspan="31" class="text-center py-6 text-gray-400 text-sm">Loading...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -260,10 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function escHtml(s) {
     return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-function t(v)  { return `<td class="px-3 py-2 text-center text-gray-600">${v}</td>`; }
-function tL(v) { return `<td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">${v}</td>`; }
+function t(v)  { return `<td class="px-3 py-2 text-center text-gray-600">${(+v) || 0}</td>`; }
+function tL(v) { return `<td class="px-3 py-2 text-center text-gray-600 border-l border-gray-100">${(+v) || 0}</td>`; }
 function tTotal(v, color, bg) {
-    return `<td class="px-3 py-2 text-center font-semibold ${color} ${bg}">${v}</td>`;
+    return `<td class="px-3 py-2 text-center font-semibold ${color} ${bg}">${(+v) || 0}</td>`;
 }
 
 // ─── Job Matching & Referral ──────────────────────────────────────────────────
@@ -299,15 +301,23 @@ function renderJobMatch(data) {
         </tr>`;
     });
 
+    // Compute full-dataset totals for columns not provided by the API's `totals` object
+    const gt = { qual_m:0, qual_f:0, nqual_m:0, nqual_f:0, ffi_m:0, ffi_f:0 };
+    data.rows.forEach(r => {
+        gt.qual_m  += +r.qual_m  || 0; gt.qual_f  += +r.qual_f  || 0;
+        gt.nqual_m += +r.nqual_m || 0; gt.nqual_f += +r.nqual_f || 0;
+        gt.ffi_m   += +r.ffi_m   || 0; gt.ffi_f   += +r.ffi_f   || 0;
+    });
+
     html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
         <td class="px-4 py-2 text-gray-800 font-bold">TOTAL</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${totals.registered}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.referred}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${totals.interviewed}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">${totals.placed}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">—</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-teal-600 bg-teal-100 border-l border-gray-100">${totals.registered || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.referred || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${totals.interviewed || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">${gt.qual_m + gt.qual_f}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">${gt.nqual_m + gt.nqual_f}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">${totals.placed || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">${gt.ffi_m + gt.ffi_f}</td>
     </tr>`;
 
     tbody.innerHTML = html;
@@ -346,16 +356,25 @@ function renderFirstTime(data) {
         </tr>`;
     });
 
+    // Compute full-dataset totals for columns not provided by the API's `totals` object
+    const gt = { int_m:0, int_f:0, qual_m:0, qual_f:0, nqual_m:0, nqual_f:0, ffi_m:0, ffi_f:0 };
+    data.rows.forEach(r => {
+        gt.int_m   += +r.int_m   || 0; gt.int_f   += +r.int_f   || 0;
+        gt.qual_m  += +r.qual_m  || 0; gt.qual_f  += +r.qual_f  || 0;
+        gt.nqual_m += +r.nqual_m || 0; gt.nqual_f += +r.nqual_f || 0;
+        gt.ffi_m   += +r.ffi_m   || 0; gt.ffi_f   += +r.ffi_f   || 0;
+    });
+
     html += `<tr class="bg-gray-50 font-semibold border-t-2 border-gray-200">
         <td class="px-4 py-2 text-gray-800 font-bold">TOTAL</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${totals.jobseekers}</td>
-        <td class="px-3 py-2 text-center font-bold text-teal-500 bg-teal-100 border-l border-gray-100">${totals.occ_permit}</td>
-        <td class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.health_card}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">—</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">${totals.placed}</td>
-        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">—</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-pink-500 bg-pink-100 border-l border-gray-100">${totals.jobseekers || 0}</td>
+        <td class="px-3 py-2 text-center font-bold text-teal-500 bg-teal-100 border-l border-gray-100">${totals.occ_permit || 0}</td>
+        <td class="px-3 py-2 text-center font-bold text-blue-500 bg-blue-100 border-l border-gray-100">${totals.health_card || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-cyan-500 bg-cyan-100 border-l border-gray-100">${gt.int_m + gt.int_f}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-green-500 bg-green-100 border-l border-gray-100">${gt.qual_m + gt.qual_f}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-red-400 bg-red-100 border-l border-gray-100">${gt.nqual_m + gt.nqual_f}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">${totals.placed || 0}</td>
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">${gt.ffi_m + gt.ffi_f}</td>
     </tr>`;
 
     tbody.innerHTML = html;
@@ -365,7 +384,7 @@ function renderFirstTime(data) {
 function renderJobFair(data) {
     const tbody = document.getElementById('jobfair-tbody');
     if (!data || !data.rows.length) {
-        clearLoading('jobfair-tbody', 28);
+        clearLoading('jobfair-tbody', 31);
         return;
     }
 
@@ -541,6 +560,10 @@ function renderJobFair(data) {
                         ${t(r.placed_f)}
                         ${tTotal(r.placed_total,'text-orange-400','bg-orange-50')}
 
+                        ${tL(r.hots_m)}
+                        ${t(r.hots_f)}
+                        ${tTotal(r.hots_total,'text-amber-500','bg-amber-50')}
+
                         ${tL(r.ffi_m)}
                         ${t(r.ffi_f)}
                         ${tTotal(r.ffi_total,'text-purple-400','bg-purple-50')}
@@ -583,6 +606,10 @@ function renderJobFair(data) {
 
         <td colspan="3" class="px-3 py-2 text-center font-bold text-orange-400 bg-orange-100 border-l border-gray-100">
             ${data.grandTotals.placed_total}
+        </td>
+
+        <td colspan="3" class="px-3 py-2 text-center font-bold text-amber-500 bg-amber-100 border-l border-gray-100">
+            ${data.grandTotals.hots_total}
         </td>
 
         <td colspan="3" class="px-3 py-2 text-center font-bold text-purple-400 bg-purple-100 border-l border-gray-100">

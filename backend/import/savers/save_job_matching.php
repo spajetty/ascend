@@ -103,7 +103,7 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
     }
 
     if ($program === 'First Time Jobseeker' && tableExists($conn, 'firstjobseek')) {
-        $occPermit = toBoolInt(rowValue($row, ['Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
+        $occPermit = toBoolInt(rowValue($row, ['Occ. Permit', 'Occupational Permit', 'occ_permit', 'Occ Permit'], 0));
         $healthCard = toBoolInt(rowValue($row, ['Health Card', 'health_card'], 0));
         $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
         if (tableHasColumn($conn, 'firstjobseek', 'company_id')) {
