@@ -113,6 +113,7 @@ export const classificationColors = {
     'Qualified': 'bg-emerald-100 text-emerald-700',
     'Not Qualified': 'bg-red-100 text-red-600',
     'Placed/Hots': 'bg-teal-100 text-teal-700',
+    'HOTS': 'bg-amber-100 text-amber-700',
     'For Further Interview': 'bg-yellow-100 text-yellow-700',
 
     // ── First Time Job Seekers (shares most with Job Matching) ───────────────

@@ -1,3 +1,5 @@
+import { openCreateEventModal } from '../../../../assets/js/imports/job-fair-modal.js';
+
 import { statusesByProgram } from '../../../../assets/js/imports/config.js';
 
 // Populate Program select based on the local PROGRAMS constants below
@@ -367,8 +369,8 @@ function bindCompanyAutocomplete() {
 
 let allJobFairEvents = [];
 
-async function fetchAllJobFairEvents() {
-  if (allJobFairEvents.length > 0) return;
+async function fetchAllJobFairEvents(force = false) {
+  if (!force && allJobFairEvents.length > 0) return;
   try {
     const res = await fetch('../../backend/import/get_all_job_fair_events.php');
     if (!res.ok) return;
@@ -402,6 +404,7 @@ function bindJobFairAutocomplete() {
   const eventChips = $('mf-jfevent-chips');
   const eventHiddens = $('mf-jfevent-hiddens');
   const eventValidator = $('mf-jfevent');
+  const addEventBtn = $('mf-add-jfevent');
   
   const compWrapper = $('mf-jfcompanies-wrapper');
   const compLists = $('mf-jfcompany-lists');
@@ -410,6 +413,55 @@ function bindJobFairAutocomplete() {
   let selectedEvents = [];
   let selectedCompaniesByEvent = {};
   let cachedCompaniesByEvent = {};
+
+  const normalizeCompanies = (items) => {
+    if (!Array.isArray(items)) return [];
+    const seen = new Set();
+    const out = [];
+    items.forEach(item => {
+      const companyId = Number(item?.company_id);
+      const companyName = String(item?.company_name ?? '').trim();
+      if (!companyId || !companyName || seen.has(companyId)) return;
+      seen.add(companyId);
+      out.push({ company_id: companyId, company_name: companyName });
+    });
+    return out;
+  };
+
+  async function addEventWithCompaniesById(eventId, seedCompanies = []) {
+    if (!eventId) return;
+
+    await fetchAllJobFairEvents(true);
+    const selectedId = Number(eventId);
+    const ev = allJobFairEvents.find(e => Number(e.jobfairevent_id) === selectedId);
+    if (!ev) {
+      if (typeof window.showToast === 'function') {
+        window.showToast('Created event was not found in the event list. Please refresh and try again.', 'warning');
+      }
+      return;
+    }
+
+    const alreadySelected = selectedEvents.some(e => Number(e.jobfairevent_id) === selectedId);
+    if (!alreadySelected) {
+      selectedEvents.push(ev);
+    }
+
+    const normalized = normalizeCompanies(seedCompanies);
+    if (!selectedCompaniesByEvent[selectedId]) {
+      selectedCompaniesByEvent[selectedId] = [];
+    }
+
+    normalized.forEach(comp => {
+      if (!selectedCompaniesByEvent[selectedId].some(existing => Number(existing.company_id) === Number(comp.company_id))) {
+        selectedCompaniesByEvent[selectedId].push(comp);
+      }
+    });
+
+    cachedCompaniesByEvent[selectedId] = await fetchEventParticipants(selectedId);
+
+    renderEvents();
+    await renderCompanySections();
+  }
 
   function validateCompanies() {
     let hasAll = true;
@@ -614,6 +666,17 @@ function bindJobFairAutocomplete() {
       if (eventDropdown && !eventInput.parentElement.contains(e.target)) {
         eventDropdown.classList.add('hidden');
       }
+    });
+  }
+
+  if (addEventBtn) {
+    addEventBtn.addEventListener('click', () => {
+      openCreateEventModal(async ({ eventId, participants }) => {
+        await addEventWithCompaniesById(eventId, participants || []);
+      }, {
+        importedCompanies: [],
+        unmatchedCompanies: [],
+      });
     });
   }
 }
