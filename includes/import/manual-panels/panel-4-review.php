@@ -57,6 +57,12 @@
                                 </dl>
                             </div>
                         </div>
+                        <div class="mf-rv-section" id="mf-rv-prog-details-sec" style="display:none;">
+                            <div class="mf-rv-title" id="mf-rv-prog-title">Program Details</div>
+                            <div class="mf-rv-grid" id="mf-rv-prog-grid">
+                                <!-- Dynamically populated -->
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="mf-btn-row">
