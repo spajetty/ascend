@@ -371,6 +371,10 @@ function resolveEmployer(mysqli $conn, string $name, ?int $batchId = null, array
         }
     }
 
+    if (isset($meta['allow_create']) && $meta['allow_create'] === false) {
+        return ['id' => null, 'created' => false];
+    }
+
     $columns = ['company_name'];
     $placeholders = ['?'];
     $bindTypes = 's';

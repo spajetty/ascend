@@ -20,11 +20,9 @@
                             <div class="mf-field mf-col2">
                                 <label for="mf-company">Company <span class="mf-req">*</span> <span class="mf-hint">Type
                                         to search</span></label>
-                                <input type="text" id="mf-company" name="company_name"
-                                    placeholder="Search company name…" list="mf-company-list">
-                                <datalist id="mf-company-list">
-                                    <!-- TODO: populate from DB query on employers table -->
-                                </datalist>
+                                <input type="text" id="mf-company" class="mf-company-autocomplete" name="company_name"
+                                    placeholder="Search company name…" data-hidden="mf-h-company-id">
+
                                 <input type="hidden" name="company_id" id="mf-h-company-id" value="">
                             </div>
                             <div class="mf-field">
@@ -177,7 +175,7 @@
                     </div>
                     <div class="mf-card-body">
                         <div class="mf-grid mf-grid-2">
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field mf-col2 mf-wiirp-only" style="display:none;">
                                 <label>Type</label>
                                 <div class="mf-chip-group">
                                     <div class="mf-chip on" data-group="inttype" data-val="inquiry">Inquiry</div>
@@ -207,8 +205,15 @@
                             <!-- WIIRP only -->
                             <div class="mf-field mf-wiirp-only" style="display:none;">
                                 <label for="mf-year-level">Year Level</label>
-                                <input type="text" id="mf-year-level" name="year_level"
-                                    placeholder="e.g. 3rd Year / Grade 12">
+                                <select id="mf-year-level" name="year_level">
+                                    <option value="">— select —</option>
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                    <option value="1st Year College">1st Year College</option>
+                                    <option value="2nd Year College">2nd Year College</option>
+                                    <option value="3rd Year College">3rd Year College</option>
+                                    <option value="4th Year College">4th Year College</option>
+                                </select>
                             </div>
                             <div class="mf-field">
                                 <label for="mf-req-hours">Required Hours</label>
@@ -221,13 +226,28 @@
                             </div>
                             <div class="mf-field">
                                 <label for="mf-pref-org">Preferred Org Type</label>
-                                <input type="text" id="mf-pref-org" name="preferred_org_type"
-                                    placeholder="e.g. Government">
+                                <select id="mf-pref-org" name="preferred_org_type">
+                                    <option value="">— select —</option>
+                                    <option value="Quezon City Government Office">Quezon City Government Office</option>
+                                    <option value="Private Company / Establishment">Private Company / Establishment</option>
+                                    <option value="No Preference">No Preference</option>
+                                </select>
                             </div>
                             <div class="mf-field">
                                 <label for="mf-pref-ind">Preferred Industry</label>
-                                <input type="text" id="mf-pref-ind" name="preferred_industry"
-                                    placeholder="e.g. IT &amp; Communications">
+                                <select id="mf-pref-ind" name="preferred_industry" onchange="document.getElementById('mf-pref-ind-other').style.display = this.value === 'Other' ? 'block' : 'none';">
+                                    <option value="">— select —</option>
+                                    <option value="Office Administration">Office Administration</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Customer Service / Retail">Customer Service / Retail</option>
+                                    <option value="Hospitality / Tourism">Hospitality / Tourism</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Accounting / Finance">Accounting / Finance</option>
+                                    <option value="Human Resources">Human Resources</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="mf-pref-ind-other" name="preferred_industry_other" placeholder="Please specify" style="display:none; margin-top: 0.5rem;">
                             </div>
                             <div class="mf-field mf-col2">
                                 <label>Willing to work outside QC?</label>
@@ -240,8 +260,14 @@
                             <!-- WIIRP only -->
                             <div class="mf-field mf-wiirp-only" style="display:none;">
                                 <label for="mf-int-sched">Internship Schedule</label>
-                                <input type="text" id="mf-int-sched" name="internship_sched"
-                                    placeholder="e.g. MWF 8am–5pm">
+                                <select id="mf-int-sched" name="internship_sched" onchange="document.getElementById('mf-int-sched-other').style.display = this.value === 'Other' ? 'block' : 'none';">
+                                    <option value="">— select —</option>
+                                    <option value="Weekdays (Mon–Fri)">Weekdays (Mon–Fri)</option>
+                                    <option value="Weekends (Sat–Sun)">Weekends (Sat–Sun)</option>
+                                    <option value="Flexible">Flexible</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="mf-int-sched-other" name="internship_sched_other" placeholder="Please specify" style="display:none; margin-top: 0.5rem;">
                             </div>
                             <div class="mf-field">
                                 <label for="mf-int-start">Start Date</label>
@@ -253,7 +279,8 @@
                             </div>
                         </div>
 
-                        <div class="mf-sec-rule"><span>Office Assignment (if PESO-assigned)</span></div>
+                        <div id="mf-int-assignment-sec" style="display:none;">
+                            
 
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
@@ -278,6 +305,7 @@
                                 <label for="mf-endorse2">Endorsement Letter 2</label>
                                 <input type="text" id="mf-endorse2" name="endorsement_2"
                                     placeholder="Filename / reference">
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -390,8 +418,9 @@
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
                                 <label for="mf-accred-company">Company <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-accred-company" name="accred_company"
-                                    placeholder="Search company name…" list="mf-company-list">
+                                <input type="text" id="mf-accred-company" class="mf-company-autocomplete" name="accred_company"
+                                    placeholder="Search company name…" data-hidden="mf-h-accred-company-id">
+                                <input type="hidden" name="accred_company_id" id="mf-h-accred-company-id" value="">
                             </div>
                             <div class="mf-field">
                                 <label>Status</label>

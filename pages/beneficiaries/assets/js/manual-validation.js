@@ -61,12 +61,48 @@ export function validatePanel(idx, selectedProgram) {
         'mf-spes-batch'
       );
     }
+    if (selectedProgram === 'wiirp') {
+      req2.push(
+        'mf-int-school',
+        'mf-int-course',
+        'mf-year-level',
+        'mf-req-hours',
+        'mf-contract-period',
+        'mf-pref-org',
+        'mf-pref-ind',
+        'mf-int-sched',
+        'mf-int-batch'
+      );
+      
+      if ($('mf-pref-ind')?.value === 'Other') {
+        req2.push('mf-pref-ind-other');
+      }
+      if ($('mf-int-sched')?.value === 'Other') {
+        req2.push('mf-int-sched-other');
+      }
+      
+      const type = $('mf-h-inttype')?.value || 'inquiry';
+      if (type === 'peso-assigned' || type === 'private') {
+        req2.push('mf-office', 'mf-assign-start', 'mf-assign-end');
+      }
+      if (type === 'private') {
+        req2.push('mf-endorse1', 'mf-endorse2');
+      }
+    }
     
     for (const id of req2) {
       const el = $(id);
-      if (el && !el.value.trim()) {
-        isValid = false;
-        if (!firstInvalid) firstInvalid = el;
+      if (el) {
+        if (!el.value.trim()) {
+          isValid = false;
+          if (!firstInvalid) firstInvalid = el;
+        } else if (el.dataset.hidden) {
+          const hiddenEl = $(el.dataset.hidden);
+          if (hiddenEl && !hiddenEl.value.trim()) {
+            isValid = false;
+            if (!firstInvalid) firstInvalid = el;
+          }
+        }
       }
     }
 
