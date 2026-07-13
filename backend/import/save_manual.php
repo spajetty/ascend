@@ -18,10 +18,11 @@ require_once __DIR__ . '/helpers/followup_utils.php';
 require_once __DIR__ . '/savers/save_common_person.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
 require_once __DIR__ . '/savers/save_spes.php';
+require_once __DIR__ . '/savers/save_wiirp.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Work Immersion and Internship Referral Program'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -68,12 +69,30 @@ try {
         'school' => $_POST['spes_school'] ?? '',
         'student_type' => $_POST['student_type'] ?? '',
         'highest_educ' => $_POST['highest_educ'] ?? '',
-        'course' => $_POST['course'] ?? '',
+        'course' => !empty($_POST['course']) ? $_POST['course'] : ($_POST['int_course'] ?? ''),
         'store_assignment' => $_POST['store_assignment'] ?? '',
         '_spes_category' => $_POST['spes_category'] ?? '',
         'start_of_contract' => $_POST['start_of_contract'] ?? '',
         'end_of_contract' => $_POST['end_of_contract'] ?? '',
-        'days' => $_POST['days'] ?? ''
+        'days' => $_POST['days'] ?? '',
+        
+        // WIIRP Fields
+        'school' => !empty($_POST['spes_school']) ? $_POST['spes_school'] : ($_POST['int_school'] ?? ''),
+        'course' => !empty($_POST['course']) ? $_POST['course'] : ($_POST['int_course'] ?? ''),
+        'year_level' => $_POST['year_level'] ?? '',
+        'contract_period' => $_POST['contract_period'] ?? '',
+        'required_hours' => $_POST['required_hours'] ?? '',
+        'inquiry_type' => $_POST['inquiry_type'] ?? 'inquiry',
+        'preferred_org_type' => $_POST['preferred_org_type'] ?? '',
+        'preferred_industry' => (($_POST['preferred_industry'] ?? '') === 'Other' && !empty($_POST['preferred_industry_other'])) ? $_POST['preferred_industry_other'] : ($_POST['preferred_industry'] ?? ''),
+        'is_willing_outside' => $_POST['is_willing_outside'] ?? '',
+        'internship_sched' => (($_POST['internship_sched'] ?? '') === 'Other' && !empty($_POST['internship_sched_other'])) ? $_POST['internship_sched_other'] : ($_POST['internship_sched'] ?? ''),
+        'start' => $_POST['int_start'] ?? '',
+        '_parsed_start_date' => $_POST['assign_start'] ?? '', // Assignment start
+        '_parsed_end_date' => $_POST['assign_end'] ?? '',     // Assignment end
+        'office_assignment' => $_POST['office_assignment'] ?? '',
+        'endorsement_1' => $_POST['endorsement_1'] ?? '',
+        'endorsement_2' => $_POST['endorsement_2'] ?? ''
     ];
 
     $duplicate = checkDuplicate(
@@ -124,6 +143,8 @@ try {
         'program' => $program,
         'programId' => $programId,
         'batchId' => $batchId,
+        'wiirpCategory' => trim((string)($_POST['inquiry_type'] ?? 'inquiry')),
+        'is_manual' => true
     ];
 
     $state = [
@@ -196,6 +217,12 @@ try {
         if ($result !== 'saved') {
             throw new RuntimeException("Failed to save SPES record.");
         }
+    } elseif ($program === 'Work Immersion and Internship Referral Program') {
+        $row['_sys_benef_id'] = $benefId;
+        $result = saveWiirpRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save WIIRP record.");
+        }
     } else {
         $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
         if ($result !== 'saved') {
@@ -208,6 +235,7 @@ try {
     echo json_encode([
         'success' => true,
         'beneficiary_id' => $benefId,
+        'state' => $state,
         'warnings' => array_values(array_unique($state['warnings'])),
     ]);
 
