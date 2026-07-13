@@ -13,15 +13,15 @@
 
                         <!-- Name row: Last / First / Middle / Suffix -->
                         <div class="mf-grid mf-grid-4" style="margin-bottom:13px;">
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field">
                                 <label for="mf-lname">Last Name <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-lname" name="last_name" placeholder="e.g. Dela Cruz">
                             </div>
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field">
                                 <label for="mf-fname">First Name <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-fname" name="first_name" placeholder="e.g. Juan">
                             </div>
-                            <div class="mf-field mf-col3">
+                            <div class="mf-field">
                                 <label for="mf-mname">Middle Name</label>
                                 <input type="text" id="mf-mname" name="middle_name" placeholder="Optional">
                             </div>
