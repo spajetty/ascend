@@ -959,14 +959,54 @@ function bindFlags() {
 function bindDob() {
   const dob = $('mf-dob');
   if (!dob) return;
-  dob.addEventListener('change', () => {
-    const hint = $('mf-age-hint');
-    if (!dob.value) { hint.textContent = ''; return; }
-    const age = Math.floor(
-      (Date.now() - new Date(dob.value).getTime()) / (365.25 * 24 * 3600 * 1000)
-    );
-    hint.textContent = `${age} years old`;
-  });
+  const ageField = $('mf-age');
+
+  // Block future dates in the native date picker
+  const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  dob.max = todayStr;
+
+  const updateAge = () => {
+    if (!ageField) return;
+    if (!dob.value) {
+      ageField.value = '';
+      return;
+    }
+
+    const birthDate = new Date(dob.value);
+    if (Number.isNaN(birthDate.getTime())) {
+      ageField.value = '';
+      return;
+    }
+
+    // Guard against a future date typed in manually (bypasses the max attribute)
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (birthDate > now) {
+      dob.value = '';
+      ageField.value = '';
+      if (typeof window.showToast === 'function') {
+        window.showToast('Date of birth cannot be in the future.', 'warning');
+      } else {
+        alert('Date of birth cannot be in the future.');
+      }
+      return;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    ageField.value = `${age} years old`;
+  };
+
+  dob.addEventListener('change', updateAge);
+  dob.addEventListener('input', updateAge);
+  updateAge();
 }
 
 // ── FILE SLOTS ────────────────────────────────────────────────────
