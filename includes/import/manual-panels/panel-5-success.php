@@ -13,9 +13,12 @@
                             id="mf-success-id">
                             Benef #—
                         </div>
-                        <div class="mf-btn-row" style="justify-content:center;">
+                        <div class="mf-btn-row" style="justify-content:center; gap: 8px;">
                             <button type="button" class="mf-btn mf-btn-primary" id="mf-add-another">+ Add Another
                                 Record</button>
+                            <button type="button" class="mf-btn mf-btn-secondary" id="mf-undo-submit" style="color: #ef4444; border-color: #fecaca; background-color: #fef2f2;">
+                                <i class="fa-solid fa-rotate-left"></i> Undo Entry
+                            </button>
                         </div>
                     </div>
                 </div>

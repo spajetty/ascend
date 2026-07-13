@@ -71,6 +71,7 @@ const ALL_DETAIL_SECTIONS = [
 let currentPanel    = 0;
 let selectedSection = '';
 let selectedProgram = '';
+let lastSubmissionState = null;
 
 // ── HELPERS ───────────────────────────────────────────────────────
 
@@ -454,6 +455,10 @@ function bindNavButtons() {
   // Success → add another
   const addAnother = $('mf-add-another');
   if (addAnother) addAnother.addEventListener('click', resetForm);
+
+  // Undo submission
+  const undoSubmit = $('mf-undo-submit');
+  if (undoSubmit) undoSubmit.addEventListener('click', undoSubmission);
 }
 
 // ── PROGRAM SECTIONS (panel 2) ────────────────────────────────────
@@ -475,6 +480,8 @@ function applyProgramSections() {
   document.querySelectorAll('.mf-wiirp-only').forEach(el => {
     el.style.display = selectedProgram === 'wiirp' ? 'flex' : 'none';
   });
+  
+  syncWiirpFields();
 
   // Dynamic titles
   const internTitle = $('mf-internship-title');
@@ -500,6 +507,30 @@ function applyProgramSections() {
   }
 }
 
+function syncWiirpFields() {
+  const type = $('mf-h-inttype')?.value || 'inquiry';
+  const assignmentSec = $('mf-int-assignment-sec');
+  const endorse1 = $('mf-endorse1')?.closest('.mf-field');
+  const endorse2 = $('mf-endorse2')?.closest('.mf-field');
+
+  if (selectedProgram === 'wiirp') {
+    if (type === 'inquiry') {
+      if (assignmentSec) assignmentSec.style.display = 'none';
+    } else if (type === 'peso-assigned') {
+      if (assignmentSec) assignmentSec.style.display = 'block';
+      if (endorse1) endorse1.style.display = 'none';
+      if (endorse2) endorse2.style.display = 'none';
+    } else if (type === 'private') {
+      if (assignmentSec) assignmentSec.style.display = 'block';
+      if (endorse1) endorse1.style.display = 'flex';
+      if (endorse2) endorse2.style.display = 'flex';
+    }
+  } else {
+    // For GIP, assignment section should not be shown based on WIIRP rules
+    if (assignmentSec) assignmentSec.style.display = 'none';
+  }
+}
+
 // ── CHIPS (radio-style toggles) ───────────────────────────────────
 
 function bindChips() {
@@ -519,7 +550,12 @@ function bindChips() {
 
     // Sync hidden input
     const hiddenInput = document.getElementById(`mf-h-${group}`);
-    if (hiddenInput) hiddenInput.value = chip.dataset.val;
+    if (hiddenInput) {
+      hiddenInput.value = chip.dataset.val;
+      if (group === 'inttype') {
+        syncWiirpFields();
+      }
+    }
   });
 }
 
@@ -674,6 +710,7 @@ function submitForm() {
   .then(data => {
     if (data.success) {
       $('mf-success-id').textContent = `Benef #${data.beneficiary_id}`;
+      lastSubmissionState = data.state;
       if (typeof window.showToast === 'function') {
         window.showToast('Manual entry saved successfully.', 'success');
       }
@@ -695,11 +732,46 @@ function submitForm() {
   });
 }
 
+// ── UNDO ──────────────────────────────────────────────────────────
+
+function undoSubmission() {
+  if (!lastSubmissionState) {
+    if (typeof window.showToast === 'function') window.showToast('No entry to undo.', 'error');
+    return;
+  }
+  
+  if (typeof showLoading === 'function') showLoading();
+  
+  fetch('../../backend/import/undo_manual.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state: lastSubmissionState })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      if (typeof window.showToast === 'function') window.showToast('Entry successfully undone.', 'info');
+      lastSubmissionState = null;
+      resetForm();
+    } else {
+      if (typeof window.showToast === 'function') window.showToast(data.error || 'Failed to undo entry.', 'error');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    if (typeof window.showToast === 'function') window.showToast('Network error during undo.', 'error');
+  })
+  .finally(() => {
+    if (typeof hideLoading === 'function') hideLoading();
+  });
+}
+
 // ── RESET ─────────────────────────────────────────────────────────
 
 function resetForm() {
   selectedSection = '';
   selectedProgram = '';
+  lastSubmissionState = null;
 
   const secEl = $('manualSection');
   if(secEl) secEl.value = '';
