@@ -17,10 +17,11 @@ require_once __DIR__ . '/helpers/followup_utils.php';
 // Row savers
 require_once __DIR__ . '/savers/save_common_person.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
+require_once __DIR__ . '/savers/save_spes.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -61,7 +62,18 @@ try {
         'Brgy Clearance' => $_POST['brgy_clearance'] ?? '',
         'NBI Clearance' => $_POST['nbi_clearance'] ?? '',
         'Birth Cert' => $_POST['birth_cert'] ?? '',
-        'TESDA Cert' => $_POST['tesda_cert'] ?? ''
+        'TESDA Cert' => $_POST['tesda_cert'] ?? '',
+
+        // SPES Fields
+        'school' => $_POST['spes_school'] ?? '',
+        'student_type' => $_POST['student_type'] ?? '',
+        'highest_educ' => $_POST['highest_educ'] ?? '',
+        'course' => $_POST['course'] ?? '',
+        'store_assignment' => $_POST['store_assignment'] ?? '',
+        '_spes_category' => $_POST['spes_category'] ?? '',
+        'start_of_contract' => $_POST['start_of_contract'] ?? '',
+        'end_of_contract' => $_POST['end_of_contract'] ?? '',
+        'days' => $_POST['days'] ?? ''
     ];
 
     $duplicate = checkDuplicate(
@@ -81,7 +93,7 @@ try {
 
     // Resolve Batch ID
     $batchId = null;
-    $batchPeriod = trim((string)($_POST['batch_period'] ?? ''));
+    $batchPeriod = trim((string)($_POST['batch_period'] ?? $_POST['spes_batch'] ?? $_POST['int_batch'] ?? $_POST['whip_batch'] ?? $_POST['school_batch'] ?? ''));
     if ($batchPeriod !== '') {
         $parts = explode('-', $batchPeriod);
         if (count($parts) === 2) {
@@ -178,6 +190,11 @@ try {
 
         if ($insertedRows === 0) {
             throw new RuntimeException('Please select at least one participating company for each chosen event.');
+        }
+    } elseif ($program === 'SPES') {
+        $result = saveSPESRow($conn, $row, $benefId, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save SPES record.");
         }
     } else {
         $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
