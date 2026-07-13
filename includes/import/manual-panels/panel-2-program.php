@@ -120,15 +120,15 @@
                                 <input type="hidden" name="student_type" id="mf-h-stutype" value="student">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-school">School</label>
+                                <label for="mf-spes-school">School <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-spes-school" name="spes_school" placeholder="School name">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-course">Course</label>
+                                <label for="mf-spes-course">Course <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-spes-course" name="course" placeholder="e.g. BSIT">
                             </div>
                             <div class="mf-field mf-col2">
-                                <label for="mf-highest-educ">Highest Education Attained</label>
+                                <label for="mf-highest-educ">Highest Education Attained <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-highest-educ" name="highest_educ"
                                     placeholder="e.g. 2nd Year College">
                             </div>
@@ -138,7 +138,7 @@
 
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field">
-                                <label for="mf-store">Company / Office Assignment</label>
+                                <label for="mf-store">Company / Office Assignment <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-store" name="store_assignment">
                             </div>
                             <div class="mf-field">
@@ -150,19 +150,19 @@
                                 <input type="hidden" name="spes_category" id="mf-h-spescat" value="lgu">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-contract-start">Contract Start</label>
+                                <label for="mf-contract-start">Contract Start <span class="mf-req">*</span></label>
                                 <input type="date" id="mf-contract-start" name="start_of_contract">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-contract-end">Contract End</label>
+                                <label for="mf-contract-end">Contract End <span class="mf-req">*</span></label>
                                 <input type="date" id="mf-contract-end" name="end_of_contract">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-days">No. of Days</label>
+                                <label for="mf-days">No. of Days <span class="mf-req">*</span></label>
                                 <input type="number" id="mf-days" name="days" min="1" placeholder="0">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-batch">Batch</label>
+                                <label for="mf-spes-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-spes-batch" name="spes_batch">
                             </div>
                         </div>
