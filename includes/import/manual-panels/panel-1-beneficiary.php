@@ -39,10 +39,26 @@
 
                         <!-- DOB / Sex / Civil / Classification / Contact / Email -->
                         <div class="mf-grid mf-grid-4">
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field">
                                 <label for="mf-dob">Date of Birth <span class="mf-req">*</span></label>
                                 <input type="date" id="mf-dob" name="dob">
-                                <span class="mf-fhint" id="mf-age-hint"></span>
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-age">Age</label>
+                                <input type="text" id="mf-age" name="age" placeholder="Auto-calculated" readonly>
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-civil">Civil Status</label>
+                                <select id="mf-civil" name="civil_status">
+                                    <option value="">— Select —</option>
+                                    <option>Single</option>
+                                    <option>Married</option>
+                                    <option>Widowed</option>
+                                    <option>Divorced</option>
+                                    <option>Separated</option>
+                                    <option>Annulled</option>
+                                    <option>Common-Law Partner</option>
+                                </select>
                             </div>
                             <div class="mf-field">
                                 <label>Sex <span class="mf-req">*</span></label>
@@ -52,16 +68,7 @@
                                 </div>
                                 <input type="hidden" name="sex" id="mf-h-sex" value="Male">
                             </div>
-                            <div class="mf-field">
-                                <label for="mf-civil">Civil Status</label>
-                                <select id="mf-civil" name="civil_status">
-                                    <option value="">— select —</option>
-                                    <option>Single</option>
-                                    <option>Married</option>
-                                    <option>Widowed</option>
-                                    <option>Separated</option>
-                                </select>
-                            </div>
+                            
                             <div class="mf-field mf-col2" id="mf-classification-wrap" style="display:none;">
                                 <label for="mf-classification">Classification <span class="mf-req">*</span></label>
                                 <select id="mf-classification" name="classification" disabled>
