@@ -165,9 +165,8 @@
                             style="border-left-color:var(--mf-accent2); margin-top:10px;">
                             <div class="mf-cond-title" style="color:var(--mf-accent2);">SPES Status</div>
                             <div class="mf-chip-group">
-                                <div class="mf-chip on" data-group="spes-status" data-val="Pending">Pending</div>
-                                <div class="mf-chip" data-group="spes-status" data-val="Active">Active</div>
-                                <div class="mf-chip" data-group="spes-status" data-val="Completed">Completed</div>
+                                <div class="mf-chip on" data-group="spes-status" data-val="Pending">New</div>
+                                <div class="mf-chip" data-group="spes-status" data-val="Active">SPES Baby</div>
                             </div>
                             <input type="hidden" name="spes_status" id="mf-h-spes-status" value="Pending">
                         </div>
