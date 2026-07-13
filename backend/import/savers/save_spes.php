@@ -93,9 +93,11 @@ function saveSPESRow(mysqli $conn, array $row, int $benefId, array $ctx, array &
         }
     }
 
-    // Calculate days between contract start and end
-    $days = null;
-    if ($startDate && $endDate) {
+    // Calculate days between contract start and end if not provided
+    $daysRaw = rowValue($row, ['Days', 'days'], '');
+    $days = ($daysRaw !== '') ? (int)$daysRaw : null;
+    
+    if ($days === null && $startDate && $endDate) {
         $start = new DateTime($startDate);
         $end = new DateTime($endDate);
         $days = (int)$start->diff($end)->days;
