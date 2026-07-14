@@ -4,14 +4,13 @@ require_once __DIR__ . '/../../api/db.php';
 
 $gip_id = isset($_POST['gip_id']) ? (int)$_POST['gip_id'] : 0;
 $benef_id = isset($_POST['benef_id']) ? (int)$_POST['benef_id'] : 0;
-$contract_period = isset($_POST['contract_period']) ? trim($_POST['contract_period']) : '';
+$student_type = isset($_POST['student_type']) ? trim($_POST['student_type']) : '';
 $school = isset($_POST['school']) ? trim($_POST['school']) : '';
 $course = isset($_POST['course']) ? trim($_POST['course']) : '';
-$required_hours = isset($_POST['required_hours']) && $_POST['required_hours'] !== '' ? (int)$_POST['required_hours'] : 0;
-$college_or_shs = isset($_POST['college_or_shs']) ? trim($_POST['college_or_shs']) : '';
-$preferred_org_type = isset($_POST['preferred_org_type']) ? trim($_POST['preferred_org_type']) : '';
-$preferred_industry = isset($_POST['preferred_industry']) ? trim($_POST['preferred_industry']) : '';
-$is_willing_outside = isset($_POST['is_willing_outside']) ? (int)$_POST['is_willing_outside'] : 0;
+$highest_educ = isset($_POST['highest_educ']) ? trim($_POST['highest_educ']) : '';
+$start_of_contract = isset($_POST['start_of_contract']) ? trim($_POST['start_of_contract']) : '';
+$end_of_contract = isset($_POST['end_of_contract']) ? trim($_POST['end_of_contract']) : '';
+$days = isset($_POST['days']) && $_POST['days'] !== '' ? (int)$_POST['days'] : 0;
 $office_assignment = isset($_POST['office_assignment']) ? trim($_POST['office_assignment']) : '';
 $type = isset($_POST['type']) ? trim($_POST['type']) : '';
 
@@ -30,8 +29,8 @@ if ($type !== '' && !in_array($type, ['DOLE', 'LGU'], true)) {
     exit;
 }
 
-if ($college_or_shs !== '' && !in_array($college_or_shs, ['college', 'shs'], true)) {
-    echo json_encode(['success' => false, 'error' => 'Invalid education level']);
+if ($student_type !== '' && !in_array($student_type, ['student', 'osy'], true)) {
+    echo json_encode(['success' => false, 'error' => 'Invalid student type']);
     exit;
 }
 
@@ -55,14 +54,13 @@ try {
     }
 
     $sql = "UPDATE gip
-            SET contract_period = ?,
+            SET student_type = ?,
                 school = ?,
                 course = ?,
-                required_hours = ?,
-                college_or_shs = ?,
-                preferred_org_type = ?,
-                preferred_industry = ?,
-                is_willing_outside = ?,
+                highest_educ = ?,
+                start_of_contract = ?,
+                end_of_contract = ?,
+                days = ?,
                 office_assignment = ?,
                 type = ?
             WHERE gip_id = ? AND benef_id = ?";
@@ -73,15 +71,14 @@ try {
     }
 
     $stmt->bind_param(
-        'sssisssissii',
-        $contract_period,
+        'ssssssissi',
+        $student_type,
         $school,
         $course,
-        $required_hours,
-        $college_or_shs,
-        $preferred_org_type,
-        $preferred_industry,
-        $is_willing_outside,
+        $highest_educ,
+        $start_of_contract,
+        $end_of_contract,
+        $days,
         $office_assignment,
         $type,
         $gip_id,

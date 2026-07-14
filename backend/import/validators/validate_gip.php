@@ -50,14 +50,15 @@ function validateGip(mysqli $conn, array $rows, string $gipCategory = ''): array
             'Contact Number' => ['Contact Number', 'Contact', 'contact'],
 
             // GIP-required program fields
-            'School Name' => ['School Name', 'School', 'school'],
-            'College/SHS' => ['College/SHS', 'College or SHS', 'college_or_shs'],
+            // GIP-required program fields
+            'Student Type' => ['Student Type', 'student_type'],
+            'School' => ['School Name', 'School', 'school'],
+            'Course' => ['Course/Degree/Strand', 'Course', 'course'],
+            'Highest Education Attained' => ['Highest Education Attained', 'Highest Education', 'highest_educ'],
             'Office Assignment' => ['Office Assignment', 'office_assignment'],
-            'Course/Degree/Strand' => ['Course/Degree/Strand', 'Course', 'course'],
-            'Required Hours' => ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'],
-            'Preferred Host Organization Type' => ['Preferred Host Organization Type', 'preferred_org_type'],
-            'Preferred Industry / Field of Internship' => ['Preferred Industry / Field of Internship', 'preferred_industry'],
-            'Are you willing to be assigned outside your preferred field if not available?' => ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'],
+            'Start of Contract' => ['Start of Contract', 'start_of_contract'],
+            'End of Contract' => ['End of Contract', 'end_of_contract'],
+            'No. of Days' => ['No. of Days', 'Days', 'days'],
         ];
 
         $missing = [];
@@ -76,14 +77,19 @@ function validateGip(mysqli $conn, array $rows, string $gipCategory = ''): array
         }
 
         // parse optional fields
+        $previewRow['student_type'] = strtolower(s(rowValue($row, ['Student Type', 'student_type'], '')));
         $previewRow['school'] = s(rowValue($row, ['School Name', 'School', 'school'], ''));
         $previewRow['course'] = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
-        $previewRow['required_hours'] = parseIntNullable(rowValue($row, ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'], ''));
-        $previewRow['preferred_org_type'] = s(rowValue($row, ['Preferred Host Organization Type', 'preferred_org_type'], ''));
-        $previewRow['preferred_industry'] = s(rowValue($row, ['Preferred Industry / Field of Internship', 'preferred_industry'], ''));
-        $previewRow['is_willing_outside'] = toBoolInt(rowValue($row, ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'], ''));
+        $previewRow['highest_educ'] = s(rowValue($row, ['Highest Education Attained', 'Highest Education', 'highest_educ'], ''));
         $previewRow['office_assignment'] = s(rowValue($row, ['Office Assignment', 'office_assignment'], ''));
-        $previewRow['college_or_shs'] = s(rowValue($row, ['College/SHS', 'College or SHS', 'college_or_shs', 'college_or_shs'], ''));
+        $parsedStart = parseDateNullable(rowValue($row, ['Start of Contract', 'start_of_contract'], ''));
+        $parsedEnd = parseDateNullable(rowValue($row, ['End of Contract', 'end_of_contract'], ''));
+        
+        $previewRow['start_of_contract'] = $parsedStart;
+        $previewRow['end_of_contract'] = $parsedEnd;
+        $previewRow['Start of Contract'] = $parsedStart;
+        $previewRow['End of Contract'] = $parsedEnd;
+        $previewRow['days'] = parseIntNullable(rowValue($row, ['No. of Days', 'Days', 'days'], ''));
 
         $excelDupKey = buildExcelDuplicateKey($fname, $lname, null);
         if ($excelDupKey !== null) {
