@@ -1815,8 +1815,27 @@ function openEditGipModal() {
   document.getElementById('editGipSchool').value = record.school || '';
   
   const formatDateForInput = (val) => val ? val.substring(0, 10) : '';
-  document.getElementById('editGipStartContract').value = formatDateForInput(record.start_of_contract);
-  document.getElementById('editGipEndContract').value = formatDateForInput(record.end_of_contract);
+  const startInput = document.getElementById('editGipStartContract');
+  const endInput = document.getElementById('editGipEndContract');
+
+  startInput.value = formatDateForInput(record.start_of_contract);
+  endInput.value = formatDateForInput(record.end_of_contract);
+
+  const updateDates = () => {
+    if (startInput.value) endInput.min = startInput.value;
+    else endInput.removeAttribute('min');
+    
+    if (endInput.value) startInput.max = endInput.value;
+    else startInput.removeAttribute('max');
+  };
+
+  startInput.onchange = updateDates;
+  startInput.oninput = updateDates;
+  endInput.onchange = updateDates;
+  endInput.oninput = updateDates;
+  
+  updateDates();
+
   document.getElementById('editGipDays').value = record.days ?? '';
   
   document.getElementById('editGipOfficeAssignment').value = record.office_assignment || '';

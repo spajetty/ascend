@@ -98,6 +98,7 @@ function initManualForm() {
   bindFileSlots();
   bindCompanyAutocomplete();
   bindJobFairAutocomplete();
+  bindDateConstraints();
 }
 
 if (document.readyState === 'loading') {
@@ -638,6 +639,34 @@ function bindDob() {
   dob.addEventListener('change', updateAge);
   dob.addEventListener('input', updateAge);
   updateAge();
+}
+
+// ── DATE CONSTRAINTS ──────────────────────────────────────────────
+
+function bindDateConstraints() {
+  const specs = [
+    { start: $('mf-contract-start'), end: $('mf-contract-end') },       // SPES
+    { start: $('mf-gip-contract-start'), end: $('mf-gip-contract-end') } // GIP
+  ];
+
+  specs.forEach(pair => {
+    if (!pair.start || !pair.end) return;
+
+    const update = () => {
+      if (pair.start.value) pair.end.min = pair.start.value;
+      else pair.end.removeAttribute('min');
+      
+      if (pair.end.value) pair.start.max = pair.end.value;
+      else pair.start.removeAttribute('max');
+    };
+
+    pair.start.addEventListener('change', update);
+    pair.start.addEventListener('input', update);
+    pair.end.addEventListener('change', update);
+    pair.end.addEventListener('input', update);
+    
+    update();
+  });
 }
 
 // ── FILE SLOTS ────────────────────────────────────────────────────
