@@ -167,7 +167,64 @@
                     </div>
                 </div>
 
-                <!-- GIP / WIIRP — Internship / Immersion -->
+                <!-- GIP Details -->
+                <div class="mf-card" id="mf-sec-gip" style="display:none;">
+                    <div class="mf-card-head">
+                        <div class="mf-card-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="mf-card-title">Government Internship Program (GIP) Details</div>
+                    </div>
+                    <div class="mf-card-body">
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field mf-col2">
+                                <label>Student Type <span class="mf-req">*</span></label>
+                                <div class="mf-chip-group">
+                                    <div class="mf-chip on" data-group="gipstutype" data-val="student">Student</div>
+                                    <div class="mf-chip" data-group="gipstutype" data-val="osy">Out-of-School Youth</div>
+                                </div>
+                                <input type="hidden" name="gip_student_type" id="mf-h-gipstutype" value="student">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-school">School <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-school" name="gip_school" placeholder="School name">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-course">Course <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-course" name="gip_course" placeholder="e.g. BSIT">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-gip-highest-educ">Highest Education Attained <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-highest-educ" name="gip_highest_educ" placeholder="e.g. College Graduate">
+                            </div>
+                        </div>
+
+                        <div class="mf-sec-rule"><span>Contract Details</span></div>
+
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field mf-col2">
+                                <label for="mf-gip-office">Office Assignment <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-office" name="gip_office_assignment">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-contract-start">Contract Start <span class="mf-req">*</span></label>
+                                <input type="date" id="mf-gip-contract-start" name="gip_start_of_contract">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-contract-end">Contract End <span class="mf-req">*</span></label>
+                                <input type="date" id="mf-gip-contract-end" name="gip_end_of_contract">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-days">No. of Days <span class="mf-req">*</span></label>
+                                <input type="number" id="mf-gip-days" name="gip_days" min="1" placeholder="0">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-batch">Batch <span class="mf-req">*</span></label>
+                                <input type="month" id="mf-gip-batch" name="gip_batch">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WIIRP — Internship / Immersion -->
                 <div class="mf-card" id="mf-sec-internship" style="display:none;">
                     <div class="mf-card-head">
                         <div class="mf-card-icon"><i class="fa-solid fa-building-columns"></i></div>
@@ -184,15 +241,6 @@
                                     <div class="mf-chip" data-group="inttype" data-val="private">Private</div>
                                 </div>
                                 <input type="hidden" name="inquiry_type" id="mf-h-inttype" value="inquiry">
-                            </div>
-                            <!-- GIP only -->
-                            <div class="mf-field mf-gip-only" style="display:none;">
-                                <label>Level</label>
-                                <div class="mf-chip-group">
-                                    <div class="mf-chip on" data-group="level" data-val="College">College</div>
-                                    <div class="mf-chip" data-group="level" data-val="SHS">SHS</div>
-                                </div>
-                                <input type="hidden" name="college_or_shs" id="mf-h-level" value="College">
                             </div>
                             <div class="mf-field">
                                 <label for="mf-int-school">School</label>
