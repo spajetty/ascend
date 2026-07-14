@@ -71,7 +71,7 @@ try {
     }
 
     $stmt->bind_param(
-        'ssssssissi',
+        'ssssssissii',
         $student_type,
         $school,
         $course,
