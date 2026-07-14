@@ -19,10 +19,11 @@ require_once __DIR__ . '/savers/save_common_person.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
 require_once __DIR__ . '/savers/save_spes.php';
 require_once __DIR__ . '/savers/save_wiirp.php';
+require_once __DIR__ . '/savers/save_gip.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Work Immersion and Internship Referral Program'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Government Internship Program', 'Work Immersion and Internship Referral Program'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -77,8 +78,9 @@ try {
         'days' => $_POST['days'] ?? '',
         
         // WIIRP Fields
-        'school' => !empty($_POST['spes_school']) ? $_POST['spes_school'] : ($_POST['int_school'] ?? ''),
-        'course' => !empty($_POST['course']) ? $_POST['course'] : ($_POST['int_course'] ?? ''),
+        'school' => $program === 'Government Internship Program' ? ($_POST['gip_school'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_school'] ?? '') : ($_POST['spes_school'] ?? '')),
+        'course' => $program === 'Government Internship Program' ? ($_POST['gip_course'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_course'] ?? '') : ($_POST['course'] ?? '')),
+        'highest_educ' => $program === 'Government Internship Program' ? ($_POST['gip_highest_educ'] ?? '') : ($_POST['highest_educ'] ?? ''),
         'year_level' => $_POST['year_level'] ?? '',
         'contract_period' => $_POST['contract_period'] ?? '',
         'required_hours' => $_POST['required_hours'] ?? '',
@@ -88,11 +90,18 @@ try {
         'is_willing_outside' => $_POST['is_willing_outside'] ?? '',
         'internship_sched' => (($_POST['internship_sched'] ?? '') === 'Other' && !empty($_POST['internship_sched_other'])) ? $_POST['internship_sched_other'] : ($_POST['internship_sched'] ?? ''),
         'start' => $_POST['int_start'] ?? '',
-        '_parsed_start_date' => $_POST['assign_start'] ?? '', // Assignment start
-        '_parsed_end_date' => $_POST['assign_end'] ?? '',     // Assignment end
-        'office_assignment' => $_POST['office_assignment'] ?? '',
+        '_parsed_start_date' => !empty($_POST['gip_start_of_contract']) ? $_POST['gip_start_of_contract'] : ($_POST['assign_start'] ?? ''), // Assignment start
+        '_parsed_end_date' => !empty($_POST['gip_end_of_contract']) ? $_POST['gip_end_of_contract'] : ($_POST['assign_end'] ?? ''),     // Assignment end
+        'office_assignment' => !empty($_POST['gip_office_assignment']) ? $_POST['gip_office_assignment'] : ($_POST['office_assignment'] ?? ''),
         'endorsement_1' => $_POST['endorsement_1'] ?? '',
-        'endorsement_2' => $_POST['endorsement_2'] ?? ''
+        'endorsement_2' => $_POST['endorsement_2'] ?? '',
+        
+        // GIP Specific Fields mapped to common names or unique names for saveGipRow
+        // GIP Specific Fields mapped to common names or unique names for saveGipRow
+        'student_type' => $program === 'Government Internship Program' ? ($_POST['gip_student_type'] ?? '') : ($_POST['student_type'] ?? ''),
+        'start_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_start_of_contract'] ?? '') : ($_POST['start_of_contract'] ?? ''),
+        'end_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_end_of_contract'] ?? '') : ($_POST['end_of_contract'] ?? ''),
+        'days' => $program === 'Government Internship Program' ? ($_POST['gip_days'] ?? '') : ($_POST['days'] ?? ''),
     ];
 
     $duplicate = checkDuplicate(
@@ -139,11 +148,20 @@ try {
         }
     }
 
+    $classification = strtolower(trim((string)($_POST['classification'] ?? '')));
+    $gipCategory = '';
+    if (strpos($classification, 'dole-accepted') !== false) {
+        $gipCategory = 'DOLE';
+    } elseif (strpos($classification, 'peso-accepted') !== false) {
+        $gipCategory = 'LGU';
+    }
+
     $ctx = [
         'program' => $program,
         'programId' => $programId,
         'batchId' => $batchId,
         'wiirpCategory' => trim((string)($_POST['inquiry_type'] ?? 'inquiry')),
+        'gipCategory' => $gipCategory,
         'is_manual' => true
     ];
 
@@ -216,6 +234,12 @@ try {
         $result = saveSPESRow($conn, $row, $benefId, $ctx, $state);
         if ($result !== 'saved') {
             throw new RuntimeException("Failed to save SPES record.");
+        }
+    } elseif ($program === 'Government Internship Program') {
+        $row['_sys_benef_id'] = $benefId;
+        $result = saveGipRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save GIP record.");
         }
     } elseif ($program === 'Work Immersion and Internship Referral Program') {
         $row['_sys_benef_id'] = $benefId;

@@ -20,41 +20,26 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         return 'skipped';
     }
 
-    // Build contract period from import month/year + duration (months). Default duration is 3 months.
-    $monthRaw = trim((string)($ctx['importMonthRaw'] ?? ''));
-    $yearRaw = trim((string)($ctx['importYearRaw'] ?? ''));
-    $durationMonths = isset($ctx['importDurationMonths']) ? (int)$ctx['importDurationMonths'] : 3;
-    $contractPeriod = trim($monthRaw . ' ' . $yearRaw);
-    $monthInt = monthToInt($monthRaw);
-    $yearInt = is_numeric($yearRaw) ? (int)$yearRaw : null;
-    if ($monthInt !== null && $yearInt !== null) {
-        try {
-            $start = new DateTime();
-            $start->setDate($yearInt, $monthInt, 1);
-            $end = clone $start;
-            if ($durationMonths > 1) {
-                $end->modify('+' . ($durationMonths - 1) . ' months');
-            }
-            $contractPeriod = $start->format('M Y') . ' - ' . $end->format('M Y') . ' (' . $durationMonths . ' months)';
-        } catch (Throwable $e) {
-            // fallback to raw text
-            $contractPeriod = trim($monthRaw . ' ' . $yearRaw);
-        }
+    $studentType = s(rowValue($row, ['Student Type', 'student_type'], 'student'));
+    if (!in_array($studentType, ['student', 'osy'])) {
+        $studentType = 'student';
     }
+    
     $school = s(rowValue($row, ['School Name', 'School', 'school'], ''));
     $course = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
-    $requiredHours = parseIntNullable(rowValue($row, ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours'], ''));
-    $preferredOrgType = s(rowValue($row, ['Preferred Host Organization Type', 'preferred_org_type'], ''));
-    $preferredIndustry = s(rowValue($row, ['Preferred Industry / Field of Internship', 'preferred_industry'], ''));
-    $isWillingOutside = toBoolInt(rowValue($row, ['Are you willing to be assigned outside your preferred field if not available?', 'is_willing_outside'], ''));
+    $highestEduc = s(rowValue($row, ['Highest Education Attained', 'Highest Education', 'highest_educ'], ''));
+    
+    $startOfContract = parseDateNullable(rowValue($row, ['Start of Contract', 'start_of_contract'], ''));
+    $endOfContract = parseDateNullable(rowValue($row, ['End of Contract', 'end_of_contract'], ''));
+    
+    $days = parseIntNullable(rowValue($row, ['No. of Days', 'Days', 'days'], ''));
     $officeAssignment = s(rowValue($row, ['Office Assignment', 'office_assignment'], ''));
-    $collegeOrShs = s(rowValue($row, ['College/SHS', 'College or SHS', 'college_or_shs'], ''));
 
     $gipType = strtoupper(trim((string)($ctx['gipCategory'] ?? '')));
     $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
 
-    $dupStmt = $conn->prepare('SELECT 1 FROM `gip` WHERE `benef_id` = ? AND `contract_period` = ? AND `type` = ? LIMIT 1');
-    $dupStmt->bind_param('iss', $benefId, $contractPeriod, $gipType);
+    $dupStmt = $conn->prepare('SELECT 1 FROM `gip` WHERE `benef_id` = ? AND `start_of_contract` = ? AND `end_of_contract` = ? AND `type` = ? LIMIT 1');
+    $dupStmt->bind_param('isss', $benefId, $startOfContract, $endOfContract, $gipType);
     $dupStmt->execute();
     if ($dupStmt->get_result()->fetch_assoc()) {
         return 'skipped';
@@ -62,31 +47,29 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
 
     $columns = [
         '`benef_id`',
-        '`contract_period`',
-        '`school`',
+        '`student_type`',
+        '`highest_educ`',
         '`course`',
-        '`required_hours`',
-        '`preferred_org_type`',
-        '`preferred_industry`',
-        '`is_willing_outside`',
+        '`school`',
+        '`start_of_contract`',
+        '`end_of_contract`',
+        '`days`',
         '`office_assignment`',
-        '`college_or_shs`',
         '`type`',
     ];
     $values = [
         $benefId,
-        $contractPeriod,
-        $school,
+        $studentType,
+        $highestEduc,
         $course,
-        $requiredHours,
-        $preferredOrgType,
-        $preferredIndustry,
-        $isWillingOutside,
+        $school,
+        $startOfContract,
+        $endOfContract,
+        $days,
         $officeAssignment,
-        $collegeOrShs,
         $gipType,
     ];
-    $types = 'isssississs';
+    $types = 'issssssiss';
 
     if (tableHasColumn($conn, 'gip', 'batch_id')) {
         $columns[] = '`batch_id`';

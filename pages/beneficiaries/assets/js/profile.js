@@ -685,14 +685,13 @@ window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
     if (gipCard) gipCard.style.display = 'block';
 
     const gipFields = {
-      pGipContractPeriod: 'pGipContractPeriod',
+      pGipStudentType: 'pGipStudentType',
+      pGipHighestEduc: 'pGipHighestEduc',
       pGipSchool: 'pGipSchool',
       pGipCourse: 'pGipCourse',
-      pGipRequiredHours: 'pGipRequiredHours',
-      pGipCollegeOrShs: 'pGipCollegeOrShs',
-      pGipPreferredOrgType: 'pGipPreferredOrgType',
-      pGipPreferredIndustry: 'pGipPreferredIndustry',
-      pGipWillingOutside: 'pGipWillingOutside',
+      pGipStartContract: 'pGipStartContract',
+      pGipEndContract: 'pGipEndContract',
+      pGipDays: 'pGipDays',
       pGipOfficeAssignment: 'pGipOfficeAssignment',
       pGipType: 'pGipType'
     };
@@ -734,8 +733,12 @@ window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
             return String(value || '—');
           };
 
-          if (document.getElementById('pGipContractPeriod')) {
-            document.getElementById('pGipContractPeriod').textContent = upperText(r.contract_period);
+          if (document.getElementById('pGipStudentType')) {
+            const st = r.student_type ? (r.student_type.toLowerCase() === 'osy' ? 'OSY' : 'Student') : '—';
+            document.getElementById('pGipStudentType').textContent = st;
+          }
+          if (document.getElementById('pGipHighestEduc')) {
+            document.getElementById('pGipHighestEduc').textContent = upperText(r.highest_educ);
           }
           if (document.getElementById('pGipSchool')) {
             document.getElementById('pGipSchool').textContent = upperText(r.school);
@@ -743,20 +746,14 @@ window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
           if (document.getElementById('pGipCourse')) {
             document.getElementById('pGipCourse').textContent = upperText(r.course);
           }
-          if (document.getElementById('pGipRequiredHours')) {
-            document.getElementById('pGipRequiredHours').textContent = r.required_hours != null ? String(r.required_hours) : '—';
+          if (document.getElementById('pGipStartContract')) {
+            document.getElementById('pGipStartContract').textContent = formatDate(r.start_of_contract);
           }
-          if (document.getElementById('pGipCollegeOrShs')) {
-            document.getElementById('pGipCollegeOrShs').textContent = upperText(formatEdLevel(r.college_or_shs));
+          if (document.getElementById('pGipEndContract')) {
+            document.getElementById('pGipEndContract').textContent = formatDate(r.end_of_contract);
           }
-          if (document.getElementById('pGipPreferredOrgType')) {
-            document.getElementById('pGipPreferredOrgType').textContent = upperText(r.preferred_org_type);
-          }
-          if (document.getElementById('pGipPreferredIndustry')) {
-            document.getElementById('pGipPreferredIndustry').textContent = upperText(r.preferred_industry);
-          }
-          if (document.getElementById('pGipWillingOutside')) {
-            document.getElementById('pGipWillingOutside').textContent = upperText(formatBool(r.is_willing_outside));
+          if (document.getElementById('pGipDays')) {
+            document.getElementById('pGipDays').textContent = r.days != null ? String(r.days) : '—';
           }
           if (document.getElementById('pGipOfficeAssignment')) {
             document.getElementById('pGipOfficeAssignment').textContent = upperText(r.office_assignment);
@@ -1812,14 +1809,16 @@ function openEditGipModal() {
   }
 
   document.getElementById('editGipId').value = record.gip_id || '';
-  document.getElementById('editGipContractPeriod').value = record.contract_period || '';
-  document.getElementById('editGipSchool').value = record.school || '';
+  document.getElementById('editGipStudentType').value = record.student_type || 'student';
+  document.getElementById('editGipHighestEduc').value = record.highest_educ || '';
   document.getElementById('editGipCourse').value = record.course || '';
-  document.getElementById('editGipRequiredHours').value = record.required_hours ?? '';
-  document.getElementById('editGipCollegeOrShs').value = record.college_or_shs || '';
-  document.getElementById('editGipPreferredOrgType').value = record.preferred_org_type || '';
-  document.getElementById('editGipPreferredIndustry').value = record.preferred_industry || '';
-  document.getElementById('editGipWillingOutside').value = Number(record.is_willing_outside) === 1 ? '1' : '0';
+  document.getElementById('editGipSchool').value = record.school || '';
+  
+  const formatDateForInput = (val) => val ? val.substring(0, 10) : '';
+  document.getElementById('editGipStartContract').value = formatDateForInput(record.start_of_contract);
+  document.getElementById('editGipEndContract').value = formatDateForInput(record.end_of_contract);
+  document.getElementById('editGipDays').value = record.days ?? '';
+  
   document.getElementById('editGipOfficeAssignment').value = record.office_assignment || '';
   document.getElementById('editGipType').value = record.type || '';
 
@@ -1842,14 +1841,13 @@ function submitEditGip() {
   const formData = new FormData();
   formData.append('gip_id', gip_id);
   formData.append('benef_id', window.currentBeneficiaryId || '');
-  formData.append('contract_period', document.getElementById('editGipContractPeriod').value.trim());
-  formData.append('school', document.getElementById('editGipSchool').value.trim());
+  formData.append('student_type', document.getElementById('editGipStudentType').value);
+  formData.append('highest_educ', document.getElementById('editGipHighestEduc').value.trim());
   formData.append('course', document.getElementById('editGipCourse').value.trim());
-  formData.append('required_hours', document.getElementById('editGipRequiredHours').value.trim());
-  formData.append('college_or_shs', document.getElementById('editGipCollegeOrShs').value);
-  formData.append('preferred_org_type', document.getElementById('editGipPreferredOrgType').value.trim());
-  formData.append('preferred_industry', document.getElementById('editGipPreferredIndustry').value.trim());
-  formData.append('is_willing_outside', document.getElementById('editGipWillingOutside').value);
+  formData.append('school', document.getElementById('editGipSchool').value.trim());
+  formData.append('start_of_contract', document.getElementById('editGipStartContract').value);
+  formData.append('end_of_contract', document.getElementById('editGipEndContract').value);
+  formData.append('days', document.getElementById('editGipDays').value.trim());
   formData.append('office_assignment', document.getElementById('editGipOfficeAssignment').value.trim());
   formData.append('type', document.getElementById('editGipType').value);
 

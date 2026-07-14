@@ -61,6 +61,18 @@ export function validatePanel(idx, selectedProgram) {
         'mf-spes-batch'
       );
     }
+    if (selectedProgram === 'gip') {
+      req2.push(
+        'mf-gip-school',
+        'mf-gip-course',
+        'mf-gip-highest-educ',
+        'mf-gip-office',
+        'mf-gip-contract-start',
+        'mf-gip-contract-end',
+        'mf-gip-days',
+        'mf-gip-batch'
+      );
+    }
     if (selectedProgram === 'wiirp') {
       req2.push(
         'mf-int-school',

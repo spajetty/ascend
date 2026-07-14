@@ -68,20 +68,27 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
       details.push(['Batch', $('mf-spes-batch')?.value || '—']);
     }
 
-    if (['gip', 'wiirp'].includes(selectedProgram)) {
+    if (selectedProgram === 'wiirp') {
       const inttype = document.querySelector('[data-group="inttype"].on')?.dataset.val || '—';
       details.push(['Internship Type', inttype]);
-      if (selectedProgram === 'gip') {
-        const level = document.querySelector('[data-group="level"].on')?.dataset.val || '—';
-        details.push(['Level', level]);
-      }
       details.push(['School', $('mf-int-school')?.value || '—']);
       details.push(['Course / Strand', $('mf-int-course')?.value || '—']);
-      if (selectedProgram === 'wiirp') {
-        details.push(['Year Level', $('mf-year-level')?.value || '—']);
-      }
+      details.push(['Year Level', $('mf-year-level')?.value || '—']);
       details.push(['Required Hours', $('mf-req-hours')?.value || '—']);
       details.push(['Contract Period', $('mf-contract-period')?.value || '—']);
+    }
+
+    if (selectedProgram === 'gip') {
+      const gipstutype = document.querySelector('[data-group="gipstutype"].on')?.dataset.val || '—';
+      details.push(['Student Type', gipstutype]);
+      details.push(['School', $('mf-gip-school')?.value || '—']);
+      details.push(['Course', $('mf-gip-course')?.value || '—']);
+      details.push(['Highest Educ.', $('mf-gip-highest-educ')?.value || '—']);
+      details.push(['Office Assignment', $('mf-gip-office')?.value || '—']);
+      details.push(['Contract Start', $('mf-gip-contract-start')?.value || '—']);
+      details.push(['Contract End', $('mf-gip-contract-end')?.value || '—']);
+      details.push(['Days', $('mf-gip-days')?.value || '—']);
+      details.push(['Batch', $('mf-gip-batch')?.value || '—']);
     }
 
     if (selectedProgram === 'whip') {

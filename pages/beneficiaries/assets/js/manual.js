@@ -54,7 +54,7 @@ const PROG_SECTIONS = {
   accreditation: ['mf-sec-accred'],
   whip:          ['mf-sec-employer', 'mf-sec-whip'],
   spes:          ['mf-sec-spes'],
-  gip:           ['mf-sec-internship'],
+  gip:           ['mf-sec-gip'],
   wiirp:         ['mf-sec-internship'],
   careerdev:     ['mf-sec-school'],
   lmi:           ['mf-sec-school'],
@@ -63,7 +63,7 @@ const PROG_SECTIONS = {
 const ALL_DETAIL_SECTIONS = [
   'mf-sec-employer', 'mf-sec-ftj', 'mf-sec-jobfair',
   'mf-sec-accred',   'mf-sec-whip', 'mf-sec-spes',
-  'mf-sec-internship', 'mf-sec-school',
+  'mf-sec-internship', 'mf-sec-gip', 'mf-sec-school',
 ];
 
 // ── STATE ──────────────────────────────────────────────────────────
@@ -471,11 +471,6 @@ function applyProgramSections() {
     if (el) el.style.display = show.includes(id) ? 'block' : 'none';
   });
 
-  // GIP-only fields
-  document.querySelectorAll('.mf-gip-only').forEach(el => {
-    el.style.display = selectedProgram === 'gip' ? 'flex' : 'none';
-  });
-
   // WIIRP-only fields
   document.querySelectorAll('.mf-wiirp-only').forEach(el => {
     el.style.display = selectedProgram === 'wiirp' ? 'flex' : 'none';
@@ -487,7 +482,6 @@ function applyProgramSections() {
   const internTitle = $('mf-internship-title');
   if (internTitle) {
     internTitle.textContent =
-      selectedProgram === 'gip'   ? 'Government Internship Program (GIP) Details' :
       selectedProgram === 'wiirp' ? 'Work Immersion & Internship Referral Details' :
                                     'Internship / Immersion Details';
   }
@@ -526,7 +520,6 @@ function syncWiirpFields() {
       if (endorse2) endorse2.style.display = 'flex';
     }
   } else {
-    // For GIP, assignment section should not be shown based on WIIRP rules
     if (assignmentSec) assignmentSec.style.display = 'none';
   }
 }
