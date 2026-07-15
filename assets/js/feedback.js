@@ -214,17 +214,59 @@
     captureLabel.textContent = 'Capturing…';
     panel.style.visibility = 'hidden';
     launcher.style.visibility = 'hidden';
-    
+
+    // Show a loading overlay so user knows capture is in progress
+    const loadingOverlay = document.createElement('div');
+    loadingOverlay.id = 'fb-capture-loading';
+    loadingOverlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.6);backdrop-filter:blur(2px);z-index:999999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#1e293b;font-family:inherit;';
+    loadingOverlay.innerHTML = `
+        <style>
+            @keyframes fb-bounce {
+                0%, 80%, 100% { transform: translateY(0) translateZ(0); }
+                40% { transform: translateY(-12px) translateZ(0); }
+            }
+            .fb-dot {
+                width: 14px;
+                height: 14px;
+                background-color: #3b82f6;
+                border-radius: 50%;
+                will-change: transform;
+                animation: fb-bounce 1.4s infinite ease-in-out both;
+            }
+            .fb-dot:nth-child(1) { animation-delay: -0.32s; }
+            .fb-dot:nth-child(2) { animation-delay: -0.16s; }
+        </style>
+        <div style="display:flex; gap:8px; margin-bottom:20px;">
+            <div class="fb-dot"></div>
+            <div class="fb-dot"></div>
+            <div class="fb-dot"></div>
+        </div>
+        <span style="font-weight:600; font-size:15px; color:#1e293b; text-shadow: 0 1px 2px rgba(255,255,255,0.8);">Taking screenshot...</span>
+    `;
+    document.body.appendChild(loadingOverlay);
+
+    // Give the browser 150ms to visually paint the loading overlay before blocking the main thread
     setTimeout(() => {
         const originalScrollY = window.scrollY;
-        // Reset scroll position before capture to prevent html2canvas offset bugs
+        // Reset scroll position before capture to prevent offset bugs
         window.scrollTo(0, 0);
 
-        htmlToImage.toPng(document.body, {
+        // Capture only the visible viewport
+        htmlToImage.toPng(document.documentElement, {
             pixelRatio: window.devicePixelRatio || 2,
-            backgroundColor: '#f8fafc' // Optional: forces a background color if body is transparent
+            backgroundColor: '#f8fafc',
+            width: window.innerWidth,
+            height: window.innerHeight,
+            style: {
+                transform: 'none',
+                marginTop: (-window.scrollY) + 'px',
+                marginLeft: (-window.scrollX) + 'px'
+            },
+            filter: (node) => node.id !== 'fb-capture-loading' && node.id !== 'fb-panel' && node.id !== 'fb-launcher'
         }).then(dataUrl => {
             window.scrollTo(0, originalScrollY); // Restore scroll position
+            if (document.body.contains(loadingOverlay)) document.body.removeChild(loadingOverlay);
+
             screenshots.push({ dataUrl: dataUrl });
             renderThumbs();
             panel.style.visibility = 'visible';
@@ -236,12 +278,15 @@
         }).catch(err => {
             console.error('Capture failed', err);
             window.scrollTo(0, originalScrollY);
+            if (document.body.contains(loadingOverlay)) document.body.removeChild(loadingOverlay);
+
             panel.style.visibility = 'visible';
             launcher.style.visibility = 'visible';
             captureBtn.disabled = false;
             captureLabel.textContent = 'Capture page';
+            alert('Failed to capture screen. Please try again or attach an image manually.');
         });
-    }, 100);
+    }, 150);
   });
 
   attachInput.addEventListener('change', (e) => {
@@ -336,13 +381,52 @@
           const pos = getMousePos(e);
           
           if (currentTool === 'text') {
-              const text = prompt('Enter text:');
-              if (text) {
-                  ctx.font = 'bold 36px sans-serif';
-                  ctx.fillStyle = currentColor;
-                  ctx.fillText(text, pos.x, pos.y);
-                  saveState();
-              }
+              const input = document.createElement('input');
+              input.type = 'text';
+              input.placeholder = 'Type here and press Enter...';
+              
+              input.style.cssText = `
+                  position: fixed;
+                  left: ${e.clientX}px;
+                  top: ${e.clientY - 16}px;
+                  z-index: 10005;
+                  background: rgba(255, 255, 255, 0.95);
+                  border: 2px dashed ${currentColor};
+                  color: ${currentColor};
+                  font: bold 16px sans-serif;
+                  padding: 6px 10px;
+                  border-radius: 6px;
+                  outline: none;
+                  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                  min-width: 220px;
+              `;
+              
+              document.body.appendChild(input);
+              // Small timeout to ensure it focuses correctly
+              setTimeout(() => input.focus(), 10);
+              
+              const finishText = () => {
+                  if (input.value.trim() !== '') {
+                      // Note: We use 36px to draw on the high-res canvas so it looks sharp when scaled down by CSS
+                      ctx.font = 'bold 36px sans-serif';
+                      ctx.fillStyle = currentColor;
+                      ctx.fillText(input.value, pos.x, pos.y);
+                      saveState();
+                  }
+                  if (document.body.contains(input)) {
+                      document.body.removeChild(input);
+                  }
+              };
+              
+              input.addEventListener('blur', finishText);
+              input.addEventListener('keydown', (evt) => {
+                  if (evt.key === 'Enter') finishText();
+                  if (evt.key === 'Escape') {
+                      input.value = '';
+                      finishText();
+                  }
+              });
+              
               return;
           }
 
@@ -494,7 +578,7 @@
     const pagesIndex = pathParts.indexOf('pages');
     let rootPrefix = pagesIndex !== -1 ? '../'.repeat(pathParts.length - pagesIndex - 1) : './';
 
-    fetch(rootPrefix + 'api/feedback_submit.php', {
+    fetch(rootPrefix + 'backend/feedback/feedback_submit.php', {
         method: 'POST',
         body: formData
     })
