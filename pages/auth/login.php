@@ -218,7 +218,7 @@ if (isset($_SESSION['user_id'])) {
 
                 setTimeout(() => {
                     loginForm.submit();
-                }, 3000);
+                }, 100);
             });
         });
     </script>
