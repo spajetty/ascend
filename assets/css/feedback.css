@@ -67,7 +67,7 @@
 }
 #fb-panel .fb-close:hover { background: rgba(255,255,255,.28); }
 
-.fb-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; max-height: min(560px,70vh); overflow-y: auto; }
+.fb-body { padding: 18px; display: flex; flex-direction: column; gap: 16px; max-height: 80vh; overflow-y: auto; }
 
 .fb-section-label { font-size: 12px; font-weight: 700; color: var(--fb-text); margin-bottom: 8px; display: block; letter-spacing: .2px; }
 
@@ -94,7 +94,7 @@
   border-radius: 10px; font-size: 13.5px; color: var(--fb-text); background: #f9fafb; font-family: inherit;
   transition: border-color .15s ease, background .15s ease;
 }
-.fb-field textarea { resize: vertical; min-height: 76px; }
+.fb-field textarea { resize: vertical; min-height: 120px; }
 .fb-field input:focus, .fb-field textarea:focus { outline: none; border-color: var(--fb-primary); background: #fff; box-shadow: 0 0 0 3px var(--fb-primary-light); }
 .fb-field.invalid input, .fb-field.invalid textarea { border-color: var(--fb-danger); background: var(--fb-danger-light); }
 .fb-field.shake { animation: fb-shake .32s; }

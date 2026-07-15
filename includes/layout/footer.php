@@ -131,10 +131,18 @@
       </div>
     </div>
 
-    <div class="fb-field">
+    <div class="fb-field" id="fb-details-field">
       <textarea id="fb-details" placeholder="What happened? Steps to reproduce, what you expected, etc."
         maxlength="1000"></textarea>
       <div class="fb-counter" id="fb-details-counter">0 / 1000</div>
+      <div class="fb-inline-error" id="fb-details-error">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        Please provide some details
+      </div>
     </div>
 
     <div>
@@ -249,7 +257,7 @@
   </div>
 </div>
 
-<script src="/assets/js/feedback.js"></script>
+<script src="/assets/js/feedback.js?v=<?= time() ?>"></script>
 </body>
 
 </html>
