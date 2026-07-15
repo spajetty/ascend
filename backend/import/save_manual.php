@@ -129,7 +129,7 @@ try {
             $monthInt = (int)$parts[1];
             
             // Check if batch exists
-            $stmt = $conn->prepare('SELECT batch_id FROM import_batches WHERE month = ? AND year = ? LIMIT 1');
+            $stmt = $conn->prepare('SELECT batch_id FROM import_batches WHERE month = ? AND year = ? AND file_name = "Manual Entry" LIMIT 1');
             $stmt->bind_param('ii', $monthInt, $yearInt);
             $stmt->execute();
             $res = $stmt->get_result()->fetch_assoc();
