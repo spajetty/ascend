@@ -19,7 +19,9 @@
   const subjectField = document.getElementById('fb-subject-field');
   const subjectInput = document.getElementById('fb-subject');
   const subjectError = document.getElementById('fb-subject-error');
+  const detailsField = document.getElementById('fb-details-field');
   const detailsInput = document.getElementById('fb-details');
+  const detailsError = document.getElementById('fb-details-error');
   const detailsCounter = document.getElementById('fb-details-counter');
   const relatedPageInput = document.getElementById('fb-related-page');
   const attachInput = document.getElementById('fb-attach-input');
@@ -106,7 +108,7 @@
   // ---------------- PANEL TOGGLE & DRAG ----------------
   function positionPanelNearLauncher() {
     const r = launcher.getBoundingClientRect();
-    const panelW = 380, panelH = Math.min(panel.scrollHeight || 520, window.innerHeight - 32);
+    const panelW = 380, panelH = Math.min(panel.scrollHeight || 750, window.innerHeight - 32);
     const onLeftHalf = r.left < window.innerWidth / 2;
     let left = onLeftHalf ? r.right + 12 : r.left - panelW - 12;
     left = Math.max(12, Math.min(left, window.innerWidth - panelW - 12));
@@ -214,8 +216,16 @@
     launcher.style.visibility = 'hidden';
     
     setTimeout(() => {
-        html2canvas(document.body).then(canvas => {
-            screenshots.push({ dataUrl: canvas.toDataURL('image/png') });
+        const originalScrollY = window.scrollY;
+        // Reset scroll position before capture to prevent html2canvas offset bugs
+        window.scrollTo(0, 0);
+
+        htmlToImage.toPng(document.body, {
+            pixelRatio: window.devicePixelRatio || 2,
+            backgroundColor: '#f8fafc' // Optional: forces a background color if body is transparent
+        }).then(dataUrl => {
+            window.scrollTo(0, originalScrollY); // Restore scroll position
+            screenshots.push({ dataUrl: dataUrl });
             renderThumbs();
             panel.style.visibility = 'visible';
             launcher.style.visibility = 'visible';
@@ -225,6 +235,7 @@
             openAnnotate(screenshots.length - 1);
         }).catch(err => {
             console.error('Capture failed', err);
+            window.scrollTo(0, originalScrollY);
             panel.style.visibility = 'visible';
             launcher.style.visibility = 'visible';
             captureBtn.disabled = false;
@@ -440,6 +451,16 @@
     } else {
       subjectField.classList.remove('invalid');
       subjectError.classList.remove('show');
+    }
+    
+    if (!detailsInput.value.trim()) {
+      detailsField.classList.add('invalid');
+      detailsError.classList.add('show');
+      shakeInvalid(detailsField);
+      valid = false;
+    } else {
+      detailsField.classList.remove('invalid');
+      detailsError.classList.remove('show');
     }
     
     if (!valid) return;
