@@ -1,44 +1,11 @@
 import { openCreateEventModal } from '../../../../assets/js/imports/job-fair-modal.js';
-
 import { statusesByProgram } from '../../../../assets/js/imports/config.js';
+import { bindJobFairAutocomplete } from './manual-jobfair.js';
+import { validatePanel } from './manual-validation.js';
+import { buildReview } from './manual-review.js';
+import { initDraftManager, clearDraft } from './manual-draft.js';
 
-// Populate Program select based on the local PROGRAMS constants below
-function loadProgramsConfig() {
-  const sectionEl = document.getElementById('manualSection');
-  const programEl = document.getElementById('manualProgram');
-  if (!sectionEl || !programEl) return;
-
-  function setProgramsForSection(sectionKey) {
-    programEl.innerHTML = '';
-    const programs = PROGRAMS[sectionKey] || [];
-    if (programs.length) {
-      programEl.disabled = false;
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = 'Select a program…';
-      programEl.appendChild(placeholder);
-      programs.forEach(p => {
-        const opt = document.createElement('option');
-        opt.value = p.val;
-        opt.textContent = p.label;
-        programEl.appendChild(opt);
-      });
-    } else {
-      programEl.disabled = true;
-      const placeholder = document.createElement('option');
-      placeholder.value = '';
-      placeholder.textContent = 'Select a section first…';
-      programEl.appendChild(placeholder);
-    }
-  }
-
-  sectionEl.addEventListener('change', (e) => setProgramsForSection(e.target.value));
-  programEl.addEventListener('change', syncClassificationOptions);
-  setProgramsForSection(sectionEl.value);
-  syncClassificationOptions();
-}
-
-document.addEventListener('DOMContentLoaded', loadProgramsConfig);
+// Program config is handled by bindProgramBar below.
 
 /**
  * assets/js/imports/manual.js
@@ -88,7 +55,7 @@ const PROG_SECTIONS = {
   accreditation: ['mf-sec-accred'],
   whip:          ['mf-sec-employer', 'mf-sec-whip'],
   spes:          ['mf-sec-spes'],
-  gip:           ['mf-sec-internship'],
+  gip:           ['mf-sec-gip'],
   wiirp:         ['mf-sec-internship'],
   careerdev:     ['mf-sec-school'],
   lmi:           ['mf-sec-school'],
@@ -97,7 +64,7 @@ const PROG_SECTIONS = {
 const ALL_DETAIL_SECTIONS = [
   'mf-sec-employer', 'mf-sec-ftj', 'mf-sec-jobfair',
   'mf-sec-accred',   'mf-sec-whip', 'mf-sec-spes',
-  'mf-sec-internship', 'mf-sec-school',
+  'mf-sec-internship', 'mf-sec-gip', 'mf-sec-school',
 ];
 
 // ── STATE ──────────────────────────────────────────────────────────
@@ -105,6 +72,7 @@ const ALL_DETAIL_SECTIONS = [
 let currentPanel    = 0;
 let selectedSection = '';
 let selectedProgram = '';
+let lastSubmissionState = null;
 
 // ── HELPERS ───────────────────────────────────────────────────────
 
@@ -120,7 +88,7 @@ const $ = id => {
 
 // ── INIT ──────────────────────────────────────────────────────────
 
-document.addEventListener('DOMContentLoaded', () => {
+function initManualForm() {
   bindProgramBar();
   bindAddressDropdowns();
   bindStepperTabs();
@@ -131,13 +99,26 @@ document.addEventListener('DOMContentLoaded', () => {
   bindFileSlots();
   bindCompanyAutocomplete();
   bindJobFairAutocomplete();
-});
+  bindDateConstraints();
+  
+  // Initialize Draft Auto-Save
+  initDraftManager();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initManualForm);
+} else {
+  initManualForm();
+}
 
 // ── PROGRAM BAR ───────────────────────────────────────────────────
 
 function bindProgramBar() {
   $('mf-sel-section').addEventListener('change', onSectionChange);
   $('mf-sel-program').addEventListener('change', onProgramChange);
+  
+  // Initialize state on load
+  onSectionChange();
 }
 
 function onSectionChange() {
@@ -145,16 +126,27 @@ function onSectionChange() {
   selectedProgram = '';
 
   const selProg = $('mf-sel-program');
-  selProg.innerHTML = '<option value="">— choose program —</option>';
-  selProg.disabled = !selectedSection;
-
-  if (selectedSection && PROGRAMS[selectedSection]) {
-    PROGRAMS[selectedSection].forEach(p => {
+  selProg.innerHTML = '';
+  
+  const programs = PROGRAMS[selectedSection] || [];
+  if (programs.length) {
+    selProg.disabled = false;
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Select a program…';
+    selProg.appendChild(placeholder);
+    programs.forEach(p => {
       const opt       = document.createElement('option');
       opt.value       = p.val;
       opt.textContent = p.label;
       selProg.appendChild(opt);
     });
+  } else {
+    selProg.disabled = true;
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Select a section first…';
+    selProg.appendChild(placeholder);
   }
 
   updateBadge();
@@ -366,320 +358,7 @@ function bindCompanyAutocomplete() {
 }
 
 // ── JOB FAIR MULTI-SELECT ─────────────────────────────────────────
-
-let allJobFairEvents = [];
-
-async function fetchAllJobFairEvents(force = false) {
-  if (!force && allJobFairEvents.length > 0) return;
-  try {
-    const res = await fetch('../../backend/import/get_all_job_fair_events.php');
-    if (!res.ok) return;
-    const data = await res.json();
-    if (data.success && data.events) {
-      allJobFairEvents = data.events;
-    }
-  } catch (err) {
-    console.error('Failed to fetch job fair events:', err);
-  }
-}
-
-async function fetchEventParticipants(eventId) {
-  try {
-    const res = await fetch(`../../backend/import/get_event_participants.php?event_id=${eventId}`);
-    const data = await res.json();
-    if (data.success && data.participants) {
-      let comps = data.participants;
-      comps.sort((a, b) => a.company_name.localeCompare(b.company_name));
-      return comps;
-    }
-  } catch (err) {
-    console.error('Failed to fetch event participants:', err);
-  }
-  return [];
-}
-
-function bindJobFairAutocomplete() {
-  const eventInput = $('mf-jfevent-input');
-  const eventDropdown = $('mf-jfevent-dropdown');
-  const eventChips = $('mf-jfevent-chips');
-  const eventHiddens = $('mf-jfevent-hiddens');
-  const eventValidator = $('mf-jfevent');
-  const addEventBtn = $('mf-add-jfevent');
-  
-  const compWrapper = $('mf-jfcompanies-wrapper');
-  const compLists = $('mf-jfcompany-lists');
-  const compValidator = $('mf-jfcompany');
-
-  let selectedEvents = [];
-  let selectedCompaniesByEvent = {};
-  let cachedCompaniesByEvent = {};
-
-  const normalizeCompanies = (items) => {
-    if (!Array.isArray(items)) return [];
-    const seen = new Set();
-    const out = [];
-    items.forEach(item => {
-      const companyId = Number(item?.company_id);
-      const companyName = String(item?.company_name ?? '').trim();
-      if (!companyId || !companyName || seen.has(companyId)) return;
-      seen.add(companyId);
-      out.push({ company_id: companyId, company_name: companyName });
-    });
-    return out;
-  };
-
-  async function addEventWithCompaniesById(eventId, seedCompanies = []) {
-    if (!eventId) return;
-
-    await fetchAllJobFairEvents(true);
-    const selectedId = Number(eventId);
-    const ev = allJobFairEvents.find(e => Number(e.jobfairevent_id) === selectedId);
-    if (!ev) {
-      if (typeof window.showToast === 'function') {
-        window.showToast('Created event was not found in the event list. Please refresh and try again.', 'warning');
-      }
-      return;
-    }
-
-    const alreadySelected = selectedEvents.some(e => Number(e.jobfairevent_id) === selectedId);
-    if (!alreadySelected) {
-      selectedEvents.push(ev);
-    }
-
-    const normalized = normalizeCompanies(seedCompanies);
-    if (!selectedCompaniesByEvent[selectedId]) {
-      selectedCompaniesByEvent[selectedId] = [];
-    }
-
-    normalized.forEach(comp => {
-      if (!selectedCompaniesByEvent[selectedId].some(existing => Number(existing.company_id) === Number(comp.company_id))) {
-        selectedCompaniesByEvent[selectedId].push(comp);
-      }
-    });
-
-    cachedCompaniesByEvent[selectedId] = await fetchEventParticipants(selectedId);
-
-    renderEvents();
-    await renderCompanySections();
-  }
-
-  function validateCompanies() {
-    let hasAll = true;
-    if (selectedEvents.length === 0) hasAll = false;
-    selectedEvents.forEach(ev => {
-      const comps = selectedCompaniesByEvent[ev.jobfairevent_id] || [];
-      if (comps.length === 0) hasAll = false;
-    });
-    if (compValidator) compValidator.value = hasAll ? '1' : '';
-  }
-
-  function renderEvents() {
-    if (eventChips) eventChips.innerHTML = '';
-    if (eventHiddens) eventHiddens.innerHTML = '';
-    
-    selectedEvents.forEach(ev => {
-      const chip = document.createElement('div');
-      chip.className = 'inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium';
-      const label = ev.event_name ? ev.event_name : ev.venue;
-      chip.innerHTML = `<span>${label}</span>
-        <button type="button" class="text-blue-500 hover:text-blue-900 focus:outline-none">&times;</button>`;
-      chip.querySelector('button').addEventListener('click', () => {
-        selectedEvents = selectedEvents.filter(e => e.jobfairevent_id !== ev.jobfairevent_id);
-        delete selectedCompaniesByEvent[ev.jobfairevent_id];
-        renderEvents();
-        renderCompanySections();
-      });
-      if (eventChips) eventChips.appendChild(chip);
-
-      const hidden = document.createElement('input');
-      hidden.type = 'hidden';
-      hidden.name = 'jobfairevent_ids[]';
-      hidden.value = ev.jobfairevent_id;
-      if (eventHiddens) eventHiddens.appendChild(hidden);
-    });
-    
-    if (eventValidator) eventValidator.value = selectedEvents.length > 0 ? '1' : '';
-    
-    if (selectedEvents.length > 0) {
-      if (compWrapper) compWrapper.style.display = 'block';
-    } else {
-      if (compWrapper) compWrapper.style.display = 'none';
-      validateCompanies(); // Revalidate when empty
-    }
-  }
-
-  async function renderCompanySections() {
-    if (!compLists) return;
-    compLists.innerHTML = '';
-    
-    for (const ev of selectedEvents) {
-      const evId = ev.jobfairevent_id;
-      const label = ev.event_name ? ev.event_name : ev.venue;
-      
-      if (!cachedCompaniesByEvent[evId]) {
-        cachedCompaniesByEvent[evId] = await fetchEventParticipants(evId);
-      }
-      const available = cachedCompaniesByEvent[evId];
-      if (!selectedCompaniesByEvent[evId]) selectedCompaniesByEvent[evId] = [];
-
-      const block = document.createElement('div');
-      block.className = 'border border-gray-200 rounded-lg p-3 bg-gray-50';
-      
-      block.innerHTML = `
-        <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Companies for: ${label}</div>
-        <div class="relative">
-          <div class="flex flex-wrap gap-2 mb-2 empty:hidden chips-container"></div>
-          <input type="text" placeholder="Search companies..." class="w-full bg-white px-3 py-1.5 border border-gray-300 rounded-md text-sm outline-none focus:border-blue-600 comp-input">
-          <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hidden max-h-40 overflow-y-auto overflow-x-hidden comp-dropdown" style="z-index: 9999;"></div>
-          <div class="hidden-inputs"></div>
-        </div>
-      `;
-      
-      compLists.appendChild(block);
-
-      const chipsCont = block.querySelector('.chips-container');
-      const hiddenCont = block.querySelector('.hidden-inputs');
-      const inputEl = block.querySelector('.comp-input');
-      const dropdownEl = block.querySelector('.comp-dropdown');
-
-      function renderChips() {
-        chipsCont.innerHTML = '';
-        hiddenCont.innerHTML = '';
-        selectedCompaniesByEvent[evId].forEach(comp => {
-          const chip = document.createElement('div');
-          chip.className = 'inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-medium';
-          chip.innerHTML = `<span>${comp.company_name}</span>
-            <button type="button" class="text-emerald-500 hover:text-emerald-900 focus:outline-none">&times;</button>`;
-          chip.querySelector('button').addEventListener('click', () => {
-            selectedCompaniesByEvent[evId] = selectedCompaniesByEvent[evId].filter(c => c.company_id !== comp.company_id);
-            renderChips();
-            validateCompanies();
-          });
-          chipsCont.appendChild(chip);
-
-          const hidden = document.createElement('input');
-          hidden.type = 'hidden';
-          hidden.name = `jf_company_ids[${evId}][]`;
-          hidden.value = comp.company_id;
-          hiddenCont.appendChild(hidden);
-        });
-        validateCompanies();
-      }
-      
-      renderChips();
-
-      function showDropdown() {
-        const query = inputEl.value.toLowerCase().trim();
-        const filtered = available.filter(c => {
-          return c.company_name.toLowerCase().includes(query) && !selectedCompaniesByEvent[evId].some(sc => sc.company_id === c.company_id);
-        });
-
-        dropdownEl.innerHTML = '';
-        if (filtered.length === 0) {
-          dropdownEl.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 italic">No options found</div>';
-        } else {
-          filtered.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors';
-            
-            const regex = new RegExp(`(${query})`, 'gi');
-            div.innerHTML = query.length > 0 
-              ? item.company_name.replace(regex, '<span class="text-blue-600 font-semibold">$1</span>') 
-              : item.company_name;
-
-            div.addEventListener('click', () => {
-              selectedCompaniesByEvent[evId].push(item);
-              inputEl.value = '';
-              renderChips();
-              dropdownEl.classList.add('hidden');
-            });
-            dropdownEl.appendChild(div);
-          });
-        }
-        dropdownEl.classList.remove('hidden');
-      }
-
-      inputEl.addEventListener('focus', showDropdown);
-      inputEl.addEventListener('input', showDropdown);
-
-      document.addEventListener('click', (e) => {
-        if (!inputEl.parentElement.contains(e.target)) {
-          dropdownEl.classList.add('hidden');
-        }
-      });
-    }
-    validateCompanies();
-  }
-
-  function renderEventDropdown() {
-    if (!eventDropdown) return;
-    const query = eventInput.value.toLowerCase().trim();
-    
-    const filtered = allJobFairEvents.filter(e => {
-      const name = (e.event_name ? e.event_name : e.venue).toLowerCase();
-      return name.includes(query) && !selectedEvents.some(se => se.jobfairevent_id === e.jobfairevent_id);
-    });
-
-    eventDropdown.innerHTML = '';
-    if (filtered.length === 0) {
-      eventDropdown.innerHTML = '<div class="px-4 py-3 text-sm text-gray-500 italic">No options found</div>';
-    } else {
-      filtered.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors';
-        
-        let label = item.event_name ? `${item.event_name} (${item.venue})` : item.venue;
-        if (item.date_start) label += ` - ${item.date_start}`;
-
-        const regex = new RegExp(`(${query})`, 'gi');
-        div.innerHTML = query.length > 0 
-          ? label.replace(regex, '<span class="text-blue-600 font-semibold">$1</span>') 
-          : label;
-
-        div.addEventListener('click', () => {
-          selectedEvents.push(item);
-          eventInput.value = '';
-          renderEvents();
-          eventDropdown.classList.add('hidden');
-          renderCompanySections();
-        });
-        eventDropdown.appendChild(div);
-      });
-    }
-    eventDropdown.classList.remove('hidden');
-  }
-
-  if (eventInput) {
-    const card = eventInput.closest('.mf-card');
-    if (card) card.style.overflow = 'visible';
-
-    eventInput.addEventListener('focus', async () => {
-      await fetchAllJobFairEvents();
-      renderEventDropdown();
-    });
-
-    eventInput.addEventListener('input', () => {
-      renderEventDropdown();
-    });
-
-    document.addEventListener('click', (e) => {
-      if (eventDropdown && !eventInput.parentElement.contains(e.target)) {
-        eventDropdown.classList.add('hidden');
-      }
-    });
-  }
-
-  if (addEventBtn) {
-    addEventBtn.addEventListener('click', () => {
-      openCreateEventModal(async ({ eventId, participants }) => {
-        await addEventWithCompaniesById(eventId, participants || []);
-      }, {
-        importedCompanies: [],
-        unmatchedCompanies: [],
-      });
-    });
-  }
-}
+// Logic moved to manual-jobfair.js
 
 // ── STEPPER TABS ──────────────────────────────────────────────────
 
@@ -692,79 +371,7 @@ function bindStepperTabs() {
   });
 }
 
-function validatePanel(idx) {
-  let isValid = true;
-  let firstInvalid = null;
-
-  if (idx === 1) {
-    if (['accreditation', 'careerdev', 'lmi'].includes(selectedProgram)) {
-      return true;
-    }
-
-    const req1 = ['mf-lname', 'mf-fname', 'mf-dob', 'mf-barangay', 'mf-city'];
-    const programLabel = $('mf-sel-program')?.selectedOptions?.[0]?.textContent?.trim() || '';
-    const needsClassification = Boolean(programLabel && (statusesByProgram[programLabel] || []).length);
-    if (needsClassification) req1.push('mf-classification');
-    const is4ps = document.getElementById('mf-flag-4ps')?.classList.contains('on');
-    if (is4ps) req1.push('mf-4psid');
-
-    for (const id of req1) {
-      const el = $(id);
-      if (el && !el.value.trim()) {
-        isValid = false;
-        if (!firstInvalid) firstInvalid = el;
-      }
-    }
-    
-    if (!isValid) {
-      window.showToast('Please fill in all required fields in Panel 1.', 'warning');
-      if (firstInvalid) firstInvalid.focus();
-      return false;
-    }
-  } else if (idx === 2) {
-    const req2 = [];
-    
-    if (['jobmatch', 'firstjobseek', 'jobfair', 'whip'].includes(selectedProgram)) {
-      req2.push('mf-company', 'mf-position');
-    }
-    if (selectedProgram === 'jobfair') {
-      req2.push('mf-jfevent', 'mf-jfcompany');
-    }
-    if (selectedProgram === 'whip') {
-      req2.push('mf-project');
-    }
-    if (['careerdev', 'lmi'].includes(selectedProgram)) {
-      req2.push('mf-school');
-    }
-    if (selectedProgram === 'accreditation') {
-      req2.push('mf-accred-company', 'mf-accred-year');
-    }
-    
-    for (const id of req2) {
-      const el = $(id);
-      if (el && !el.value.trim()) {
-        isValid = false;
-        if (!firstInvalid) firstInvalid = el;
-      }
-    }
-
-    if (!isValid) {
-      window.showToast('Please fill in all required fields in Panel 2.', 'warning');
-      if (firstInvalid) firstInvalid.focus();
-      return false;
-    }
-  } else if (idx === 3) {
-    if (!['accreditation', 'careerdev', 'lmi'].includes(selectedProgram)) {
-      const resumeInput = document.querySelector('input[name="resume"]');
-      if (resumeInput && resumeInput.value.trim() === '') {
-        window.showToast('Please provide the required Resume / CV link in Panel 3.', 'warning');
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
+// Validation logic moved to manual-validation.js
 
 function tryGoStep(n) {
   if (n >= 1 && !selectedProgram) {
@@ -774,7 +381,7 @@ function tryGoStep(n) {
   
   if (n > currentPanel) {
     for (let i = currentPanel; i < n; i++) {
-      if (!validatePanel(i)) {
+      if (!validatePanel(i, selectedProgram)) {
         return;
       }
     }
@@ -818,8 +425,9 @@ function goPanel(n) {
 
   // Panel-specific hooks
   if (n === 2) applyProgramSections();
-  if (n === 4) buildReview();
-
+  if (n === 4) {
+    buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_LABELS);
+  }
   currentPanel = n;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -852,6 +460,10 @@ function bindNavButtons() {
   // Success → add another
   const addAnother = $('mf-add-another');
   if (addAnother) addAnother.addEventListener('click', resetForm);
+
+  // Undo submission
+  const undoSubmit = $('mf-undo-submit');
+  if (undoSubmit) undoSubmit.addEventListener('click', undoSubmission);
 }
 
 // ── PROGRAM SECTIONS (panel 2) ────────────────────────────────────
@@ -864,21 +476,17 @@ function applyProgramSections() {
     if (el) el.style.display = show.includes(id) ? 'block' : 'none';
   });
 
-  // GIP-only fields
-  document.querySelectorAll('.mf-gip-only').forEach(el => {
-    el.style.display = selectedProgram === 'gip' ? 'flex' : 'none';
-  });
-
   // WIIRP-only fields
   document.querySelectorAll('.mf-wiirp-only').forEach(el => {
     el.style.display = selectedProgram === 'wiirp' ? 'flex' : 'none';
   });
+  
+  syncWiirpFields();
 
   // Dynamic titles
   const internTitle = $('mf-internship-title');
   if (internTitle) {
     internTitle.textContent =
-      selectedProgram === 'gip'   ? 'Government Internship Program (GIP) Details' :
       selectedProgram === 'wiirp' ? 'Work Immersion & Internship Referral Details' :
                                     'Internship / Immersion Details';
   }
@@ -895,6 +503,29 @@ function applyProgramSections() {
   const noteText = $('mf-panel2-note-text');
   if (p && noteText) {
     noteText.innerHTML = `Showing fields for <strong>${p.label}</strong>. Fill in what applies.`;
+  }
+}
+
+function syncWiirpFields() {
+  const type = $('mf-h-inttype')?.value || 'inquiry';
+  const assignmentSec = $('mf-int-assignment-sec');
+  const endorse1 = $('mf-endorse1')?.closest('.mf-field');
+  const endorse2 = $('mf-endorse2')?.closest('.mf-field');
+
+  if (selectedProgram === 'wiirp') {
+    if (type === 'inquiry') {
+      if (assignmentSec) assignmentSec.style.display = 'none';
+    } else if (type === 'peso-assigned') {
+      if (assignmentSec) assignmentSec.style.display = 'block';
+      if (endorse1) endorse1.style.display = 'none';
+      if (endorse2) endorse2.style.display = 'none';
+    } else if (type === 'private') {
+      if (assignmentSec) assignmentSec.style.display = 'block';
+      if (endorse1) endorse1.style.display = 'flex';
+      if (endorse2) endorse2.style.display = 'flex';
+    }
+  } else {
+    if (assignmentSec) assignmentSec.style.display = 'none';
   }
 }
 
@@ -917,7 +548,12 @@ function bindChips() {
 
     // Sync hidden input
     const hiddenInput = document.getElementById(`mf-h-${group}`);
-    if (hiddenInput) hiddenInput.value = chip.dataset.val;
+    if (hiddenInput) {
+      hiddenInput.value = chip.dataset.val;
+      if (group === 'inttype') {
+        syncWiirpFields();
+      }
+    }
   });
 }
 
@@ -959,13 +595,81 @@ function bindFlags() {
 function bindDob() {
   const dob = $('mf-dob');
   if (!dob) return;
-  dob.addEventListener('change', () => {
-    const hint = $('mf-age-hint');
-    if (!dob.value) { hint.textContent = ''; return; }
-    const age = Math.floor(
-      (Date.now() - new Date(dob.value).getTime()) / (365.25 * 24 * 3600 * 1000)
-    );
-    hint.textContent = `${age} years old`;
+  const ageField = $('mf-age');
+
+  // Block future dates in the native date picker
+  const todayStr = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  dob.max = todayStr;
+
+  const updateAge = () => {
+    if (!ageField) return;
+    if (!dob.value) {
+      ageField.value = '';
+      return;
+    }
+
+    const birthDate = new Date(dob.value);
+    if (Number.isNaN(birthDate.getTime())) {
+      ageField.value = '';
+      return;
+    }
+
+    // Guard against a future date typed in manually (bypasses the max attribute)
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (birthDate > now) {
+      dob.value = '';
+      ageField.value = '';
+      if (typeof window.showToast === 'function') {
+        window.showToast('Date of birth cannot be in the future.', 'warning');
+      } else {
+        alert('Date of birth cannot be in the future.');
+      }
+      return;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const dayDiff = today.getDate() - birthDate.getDate();
+
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      age--;
+    }
+
+    ageField.value = `${age} years old`;
+  };
+
+  dob.addEventListener('change', updateAge);
+  dob.addEventListener('input', updateAge);
+  updateAge();
+}
+
+// ── DATE CONSTRAINTS ──────────────────────────────────────────────
+
+function bindDateConstraints() {
+  const specs = [
+    { start: $('mf-contract-start'), end: $('mf-contract-end') },       // SPES
+    { start: $('mf-gip-contract-start'), end: $('mf-gip-contract-end') } // GIP
+  ];
+
+  specs.forEach(pair => {
+    if (!pair.start || !pair.end) return;
+
+    const update = () => {
+      if (pair.start.value) pair.end.min = pair.start.value;
+      else pair.end.removeAttribute('min');
+      
+      if (pair.end.value) pair.start.max = pair.end.value;
+      else pair.start.removeAttribute('max');
+    };
+
+    pair.start.addEventListener('change', update);
+    pair.start.addEventListener('input', update);
+    pair.end.addEventListener('change', update);
+    pair.end.addEventListener('input', update);
+    
+    update();
   });
 }
 
@@ -1007,37 +711,7 @@ function bindFileSlots() {
 }
 
 // ── REVIEW PANEL ──────────────────────────────────────────────────
-
-function buildReview() {
-  const p = (PROGRAMS[selectedSection] || []).find(x => x.val === selectedProgram);
-
-  $('mf-rv-section').textContent = SECTION_LABELS[selectedSection] || '—';
-  $('mf-rv-program').textContent = p ? p.label : '—';
-
-  const fname = $('mf-fname')?.value || '';
-  const lname = $('mf-lname')?.value || '';
-  $('mf-rv-name').textContent =
-    (lname && fname) ? `${lname}, ${fname}` : fname || lname || '—';
-
-  const dob = $('mf-dob')?.value;
-  $('mf-rv-dob').textContent = dob
-    ? new Date(dob).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
-    : '—';
-
-  const sexChip = document.querySelector('[data-group="sex"].on');
-  $('mf-rv-sex').textContent = sexChip?.dataset.val || '—';
-
-  const classificationWrap = $('mf-classification-wrap');
-  $('mf-rv-class').textContent    = classificationWrap?.style.display === 'none' ? '—' : ($('mf-classification')?.value || '—');
-  $('mf-rv-district').textContent = $('mf-district')?.value ? `District ${$('mf-district').value}` : '—';
-  $('mf-rv-barangay').textContent = $('mf-barangay')?.value || '—';
-
-  const flags = [];
-  if ($('mf-flag-4ps')?.classList.contains('on')) flags.push('4Ps');
-  if ($('mf-flag-pwd')?.classList.contains('on')) flags.push('PWD');
-  if ($('mf-flag-ofw')?.classList.contains('on')) flags.push('OFW Dependent');
-  $('mf-rv-flags').textContent = flags.length ? flags.join(', ') : 'None';
-}
+// Logic moved to manual-review.js
 
 // ── SUBMIT ────────────────────────────────────────────────────────
 // Replace this with a real fetch() POST to your API endpoint.
@@ -1062,9 +736,11 @@ function submitForm() {
   .then(data => {
     if (data.success) {
       $('mf-success-id').textContent = `Benef #${data.beneficiary_id}`;
+      lastSubmissionState = data.state;
       if (typeof window.showToast === 'function') {
         window.showToast('Manual entry saved successfully.', 'success');
       }
+      clearDraft(); // Clear draft on successful save
       goPanel(5);
     } else {
       if (typeof window.showToast === 'function') {
@@ -1083,11 +759,46 @@ function submitForm() {
   });
 }
 
+// ── UNDO ──────────────────────────────────────────────────────────
+
+function undoSubmission() {
+  if (!lastSubmissionState) {
+    if (typeof window.showToast === 'function') window.showToast('No entry to undo.', 'error');
+    return;
+  }
+  
+  if (typeof showLoading === 'function') showLoading();
+  
+  fetch('../../backend/import/undo_manual.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state: lastSubmissionState })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      if (typeof window.showToast === 'function') window.showToast('Entry successfully undone.', 'info');
+      lastSubmissionState = null;
+      resetForm();
+    } else {
+      if (typeof window.showToast === 'function') window.showToast(data.error || 'Failed to undo entry.', 'error');
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    if (typeof window.showToast === 'function') window.showToast('Network error during undo.', 'error');
+  })
+  .finally(() => {
+    if (typeof hideLoading === 'function') hideLoading();
+  });
+}
+
 // ── RESET ─────────────────────────────────────────────────────────
 
 function resetForm() {
   selectedSection = '';
   selectedProgram = '';
+  lastSubmissionState = null;
 
   const secEl = $('manualSection');
   if(secEl) secEl.value = '';

@@ -461,16 +461,22 @@
                 </svg>
             </button>
         </div>
-        <div style="display:flex;gap:12px;">
-            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
                     <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
                     <strong style="font-size:13px;">Academic Details</strong>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Contract Period</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipContractPeriod">—</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label style="font-size:11.5px;color:var(--text-muted);">Student Type</label>
+                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStudentType">—</div>
+                        </div>
+                        <div>
+                            <label style="font-size:11.5px;color:var(--text-muted);">Highest Educational Attainment</label>
+                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipHighestEduc">—</div>
+                        </div>
                     </div>
                     <div>
                         <label style="font-size:11.5px;color:var(--text-muted);">School</label>
@@ -480,37 +486,33 @@
                         <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCourse">—</div>
                     </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Required Hours</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipRequiredHours">—</div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Education Level</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCollegeOrShs">—</div>
-                    </div>
                 </div>
             </div>
-            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+            
+            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
                     <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                    <strong style="font-size:13px;">Preferences</strong>
+                    <strong style="font-size:13px;">Contract Details</strong>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Organization</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipPreferredOrgType">—</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                        <div>
+                            <label style="font-size:11.5px;color:var(--text-muted);">Start of Contract</label>
+                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStartContract">—</div>
+                        </div>
+                        <div>
+                            <label style="font-size:11.5px;color:var(--text-muted);">End of Contract</label>
+                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipEndContract">—</div>
+                        </div>
                     </div>
                     <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Preferred Industry</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipPreferredIndustry">—</div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Willing Outside Area</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipWillingOutside">—</div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">No. of Days</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipDays">—</div>
                     </div>
                 </div>
             </div>
-            <div class="info-card" style="margin:0;padding:12px;flex:1;">
+            
+            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
                     <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
                     <strong style="font-size:13px;">Placement</strong>

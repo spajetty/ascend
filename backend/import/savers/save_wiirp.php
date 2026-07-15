@@ -23,7 +23,7 @@ function saveWiirpRow(mysqli $conn, array $row, array $ctx, array &$state): stri
 
 	$shape = resolveWiirpTableSchema($conn);
 
-	$contractPeriod = trim((string)($ctx['importMonthRaw'] ?? '') . ' ' . (string)($ctx['importYearRaw'] ?? ''));
+	$contractPeriod = s(rowValue($row, ['Contract Period', 'contract_period'], trim((string)($ctx['importMonthRaw'] ?? '') . ' ' . (string)($ctx['importYearRaw'] ?? ''))));
 	$school = s(rowValue($row, ['School Name', 'School', 'school'], ''));
 	$course = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
 	$requiredHours = parseIntNullable(rowValue($row, ['Required Work Immersion / Internship Hours', 'Required Hours', 'required_hours', '# of hours', 'Number of hours'], ''));

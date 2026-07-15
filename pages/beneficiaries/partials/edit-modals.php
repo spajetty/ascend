@@ -309,7 +309,7 @@
 
 <!-- ── Edit Government Internship Program Modal ── -->
 <div id="modalEditGip" class="timeline-modal-overlay" style="display:none;">
-    <div class="modal-box" style="max-width:860px;">
+    <div class="modal-box" style="max-width:680px;">
         <div class="modal-header">
             <h3>Edit Government Internship Program</h3>
             <button class="modal-close" onclick="closeEditGipModal()">✕</button>
@@ -317,82 +317,54 @@
         <div class="modal-body" style="display:flex;flex-direction:column;gap:14px;">
             <input type="hidden" id="editGipId" value="">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
-                <div class="info-card" style="margin:0;padding:12px;">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                        <strong style="font-size:13px;">Academic Details</strong>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="modal-field">
-                            <label>Contract Period</label>
-                            <input type="text" id="editGipContractPeriod" placeholder="e.g. June 2026 to November 2026">
-                        </div>
-                        <div class="modal-field">
-                            <label>School</label>
-                            <input type="text" id="editGipSchool" placeholder="School name">
-                        </div>
-                        <div class="modal-field">
-                            <label>Course</label>
-                            <input type="text" id="editGipCourse" placeholder="Course">
-                        </div>
-                        <div class="modal-field">
-                            <label>Required Hours</label>
-                            <input type="number" id="editGipRequiredHours" min="0" step="1" placeholder="Required hours">
-                        </div>
-                        <div class="modal-field">
-                            <label>Education Level</label>
-                            <select id="editGipCollegeOrShs">
-                                <option value="">— Select —</option>
-                                <option value="college">College</option>
-                                <option value="shs">Senior High School</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="modal-field">
+                    <label>Student Type</label>
+                    <select id="editGipStudentType">
+                        <option value="student">Student</option>
+                        <option value="osy">OSY</option>
+                    </select>
                 </div>
-
-                <div class="info-card" style="margin:0;padding:12px;">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                        <strong style="font-size:13px;">Preferences</strong>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="modal-field">
-                            <label>Preferred Organization</label>
-                            <input type="text" id="editGipPreferredOrgType" placeholder="Preferred organization type">
-                        </div>
-                        <div class="modal-field">
-                            <label>Preferred Industry</label>
-                            <input type="text" id="editGipPreferredIndustry" placeholder="Preferred industry">
-                        </div>
-                        <div class="modal-field">
-                            <label>Willing Outside Area</label>
-                            <select id="editGipWillingOutside">
-                                <option value="0">No</option>
-                                <option value="1">Yes</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="modal-field">
+                    <label>Highest Educational Attainment</label>
+                    <input type="text" id="editGipHighestEduc" placeholder="Highest educational attainment">
                 </div>
+                <div class="modal-field">
+                    <label>Course</label>
+                    <input type="text" id="editGipCourse" placeholder="Course">
+                </div>
+                <div class="modal-field">
+                    <label>School</label>
+                    <input type="text" id="editGipSchool" placeholder="School">
+                </div>
+            </div>
 
-                <div class="info-card" style="margin:0;padding:12px;">
-                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                        <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                        <strong style="font-size:13px;">Placement</strong>
-                    </div>
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <div class="modal-field">
-                            <label>Office Assignment</label>
-                            <input type="text" id="editGipOfficeAssignment" placeholder="Office assignment">
-                        </div>
-                        <div class="modal-field">
-                            <label>Placement Type</label>
-                            <select id="editGipType">
-                                <option value="">— Select —</option>
-                                <option value="DOLE">DOLE</option>
-                                <option value="LGU">LGU</option>
-                            </select>
-                        </div>
-                    </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Start of Contract</label>
+                    <input type="date" id="editGipStartContract">
+                </div>
+                <div class="modal-field">
+                    <label>End of Contract</label>
+                    <input type="date" id="editGipEndContract">
+                </div>
+                <div class="modal-field">
+                    <label>No. of Days</label>
+                    <input type="number" id="editGipDays" min="0">
+                </div>
+            </div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+                <div class="modal-field">
+                    <label>Office Assignment</label>
+                    <input type="text" id="editGipOfficeAssignment" placeholder="Office assignment">
+                </div>
+                <div class="modal-field">
+                    <label>Placement Type</label>
+                    <select id="editGipType">
+                        <option value="">— Select —</option>
+                        <option value="DOLE">DOLE</option>
+                        <option value="LGU">LGU</option>
+                    </select>
                 </div>
             </div>
         </div>

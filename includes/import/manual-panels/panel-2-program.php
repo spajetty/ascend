@@ -20,11 +20,9 @@
                             <div class="mf-field mf-col2">
                                 <label for="mf-company">Company <span class="mf-req">*</span> <span class="mf-hint">Type
                                         to search</span></label>
-                                <input type="text" id="mf-company" name="company_name"
-                                    placeholder="Search company name…" list="mf-company-list">
-                                <datalist id="mf-company-list">
-                                    <!-- TODO: populate from DB query on employers table -->
-                                </datalist>
+                                <input type="text" id="mf-company" class="mf-company-autocomplete" name="company_name"
+                                    placeholder="Search company name…" data-hidden="mf-h-company-id">
+
                                 <input type="hidden" name="company_id" id="mf-h-company-id" value="">
                             </div>
                             <div class="mf-field">
@@ -33,7 +31,7 @@
                                     placeholder="e.g. Customer Service Rep">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-batch">Batch / Period</label>
+                                <label for="mf-batch">Batch / Period <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-batch" name="batch_period">
                             </div>
                         </div>
@@ -120,15 +118,15 @@
                                 <input type="hidden" name="student_type" id="mf-h-stutype" value="student">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-school">School</label>
+                                <label for="mf-spes-school">School <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-spes-school" name="spes_school" placeholder="School name">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-course">Course</label>
+                                <label for="mf-spes-course">Course <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-spes-course" name="course" placeholder="e.g. BSIT">
                             </div>
                             <div class="mf-field mf-col2">
-                                <label for="mf-highest-educ">Highest Education Attained</label>
+                                <label for="mf-highest-educ">Highest Education Attained <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-highest-educ" name="highest_educ"
                                     placeholder="e.g. 2nd Year College">
                             </div>
@@ -138,7 +136,7 @@
 
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field">
-                                <label for="mf-store">Company / Office Assignment</label>
+                                <label for="mf-store">Company / Office Assignment <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-store" name="store_assignment">
                             </div>
                             <div class="mf-field">
@@ -150,26 +148,83 @@
                                 <input type="hidden" name="spes_category" id="mf-h-spescat" value="lgu">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-contract-start">Contract Start</label>
+                                <label for="mf-contract-start">Contract Start <span class="mf-req">*</span></label>
                                 <input type="date" id="mf-contract-start" name="start_of_contract">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-contract-end">Contract End</label>
+                                <label for="mf-contract-end">Contract End <span class="mf-req">*</span></label>
                                 <input type="date" id="mf-contract-end" name="end_of_contract">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-days">No. of Days</label>
+                                <label for="mf-days">No. of Days <span class="mf-req">*</span></label>
                                 <input type="number" id="mf-days" name="days" min="1" placeholder="0">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-spes-batch">Batch</label>
+                                <label for="mf-spes-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-spes-batch" name="spes_batch">
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- GIP / WIIRP — Internship / Immersion -->
+                <!-- GIP Details -->
+                <div class="mf-card" id="mf-sec-gip" style="display:none;">
+                    <div class="mf-card-head">
+                        <div class="mf-card-icon"><i class="fa-solid fa-briefcase"></i></div>
+                        <div class="mf-card-title">Government Internship Program (GIP) Details</div>
+                    </div>
+                    <div class="mf-card-body">
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field mf-col2">
+                                <label>Student Type <span class="mf-req">*</span></label>
+                                <div class="mf-chip-group">
+                                    <div class="mf-chip on" data-group="gipstutype" data-val="student">Student</div>
+                                    <div class="mf-chip" data-group="gipstutype" data-val="osy">Out-of-School Youth</div>
+                                </div>
+                                <input type="hidden" name="gip_student_type" id="mf-h-gipstutype" value="student">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-school">School <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-school" name="gip_school" placeholder="School name">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-course">Course <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-course" name="gip_course" placeholder="e.g. BSIT">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-gip-highest-educ">Highest Education Attained <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-highest-educ" name="gip_highest_educ" placeholder="e.g. College Graduate">
+                            </div>
+                        </div>
+
+                        <div class="mf-sec-rule"><span>Contract Details</span></div>
+
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field mf-col2">
+                                <label for="mf-gip-office">Office Assignment <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-gip-office" name="gip_office_assignment">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-contract-start">Contract Start <span class="mf-req">*</span></label>
+                                <input type="date" id="mf-gip-contract-start" name="gip_start_of_contract">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-contract-end">Contract End <span class="mf-req">*</span></label>
+                                <input type="date" id="mf-gip-contract-end" name="gip_end_of_contract">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-days">No. of Days <span class="mf-req">*</span></label>
+                                <input type="number" id="mf-gip-days" name="gip_days" min="1" placeholder="0">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-gip-batch">Batch <span class="mf-req">*</span></label>
+                                <input type="month" id="mf-gip-batch" name="gip_batch">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WIIRP — Internship / Immersion -->
                 <div class="mf-card" id="mf-sec-internship" style="display:none;">
                     <div class="mf-card-head">
                         <div class="mf-card-icon"><i class="fa-solid fa-building-columns"></i></div>
@@ -177,7 +232,7 @@
                     </div>
                     <div class="mf-card-body">
                         <div class="mf-grid mf-grid-2">
-                            <div class="mf-field mf-col2">
+                            <div class="mf-field mf-col2 mf-wiirp-only" style="display:none;">
                                 <label>Type</label>
                                 <div class="mf-chip-group">
                                     <div class="mf-chip on" data-group="inttype" data-val="inquiry">Inquiry</div>
@@ -186,15 +241,6 @@
                                     <div class="mf-chip" data-group="inttype" data-val="private">Private</div>
                                 </div>
                                 <input type="hidden" name="inquiry_type" id="mf-h-inttype" value="inquiry">
-                            </div>
-                            <!-- GIP only -->
-                            <div class="mf-field mf-gip-only" style="display:none;">
-                                <label>Level</label>
-                                <div class="mf-chip-group">
-                                    <div class="mf-chip on" data-group="level" data-val="College">College</div>
-                                    <div class="mf-chip" data-group="level" data-val="SHS">SHS</div>
-                                </div>
-                                <input type="hidden" name="college_or_shs" id="mf-h-level" value="College">
                             </div>
                             <div class="mf-field">
                                 <label for="mf-int-school">School</label>
@@ -207,8 +253,15 @@
                             <!-- WIIRP only -->
                             <div class="mf-field mf-wiirp-only" style="display:none;">
                                 <label for="mf-year-level">Year Level</label>
-                                <input type="text" id="mf-year-level" name="year_level"
-                                    placeholder="e.g. 3rd Year / Grade 12">
+                                <select id="mf-year-level" name="year_level">
+                                    <option value="">— select —</option>
+                                    <option value="Grade 11">Grade 11</option>
+                                    <option value="Grade 12">Grade 12</option>
+                                    <option value="1st Year College">1st Year College</option>
+                                    <option value="2nd Year College">2nd Year College</option>
+                                    <option value="3rd Year College">3rd Year College</option>
+                                    <option value="4th Year College">4th Year College</option>
+                                </select>
                             </div>
                             <div class="mf-field">
                                 <label for="mf-req-hours">Required Hours</label>
@@ -221,13 +274,28 @@
                             </div>
                             <div class="mf-field">
                                 <label for="mf-pref-org">Preferred Org Type</label>
-                                <input type="text" id="mf-pref-org" name="preferred_org_type"
-                                    placeholder="e.g. Government">
+                                <select id="mf-pref-org" name="preferred_org_type">
+                                    <option value="">— select —</option>
+                                    <option value="Quezon City Government Office">Quezon City Government Office</option>
+                                    <option value="Private Company / Establishment">Private Company / Establishment</option>
+                                    <option value="No Preference">No Preference</option>
+                                </select>
                             </div>
                             <div class="mf-field">
                                 <label for="mf-pref-ind">Preferred Industry</label>
-                                <input type="text" id="mf-pref-ind" name="preferred_industry"
-                                    placeholder="e.g. IT &amp; Communications">
+                                <select id="mf-pref-ind" name="preferred_industry" onchange="document.getElementById('mf-pref-ind-other').style.display = this.value === 'Other' ? 'block' : 'none';">
+                                    <option value="">— select —</option>
+                                    <option value="Office Administration">Office Administration</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Customer Service / Retail">Customer Service / Retail</option>
+                                    <option value="Hospitality / Tourism">Hospitality / Tourism</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Accounting / Finance">Accounting / Finance</option>
+                                    <option value="Human Resources">Human Resources</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="mf-pref-ind-other" name="preferred_industry_other" placeholder="Please specify" style="display:none; margin-top: 0.5rem;">
                             </div>
                             <div class="mf-field mf-col2">
                                 <label>Willing to work outside QC?</label>
@@ -240,20 +308,27 @@
                             <!-- WIIRP only -->
                             <div class="mf-field mf-wiirp-only" style="display:none;">
                                 <label for="mf-int-sched">Internship Schedule</label>
-                                <input type="text" id="mf-int-sched" name="internship_sched"
-                                    placeholder="e.g. MWF 8am–5pm">
+                                <select id="mf-int-sched" name="internship_sched" onchange="document.getElementById('mf-int-sched-other').style.display = this.value === 'Other' ? 'block' : 'none';">
+                                    <option value="">— select —</option>
+                                    <option value="Weekdays (Mon–Fri)">Weekdays (Mon–Fri)</option>
+                                    <option value="Weekends (Sat–Sun)">Weekends (Sat–Sun)</option>
+                                    <option value="Flexible">Flexible</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <input type="text" id="mf-int-sched-other" name="internship_sched_other" placeholder="Please specify" style="display:none; margin-top: 0.5rem;">
                             </div>
                             <div class="mf-field">
                                 <label for="mf-int-start">Start Date</label>
                                 <input type="date" id="mf-int-start" name="int_start">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-int-batch">Batch</label>
+                                <label for="mf-int-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-int-batch" name="int_batch">
                             </div>
                         </div>
 
-                        <div class="mf-sec-rule"><span>Office Assignment (if PESO-assigned)</span></div>
+                        <div id="mf-int-assignment-sec" style="display:none;">
+                            
 
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
@@ -278,6 +353,7 @@
                                 <label for="mf-endorse2">Endorsement Letter 2</label>
                                 <input type="text" id="mf-endorse2" name="endorsement_2"
                                     placeholder="Filename / reference">
+                            </div>
                             </div>
                         </div>
                     </div>
@@ -308,7 +384,7 @@
                                 <input type="date" id="mf-date-hired" name="date_hired">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-whip-batch">Batch</label>
+                                <label for="mf-whip-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-whip-batch" name="whip_batch">
                             </div>
                         </div>
@@ -370,7 +446,7 @@
                                 <input type="hidden" name="approval_letter" id="mf-h-approval" value="1">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-school-batch">Batch</label>
+                                <label for="mf-school-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-school-batch" name="school_batch">
                             </div>
                         </div>
@@ -390,8 +466,9 @@
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
                                 <label for="mf-accred-company">Company <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-accred-company" name="accred_company"
-                                    placeholder="Search company name…" list="mf-company-list">
+                                <input type="text" id="mf-accred-company" class="mf-company-autocomplete" name="accred_company"
+                                    placeholder="Search company name…" data-hidden="mf-h-accred-company-id">
+                                <input type="hidden" name="accred_company_id" id="mf-h-accred-company-id" value="">
                             </div>
                             <div class="mf-field">
                                 <label>Status</label>

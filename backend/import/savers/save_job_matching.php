@@ -18,6 +18,7 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
             'est_type' => rowValue($row, ['Establishment Type', 'Est Type', 'est_type'], ''),
             'industry' => rowValue($row, ['Industry', 'industry'], ''),
             'city' => rowValue($row, ['City/Municipality', 'City', 'city'], ''),
+            'allow_create' => !($ctx['is_manual'] ?? false)
         ]);
         $companyId = (int)($employerResult['id'] ?? 0);
 
@@ -28,6 +29,9 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
     }
 
     if (!$companyId) {
+        if ($ctx['is_manual'] ?? false) {
+            throw new RuntimeException("Please select a valid, existing company from the dropdown.");
+        }
         return 'skipped';
     }
 

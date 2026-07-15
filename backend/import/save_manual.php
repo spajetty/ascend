@@ -17,10 +17,13 @@ require_once __DIR__ . '/helpers/followup_utils.php';
 // Row savers
 require_once __DIR__ . '/savers/save_common_person.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
+require_once __DIR__ . '/savers/save_spes.php';
+require_once __DIR__ . '/savers/save_wiirp.php';
+require_once __DIR__ . '/savers/save_gip.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Government Internship Program', 'Work Immersion and Internship Referral Program'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -61,7 +64,44 @@ try {
         'Brgy Clearance' => $_POST['brgy_clearance'] ?? '',
         'NBI Clearance' => $_POST['nbi_clearance'] ?? '',
         'Birth Cert' => $_POST['birth_cert'] ?? '',
-        'TESDA Cert' => $_POST['tesda_cert'] ?? ''
+        'TESDA Cert' => $_POST['tesda_cert'] ?? '',
+
+        // SPES Fields
+        'school' => $_POST['spes_school'] ?? '',
+        'student_type' => $_POST['student_type'] ?? '',
+        'highest_educ' => $_POST['highest_educ'] ?? '',
+        'course' => !empty($_POST['course']) ? $_POST['course'] : ($_POST['int_course'] ?? ''),
+        'store_assignment' => $_POST['store_assignment'] ?? '',
+        '_spes_category' => $_POST['spes_category'] ?? '',
+        'start_of_contract' => $_POST['start_of_contract'] ?? '',
+        'end_of_contract' => $_POST['end_of_contract'] ?? '',
+        'days' => $_POST['days'] ?? '',
+        
+        // WIIRP Fields
+        'school' => $program === 'Government Internship Program' ? ($_POST['gip_school'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_school'] ?? '') : ($_POST['spes_school'] ?? '')),
+        'course' => $program === 'Government Internship Program' ? ($_POST['gip_course'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_course'] ?? '') : ($_POST['course'] ?? '')),
+        'highest_educ' => $program === 'Government Internship Program' ? ($_POST['gip_highest_educ'] ?? '') : ($_POST['highest_educ'] ?? ''),
+        'year_level' => $_POST['year_level'] ?? '',
+        'contract_period' => $_POST['contract_period'] ?? '',
+        'required_hours' => $_POST['required_hours'] ?? '',
+        'inquiry_type' => $_POST['inquiry_type'] ?? 'inquiry',
+        'preferred_org_type' => $_POST['preferred_org_type'] ?? '',
+        'preferred_industry' => (($_POST['preferred_industry'] ?? '') === 'Other' && !empty($_POST['preferred_industry_other'])) ? $_POST['preferred_industry_other'] : ($_POST['preferred_industry'] ?? ''),
+        'is_willing_outside' => $_POST['is_willing_outside'] ?? '',
+        'internship_sched' => (($_POST['internship_sched'] ?? '') === 'Other' && !empty($_POST['internship_sched_other'])) ? $_POST['internship_sched_other'] : ($_POST['internship_sched'] ?? ''),
+        'start' => $_POST['int_start'] ?? '',
+        '_parsed_start_date' => !empty($_POST['gip_start_of_contract']) ? $_POST['gip_start_of_contract'] : ($_POST['assign_start'] ?? ''), // Assignment start
+        '_parsed_end_date' => !empty($_POST['gip_end_of_contract']) ? $_POST['gip_end_of_contract'] : ($_POST['assign_end'] ?? ''),     // Assignment end
+        'office_assignment' => !empty($_POST['gip_office_assignment']) ? $_POST['gip_office_assignment'] : ($_POST['office_assignment'] ?? ''),
+        'endorsement_1' => $_POST['endorsement_1'] ?? '',
+        'endorsement_2' => $_POST['endorsement_2'] ?? '',
+        
+        // GIP Specific Fields mapped to common names or unique names for saveGipRow
+        // GIP Specific Fields mapped to common names or unique names for saveGipRow
+        'student_type' => $program === 'Government Internship Program' ? ($_POST['gip_student_type'] ?? '') : ($_POST['student_type'] ?? ''),
+        'start_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_start_of_contract'] ?? '') : ($_POST['start_of_contract'] ?? ''),
+        'end_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_end_of_contract'] ?? '') : ($_POST['end_of_contract'] ?? ''),
+        'days' => $program === 'Government Internship Program' ? ($_POST['gip_days'] ?? '') : ($_POST['days'] ?? ''),
     ];
 
     $duplicate = checkDuplicate(
@@ -81,7 +121,7 @@ try {
 
     // Resolve Batch ID
     $batchId = null;
-    $batchPeriod = trim((string)($_POST['batch_period'] ?? ''));
+    $batchPeriod = trim((string)($_POST['batch_period'] ?? $_POST['spes_batch'] ?? $_POST['int_batch'] ?? $_POST['whip_batch'] ?? $_POST['school_batch'] ?? ''));
     if ($batchPeriod !== '') {
         $parts = explode('-', $batchPeriod);
         if (count($parts) === 2) {
@@ -89,7 +129,7 @@ try {
             $monthInt = (int)$parts[1];
             
             // Check if batch exists
-            $stmt = $conn->prepare('SELECT batch_id FROM import_batches WHERE month = ? AND year = ? LIMIT 1');
+            $stmt = $conn->prepare('SELECT batch_id FROM import_batches WHERE month = ? AND year = ? AND file_name = "Manual Entry" LIMIT 1');
             $stmt->bind_param('ii', $monthInt, $yearInt);
             $stmt->execute();
             $res = $stmt->get_result()->fetch_assoc();
@@ -108,10 +148,21 @@ try {
         }
     }
 
+    $classification = strtolower(trim((string)($_POST['classification'] ?? '')));
+    $gipCategory = '';
+    if (strpos($classification, 'dole-accepted') !== false) {
+        $gipCategory = 'DOLE';
+    } elseif (strpos($classification, 'peso-accepted') !== false) {
+        $gipCategory = 'LGU';
+    }
+
     $ctx = [
         'program' => $program,
         'programId' => $programId,
         'batchId' => $batchId,
+        'wiirpCategory' => trim((string)($_POST['inquiry_type'] ?? 'inquiry')),
+        'gipCategory' => $gipCategory,
+        'is_manual' => true
     ];
 
     $state = [
@@ -179,6 +230,23 @@ try {
         if ($insertedRows === 0) {
             throw new RuntimeException('Please select at least one participating company for each chosen event.');
         }
+    } elseif ($program === 'SPES') {
+        $result = saveSPESRow($conn, $row, $benefId, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save SPES record.");
+        }
+    } elseif ($program === 'Government Internship Program') {
+        $row['_sys_benef_id'] = $benefId;
+        $result = saveGipRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save GIP record.");
+        }
+    } elseif ($program === 'Work Immersion and Internship Referral Program') {
+        $row['_sys_benef_id'] = $benefId;
+        $result = saveWiirpRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save WIIRP record.");
+        }
     } else {
         $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);
         if ($result !== 'saved') {
@@ -191,6 +259,7 @@ try {
     echo json_encode([
         'success' => true,
         'beneficiary_id' => $benefId,
+        'state' => $state,
         'warnings' => array_values(array_unique($state['warnings'])),
     ]);
 

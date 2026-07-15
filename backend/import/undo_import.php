@@ -243,10 +243,29 @@ try {
     $batchId = (int)($payload['batch_id'] ?? 0);
     $deletedBatch = 0;
     if ($batchId > 0) {
-        $delBatch = $conn->prepare('DELETE FROM import_batches WHERE batch_id = ?');
-        $delBatch->bind_param('i', $batchId);
-        $delBatch->execute();
-        $deletedBatch = $delBatch->affected_rows;
+        $tablesToCheck = ['jobmatch', 'jobfair', 'firstjobseek', 'spes', 'wiirp', 'gip', 'whip', 'whip_beneficiaries', 'projects'];
+        $inUse = false;
+        foreach ($tablesToCheck as $tbl) {
+            if (tableExists($conn, $tbl)) {
+                $col = findExistingColumn($conn, $tbl, ['batch_id']);
+                if ($col) {
+                    $chk = $conn->prepare("SELECT 1 FROM {$tbl} WHERE {$col} = ? LIMIT 1");
+                    $chk->bind_param('i', $batchId);
+                    $chk->execute();
+                    if ($chk->get_result()->fetch_assoc()) {
+                        $inUse = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (!$inUse) {
+            $delBatch = $conn->prepare('DELETE FROM import_batches WHERE batch_id = ?');
+            $delBatch->bind_param('i', $batchId);
+            $delBatch->execute();
+            $deletedBatch = $delBatch->affected_rows;
+        }
     }
 
     $conn->commit();
