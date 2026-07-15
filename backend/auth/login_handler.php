@@ -121,6 +121,7 @@ $_SESSION['user_id']   = $user['user_id'];
 $_SESSION['user_name'] = strtok($user['fname'], ' ') . ' ' . $user['lname'];
 $_SESSION['user_role'] = $user['role'];   // 'Admin' or 'Staff'
 
+/*
 function warmDashboardCache(): void {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
@@ -172,6 +173,7 @@ function warmDashboardCache(): void {
 }
 
 warmDashboardCache();
+*/
 
 header("Location: /pages/dashboard/dashboard.php");
 exit;
