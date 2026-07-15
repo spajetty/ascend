@@ -3,6 +3,7 @@ import { statusesByProgram } from '../../../../assets/js/imports/config.js';
 import { bindJobFairAutocomplete } from './manual-jobfair.js';
 import { validatePanel } from './manual-validation.js';
 import { buildReview } from './manual-review.js';
+import { initDraftManager, clearDraft } from './manual-draft.js';
 
 // Program config is handled by bindProgramBar below.
 
@@ -99,6 +100,9 @@ function initManualForm() {
   bindCompanyAutocomplete();
   bindJobFairAutocomplete();
   bindDateConstraints();
+  
+  // Initialize Draft Auto-Save
+  initDraftManager();
 }
 
 if (document.readyState === 'loading') {
@@ -736,6 +740,7 @@ function submitForm() {
       if (typeof window.showToast === 'function') {
         window.showToast('Manual entry saved successfully.', 'success');
       }
+      clearDraft(); // Clear draft on successful save
       goPanel(5);
     } else {
       if (typeof window.showToast === 'function') {
