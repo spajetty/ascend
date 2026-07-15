@@ -35,16 +35,16 @@ export function validatePanel(idx, selectedProgram) {
     const req2 = [];
     
     if (['jobmatch', 'firstjobseek', 'jobfair', 'whip'].includes(selectedProgram)) {
-      req2.push('mf-company', 'mf-position');
+      req2.push('mf-company', 'mf-position', 'mf-batch');
     }
     if (selectedProgram === 'jobfair') {
       req2.push('mf-jfevent', 'mf-jfcompany');
     }
     if (selectedProgram === 'whip') {
-      req2.push('mf-project');
+      req2.push('mf-project', 'mf-whip-batch');
     }
     if (['careerdev', 'lmi'].includes(selectedProgram)) {
-      req2.push('mf-school');
+      req2.push('mf-school', 'mf-school-batch');
     }
     if (selectedProgram === 'accreditation') {
       req2.push('mf-accred-company', 'mf-accred-year');
