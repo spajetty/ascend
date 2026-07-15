@@ -31,7 +31,7 @@
                                     placeholder="e.g. Customer Service Rep">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-batch">Batch / Period</label>
+                                <label for="mf-batch">Batch / Period <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-batch" name="batch_period">
                             </div>
                         </div>
@@ -322,7 +322,7 @@
                                 <input type="date" id="mf-int-start" name="int_start">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-int-batch">Batch</label>
+                                <label for="mf-int-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-int-batch" name="int_batch">
                             </div>
                         </div>
@@ -384,7 +384,7 @@
                                 <input type="date" id="mf-date-hired" name="date_hired">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-whip-batch">Batch</label>
+                                <label for="mf-whip-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-whip-batch" name="whip_batch">
                             </div>
                         </div>
@@ -446,7 +446,7 @@
                                 <input type="hidden" name="approval_letter" id="mf-h-approval" value="1">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-school-batch">Batch</label>
+                                <label for="mf-school-batch">Batch <span class="mf-req">*</span></label>
                                 <input type="month" id="mf-school-batch" name="school_batch">
                             </div>
                         </div>
