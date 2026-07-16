@@ -17,14 +17,14 @@
 /* ---------------- FLOATING BUTTON ---------------- */
 #fb-launcher {
   position: fixed; z-index: 9998; width: 56px; height: 56px; border-radius: 50%;
-  background: var(--fb-primary); color: #fff; border: none; cursor: grab;
+  background: linear-gradient(135deg, #3b82f6 0%, #ef4444 50%, #eab308 100%); color: #fff; border: none; cursor: grab;
   box-shadow: var(--fb-shadow-sm); display: flex; align-items: center; justify-content: center;
   touch-action: none; user-select: none;
   transition: box-shadow .2s ease, background .15s ease, transform .18s cubic-bezier(.34,1.56,.64,1);
 }
-#fb-launcher:hover { background: var(--fb-primary-dark); box-shadow: var(--fb-shadow); transform: scale(1.05); }
+#fb-launcher:hover { box-shadow: var(--fb-shadow); transform: scale(1.05); filter: brightness(0.9); }
 #fb-launcher.dragging { cursor: grabbing; transform: scale(1.1); box-shadow: var(--fb-shadow); transition: none; }
-#fb-launcher.open { background: var(--fb-primary-dark); }
+#fb-launcher.open { filter: brightness(0.85); }
 #fb-launcher svg { width: 23px; height: 23px; pointer-events: none; transition: transform .25s ease; }
 #fb-launcher.open svg { transform: rotate(90deg) scale(.9); }
 
@@ -47,7 +47,7 @@
 #fb-panel.open { opacity: 1; transform: scale(1) translateY(0); pointer-events: auto; }
 
 #fb-panel .fb-header {
-  background: linear-gradient(135deg, var(--fb-primary), var(--fb-primary-dark));
+  background: var(--fb-primary);
   color: #fff; padding: 16px 18px; display: flex; align-items: center; gap: 10px;
   cursor: grab; touch-action: none; user-select: none;
 }
@@ -276,9 +276,9 @@
 }
 
 .annotate-tool.active {
-    background: #eff6ff;
-    color: #1a56db;
-    border-color: #1a56db;
+    background: var(--fb-primary-light);
+    color: var(--fb-primary);
+    border-color: var(--fb-primary);
 }
 
 .annotate-colors {
@@ -301,7 +301,7 @@
 
 .color-swatch.active {
     transform: scale(1.2);
-    border-color: #1a56db;
+    border-color: var(--fb-primary);
     box-shadow: 0 0 0 1px white inset;
 }
 
@@ -374,7 +374,7 @@
 
 #btn-annotate-save {
     padding: 8px 16px;
-    background: #1a56db;
+    background: var(--fb-primary);
     border: none;
     border-radius: 6px;
     font-weight: 600;
