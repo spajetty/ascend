@@ -48,6 +48,9 @@ if (isset($_SESSION['user_id'])) {
                             case 'empty':
                                 echo "Please fill in all fields.";
                                 break;
+                            case 'timeout':
+                                echo "Your session has expired due to inactivity. Please log in again.";
+                                break;
                             case 'invalid':
                                 $left = intval($_GET['left'] ?? 0);
                                 echo "Invalid email or password.";
