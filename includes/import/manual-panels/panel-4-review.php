@@ -24,7 +24,7 @@
                                 </dl>
                             </div>
                         </div>
-                        <div class="mf-rv-section">
+                        <div class="mf-rv-section" id="mf-rv-beneficiary-section" style="display:none;">
                             <div class="mf-rv-title">Beneficiary</div>
                             <div class="mf-rv-grid">
                                 <dl class="mf-rv-item">

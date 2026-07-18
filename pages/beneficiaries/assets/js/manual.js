@@ -27,7 +27,7 @@ const PROGRAMS = {
   ],
   '2': [
     { val: 'accreditation', label: 'Employers Accreditation' },
-    { val: 'whip',          label: 'Workers Hiring for Infrastructure Projects' },
+    { val: 'whip', label: 'Workers Hiring for Infrastructure Projects' },
   ],
   '3': [
     { val: 'spes',  label: 'SPES' },
@@ -53,7 +53,9 @@ const PROG_SECTIONS = {
   firstjobseek:  ['mf-sec-employer', 'mf-sec-ftj'],
   jobfair:       ['mf-sec-employer', 'mf-sec-jobfair'],
   accreditation: ['mf-sec-accred'],
-  whip:          ['mf-sec-employer', 'mf-sec-whip'],
+  // mf-sec-whip-projects (the "new project" sub-form) is toggled separately
+  // by the project-picker logic, not shown unconditionally here.
+  whip:          ['mf-sec-whip-picker', 'mf-sec-whip'],
   spes:          ['mf-sec-spes'],
   gip:           ['mf-sec-gip'],
   wiirp:         ['mf-sec-internship'],
@@ -63,7 +65,7 @@ const PROG_SECTIONS = {
 
 const ALL_DETAIL_SECTIONS = [
   'mf-sec-employer', 'mf-sec-ftj', 'mf-sec-jobfair',
-  'mf-sec-accred',   'mf-sec-whip', 'mf-sec-spes',
+  'mf-sec-accred',   'mf-sec-whip-picker', 'mf-sec-whip', 'mf-sec-whip-projects', 'mf-sec-spes',
   'mf-sec-internship', 'mf-sec-gip', 'mf-sec-school',
 ];
 
@@ -73,6 +75,7 @@ let currentPanel    = 0;
 let selectedSection = '';
 let selectedProgram = '';
 let lastSubmissionState = null;
+let lastWhipProject = null; // { id, mode, title } — set on WHIP submit, used for "Add Another Worker"
 
 // ── HELPERS ───────────────────────────────────────────────────────
 
@@ -98,6 +101,7 @@ function initManualForm() {
   bindDob();
   bindFileSlots();
   bindCompanyAutocomplete();
+  bindWhipProjectPicker();
   bindJobFairAutocomplete();
   bindDateConstraints();
   
@@ -162,8 +166,18 @@ function onProgramChange() {
   const spesPanel = $('mf-cond-spes-status');
   if (spesPanel) spesPanel.classList.toggle('show', selectedProgram === 'spes');
 
+  if (selectedProgram === 'whip') {
+    resetWhipProjectPicker();
+  }
+
   // Refresh detail sections if already on step 2
   if (currentPanel === 2) applyProgramSections();
+
+  // Accreditation is company-level only, so jump straight to program details.
+  if (selectedProgram === 'accreditation') {
+    goPanel(2);
+    return;
+  }
 
   // Show the first form immediately once a valid program exists.
   if (selectedProgram) {
@@ -258,7 +272,8 @@ function updateBadge() {
 function bindCompanyAutocomplete() {
   const inputs = [
     { el: $('mf-company'), hidden: $('mf-h-company-id') },
-    { el: $('mf-accred-company'), hidden: null }
+    { el: $('mf-accred-company'), hidden: null },
+    { el: $('mf-project-contractor'), hidden: null }
   ];
 
   let debounceTimer;
@@ -285,6 +300,32 @@ function bindCompanyAutocomplete() {
     dropdown.style.zIndex = '9999';
     parent.appendChild(dropdown);
 
+    const isAccredCompany = el.id === 'mf-accred-company';
+
+    const renderAddCompanyAction = (typedName) => {
+      if (!isAccredCompany || !typedName) return;
+
+      const footer = document.createElement('div');
+      footer.className = 'sticky bottom-0 border-t border-gray-100 bg-gray-50 p-2';
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-left text-sm font-semibold text-blue-700 hover:bg-blue-100 transition-colors';
+      btn.textContent = `+ Add "${typedName}" as a new company`;
+      btn.addEventListener('click', () => {
+        const modeHidden = $('mf-h-accred-company-mode');
+        if (modeHidden) modeHidden.value = 'new';
+        if (hidden) hidden.value = '';
+        dropdown.classList.add('hidden');
+        if (typeof window.showToast === 'function') {
+          window.showToast('New company mode enabled. Continue filling in the company details.', 'info');
+        }
+      });
+
+      footer.appendChild(btn);
+      dropdown.appendChild(footer);
+    };
+
     const closeDropdown = () => {
       dropdown.classList.add('hidden');
     };
@@ -301,6 +342,8 @@ function bindCompanyAutocomplete() {
       
       // Clear hidden input since the text is changing
       if (hidden) hidden.value = '';
+      const modeHidden = el.id === 'mf-accred-company' ? $('mf-h-accred-company-mode') : null;
+      if (modeHidden) modeHidden.value = 'search';
       
       const trimVal = val.trim();
       if (trimVal.length < 1) {
@@ -316,12 +359,14 @@ function bindCompanyAutocomplete() {
           const data = await res.json();
           if (data.success && data.companies) {
             dropdown.innerHTML = '';
+            const typedName = trimVal;
             
             if (data.companies.length === 0) {
               const noRes = document.createElement('div');
-              noRes.className = 'px-4 py-3 text-sm text-gray-500 italic';
+              noRes.className = 'px-4 py-3 text-sm text-gray-500';
               noRes.textContent = 'No companies found';
               dropdown.appendChild(noRes);
+              renderAddCompanyAction(typedName);
             } else {
               data.companies.forEach(c => {
                 const item = document.createElement('div');
@@ -339,6 +384,10 @@ function bindCompanyAutocomplete() {
                 });
                 dropdown.appendChild(item);
               });
+
+              if (isAccredCompany) {
+                renderAddCompanyAction(typedName);
+              }
             }
             
             dropdown.classList.remove('hidden');
@@ -354,6 +403,164 @@ function bindCompanyAutocomplete() {
         dropdown.classList.remove('hidden');
       }
     });
+  });
+}
+
+// ── WHIP PROJECT PICKER (search existing project or add a new one) ────
+
+let whipProjectsCache = null; // [{ project_id, project_title, contractor }]
+
+function fetchWhipProjects() {
+  if (whipProjectsCache) return Promise.resolve(whipProjectsCache);
+  return fetch('../../backend/beneficiaries/get_projects_options.php')
+    .then(res => res.json())
+    .then(data => {
+      whipProjectsCache = (data && data.success && Array.isArray(data.projects)) ? data.projects : [];
+      return whipProjectsCache;
+    })
+    .catch(() => {
+      whipProjectsCache = [];
+      return whipProjectsCache;
+    });
+}
+
+function showNewWhipProjectFields(typedTitle) {
+  const card = $('mf-sec-whip-projects');
+  if (card) card.style.display = 'block';
+  const titleInput = $('mf-project-title');
+  if (titleInput && typedTitle) titleInput.value = typedTitle;
+  const modeHidden = $('mf-h-whip-project-mode');
+  if (modeHidden) modeHidden.value = 'new';
+  const idHidden = $('mf-h-whip-project-id');
+  if (idHidden) idHidden.value = '';
+  const summary = $('mf-whip-project-summary');
+  if (summary) summary.style.display = 'none';
+}
+
+function hideNewWhipProjectFields() {
+  const card = $('mf-sec-whip-projects');
+  if (card) card.style.display = 'none';
+}
+
+function selectExistingWhipProject(project) {
+  const search = $('mf-whip-project-search');
+  const idHidden = $('mf-h-whip-project-id');
+  const modeHidden = $('mf-h-whip-project-mode');
+  if (search) search.value = project.project_title;
+  if (idHidden) idHidden.value = project.project_id;
+  if (modeHidden) modeHidden.value = 'search';
+  hideNewWhipProjectFields();
+
+  const summary = $('mf-whip-project-summary');
+  const summaryTitle = $('mf-whip-project-summary-title');
+  const summaryMeta = $('mf-whip-project-summary-meta');
+  if (summary && summaryTitle && summaryMeta) {
+    summaryTitle.textContent = project.project_title;
+    summaryMeta.textContent = project.contractor ? `Contractor: ${project.contractor}` : '';
+    summary.style.display = 'block';
+  }
+}
+
+function resetWhipProjectPicker() {
+  const search = $('mf-whip-project-search');
+  const idHidden = $('mf-h-whip-project-id');
+  const modeHidden = $('mf-h-whip-project-mode');
+  if (search) search.value = '';
+  if (idHidden) idHidden.value = '';
+  if (modeHidden) modeHidden.value = 'search';
+  hideNewWhipProjectFields();
+  const summary = $('mf-whip-project-summary');
+  if (summary) summary.style.display = 'none';
+}
+
+function bindWhipProjectPicker() {
+  const search = $('mf-whip-project-search');
+  if (!search) return;
+
+  const parent = search.parentElement;
+  parent.style.position = 'relative';
+  const card = search.closest('.mf-card');
+  if (card) card.style.overflow = 'visible';
+
+  const dropdown = document.createElement('div');
+  dropdown.className = 'absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hidden max-h-60 overflow-y-auto overflow-x-hidden';
+  dropdown.style.zIndex = '9999';
+  parent.appendChild(dropdown);
+
+  const closeDropdown = () => dropdown.classList.add('hidden');
+  document.addEventListener('click', (e) => {
+    if (!parent.contains(e.target)) closeDropdown();
+  });
+
+  let debounceTimer;
+  search.addEventListener('input', (e) => {
+    const typedName = e.target.value;
+    const trimVal = typedName.trim();
+
+    // Any manual edit invalidates a previous selection until they pick again.
+    const idHidden = $('mf-h-whip-project-id');
+    if (idHidden) idHidden.value = '';
+    const summary = $('mf-whip-project-summary');
+    if (summary) summary.style.display = 'none';
+
+    if (trimVal.length < 1) {
+      closeDropdown();
+      hideNewWhipProjectFields();
+      return;
+    }
+
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(async () => {
+      const projects = await fetchWhipProjects();
+      const q = trimVal.toLowerCase();
+      const matches = projects.filter(p =>
+        (p.project_title || '').toLowerCase().includes(q) ||
+        (p.contractor || '').toLowerCase().includes(q)
+      ).slice(0, 8);
+
+      dropdown.innerHTML = '';
+
+      matches.forEach(project => {
+        const item = document.createElement('div');
+        item.className = 'px-4 py-3 text-sm font-medium text-gray-700 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors';
+        const label = project.contractor ? `${project.project_title} <span class="text-gray-400 font-normal">— ${project.contractor}</span>` : project.project_title;
+        item.innerHTML = label;
+        item.addEventListener('click', () => {
+          selectExistingWhipProject(project);
+          closeDropdown();
+        });
+        dropdown.appendChild(item);
+      });
+
+      if (matches.length === 0) {
+        const noRes = document.createElement('div');
+        noRes.className = 'px-4 py-3 text-sm text-gray-500';
+        noRes.textContent = 'No matching projects found';
+        dropdown.appendChild(noRes);
+      }
+
+      const footer = document.createElement('div');
+      footer.className = 'sticky bottom-0 border-t border-gray-100 bg-gray-50 p-2';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'w-full rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-left text-sm font-semibold text-blue-700 hover:bg-blue-100 transition-colors';
+      btn.textContent = `+ Add "${typedName}" as a new project`;
+      btn.addEventListener('click', () => {
+        showNewWhipProjectFields(typedName);
+        closeDropdown();
+        if (window.showToast) window.showToast('New project mode enabled. Fill in the project details below.', 'info');
+      });
+      footer.appendChild(btn);
+      dropdown.appendChild(footer);
+
+      dropdown.classList.remove('hidden');
+    }, 250);
+  });
+
+  search.addEventListener('focus', () => {
+    if (dropdown.innerHTML !== '' && search.value.trim().length > 0) {
+      dropdown.classList.remove('hidden');
+    }
   });
 }
 
@@ -378,6 +585,17 @@ function tryGoStep(n) {
     window.showToast('Please select a Section and Program first.', 'warning');
     return;
   }
+
+  if (selectedProgram === 'accreditation') {
+    // Accreditation only has two real steps: Program Details -> Review.
+    // Route "Continue" (n=3, originally "Documents") and the Review tab (n=4)
+    // to the Review panel so the user can check their input before submitting.
+    if (n === 3 || n === 4) {
+      if (!validatePanel(2, selectedProgram)) return;
+      goPanel(4);
+      return;
+    }
+  }
   
   if (n > currentPanel) {
     for (let i = currentPanel; i < n; i++) {
@@ -391,6 +609,11 @@ function tryGoStep(n) {
 }
 
 function goPanel(n) {
+  if (selectedProgram === 'accreditation') {
+    if (n === 1) n = 2;
+    if (n === 3) n = 2; // "Back" from Review (panel 4) lands on Program Details
+  }
+
   // Hide all panels, show target
   document.querySelectorAll('.mf-panel').forEach(p => p.classList.remove('active'));
   $('mf-panel-' + n).classList.add('active');
@@ -461,6 +684,10 @@ function bindNavButtons() {
   const addAnother = $('mf-add-another');
   if (addAnother) addAnother.addEventListener('click', resetForm);
 
+  // Success → add another worker to the same WHIP project
+  const addWhipWorker = $('mf-add-whip-worker');
+  if (addWhipWorker) addWhipWorker.addEventListener('click', addAnotherWhipWorker);
+
   // Undo submission
   const undoSubmit = $('mf-undo-submit');
   if (undoSubmit) undoSubmit.addEventListener('click', undoSubmission);
@@ -470,11 +697,32 @@ function bindNavButtons() {
 
 function applyProgramSections() {
   const show = PROG_SECTIONS[selectedProgram] || [];
+  const isAccreditation = selectedProgram === 'accreditation';
 
   ALL_DETAIL_SECTIONS.forEach(id => {
     const el = $(id);
     if (el) el.style.display = show.includes(id) ? 'block' : 'none';
   });
+
+  // mf-sec-whip-projects isn't in PROG_SECTIONS (it's conditional), so restore
+  // its visibility based on the current project mode rather than always hiding it.
+  if (selectedProgram === 'whip') {
+    const modeHidden = $('mf-h-whip-project-mode');
+    const projCard = $('mf-sec-whip-projects');
+    if (projCard) projCard.style.display = (modeHidden && modeHidden.value === 'new') ? 'block' : 'none';
+  }
+
+  const beneficiaryPanel = $('mf-panel-1');
+  const documentsPanel = $('mf-panel-3');
+  const step1 = $('mf-stab-1');
+  const step3 = $('mf-stab-3');
+  if (beneficiaryPanel) beneficiaryPanel.style.display = isAccreditation ? 'none' : '';
+  if (documentsPanel) documentsPanel.style.display = isAccreditation ? 'none' : '';
+  if (step1) step1.style.display = isAccreditation ? 'none' : '';
+  if (step3) step3.style.display = isAccreditation ? 'none' : '';
+  // Step 4 (Review) and panel 2/4 visibility are controlled entirely by the
+  // 'active' class via goPanel() — no inline style overrides here, otherwise
+  // the panel stays visibly stuck on screen after navigating away from it.
 
   // WIIRP-only fields
   document.querySelectorAll('.mf-wiirp-only').forEach(el => {
@@ -489,6 +737,16 @@ function applyProgramSections() {
     internTitle.textContent =
       selectedProgram === 'wiirp' ? 'Work Immersion & Internship Referral Details' :
                                     'Internship / Immersion Details';
+  }
+
+  const accredCompany = $('mf-accred-company');
+  if (accredCompany) {
+    accredCompany.placeholder = 'Search existing company or type a new company name';
+  }
+
+  const next2 = $('mf-next-2');
+  if (next2) {
+    next2.textContent = isAccreditation ? 'Continue → Review' : 'Continue → Documents';
   }
 
   const schoolTitle = $('mf-school-card-title');
@@ -720,6 +978,10 @@ function submitForm() {
   const p = (PROGRAMS[selectedSection] || []).find(x => x.val === selectedProgram);
   $('mf-success-prog').textContent = p ? p.label : selectedProgram;
 
+  const isWhip = selectedProgram === 'whip';
+  const whipProjectIdAtSubmit = isWhip ? ($('mf-h-whip-project-id')?.value || '') : '';
+  const whipProjectTitleAtSubmit = isWhip ? ($('mf-whip-project-search')?.value || '') : '';
+
   const formEl = document.getElementById('manualEntryForm');
   const formData = new FormData(formEl);
   const programLabel = p ? p.label : selectedProgram;
@@ -735,8 +997,25 @@ function submitForm() {
   .then(res => res.json())
   .then(data => {
     if (data.success) {
-      $('mf-success-id').textContent = `Benef #${data.beneficiary_id}`;
+      const successId = data.beneficiary_id ? `Benef #${data.beneficiary_id}` : 'Record saved';
+      $('mf-success-id').textContent = successId;
       lastSubmissionState = data.state;
+
+      const addWorkerBtn = $('mf-add-whip-worker');
+      const addWorkerLabel = $('mf-add-whip-worker-label');
+      if (isWhip) {
+        let projId = whipProjectIdAtSubmit ? parseInt(whipProjectIdAtSubmit, 10) : null;
+        if (!projId && data.state && Array.isArray(data.state.insertedProjectIds) && data.state.insertedProjectIds.length) {
+          projId = data.state.insertedProjectIds[data.state.insertedProjectIds.length - 1];
+        }
+        lastWhipProject = projId ? { id: projId, title: whipProjectTitleAtSubmit } : null;
+        if (addWorkerBtn) addWorkerBtn.style.display = lastWhipProject ? 'inline-flex' : 'none';
+        if (addWorkerLabel && lastWhipProject) addWorkerLabel.textContent = lastWhipProject.title;
+        whipProjectsCache = null; // force a refresh so a newly-created project is searchable next time
+      } else if (addWorkerBtn) {
+        addWorkerBtn.style.display = 'none';
+      }
+
       if (typeof window.showToast === 'function') {
         window.showToast('Manual entry saved successfully.', 'success');
       }
@@ -757,6 +1036,52 @@ function submitForm() {
   .finally(() => {
     if (typeof hideLoading === 'function') hideLoading();
   });
+}
+
+// ── WHIP: ADD ANOTHER WORKER TO THE SAME PROJECT ───────────────────
+
+function addAnotherWhipWorker() {
+  if (!lastWhipProject || selectedProgram !== 'whip') {
+    resetForm();
+    return;
+  }
+
+  // Clear only the person + worker fields; keep section/program/project intact.
+  ['mf-lname', 'mf-fname', 'mf-mname', 'mf-dob', 'mf-age', 'mf-contact', 'mf-email',
+   'mf-house', 'mf-city', 'mf-notes', 'mf-whip-pos', 'mf-date-hired'].forEach(id => {
+    const el = $(id);
+    if (el) el.value = '';
+  });
+
+  const districtEl = $('mf-district');
+  const barangayEl = $('mf-barangay');
+  if (districtEl) districtEl.value = '';
+  if (barangayEl) {
+    barangayEl.value = '';
+    barangayEl.innerHTML = '<option value="">Select district first…</option>';
+    barangayEl.disabled = true;
+  }
+
+  document.querySelectorAll('[data-group="sex"]').forEach(c => c.classList.remove('on'));
+  document.querySelector('[data-group="sex"][data-val="Male"]')?.classList.add('on');
+  const hSex = $('mf-h-sex');
+  if (hSex) hSex.value = 'Male';
+
+  ['mf-flag-4ps', 'mf-flag-pwd', 'mf-flag-ofw'].forEach(id => $(id)?.classList.remove('on'));
+  const h4ps = $('mf-h-4ps'); if (h4ps) h4ps.value = '0';
+  const hPwd = $('mf-h-pwd'); if (hPwd) hPwd.value = '0';
+  const hOfw = $('mf-h-ofw'); if (hOfw) hOfw.value = '0';
+
+  document.querySelectorAll('.mf-url-input').forEach(input => {
+    input.value = '';
+    input.dispatchEvent(new Event('input'));
+  });
+
+  // Re-apply the same project selection.
+  const cached = (whipProjectsCache || []).find(p => String(p.project_id) === String(lastWhipProject.id));
+  selectExistingWhipProject(cached || { project_id: lastWhipProject.id, project_title: lastWhipProject.title, contractor: '' });
+
+  goPanel(1);
 }
 
 // ── UNDO ──────────────────────────────────────────────────────────
@@ -799,6 +1124,9 @@ function resetForm() {
   selectedSection = '';
   selectedProgram = '';
   lastSubmissionState = null;
+  lastWhipProject = null;
+  const addWhipWorker = $('mf-add-whip-worker');
+  if (addWhipWorker) addWhipWorker.style.display = 'none';
 
   const secEl = $('manualSection');
   if(secEl) secEl.value = '';

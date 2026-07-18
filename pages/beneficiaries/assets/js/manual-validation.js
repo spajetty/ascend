@@ -7,7 +7,7 @@ export function validatePanel(idx, selectedProgram) {
   let firstInvalid = null;
 
   if (idx === 1) {
-    if (['accreditation', 'careerdev', 'lmi'].includes(selectedProgram)) {
+    if (['accreditation', 'whip_projects', 'careerdev', 'lmi'].includes(selectedProgram)) {
       return true;
     }
 
@@ -34,20 +34,20 @@ export function validatePanel(idx, selectedProgram) {
   } else if (idx === 2) {
     const req2 = [];
     
-    if (['jobmatch', 'firstjobseek', 'jobfair', 'whip'].includes(selectedProgram)) {
+    if (['jobmatch', 'firstjobseek', 'jobfair'].includes(selectedProgram)) {
       req2.push('mf-company', 'mf-position', 'mf-batch');
     }
     if (selectedProgram === 'jobfair') {
       req2.push('mf-jfevent', 'mf-jfcompany');
     }
     if (selectedProgram === 'whip') {
-      req2.push('mf-project', 'mf-whip-batch');
+      req2.push('mf-whip-batch');
     }
     if (['careerdev', 'lmi'].includes(selectedProgram)) {
       req2.push('mf-school', 'mf-school-batch');
     }
     if (selectedProgram === 'accreditation') {
-      req2.push('mf-accred-company', 'mf-accred-year');
+      req2.push('mf-accred-period', 'mf-accred-company');
     }
     if (selectedProgram === 'spes') {
       req2.push(
@@ -102,26 +102,51 @@ export function validatePanel(idx, selectedProgram) {
       }
     }
     
+    const missingIds = [];
     for (const id of req2) {
       const el = $(id);
-      if (el) {
-        if (!el.value.trim()) {
+      if (!el) {
+        missingIds.push(`${id} (not found in DOM)`);
+        continue;
+      }
+      if (!el.value.trim()) {
+        isValid = false;
+        missingIds.push(id);
+        if (!firstInvalid) firstInvalid = el;
+      } else if (selectedProgram !== 'accreditation' && el.dataset.hidden) {
+        const hiddenEl = $(el.dataset.hidden);
+        if (hiddenEl && !hiddenEl.value.trim()) {
           isValid = false;
+          missingIds.push(`${id} -> ${el.dataset.hidden}`);
           if (!firstInvalid) firstInvalid = el;
-        } else if (el.dataset.hidden) {
-          const hiddenEl = $(el.dataset.hidden);
-          if (hiddenEl && !hiddenEl.value.trim()) {
-            isValid = false;
-            if (!firstInvalid) firstInvalid = el;
-          }
         }
       }
     }
 
     if (!isValid) {
+      console.warn('[manual-validation] Panel 2 blocked. selectedProgram =', selectedProgram, '| missing/invalid fields:', missingIds);
       window.showToast('Please fill in all required fields in Panel 2.', 'warning');
       if (firstInvalid) firstInvalid.focus();
       return false;
+    }
+
+    if (selectedProgram === 'whip') {
+      const mode = $('mf-h-whip-project-mode')?.value || 'search';
+      const projectId = $('mf-h-whip-project-id')?.value || '';
+
+      if (mode === 'new') {
+        const title = $('mf-project-title');
+        const contractor = $('mf-project-contractor');
+        if (!title?.value.trim() || !contractor?.value.trim()) {
+          window.showToast('Please fill in the new project\'s title and contractor.', 'warning');
+          (title?.value.trim() ? contractor : title)?.focus();
+          return false;
+        }
+      } else if (!projectId) {
+        window.showToast('Please select a project, or add it as a new one, before continuing.', 'warning');
+        $('mf-whip-project-search')?.focus();
+        return false;
+      }
     }
   } else if (idx === 3) {
     if (!['accreditation', 'careerdev', 'lmi'].includes(selectedProgram)) {

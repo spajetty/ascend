@@ -2,6 +2,7 @@
 
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/helpers/db_utils.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -57,6 +58,11 @@ try {
     if (!empty($state['insertedJobFairIds'])) {
         $deleteIds('jobfair', 'jobfair_id', $state['insertedJobFairIds']);
     }
+    if (!empty($state['insertedWhipIds'])) {
+        $whipTable = !empty($state['insertedWhipTable']) ? (string)$state['insertedWhipTable'] : 'whip';
+        $whipIdColumn = tableHasColumn($conn, $whipTable, 'whip_id') ? 'whip_id' : 'id';
+        $deleteIds($whipTable, $whipIdColumn, $state['insertedWhipIds']);
+    }
     if (!empty($state['insertedActivityHistoryIds'])) {
         $deleteIds('beneficiary_activity_history', 'history_id', $state['insertedActivityHistoryIds']);
     }
@@ -71,6 +77,14 @@ try {
     }
     if (!empty($state['insertedWiirpIds'])) {
         $deleteIds('wiirp', 'work_immersion_id', $state['insertedWiirpIds']);
+    }
+    if (!empty($state['insertedProjectIds'])) {
+        $projectTable = !empty($state['insertedProjectTable']) ? (string)$state['insertedProjectTable'] : 'projects';
+        $projectIdColumn = tableHasColumn($conn, $projectTable, 'project_id') ? 'project_id' : 'id';
+        $deleteIds($projectTable, $projectIdColumn, $state['insertedProjectIds']);
+    }
+    if (!empty($state['insertedAccreditationIds'])) {
+        $deleteIds('employers_accreditations', 'accreditation_id', $state['insertedAccreditationIds']);
     }
     
     // 2. Delete docs related to beneficiary

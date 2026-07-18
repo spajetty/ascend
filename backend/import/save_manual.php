@@ -16,14 +16,17 @@ require_once __DIR__ . '/helpers/followup_utils.php';
 
 // Row savers
 require_once __DIR__ . '/savers/save_common_person.php';
+require_once __DIR__ . '/savers/save_employers_accreditation.php';
 require_once __DIR__ . '/savers/save_job_matching.php';
+require_once __DIR__ . '/savers/save_whip_beneficiaries.php';
+require_once __DIR__ . '/savers/save_whip_projects.php';
 require_once __DIR__ . '/savers/save_spes.php';
 require_once __DIR__ . '/savers/save_wiirp.php';
 require_once __DIR__ . '/savers/save_gip.php';
 
 try {
     $program = trim((string)($_POST['program'] ?? ''));
-    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Government Internship Program', 'Work Immersion and Internship Referral Program'], true)) {
+    if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Government Internship Program', 'Work Immersion and Internship Referral Program', 'Employers Accreditation', 'Workers Hiring for Infrastructure Projects', 'Workers Hiring for Infrastructure Projects - Beneficiaries', 'Workers Hiring for Infrastructure Projects — Beneficiaries', 'Workers Hiring for Infrastructure Projects - Projects', 'Workers Hiring for Infrastructure Projects — Projects'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
 
@@ -171,9 +174,144 @@ try {
         'insertedDocIds' => [],
         'insertedJobMatchIds' => [],
         'insertedJobFairIds' => [],
+        'insertedWhipIds' => [],
+        'insertedWhipTable' => null,
         'createdEmployerIds' => [],
         'warnings' => [],
+        'insertedProjectIds' => [],
+        'insertedProjectTable' => null,
+        'insertedAccreditationIds' => [],
     ];
+
+    if ($program === 'Employers Accreditation') {
+        $accredPeriod = trim((string)($_POST['accred_period'] ?? ''));
+        $accredMonth = '';
+        $accredYear = '';
+        if ($accredPeriod !== '' && preg_match('/^(\d{4})-(\d{2})$/', $accredPeriod, $matches)) {
+            $accredYear = $matches[1];
+            $accredMonth = (string)((int)$matches[2]);
+        }
+
+        $row = [
+            'Company' => $_POST['accred_company'] ?? '',
+            'ACCREDITATION' => $_POST['accred_status'] ?? '',
+            'MONTH' => $accredMonth,
+            'YEAR' => $accredYear,
+            'EST. TYPE' => $_POST['est_type'] ?? '',
+            'Industry' => $_POST['industry'] ?? '',
+            'City/Municipality/Province' => $_POST['city'] ?? '',
+        ];
+
+        $result = saveEmployersAccreditationRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException('Failed to save employer accreditation.');
+        }
+
+        $conn->commit();
+        echo json_encode([
+            'success' => true,
+            'beneficiary_id' => null,
+            'state' => $state,
+            'warnings' => array_values(array_unique($state['warnings'])),
+        ]);
+        exit;
+    }
+
+    if ($program === 'Workers Hiring for Infrastructure Projects') {
+        $projectMode = trim((string)($_POST['project_mode'] ?? 'search'));
+        $postedProjectId = isset($_POST['project_id']) && is_numeric($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
+
+        $resolvedProjectId = 0;
+
+        if ($projectMode === 'new' || $postedProjectId <= 0) {
+            $projectRow = [
+                'Project Title / Name of Implementing Partner' => $_POST['project_title'] ?? '',
+                'Project Contractor' => $_POST['project_contractor'] ?? '',
+                'Nature of Project' => $_POST['nature_of_project'] ?? '',
+                'Duration' => $_POST['duration'] ?? '',
+                'Budget' => $_POST['budget'] ?? '',
+                'Fund Source' => $_POST['fund_source'] ?? '',
+                'No. of Persons Employed from the Locality' => $_POST['persons_locality'] ?? '',
+                'Skills Required for the Job' => $_POST['skills_required'] ?? '',
+                'Skills Deficiencies' => $_POST['skills_deficiencies'] ?? '',
+                'Legitimate Contractors (YES or NO)' => $_POST['legitimate_contractors'] ?? '',
+                'Filled' => $_POST['filled'] ?? '',
+                'Unfilled' => $_POST['unfilled'] ?? '',
+            ];
+
+            if (trim((string)$projectRow['Project Title / Name of Implementing Partner']) === '' || trim((string)$projectRow['Project Contractor']) === '') {
+                throw new RuntimeException('Project title and contractor are required to create a new project.');
+            }
+
+            $projectResult = saveWhipProjectsRow($conn, $projectRow, $ctx, $state);
+            if ($projectResult === 'saved') {
+                $resolvedProjectId = (int)end($state['insertedProjectIds']);
+            } elseif ($projectResult === 'skipped') {
+                throw new RuntimeException('A project with this title/contractor already exists. Please search for it and select it instead of adding it as new.');
+            }
+
+            if ($resolvedProjectId <= 0) {
+                throw new RuntimeException('Failed to save the new WHIP project.');
+            }
+        } else {
+            $resolvedProjectId = $postedProjectId;
+        }
+
+        $benefId = ensurePersonBeneficiaryAndDocs($conn, $row, $ctx, $state);
+        if (!$benefId) {
+            throw new RuntimeException('Failed to save beneficiary.');
+        }
+
+        $row['_sys_benef_id'] = $benefId;
+        $row['Position'] = $_POST['position'] ?? '';
+        $row['Date Hired'] = $_POST['date_hired'] ?? '';
+        $row['_sys_project_id'] = $resolvedProjectId;
+
+        $result = saveWhipBeneficiariesRow($conn, $row, $benefId, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException('Failed to save the WHIP worker record. They may already be assigned to this project.');
+        }
+
+        $conn->commit();
+        echo json_encode([
+            'success' => true,
+            'beneficiary_id' => $benefId,
+            'state' => $state,
+            'warnings' => array_values(array_unique($state['warnings'])),
+        ]);
+        exit;
+    }
+
+    if (isWhipProjectsProgram($program)) {
+        $row = [
+            'Project Title / Name of Implementing Partner' => $_POST['project_title'] ?? '',
+            'Project Contractor' => $_POST['project_contractor'] ?? '',
+            'Nature of Project' => $_POST['nature_of_project'] ?? '',
+            'Duration' => $_POST['duration'] ?? '',
+            'Budget' => $_POST['budget'] ?? '',
+            'Fund Source' => $_POST['fund_source'] ?? '',
+            'No. of Persons Employed from the Locality' => $_POST['persons_locality'] ?? '',
+            'Skills Required for the Job' => $_POST['skills_required'] ?? '',
+            'Skills Deficiencies' => $_POST['skills_deficiencies'] ?? '',
+            'Legitimate Contractors (YES or NO)' => $_POST['legitimate_contractors'] ?? '',
+            'Filled' => $_POST['filled'] ?? '',
+            'Unfilled' => $_POST['unfilled'] ?? '',
+        ];
+
+        $result = saveWhipProjectsRow($conn, $row, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException('Failed to save WHIP project.');
+        }
+
+        $conn->commit();
+        echo json_encode([
+            'success' => true,
+            'beneficiary_id' => null,
+            'state' => $state,
+            'warnings' => array_values(array_unique($state['warnings'])),
+        ]);
+        exit;
+    }
 
     $benefId = ensurePersonBeneficiaryAndDocs($conn, $row, $ctx, $state);
     if (!$benefId) {
@@ -246,6 +384,15 @@ try {
         $result = saveWiirpRow($conn, $row, $ctx, $state);
         if ($result !== 'saved') {
             throw new RuntimeException("Failed to save WIIRP record.");
+        }
+    } elseif (isWhipBeneficiariesProgram($program)) {
+        $row['_sys_benef_id'] = $benefId;
+        $row['Position'] = $_POST['position'] ?? '';
+        $row['Date Hired'] = $_POST['date_hired'] ?? '';
+        $row['_sys_project_id'] = !empty($_POST['project_id']) && is_numeric($_POST['project_id']) ? (int)$_POST['project_id'] : null;
+        $result = saveWhipBeneficiariesRow($conn, $row, $benefId, $ctx, $state);
+        if ($result !== 'saved') {
+            throw new RuntimeException("Failed to save WHIP beneficiary record.");
         }
     } else {
         $result = saveJobMatchingFamilyRow($conn, $row, $benefId, $ctx, $state);

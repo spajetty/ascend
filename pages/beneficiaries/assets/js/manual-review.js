@@ -2,33 +2,44 @@ const $ = id => document.getElementById(id);
 
 export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_LABELS) {
   const p = (PROGRAMS[selectedSection] || []).find(x => x.val === selectedProgram);
+  const isAccreditation = selectedProgram === 'accreditation';
 
   $('mf-rv-section').textContent = SECTION_LABELS[selectedSection] || '—';
   $('mf-rv-program').textContent = p ? p.label : '—';
 
-  const fname = $('mf-fname')?.value || '';
-  const lname = $('mf-lname')?.value || '';
-  $('mf-rv-name').textContent =
-    (lname && fname) ? `${lname}, ${fname}` : fname || lname || '—';
+  if (isAccreditation) {
+    $('mf-rv-name').textContent = 'Not applicable';
+    $('mf-rv-dob').textContent = 'Not applicable';
+    $('mf-rv-sex').textContent = 'Not applicable';
+    $('mf-rv-class').textContent = 'Not applicable';
+    $('mf-rv-district').textContent = 'Not applicable';
+    $('mf-rv-barangay').textContent = 'Not applicable';
+    $('mf-rv-flags').textContent = 'None';
+  } else {
+    const fname = $('mf-fname')?.value || '';
+    const lname = $('mf-lname')?.value || '';
+    $('mf-rv-name').textContent =
+      (lname && fname) ? `${lname}, ${fname}` : fname || lname || '—';
 
-  const dob = $('mf-dob')?.value;
-  $('mf-rv-dob').textContent = dob
-    ? new Date(dob).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
-    : '—';
+    const dob = $('mf-dob')?.value;
+    $('mf-rv-dob').textContent = dob
+      ? new Date(dob).toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' })
+      : '—';
 
-  const sexChip = document.querySelector('[data-group="sex"].on');
-  $('mf-rv-sex').textContent = sexChip?.dataset.val || '—';
+    const sexChip = document.querySelector('[data-group="sex"].on');
+    $('mf-rv-sex').textContent = sexChip?.dataset.val || '—';
 
-  const classificationWrap = $('mf-classification-wrap');
-  $('mf-rv-class').textContent    = classificationWrap?.style.display === 'none' ? '—' : ($('mf-classification')?.value || '—');
-  $('mf-rv-district').textContent = $('mf-district')?.value ? `District ${$('mf-district').value}` : '—';
-  $('mf-rv-barangay').textContent = $('mf-barangay')?.value || '—';
+    const classificationWrap = $('mf-classification-wrap');
+    $('mf-rv-class').textContent    = classificationWrap?.style.display === 'none' ? '—' : ($('mf-classification')?.value || '—');
+    $('mf-rv-district').textContent = $('mf-district')?.value ? `District ${$('mf-district')?.value}` : '—';
+    $('mf-rv-barangay').textContent = $('mf-barangay')?.value || '—';
 
-  const flags = [];
-  if ($('mf-flag-4ps')?.classList.contains('on')) flags.push('4Ps');
-  if ($('mf-flag-pwd')?.classList.contains('on')) flags.push('PWD');
-  if ($('mf-flag-ofw')?.classList.contains('on')) flags.push('OFW Dependent');
-  $('mf-rv-flags').textContent = flags.length ? flags.join(', ') : 'None';
+    const flags = [];
+    if ($('mf-flag-4ps')?.classList.contains('on')) flags.push('4Ps');
+    if ($('mf-flag-pwd')?.classList.contains('on')) flags.push('PWD');
+    if ($('mf-flag-ofw')?.classList.contains('on')) flags.push('OFW Dependent');
+    $('mf-rv-flags').textContent = flags.length ? flags.join(', ') : 'None';
+  }
 
   // --- Program Details ---
   const progGrid = $('mf-rv-prog-grid');
@@ -92,9 +103,17 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
     }
 
     if (selectedProgram === 'whip') {
-      const proj = $('mf-project');
-      const projLabel = (proj && proj.selectedIndex > 0) ? proj.options[proj.selectedIndex].text : '—';
-      details.push(['Project', projLabel]);
+      const mode = $('mf-h-whip-project-mode')?.value || 'search';
+      if (mode === 'new') {
+        details.push(['Project', `${$('mf-project-title')?.value || '—'} (new)`]);
+        details.push(['Project Contractor', $('mf-project-contractor')?.value || '—']);
+        details.push(['Nature of Project', $('mf-project-nature')?.value || '—']);
+        details.push(['Duration', $('mf-project-duration')?.value || '—']);
+        details.push(['Budget', $('mf-project-budget')?.value || '—']);
+        details.push(['Fund Source', $('mf-project-fund')?.value || '—']);
+      } else {
+        details.push(['Project', $('mf-whip-project-search')?.value || '—']);
+      }
       details.push(['Position', $('mf-whip-pos')?.value || '—']);
       details.push(['Date Hired', $('mf-date-hired')?.value || '—']);
       details.push(['Batch', $('mf-whip-batch')?.value || '—']);
@@ -110,13 +129,16 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
     }
 
     if (selectedProgram === 'accreditation') {
+      const beneficiarySection = $('mf-rv-beneficiary-section');
+      if (beneficiarySection) beneficiarySection.style.display = 'none';
       details.push(['Company', $('mf-accred-company')?.value || '—']);
       const accstatus = document.querySelector('[data-group="accstatus"].on')?.dataset.val || '—';
-      details.push(['Status', accstatus]);
-      const month = $('mf-accred-month');
-      const monthLabel = (month && month.selectedIndex > 0) ? month.options[month.selectedIndex].text : '—';
-      details.push(['Month', monthLabel]);
-      details.push(['Year', $('mf-accred-year')?.value || '—']);
+      details.push(['Accreditation', accstatus === 'renew' ? 'Renew' : 'New']);
+      const period = $('mf-accred-period')?.value || '';
+      details.push(['Accreditation Period', period ? new Date(period + '-01').toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : '—']);
+      details.push(['Est. Type', $('mf-accred-est-type')?.value || '—']);
+      details.push(['Industry', $('mf-accred-industry')?.value || '—']);
+      details.push(['City/Municipality', $('mf-accred-city')?.value || '—']);
     }
 
     if (details.length > 0) {
@@ -128,6 +150,11 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
         progGrid.appendChild(dl);
       });
       progSec.style.display = 'block';
+    }
+
+    if (selectedProgram !== 'accreditation') {
+      const beneficiarySection = $('mf-rv-beneficiary-section');
+      if (beneficiarySection) beneficiarySection.style.display = '';
     }
   }
 }

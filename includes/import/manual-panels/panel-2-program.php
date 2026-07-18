@@ -465,49 +465,114 @@
                     <div class="mf-card-body">
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
-                                <label for="mf-accred-company">Company <span class="mf-req">*</span></label>
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <label for="mf-accred-company" class="mb-0">Company <span class="mf-req">*</span></label>
+                                </div>
                                 <input type="text" id="mf-accred-company" class="mf-company-autocomplete" name="accred_company"
-                                    placeholder="Search company name…" data-hidden="mf-h-accred-company-id">
+                                    placeholder="Search existing company or type a new one" data-hidden="mf-h-accred-company-id">
                                 <input type="hidden" name="accred_company_id" id="mf-h-accred-company-id" value="">
+                                <input type="hidden" name="accred_company_mode" id="mf-h-accred-company-mode" value="search">
                             </div>
                             <div class="mf-field">
-                                <label>Status</label>
+                                <label>Accreditation</label>
                                 <div class="mf-chip-group">
                                     <div class="mf-chip on" data-group="accstatus" data-val="new">New</div>
-                                    <div class="mf-chip" data-group="accstatus" data-val="renew">Renewal</div>
+                                    <div class="mf-chip" data-group="accstatus" data-val="renew">Renew</div>
                                 </div>
                                 <input type="hidden" name="accred_status" id="mf-h-accstatus" value="new">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-accred-month">Month</label>
-                                <select id="mf-accred-month" name="accred_month">
-                                    <option value="">— month —</option>
-                                    <?php
-                                    $months = [
-                                        'January',
-                                        'February',
-                                        'March',
-                                        'April',
-                                        'May',
-                                        'June',
-                                        'July',
-                                        'August',
-                                        'September',
-                                        'October',
-                                        'November',
-                                        'December'
-                                    ];
-                                    foreach ($months as $i => $m) {
-                                        $val = $i + 1;
-                                        echo "<option value='$val'>$m</option>";
-                                    }
-                                    ?>
+                                <label for="mf-accred-period">Accreditation Period <span class="mf-req">*</span></label>
+                                <input type="month" id="mf-accred-period" name="accred_period">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-accred-est-type">Establishment Type <span class="mf-hint">Optional</span></label>
+                                <select id="mf-accred-est-type" name="est_type">
+                                    <option value="">— select —</option>
+                                    <option value="Corporation">Corporation</option>
+                                    <option value="Manpower">Manpower</option>
+                                    <option value="Direct">Direct</option>
+                                    <option value="LGU">LGU</option>
                                 </select>
                             </div>
                             <div class="mf-field">
-                                <label for="mf-accred-year">Year <span class="mf-req">*</span></label>
-                                <input type="number" id="mf-accred-year" name="accred_year" min="2020" max="2035"
-                                    placeholder="<?= date('Y') ?>">
+                                <label for="mf-accred-industry">Industry <span class="mf-hint">Optional</span></label>
+                                <input type="text" id="mf-accred-industry" name="industry" placeholder="e.g. Logistics">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-accred-city">City / Municipality <span class="mf-hint">Optional</span></label>
+                                <input type="text" id="mf-accred-city" name="city" placeholder="e.g. Quezon City">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHIP PROJECTS -->
+                <div class="mf-card" id="mf-sec-whip-projects" style="display:none;">
+                    <div class="mf-card-head">
+                        <div class="mf-card-icon"><i class="fa-solid fa-helmet-safety"></i></div>
+                        <div>
+                            <div class="mf-card-title">WHIP Project Details</div>
+                            <div class="mf-card-sub">Records infrastructure project metadata</div>
+                        </div>
+                    </div>
+                    <div class="mf-card-body">
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-title">Project Title / Name of Implementing Partner <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-project-title" name="project_title" placeholder="Project title">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-contractor">Project Contractor <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-project-contractor" class="mf-company-autocomplete" name="project_contractor" placeholder="Search contractor name…">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-nature">Nature of Project</label>
+                                <input type="text" id="mf-project-nature" name="nature_of_project" placeholder="e.g. Road Construction">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-duration">Duration</label>
+                                <input type="text" id="mf-project-duration" name="duration" placeholder="e.g. 6 months">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-budget">Budget</label>
+                                <input type="text" id="mf-project-budget" name="budget" placeholder="e.g. 1500000">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-fund">Fund Source</label>
+                                <input type="text" id="mf-project-fund" name="fund_source" placeholder="e.g. City Budget">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-jobs">No. of Persons Employed from the Locality</label>
+                                <input type="number" id="mf-project-jobs" name="jobs_generated" min="0" placeholder="0">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-locality">Filled / Locality Workers</label>
+                                <input type="number" id="mf-project-locality" name="persons_locality" min="0" placeholder="0">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-skills">Skills Required for the Job</label>
+                                <textarea id="mf-project-skills" name="skills_required" rows="2" placeholder="List required skills"></textarea>
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-deficiencies">Skills Deficiencies</label>
+                                <textarea id="mf-project-deficiencies" name="skills_deficiencies" rows="2" placeholder="List any skills gaps"></textarea>
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-legit">Legitimate Contractors</label>
+                                <select id="mf-project-legit" name="legitimate_contractors">
+                                    <option value="">— select —</option>
+                                    <option value="YES">YES</option>
+                                    <option value="NO">NO</option>
+                                </select>
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-filled">Filled</label>
+                                <input type="number" id="mf-project-filled" name="filled" min="0" placeholder="0">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-unfilled">Unfilled</label>
+                                <input type="number" id="mf-project-unfilled" name="unfilled" min="0" placeholder="0">
                             </div>
                         </div>
                     </div>
