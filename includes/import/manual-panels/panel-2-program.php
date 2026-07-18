@@ -435,6 +435,11 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mf-note mf-note-warn" id="mf-whip-project-full-warning" style="display:none; margin-top:12px;">
+                            <span><i class="fa-solid fa-triangle-exclamation"></i></span>
+                            <span>This project has no open slots left. An admin needs to edit the project details (increase unfilled slots) before another worker can be added here.</span>
+                        </div>
                     </div>
                 </div>
 

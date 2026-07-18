@@ -97,7 +97,7 @@
                     <div class="mf-card-body">
                         <div class="mf-grid mf-grid-4">
                             <div class="mf-field">
-                                <label for="mf-house">House / Unit</label>
+                                <label for="mf-house">House / Unit / Street </label>
                                 <input type="text" id="mf-house" name="house_no" placeholder="123">
                             </div>
                             <div class="mf-field">

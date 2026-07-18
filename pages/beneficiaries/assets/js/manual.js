@@ -581,6 +581,17 @@ function selectExistingWhipProject(project) {
     set('mf-whip-summary-deficiencies', project.skills_deficiencies);
     summary.style.display = 'block';
   }
+
+  const unfilledCount = parseInt(project.unfilled, 10) || 0;
+  const fullWarning = $('mf-whip-project-full-warning');
+  const next2 = $('mf-next-2');
+  if (unfilledCount <= 0) {
+    if (fullWarning) fullWarning.style.display = 'flex';
+    if (next2) { next2.disabled = true; next2.title = 'This project has no open slots left.'; }
+  } else {
+    if (fullWarning) fullWarning.style.display = 'none';
+    if (next2) { next2.disabled = false; next2.title = ''; }
+  }
 }
 
 // Saves ONLY the project fields (no beneficiary required) when editing an
@@ -691,6 +702,10 @@ function resetWhipProjectPicker() {
   hideNewWhipProjectFields();
   const summary = $('mf-whip-project-summary');
   if (summary) summary.style.display = 'none';
+  const fullWarning = $('mf-whip-project-full-warning');
+  if (fullWarning) fullWarning.style.display = 'none';
+  const next2 = $('mf-next-2');
+  if (next2) { next2.disabled = false; next2.title = ''; }
 }
 
 function bindWhipProjectPicker() {
@@ -725,6 +740,10 @@ function bindWhipProjectPicker() {
     if (modeReset) modeReset.value = 'search';
     const summary = $('mf-whip-project-summary');
     if (summary) summary.style.display = 'none';
+    const fullWarning = $('mf-whip-project-full-warning');
+    if (fullWarning) fullWarning.style.display = 'none';
+    const next2Reset = $('mf-next-2');
+    if (next2Reset) { next2Reset.disabled = false; next2Reset.title = ''; }
 
     if (trimVal.length < 1) {
       closeDropdown();

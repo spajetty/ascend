@@ -286,6 +286,40 @@ try {
             $resolvedProjectId = $postedProjectId;
         }
 
+        // Lock the project row and confirm there's an open slot before we go
+        // any further. This must happen after we know the final project_id
+        // (new/edit/search all converge above) and before the beneficiary is
+        // created, so we never save a worker against a project with 0 unfilled
+        // slots — that call must go through "Edit Details" instead.
+        $projSchema = resolveWhipProjectsSchema($conn);
+        $projTable = $projSchema['table'] ?? null;
+        $projIdCol = $projSchema['project_id_col'] ?? null;
+        $filledCol = $projSchema['filled_col'] ?? null;
+        $unfilledCol = $projSchema['unfilled_col'] ?? null;
+
+        if ($projTable && $projIdCol && $filledCol && $unfilledCol) {
+            $lockSql = sprintf(
+                'SELECT `%s` AS filled, `%s` AS unfilled FROM `%s` WHERE `%s` = ? FOR UPDATE',
+                $filledCol,
+                $unfilledCol,
+                $projTable,
+                $projIdCol
+            );
+            $lockStmt = $conn->prepare($lockSql);
+            $lockStmt->bind_param('i', $resolvedProjectId);
+            $lockStmt->execute();
+            $slotRow = $lockStmt->get_result()->fetch_assoc();
+
+            if (!$slotRow) {
+                throw new RuntimeException('Could not find the project to verify open slots.');
+            }
+
+            $unfilledCount = (int)($slotRow['unfilled'] ?? 0);
+            if ($unfilledCount <= 0) {
+                throw new RuntimeException('This project has no open slots left. An admin needs to edit the project details to add more slots before another worker can be added.');
+            }
+        }
+
         $benefId = ensurePersonBeneficiaryAndDocs($conn, $row, $ctx, $state);
         if (!$benefId) {
             throw new RuntimeException('Failed to save beneficiary.');
@@ -299,6 +333,32 @@ try {
         $result = saveWhipBeneficiariesRow($conn, $row, $benefId, $ctx, $state);
         if ($result !== 'saved') {
             throw new RuntimeException('Failed to save the WHIP worker record. They may already be assigned to this project.');
+        }
+
+        // Move one slot from unfilled -> filled now that the worker is
+        // actually attached to the project. The "WHERE unfilled > 0" guard
+        // re-checks the invariant at the moment of the write (not just at
+        // the earlier read), so a second request racing in between can't
+        // push the count negative even under concurrent submissions.
+        if ($projTable && $projIdCol && $filledCol && $unfilledCol) {
+            $slotSql = sprintf(
+                'UPDATE `%s` SET `%s` = `%s` + 1, `%s` = `%s` - 1 WHERE `%s` = ? AND `%s` > 0',
+                $projTable,
+                $filledCol, $filledCol,
+                $unfilledCol, $unfilledCol,
+                $projIdCol,
+                $unfilledCol
+            );
+            $slotStmt = $conn->prepare($slotSql);
+            $slotStmt->bind_param('i', $resolvedProjectId);
+            $slotStmt->execute();
+
+            if ($slotStmt->affected_rows < 1) {
+                // Someone else took the last slot between our lock read and
+                // this write — don't leave a worker attached to a project
+                // that's actually full.
+                throw new RuntimeException('This project just filled up while your submission was processing. Please pick another project or edit its slots.');
+            }
         }
 
         $conn->commit();
