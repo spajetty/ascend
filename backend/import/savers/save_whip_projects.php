@@ -86,11 +86,8 @@ function saveWhipProjectsRow(mysqli $conn, array $row, array $ctx, array &$state
     }
 
     if (($col = $schema['legit_col'] ?? null) && $payload['legitimate_contractors'] !== '') {
-        $legit = in_array($payload['legitimate_contractors'], ['YES', 'NO'], true)
-            ? $payload['legitimate_contractors']
-            : null;
-        if ($legit !== null) {
-            $addValue($col, 's', $legit);
+        if (in_array($payload['legitimate_contractors'], ['YES', 'NO'], true)) {
+            $addValue($col, 'i', $payload['legitimate_contractors'] === 'YES' ? 1 : 0);
         }
     }
     if (($col = $schema['filled_col'] ?? null)) {
@@ -129,4 +126,116 @@ function saveWhipProjectsRow(mysqli $conn, array $row, array $ctx, array &$state
     }
 
     return 'saved';
+}
+
+/**
+ * Updates an existing WHIP project row (the master record) with corrected
+ * details from the "Edit Details" form on the manual-entry Project step.
+ * Mirrors saveWhipProjectsRow()'s column mapping but issues an UPDATE keyed
+ * on project_id instead of an INSERT, and skips the duplicate check (we
+ * already know exactly which row is being edited).
+ */
+function updateWhipProjectsRow(mysqli $conn, int $projectId, array $row, array $ctx, array &$state): bool {
+    if ($projectId <= 0) return false;
+
+    $payload = whipProjectPayload($row);
+    if ($payload['title'] === '' || $payload['contractor'] === '') {
+        return false;
+    }
+
+    $schema = resolveWhipProjectsSchema($conn);
+    $table = $schema['table'] ?? null;
+    $titleCol = $schema['title_col'] ?? null;
+    $projectIdCol = $schema['project_id_col'] ?? null;
+    if (!$table || !$titleCol || !$projectIdCol) {
+        throw new RuntimeException('WHIP Projects table is not configured in the database.');
+    }
+
+    $batchId = $ctx['batchId'] ?? null;
+
+    $employerResult = resolveEmployer($conn, $payload['contractor'], $batchId, [
+        'est_type' => rowValue($row, ['Establishment Type', 'Est Type', 'est_type'], ''),
+        'industry' => rowValue($row, ['Industry', 'industry'], ''),
+        'city' => rowValue($row, ['City/Municipality', 'City', 'city'], ''),
+    ]);
+    $companyId = (int)($employerResult['id'] ?? 0);
+    if (!empty($employerResult['created']) && $companyId > 0) {
+        $state['createdEmployerIds'][] = $companyId;
+        $state['warnings'][] = 'New company created: ' . ($employerResult['matched_name'] ?? $payload['contractor']);
+    }
+
+    $sets = [];
+    $types = '';
+    $values = [];
+
+    $addSet = static function (string $column, string $type, $value) use (&$sets, &$types, &$values) {
+        $sets[] = '`' . $column . '` = ?';
+        $types .= $type;
+        $values[] = $value;
+    };
+
+    $addSet($titleCol, 's', $payload['title']);
+
+    if ($col = $schema['nature_col'] ?? null) {
+        $addSet($col, 's', $payload['nature']);
+    }
+    if ($col = $schema['duration_col'] ?? null) {
+        $addSet($col, 's', $payload['duration']);
+    }
+    if ($col = $schema['budget_col'] ?? null) {
+        $addSet($col, 'd', parseMoneyNullable($payload['budget_raw']) ?? 0);
+    }
+    if ($col = $schema['fund_col'] ?? null) {
+        $addSet($col, 's', $payload['fund_source']);
+    }
+    if ($col = $schema['persons_locality_col'] ?? null) {
+        $addSet($col, 'i', parseIntNullable($payload['persons_locality']) ?? 0);
+    }
+    if ($col = $schema['skills_required_col'] ?? null) {
+        $addSet($col, 's', $payload['skills_required']);
+    }
+    if ($col = $schema['skills_def_col'] ?? null) {
+        $addSet($col, 's', $payload['skills_deficiencies']);
+    }
+
+    if (($col = $schema['company_id_col'] ?? null) && $companyId > 0) {
+        $addSet($col, 'i', $companyId);
+    } elseif ($col = $schema['contractor_col'] ?? null) {
+        $addSet($col, 's', $payload['contractor']);
+    }
+
+    // is_legitimate_contractor is a tinyint boolean, not a 'YES'/'NO' string.
+    if ($col = $schema['legit_col'] ?? null) {
+        if (in_array($payload['legitimate_contractors'], ['YES', 'NO'], true)) {
+            $addSet($col, 'i', $payload['legitimate_contractors'] === 'YES' ? 1 : 0);
+        }
+    }
+    if ($col = $schema['filled_col'] ?? null) {
+        $addSet($col, 'i', parseIntNullable($payload['filled']) ?? 0);
+    }
+    if ($col = $schema['unfilled_col'] ?? null) {
+        $addSet($col, 'i', parseIntNullable($payload['unfilled']) ?? 0);
+    }
+
+    if (empty($sets)) return false;
+
+    $types .= 'i';
+    $values[] = $projectId;
+
+    $sql = sprintf(
+        'UPDATE `%s` SET %s WHERE `%s` = ?',
+        $table,
+        implode(', ', $sets),
+        $projectIdCol
+    );
+    $upd = $conn->prepare($sql);
+    $upd->bind_param($types, ...$values);
+    $upd->execute();
+
+    if (empty($state['updatedProjectIds'])) {
+        $state['updatedProjectIds'] = [];
+    }
+    $state['updatedProjectIds'][] = $projectId;
+
+    return true;
 }

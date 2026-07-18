@@ -53,9 +53,11 @@ const PROG_SECTIONS = {
   firstjobseek:  ['mf-sec-employer', 'mf-sec-ftj'],
   jobfair:       ['mf-sec-employer', 'mf-sec-jobfair'],
   accreditation: ['mf-sec-accred'],
-  // mf-sec-whip-projects (the "new project" sub-form) is toggled separately
+  // mf-sec-whip-projects (the new/edit project sub-form) is toggled separately
   // by the project-picker logic, not shown unconditionally here.
-  whip:          ['mf-sec-whip-picker', 'mf-sec-whip'],
+  // Worker Assignment fields (position/date hired/batch) now live in the
+  // Beneficiary panel (mf-sec-ben-whip), not here.
+  whip:          ['mf-sec-whip-picker'],
   spes:          ['mf-sec-spes'],
   gip:           ['mf-sec-gip'],
   wiirp:         ['mf-sec-internship'],
@@ -65,7 +67,7 @@ const PROG_SECTIONS = {
 
 const ALL_DETAIL_SECTIONS = [
   'mf-sec-employer', 'mf-sec-ftj', 'mf-sec-jobfair',
-  'mf-sec-accred',   'mf-sec-whip-picker', 'mf-sec-whip', 'mf-sec-whip-projects', 'mf-sec-spes',
+  'mf-sec-accred',   'mf-sec-whip-picker', 'mf-sec-whip-projects', 'mf-sec-spes',
   'mf-sec-internship', 'mf-sec-gip', 'mf-sec-school',
 ];
 
@@ -76,6 +78,39 @@ let selectedSection = '';
 let selectedProgram = '';
 let lastSubmissionState = null;
 let lastWhipProject = null; // { id, mode, title } — set on WHIP submit, used for "Add Another Worker"
+
+// ── STEP ORDER (per-program sequencing) ────────────────────────────
+// Default displayed order: Beneficiary(panel1) → Program Details(panel2) → Documents(panel3) → Review(panel4)
+// WHIP flips the first two: Project(panel2) is shown first, Beneficiary(panel1) second, so the
+// user logs the infrastructure project before adding the worker(s) on it — matching how imports
+// insert the project row before beneficiary rows.
+const STEP_ORDER = {
+  whip: [2, 1, 3, 4],
+};
+
+function getStepOrder() {
+  return STEP_ORDER[selectedProgram] || [1, 2, 3, 4];
+}
+
+// Displayed position (1-4, left to right on the stepper) → the panel id to show
+function panelForPosition(pos) {
+  return getStepOrder()[pos - 1] ?? pos;
+}
+
+// Panel id → its displayed position (1-4) for the current program
+function positionForPanel(panel) {
+  const idx = getStepOrder().indexOf(panel);
+  return idx === -1 ? panel : idx + 1;
+}
+
+// "Continue" buttons live inside a specific panel and just need to go to
+// whatever comes next in the CURRENT program's order — not a hardcoded number.
+function goNext(fromPanel) {
+  tryGoStep(positionForPanel(fromPanel) + 1);
+}
+function goBack(fromPanel) {
+  goPanel(panelForPosition(positionForPanel(fromPanel) - 1));
+}
 
 // ── HELPERS ───────────────────────────────────────────────────────
 
@@ -102,6 +137,8 @@ function initManualForm() {
   bindFileSlots();
   bindCompanyAutocomplete();
   bindWhipProjectPicker();
+  bindWhipProjectEditToggle();
+  bindWhipProjectSaveEdit();
   bindJobFairAutocomplete();
   bindDateConstraints();
   
@@ -181,7 +218,7 @@ function onProgramChange() {
 
   // Show the first form immediately once a valid program exists.
   if (selectedProgram) {
-    goPanel(1);
+    goPanel(panelForPosition(1));
   } else {
     goPanel(0);
   }
@@ -408,7 +445,25 @@ function bindCompanyAutocomplete() {
 
 // ── WHIP PROJECT PICKER (search existing project or add a new one) ────
 
-let whipProjectsCache = null; // [{ project_id, project_title, contractor }]
+let whipProjectsCache = null; // [{ project_id, project_title, contractor, ...full fields }]
+let selectedWhipProject = null; // the full record for whatever project is currently picked
+
+// Map project-record keys returned by the backend to the edit form's field ids.
+// Adjust the left-hand keys to match whatever get_projects_options.php actually returns.
+const WHIP_PROJECT_FIELD_MAP = {
+  project_title: 'mf-project-title',
+  contractor: 'mf-project-contractor',
+  nature_of_project: 'mf-project-nature',
+  duration: 'mf-project-duration',
+  budget: 'mf-project-budget',
+  fund_source: 'mf-project-fund',
+  legitimate_contractors: 'mf-project-legit',
+  persons_locality: 'mf-project-locality',
+  filled: 'mf-project-filled',
+  unfilled: 'mf-project-unfilled',
+  skills_required: 'mf-project-skills',
+  skills_deficiencies: 'mf-project-deficiencies',
+};
 
 function fetchWhipProjects() {
   if (whipProjectsCache) return Promise.resolve(whipProjectsCache);
@@ -424,9 +479,42 @@ function fetchWhipProjects() {
     });
 }
 
+function updateWhipProjectFormLabels(mode) {
+  const title = $('mf-whip-projects-title');
+  const sub = $('mf-whip-projects-sub');
+  const editToggle = $('mf-whip-project-edit-toggle');
+  const saveEditBtn = $('mf-whip-project-save-edit');
+  if (mode === 'edit') {
+    if (title) title.textContent = 'Edit WHIP Project Details';
+    if (sub) sub.textContent = 'Saving will update this project for everyone';
+    if (editToggle) editToggle.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel Edit';
+    if (saveEditBtn) saveEditBtn.style.display = 'inline-flex';
+  } else {
+    if (title) title.textContent = 'WHIP Project Details';
+    if (sub) sub.textContent = 'Records infrastructure project metadata';
+    if (editToggle) editToggle.innerHTML = '<i class="fa-solid fa-pen"></i> Edit Details';
+    if (saveEditBtn) saveEditBtn.style.display = 'none';
+  }
+}
+
+function fillWhipProjectForm(project) {
+  Object.entries(WHIP_PROJECT_FIELD_MAP).forEach(([key, id]) => {
+    const el = $(id);
+    if (el) el.value = project?.[key] ?? '';
+  });
+}
+
+function clearWhipProjectForm() {
+  Object.values(WHIP_PROJECT_FIELD_MAP).forEach(id => {
+    const el = $(id);
+    if (el) el.value = '';
+  });
+}
+
 function showNewWhipProjectFields(typedTitle) {
   const card = $('mf-sec-whip-projects');
   if (card) card.style.display = 'block';
+  clearWhipProjectForm();
   const titleInput = $('mf-project-title');
   if (titleInput && typedTitle) titleInput.value = typedTitle;
   const modeHidden = $('mf-h-whip-project-mode');
@@ -435,14 +523,34 @@ function showNewWhipProjectFields(typedTitle) {
   if (idHidden) idHidden.value = '';
   const summary = $('mf-whip-project-summary');
   if (summary) summary.style.display = 'none';
+  updateWhipProjectFormLabels('new');
+}
+
+function showEditWhipProjectFields(project) {
+  const card = $('mf-sec-whip-projects');
+  if (card) card.style.display = 'block';
+  fillWhipProjectForm(project);
+  const modeHidden = $('mf-h-whip-project-mode');
+  if (modeHidden) modeHidden.value = 'edit';
+  const idHidden = $('mf-h-whip-project-id');
+  if (idHidden) idHidden.value = project?.project_id ?? '';
+  updateWhipProjectFormLabels('edit');
 }
 
 function hideNewWhipProjectFields() {
   const card = $('mf-sec-whip-projects');
   if (card) card.style.display = 'none';
+  updateWhipProjectFormLabels('search');
+}
+
+function money(v) {
+  const n = Number(v);
+  if (v === null || v === undefined || v === '' || Number.isNaN(n)) return '—';
+  return '₱' + n.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function selectExistingWhipProject(project) {
+  selectedWhipProject = project;
   const search = $('mf-whip-project-search');
   const idHidden = $('mf-h-whip-project-id');
   const modeHidden = $('mf-h-whip-project-mode');
@@ -453,15 +561,127 @@ function selectExistingWhipProject(project) {
 
   const summary = $('mf-whip-project-summary');
   const summaryTitle = $('mf-whip-project-summary-title');
-  const summaryMeta = $('mf-whip-project-summary-meta');
-  if (summary && summaryTitle && summaryMeta) {
-    summaryTitle.textContent = project.project_title;
-    summaryMeta.textContent = project.contractor ? `Contractor: ${project.contractor}` : '';
+  if (summary && summaryTitle) {
+    summaryTitle.textContent = project.project_title || '—';
+    const set = (id, val) => { const el = $(id); if (el) el.textContent = (val ?? '') !== '' ? val : '—'; };
+    set('mf-whip-summary-nature', project.nature_of_project);
+    set('mf-whip-summary-duration', project.duration);
+    set('mf-whip-summary-budget', money(project.budget));
+    set('mf-whip-summary-fund', project.fund_source);
+    set('mf-whip-summary-contractor', project.contractor);
+    set('mf-whip-summary-legit', project.legitimate_contractors === 'YES' ? 'Yes' : project.legitimate_contractors === 'NO' ? 'No' : '—');
+    set('mf-whip-summary-locality', project.persons_locality ?? 0);
+    const filledEl = $('mf-whip-summary-filled');
+    const unfilledEl = $('mf-whip-summary-unfilled');
+    if (filledEl) filledEl.textContent = project.filled ?? 0;
+    if (unfilledEl) unfilledEl.textContent = project.unfilled ?? 0;
+    set('mf-whip-summary-skills', project.skills_required);
+    const defWrap = $('mf-whip-summary-deficiencies-wrap');
+    if (defWrap) defWrap.style.display = project.skills_deficiencies ? '' : 'none';
+    set('mf-whip-summary-deficiencies', project.skills_deficiencies);
     summary.style.display = 'block';
   }
 }
 
+// Saves ONLY the project fields (no beneficiary required) when editing an
+// existing project from the summary card. Hits save_manual.php directly
+// with the Projects-only program name + the project_id being edited.
+function bindWhipProjectSaveEdit() {
+  const btn = $('mf-whip-project-save-edit');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    const idHidden = $('mf-h-whip-project-id');
+    const projectId = idHidden ? idHidden.value : '';
+
+    if (!projectId) {
+      if (window.showToast) window.showToast('Something went wrong identifying the project being edited. Please re-select it.', 'warning');
+      return;
+    }
+
+    const title = $('mf-project-title')?.value.trim() || '';
+    const contractor = $('mf-project-contractor')?.value.trim() || '';
+    if (!title || !contractor) {
+      if (window.showToast) window.showToast("Please fill in the project's title and contractor.", 'warning');
+      (title ? $('mf-project-contractor') : $('mf-project-title'))?.focus();
+      return;
+    }
+
+    const fd = new FormData();
+    fd.append('program', 'Workers Hiring for Infrastructure Projects - Projects');
+    fd.append('project_id', projectId);
+    fd.append('project_title', title);
+    fd.append('project_contractor', contractor);
+    fd.append('nature_of_project', $('mf-project-nature')?.value || '');
+    fd.append('duration', $('mf-project-duration')?.value || '');
+    fd.append('budget', $('mf-project-budget')?.value || '');
+    fd.append('fund_source', $('mf-project-fund')?.value || '');
+    fd.append('persons_locality', $('mf-project-locality')?.value || '');
+    fd.append('skills_required', $('mf-project-skills')?.value || '');
+    fd.append('skills_deficiencies', $('mf-project-deficiencies')?.value || '');
+    fd.append('legitimate_contractors', $('mf-project-legit')?.value || '');
+    fd.append('filled', $('mf-project-filled')?.value || '');
+    fd.append('unfilled', $('mf-project-unfilled')?.value || '');
+
+    if (typeof showLoading === 'function') showLoading();
+
+    fetch('../../backend/import/save_manual.php', { method: 'POST', body: fd })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          if (window.showToast) window.showToast('Project details updated.', 'success');
+          whipProjectsCache = null; // force refresh so search picks up the edit
+
+          // Reflect the edit in the summary card and drop back out of edit mode.
+          const updatedProject = {
+            project_id: projectId,
+            project_title: title,
+            contractor: contractor,
+            nature_of_project: $('mf-project-nature')?.value || '',
+            duration: $('mf-project-duration')?.value || '',
+            budget: $('mf-project-budget')?.value || '',
+            fund_source: $('mf-project-fund')?.value || '',
+            legitimate_contractors: $('mf-project-legit')?.value || '',
+            persons_locality: $('mf-project-locality')?.value || '',
+            filled: $('mf-project-filled')?.value || '',
+            unfilled: $('mf-project-unfilled')?.value || '',
+            skills_required: $('mf-project-skills')?.value || '',
+            skills_deficiencies: $('mf-project-deficiencies')?.value || '',
+          };
+          selectExistingWhipProject(updatedProject);
+        } else {
+          if (window.showToast) window.showToast(data.error || 'Failed to update project.', 'error');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        if (window.showToast) window.showToast('Network error while saving project changes.', 'error');
+      })
+      .finally(() => {
+        if (typeof hideLoading === 'function') hideLoading();
+      });
+  });
+}
+
+function bindWhipProjectEditToggle() {
+  const btn = $('mf-whip-project-edit-toggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => {
+    const modeHidden = $('mf-h-whip-project-mode');
+    const currentlyEditing = modeHidden && modeHidden.value === 'edit';
+    if (currentlyEditing) {
+      // Cancel edit — go back to plain preview, discard unsaved edits.
+      const modeH = $('mf-h-whip-project-mode');
+      if (modeH) modeH.value = 'search';
+      hideNewWhipProjectFields();
+    } else if (selectedWhipProject) {
+      showEditWhipProjectFields(selectedWhipProject);
+    }
+  });
+}
+
 function resetWhipProjectPicker() {
+  selectedWhipProject = null;
   const search = $('mf-whip-project-search');
   const idHidden = $('mf-h-whip-project-id');
   const modeHidden = $('mf-h-whip-project-mode');
@@ -498,8 +718,11 @@ function bindWhipProjectPicker() {
     const trimVal = typedName.trim();
 
     // Any manual edit invalidates a previous selection until they pick again.
+    selectedWhipProject = null;
     const idHidden = $('mf-h-whip-project-id');
     if (idHidden) idHidden.value = '';
+    const modeReset = $('mf-h-whip-project-mode');
+    if (modeReset) modeReset.value = 'search';
     const summary = $('mf-whip-project-summary');
     if (summary) summary.style.display = 'none';
 
@@ -597,15 +820,18 @@ function tryGoStep(n) {
     }
   }
   
-  if (n > currentPanel) {
-    for (let i = currentPanel; i < n; i++) {
-      if (!validatePanel(i, selectedProgram)) {
+  const targetPanel = panelForPosition(n);
+  const currentPos  = positionForPanel(currentPanel);
+
+  if (n > currentPos) {
+    for (let pos = currentPos; pos < n; pos++) {
+      if (!validatePanel(panelForPosition(pos), selectedProgram)) {
         return;
       }
     }
   }
 
-  goPanel(n);
+  goPanel(targetPanel);
 }
 
 function goPanel(n) {
@@ -618,11 +844,15 @@ function goPanel(n) {
   document.querySelectorAll('.mf-panel').forEach(p => p.classList.remove('active'));
   $('mf-panel-' + n).classList.add('active');
 
+  // Displayed position on the stepper — differs from the panel id when the
+  // program reorders steps (e.g. WHIP shows panel2 at position 1).
+  const pos = positionForPanel(n);
+
   // Disable Program/Section dropdowns if past Step 1
   const secSel = $('mf-sel-section');
   const progSel = $('mf-sel-program');
   if (secSel && progSel) {
-    if (n >= 2) {
+    if (pos >= 2) {
       secSel.disabled = true;
       progSel.disabled = true;
     } else {
@@ -637,13 +867,13 @@ function goPanel(n) {
     const num = $('mf-snum-' + i);
     if (!tab) continue;
     tab.classList.remove('active', 'done');
-    if (i < n)        { tab.classList.add('done');   num.textContent = '✓'; }
-    else if (i === n) { tab.classList.add('active'); num.textContent = i;   }
-    else                num.textContent = i;
+    if (i < pos)        { tab.classList.add('done');   num.textContent = '✓'; }
+    else if (i === pos) { tab.classList.add('active'); num.textContent = i;   }
+    else                  num.textContent = i;
   }
 
   // Progress bar
-  const pct = { 0: 0, 1: 25, 2: 50, 3: 75, 4: 95, 5: 100 }[n] ?? 0;
+  const pct = { 0: 0, 1: 25, 2: 50, 3: 75, 4: 95, 5: 100 }[pos] ?? 0;
   $('mf-prog-fill').style.width = pct + '%';
 
   // Panel-specific hooks
@@ -658,26 +888,26 @@ function goPanel(n) {
 // ── NAV BUTTONS ───────────────────────────────────────────────────
 
 function bindNavButtons() {
-  // Step 1 → 2
+  // Panel 1 (Beneficiary)
   const next1 = $('mf-next-1');
-  if (next1) next1.addEventListener('click', () => tryGoStep(2));
+  if (next1) next1.addEventListener('click', () => goNext(1));
 
-  // Step 2
+  // Panel 2 (Program Details / Project for WHIP)
   const back2 = $('mf-back-2');
   const next2 = $('mf-next-2');
-  if (back2) back2.addEventListener('click', () => goPanel(1));
-  if (next2) next2.addEventListener('click', () => tryGoStep(3));
+  if (back2) back2.addEventListener('click', () => goBack(2));
+  if (next2) next2.addEventListener('click', () => goNext(2));
 
-  // Step 3
+  // Panel 3 (Documents)
   const back3 = $('mf-back-3');
   const next3 = $('mf-next-3');
-  if (back3) back3.addEventListener('click', () => goPanel(2));
-  if (next3) next3.addEventListener('click', () => tryGoStep(4));
+  if (back3) back3.addEventListener('click', () => goBack(3));
+  if (next3) next3.addEventListener('click', () => goNext(3));
 
-  // Step 4
+  // Panel 4 (Review)
   const back4    = $('mf-back-4');
   const submit   = $('mf-submit');
-  if (back4)  back4.addEventListener('click', () => goPanel(3));
+  if (back4)  back4.addEventListener('click', () => goBack(4));
   if (submit) submit.addEventListener('click', submitForm);
 
   // Success → add another
@@ -706,11 +936,19 @@ function applyProgramSections() {
 
   // mf-sec-whip-projects isn't in PROG_SECTIONS (it's conditional), so restore
   // its visibility based on the current project mode rather than always hiding it.
-  if (selectedProgram === 'whip') {
+  const isWhipProgram = selectedProgram === 'whip';
+  if (isWhipProgram) {
     const modeHidden = $('mf-h-whip-project-mode');
     const projCard = $('mf-sec-whip-projects');
-    if (projCard) projCard.style.display = (modeHidden && modeHidden.value === 'new') ? 'block' : 'none';
+    const mode = modeHidden ? modeHidden.value : 'search';
+    if (projCard) projCard.style.display = (mode === 'new' || mode === 'edit') ? 'block' : 'none';
+    updateWhipProjectFormLabels(mode);
   }
+
+  // Worker Assignment card lives in the Beneficiary panel (panel 1), not
+  // among the panel-2 detail sections, so toggle it separately here.
+  const benWhipCard = $('mf-sec-ben-whip');
+  if (benWhipCard) benWhipCard.style.display = isWhipProgram ? 'block' : 'none';
 
   const beneficiaryPanel = $('mf-panel-1');
   const documentsPanel = $('mf-panel-3');
@@ -744,9 +982,23 @@ function applyProgramSections() {
     accredCompany.placeholder = 'Search existing company or type a new company name';
   }
 
+  const isWhip = selectedProgram === 'whip';
+
+  const stepLabel1 = document.querySelector('#mf-stab-1 .mf-step-label');
+  const stepLabel2 = document.querySelector('#mf-stab-2 .mf-step-label');
+  if (stepLabel1) stepLabel1.textContent = isWhip ? 'Project' : 'Beneficiary';
+  if (stepLabel2) stepLabel2.textContent = isWhip ? 'Beneficiary' : 'Program Details';
+
+  const next1 = $('mf-next-1');
+  if (next1) {
+    next1.textContent = isWhip ? 'Continue → Documents' : 'Continue → Program Details';
+  }
+
   const next2 = $('mf-next-2');
   if (next2) {
-    next2.textContent = isAccreditation ? 'Continue → Review' : 'Continue → Documents';
+    next2.textContent = isAccreditation ? 'Continue → Review'
+      : isWhip ? 'Continue → Beneficiary'
+      : 'Continue → Documents';
   }
 
   const schoolTitle = $('mf-school-card-title');
@@ -1003,6 +1255,7 @@ function submitForm() {
 
       const addWorkerBtn = $('mf-add-whip-worker');
       const addWorkerLabel = $('mf-add-whip-worker-label');
+      const addAnotherLabel = $('mf-add-another-label');
       if (isWhip) {
         let projId = whipProjectIdAtSubmit ? parseInt(whipProjectIdAtSubmit, 10) : null;
         if (!projId && data.state && Array.isArray(data.state.insertedProjectIds) && data.state.insertedProjectIds.length) {
@@ -1011,9 +1264,11 @@ function submitForm() {
         lastWhipProject = projId ? { id: projId, title: whipProjectTitleAtSubmit } : null;
         if (addWorkerBtn) addWorkerBtn.style.display = lastWhipProject ? 'inline-flex' : 'none';
         if (addWorkerLabel && lastWhipProject) addWorkerLabel.textContent = lastWhipProject.title;
-        whipProjectsCache = null; // force a refresh so a newly-created project is searchable next time
+        if (addAnotherLabel) addAnotherLabel.textContent = 'a New Project Entry';
+        whipProjectsCache = null; // force a refresh so a newly-created/edited project is up to date next time
       } else if (addWorkerBtn) {
         addWorkerBtn.style.display = 'none';
+        if (addAnotherLabel) addAnotherLabel.textContent = 'Record';
       }
 
       if (typeof window.showToast === 'function') {
@@ -1127,6 +1382,8 @@ function resetForm() {
   lastWhipProject = null;
   const addWhipWorker = $('mf-add-whip-worker');
   if (addWhipWorker) addWhipWorker.style.display = 'none';
+  const addAnotherLabel = $('mf-add-another-label');
+  if (addAnotherLabel) addAnotherLabel.textContent = 'Record';
 
   const secEl = $('manualSection');
   if(secEl) secEl.value = '';
@@ -1138,6 +1395,13 @@ function resetForm() {
 
   const badge = $('mf-prog-badge');
   if(badge) badge.classList.add('mf-hidden');
+
+  const stepLabel1 = document.querySelector('#mf-stab-1 .mf-step-label');
+  const stepLabel2 = document.querySelector('#mf-stab-2 .mf-step-label');
+  if (stepLabel1) stepLabel1.textContent = 'Beneficiary';
+  if (stepLabel2) stepLabel2.textContent = 'Program Details';
+  const resetNext1 = $('mf-next-1');
+  if (resetNext1) resetNext1.textContent = 'Continue → Program Details';
 
   const districtEl = $('mf-district');
   const barangayEl = $('mf-barangay');

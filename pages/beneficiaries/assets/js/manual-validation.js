@@ -17,6 +17,7 @@ export function validatePanel(idx, selectedProgram) {
     if (needsClassification) req1.push('mf-classification');
     const is4ps = document.getElementById('mf-flag-4ps')?.classList.contains('on');
     if (is4ps) req1.push('mf-4psid');
+    if (selectedProgram === 'whip') req1.push('mf-whip-batch');
 
     for (const id of req1) {
       const el = $(id);
@@ -39,9 +40,6 @@ export function validatePanel(idx, selectedProgram) {
     }
     if (selectedProgram === 'jobfair') {
       req2.push('mf-jfevent', 'mf-jfcompany');
-    }
-    if (selectedProgram === 'whip') {
-      req2.push('mf-whip-batch');
     }
     if (['careerdev', 'lmi'].includes(selectedProgram)) {
       req2.push('mf-school', 'mf-school-batch');
@@ -134,12 +132,16 @@ export function validatePanel(idx, selectedProgram) {
       const mode = $('mf-h-whip-project-mode')?.value || 'search';
       const projectId = $('mf-h-whip-project-id')?.value || '';
 
-      if (mode === 'new') {
+      if (mode === 'new' || mode === 'edit') {
         const title = $('mf-project-title');
         const contractor = $('mf-project-contractor');
         if (!title?.value.trim() || !contractor?.value.trim()) {
-          window.showToast('Please fill in the new project\'s title and contractor.', 'warning');
+          window.showToast('Please fill in the project\'s title and contractor.', 'warning');
           (title?.value.trim() ? contractor : title)?.focus();
+          return false;
+        }
+        if (mode === 'edit' && !projectId) {
+          window.showToast('Something went wrong identifying the project being edited. Please re-select it.', 'warning');
           return false;
         }
       } else if (!projectId) {

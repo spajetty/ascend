@@ -253,6 +253,35 @@ try {
             if ($resolvedProjectId <= 0) {
                 throw new RuntimeException('Failed to save the new WHIP project.');
             }
+        } elseif ($projectMode === 'edit') {
+            if ($postedProjectId <= 0) {
+                throw new RuntimeException('Something went wrong identifying the project being edited. Please re-select it.');
+            }
+
+            $projectRow = [
+                'Project Title / Name of Implementing Partner' => $_POST['project_title'] ?? '',
+                'Project Contractor' => $_POST['project_contractor'] ?? '',
+                'Nature of Project' => $_POST['nature_of_project'] ?? '',
+                'Duration' => $_POST['duration'] ?? '',
+                'Budget' => $_POST['budget'] ?? '',
+                'Fund Source' => $_POST['fund_source'] ?? '',
+                'No. of Persons Employed from the Locality' => $_POST['persons_locality'] ?? '',
+                'Skills Required for the Job' => $_POST['skills_required'] ?? '',
+                'Skills Deficiencies' => $_POST['skills_deficiencies'] ?? '',
+                'Legitimate Contractors (YES or NO)' => $_POST['legitimate_contractors'] ?? '',
+                'Filled' => $_POST['filled'] ?? '',
+                'Unfilled' => $_POST['unfilled'] ?? '',
+            ];
+
+            if (trim((string)$projectRow['Project Title / Name of Implementing Partner']) === '' || trim((string)$projectRow['Project Contractor']) === '') {
+                throw new RuntimeException('Project title and contractor are required to update this project.');
+            }
+
+            $updated = updateWhipProjectsRow($conn, $postedProjectId, $projectRow, $ctx, $state);
+            if (!$updated) {
+                throw new RuntimeException('Failed to update the WHIP project.');
+            }
+            $resolvedProjectId = $postedProjectId;
         } else {
             $resolvedProjectId = $postedProjectId;
         }
@@ -298,7 +327,37 @@ try {
             'Unfilled' => $_POST['unfilled'] ?? '',
         ];
 
+        // Standalone "Save Project Changes" call from the Edit Details panel
+        // posts a project_id — in that case this is an update to the master
+        // project row, not a new project, and skips the duplicate check
+        // entirely (we already know exactly which row we're editing).
+        $editProjectId = isset($_POST['project_id']) && is_numeric($_POST['project_id']) ? (int)$_POST['project_id'] : 0;
+
+        if ($editProjectId > 0) {
+            if (trim((string)$row['Project Title / Name of Implementing Partner']) === '' || trim((string)$row['Project Contractor']) === '') {
+                throw new RuntimeException('Project title and contractor are required to update this project.');
+            }
+
+            $updated = updateWhipProjectsRow($conn, $editProjectId, $row, $ctx, $state);
+            if (!$updated) {
+                throw new RuntimeException('Failed to update the WHIP project.');
+            }
+
+            $conn->commit();
+            echo json_encode([
+                'success' => true,
+                'beneficiary_id' => null,
+                'project_id' => $editProjectId,
+                'state' => $state,
+                'warnings' => array_values(array_unique($state['warnings'])),
+            ]);
+            exit;
+        }
+
         $result = saveWhipProjectsRow($conn, $row, $ctx, $state);
+        if ($result === 'skipped') {
+            throw new RuntimeException('A project with this title/contractor already exists. Please search for it and select it instead of adding it as new.');
+        }
         if ($result !== 'saved') {
             throw new RuntimeException('Failed to save WHIP project.');
         }
@@ -307,6 +366,7 @@ try {
         echo json_encode([
             'success' => true,
             'beneficiary_id' => null,
+            'project_id' => (int)end($state['insertedProjectIds']),
             'state' => $state,
             'warnings' => array_values(array_unique($state['warnings'])),
         ]);

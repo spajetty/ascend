@@ -1,4 +1,4 @@
-            <!-- ════════════════════════════════════════════════════════
+<!-- ════════════════════════════════════════════════════════
                 PANEL 2 — Program-Specific Fields
                 All cards rendered; JS shows/hides per selected program
             ════════════════════════════════════════════════════════ -->
@@ -359,33 +359,149 @@
                     </div>
                 </div>
 
-                <!-- WHIP — Infrastructure Project -->
-                <div class="mf-card" id="mf-sec-whip" style="display:none;">
+                <!-- WHIP — Project Picker (search existing project or add a new one) -->
+                <div class="mf-card" id="mf-sec-whip-picker" style="display:none;">
                     <div class="mf-card-head">
-                        <div class="mf-card-icon"><i class="fa-solid fa-hammer"></i></div>
-                        <div class="mf-card-title">Infrastructure Project</div>
+                        <div class="mf-card-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <div>
+                            <div class="mf-card-title">Infrastructure Project</div>
+                            <div class="mf-card-sub">Search an existing project, or add it as new if it isn't found</div>
+                        </div>
+                    </div>
+                    <div class="mf-card-body">
+                        <div class="mf-field" style="position:relative;">
+                            <label for="mf-whip-project-search">Project <span class="mf-req">*</span> <span class="mf-hint">Type to search</span></label>
+                            <input type="text" id="mf-whip-project-search" placeholder="Search project title or contractor…" autocomplete="off">
+                            <input type="hidden" name="project_id" id="mf-h-whip-project-id" value="">
+                            <input type="hidden" name="project_mode" id="mf-h-whip-project-mode" value="search">
+                        </div>
+                        <div class="mf-card" id="mf-whip-project-summary" style="display:none; margin-top:12px; border:1px solid var(--mf-border, #e5e7eb); border-radius:12px; overflow:hidden;">
+                            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:var(--mf-surface2, #f8fafc); border-bottom:1px solid var(--mf-border, #e5e7eb);">
+                                <strong id="mf-whip-project-summary-title" style="font-size:14px;">—</strong>
+                                <div style="display:flex; gap:8px;">
+                                    <button type="button" id="mf-whip-project-save-edit" style="display:none;"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-white bg-green-600 border border-green-600 rounded-md hover:bg-green-700 transition-colors">
+                                        <i class="fa-solid fa-floppy-disk"></i> Save Project Changes
+                                    </button>
+                                    <button type="button" id="mf-whip-project-edit-toggle"
+                                        class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+                                        <i class="fa-solid fa-pen"></i> Edit Details
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="mf-grid mf-grid-2" style="padding:14px 16px;">
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Nature of Project</label>
+                                    <div id="mf-whip-summary-nature" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Duration</label>
+                                    <div id="mf-whip-summary-duration" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Budget</label>
+                                    <div id="mf-whip-summary-budget" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Fund Source</label>
+                                    <div id="mf-whip-summary-fund" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Contractor</label>
+                                    <div id="mf-whip-summary-contractor" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Legitimate Contractor</label>
+                                    <div id="mf-whip-summary-legit" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Persons from Locality</label>
+                                    <div id="mf-whip-summary-locality" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Slots</label>
+                                    <div style="font-size:13px; font-weight:500;">
+                                        <span id="mf-whip-summary-filled">0</span> filled ·
+                                        <span id="mf-whip-summary-unfilled">0</span> unfilled
+                                    </div>
+                                </div>
+                                <div class="mf-field mf-col2" style="margin-bottom:0;">
+                                    <label style="margin-bottom:2px;">Skills Required</label>
+                                    <div id="mf-whip-summary-skills" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                                <div class="mf-field mf-col2" style="margin-bottom:0;" id="mf-whip-summary-deficiencies-wrap">
+                                    <label style="margin-bottom:2px;">Skills Deficiencies</label>
+                                    <div id="mf-whip-summary-deficiencies" style="font-size:13px; font-weight:500;">—</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- WHIP PROJECT DETAILS — shown when adding a new project (mode='new')
+                     OR when editing the currently-selected existing project (mode='edit').
+                     In 'edit' mode, saving this form updates the master project record. -->
+                <div class="mf-card" id="mf-sec-whip-projects" style="display:none;">
+                    <div class="mf-card-head">
+                        <div class="mf-card-icon"><i class="fa-solid fa-helmet-safety"></i></div>
+                        <div>
+                            <div class="mf-card-title" id="mf-whip-projects-title">WHIP Project Details</div>
+                            <div class="mf-card-sub" id="mf-whip-projects-sub">Records infrastructure project metadata</div>
+                        </div>
                     </div>
                     <div class="mf-card-body">
                         <div class="mf-grid mf-grid-2">
                             <div class="mf-field mf-col2">
-                                <label for="mf-project">Project <span class="mf-req">*</span></label>
-                                <select id="mf-project" name="project_id">
-                                    <option value="">— select project —</option>
-                                    <!-- TODO: populate from projects table -->
+                                <label for="mf-project-title">Project Title <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-project-title" name="project_title" placeholder="e.g. Pharmacy Operations Support Program for Mercury Drug Branches">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-nature">Nature of Project</label>
+                                <input type="text" id="mf-project-nature" name="nature_of_project" placeholder="e.g. Pharmaceutical Retail">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-duration">Duration</label>
+                                <input type="text" id="mf-project-duration" name="duration" placeholder="e.g. 150 CALENDAR DAYS">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-budget">Budget</label>
+                                <input type="text" id="mf-project-budget" name="budget" placeholder="e.g. 29800000">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-fund">Fund Source</label>
+                                <input type="text" id="mf-project-fund" name="fund_source" placeholder="e.g. COMPANY FUND">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-contractor">Contractor <span class="mf-req">*</span></label>
+                                <input type="text" id="mf-project-contractor" class="mf-company-autocomplete" name="project_contractor" placeholder="Search contractor name…">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-project-legit">Legitimate Contractor</label>
+                                <select id="mf-project-legit" name="legitimate_contractors">
+                                    <option value="">— select —</option>
+                                    <option value="YES">Yes</option>
+                                    <option value="NO">No</option>
                                 </select>
                             </div>
                             <div class="mf-field">
-                                <label for="mf-whip-pos">Position</label>
-                                <input type="text" id="mf-whip-pos" name="whip_position"
-                                    placeholder="e.g. Construction Worker">
+                                <label for="mf-project-locality">No. of Persons Employed from the Locality</label>
+                                <input type="number" id="mf-project-locality" name="persons_locality" min="0" placeholder="0">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-date-hired">Date Hired</label>
-                                <input type="date" id="mf-date-hired" name="date_hired">
+                                <label for="mf-project-filled">Slots Filled</label>
+                                <input type="number" id="mf-project-filled" name="filled" min="0" placeholder="0">
                             </div>
                             <div class="mf-field">
-                                <label for="mf-whip-batch">Batch <span class="mf-req">*</span></label>
-                                <input type="month" id="mf-whip-batch" name="whip_batch">
+                                <label for="mf-project-unfilled">Slots Unfilled</label>
+                                <input type="number" id="mf-project-unfilled" name="unfilled" min="0" placeholder="0">
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-skills">Skills Required for the Job <span class="mf-hint">e.g. 2 - Branch Supervisor, 5 - Pharmacy Assistant, 4 - Cashier</span></label>
+                                <textarea id="mf-project-skills" name="skills_required" rows="2" placeholder="Count - Role, one per line or comma-separated"></textarea>
+                            </div>
+                            <div class="mf-field mf-col2">
+                                <label for="mf-project-deficiencies">Skills Deficiencies <span class="mf-hint">Optional</span></label>
+                                <textarea id="mf-project-deficiencies" name="skills_deficiencies" rows="2" placeholder="List any skills gaps"></textarea>
                             </div>
                         </div>
                     </div>
@@ -502,77 +618,6 @@
                             <div class="mf-field mf-col2">
                                 <label for="mf-accred-city">City / Municipality <span class="mf-hint">Optional</span></label>
                                 <input type="text" id="mf-accred-city" name="city" placeholder="e.g. Quezon City">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- WHIP PROJECTS -->
-                <div class="mf-card" id="mf-sec-whip-projects" style="display:none;">
-                    <div class="mf-card-head">
-                        <div class="mf-card-icon"><i class="fa-solid fa-helmet-safety"></i></div>
-                        <div>
-                            <div class="mf-card-title">WHIP Project Details</div>
-                            <div class="mf-card-sub">Records infrastructure project metadata</div>
-                        </div>
-                    </div>
-                    <div class="mf-card-body">
-                        <div class="mf-grid mf-grid-2">
-                            <div class="mf-field mf-col2">
-                                <label for="mf-project-title">Project Title / Name of Implementing Partner <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-project-title" name="project_title" placeholder="Project title">
-                            </div>
-                            <div class="mf-field mf-col2">
-                                <label for="mf-project-contractor">Project Contractor <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-project-contractor" class="mf-company-autocomplete" name="project_contractor" placeholder="Search contractor name…">
-                            </div>
-                            <div class="mf-field mf-col2">
-                                <label for="mf-project-nature">Nature of Project</label>
-                                <input type="text" id="mf-project-nature" name="nature_of_project" placeholder="e.g. Road Construction">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-duration">Duration</label>
-                                <input type="text" id="mf-project-duration" name="duration" placeholder="e.g. 6 months">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-budget">Budget</label>
-                                <input type="text" id="mf-project-budget" name="budget" placeholder="e.g. 1500000">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-fund">Fund Source</label>
-                                <input type="text" id="mf-project-fund" name="fund_source" placeholder="e.g. City Budget">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-jobs">No. of Persons Employed from the Locality</label>
-                                <input type="number" id="mf-project-jobs" name="jobs_generated" min="0" placeholder="0">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-locality">Filled / Locality Workers</label>
-                                <input type="number" id="mf-project-locality" name="persons_locality" min="0" placeholder="0">
-                            </div>
-                            <div class="mf-field mf-col2">
-                                <label for="mf-project-skills">Skills Required for the Job</label>
-                                <textarea id="mf-project-skills" name="skills_required" rows="2" placeholder="List required skills"></textarea>
-                            </div>
-                            <div class="mf-field mf-col2">
-                                <label for="mf-project-deficiencies">Skills Deficiencies</label>
-                                <textarea id="mf-project-deficiencies" name="skills_deficiencies" rows="2" placeholder="List any skills gaps"></textarea>
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-legit">Legitimate Contractors</label>
-                                <select id="mf-project-legit" name="legitimate_contractors">
-                                    <option value="">— select —</option>
-                                    <option value="YES">YES</option>
-                                    <option value="NO">NO</option>
-                                </select>
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-filled">Filled</label>
-                                <input type="number" id="mf-project-filled" name="filled" min="0" placeholder="0">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-project-unfilled">Unfilled</label>
-                                <input type="number" id="mf-project-unfilled" name="unfilled" min="0" placeholder="0">
                             </div>
                         </div>
                     </div>

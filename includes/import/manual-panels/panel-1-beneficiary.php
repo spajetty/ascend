@@ -1,4 +1,4 @@
-            <!-- ════════════════════════════════════════════════════════
+<!-- ════════════════════════════════════════════════════════
                 PANEL 1 — Beneficiary Info
             ════════════════════════════════════════════════════════ -->
             <div class="mf-panel" id="mf-panel-1">
@@ -177,6 +177,31 @@
                                 placeholder="Any additional notes about this beneficiary…"></textarea>
                         </div>
 
+                    </div>
+                </div>
+
+                <!-- Worker Assignment (WHIP only) -->
+                <div class="mf-card" id="mf-sec-ben-whip" style="display:none;">
+                    <div class="mf-card-head">
+                        <div class="mf-card-icon"><i class="fa-solid fa-hammer"></i></div>
+                        <div class="mf-card-title">Worker Assignment</div>
+                    </div>
+                    <div class="mf-card-body">
+                        <div class="mf-grid mf-grid-2">
+                            <div class="mf-field">
+                                <label for="mf-whip-pos">Position</label>
+                                <input type="text" id="mf-whip-pos" name="whip_position"
+                                    placeholder="e.g. Construction Worker">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-date-hired">Date Hired</label>
+                                <input type="date" id="mf-date-hired" name="date_hired">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-whip-batch">Batch <span class="mf-req">*</span></label>
+                                <input type="month" id="mf-whip-batch" name="whip_batch">
+                            </div>
+                        </div>
                     </div>
                 </div>
 

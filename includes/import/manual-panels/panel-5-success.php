@@ -15,10 +15,10 @@
                         </div>
                         <div class="mf-btn-row" style="justify-content:center; gap: 8px; flex-wrap:wrap;">
                             <button type="button" class="mf-btn mf-btn-secondary" id="mf-add-whip-worker" style="display:none; color:#1d4ed8; border-color:#bfdbfe; background-color:#eff6ff;">
-                                <i class="fa-solid fa-user-plus"></i> Add Another Worker for <span id="mf-add-whip-worker-label">this project</span>
+                                <i class="fa-solid fa-user-plus"></i> Add Another Worker for this project</span>
                             </button>
-                            <button type="button" class="mf-btn mf-btn-primary" id="mf-add-another">+ Add Another
-                                Record</button>
+                            <button type="button" class="mf-btn mf-btn-primary" id="mf-add-another">+ Add
+                                <span id="mf-add-another-label"></span></button>
                             <button type="button" class="mf-btn mf-btn-secondary" id="mf-undo-submit" style="color: #ef4444; border-color: #fecaca; background-color: #fef2f2;">
                                 <i class="fa-solid fa-rotate-left"></i> Undo Entry
                             </button>

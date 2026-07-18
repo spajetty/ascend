@@ -196,11 +196,11 @@ function resolveWhipProjectsSchema(mysqli $conn): array {
         'budget_col' => firstExistingColumn($conn, $table, ['budget', 'project_budget']),
         'fund_col' => firstExistingColumn($conn, $table, ['fund_source', 'fundsource', 'source_of_funds']),
         'jobs_generated_col' => firstExistingColumn($conn, $table, ['jobs_generated']),
-        'persons_locality_col' => firstExistingColumn($conn, $table, ['persons_employed_locality', 'no_of_persons', 'persons_locality']),
+        'persons_locality_col' => firstExistingColumn($conn, $table, ['persons_from_locality', 'persons_employed_locality', 'no_of_persons', 'persons_locality']),
         'skills_required_col' => firstExistingColumn($conn, $table, ['skills_required', 'skills_required_for_the_job']),
         'skills_def_col' => firstExistingColumn($conn, $table, ['skills_deficiencies', 'skills_deficiency']),
         'contractor_col' => firstExistingColumn($conn, $table, ['project_contractor', 'contractor', 'company_name']),
-        'legit_col' => firstExistingColumn($conn, $table, ['legitimate_contractors', 'legitimate_contractor']),
+        'legit_col' => firstExistingColumn($conn, $table, ['is_legitimate_contractor', 'legitimate_contractors', 'legitimate_contractor']),
         'filled_col' => firstExistingColumn($conn, $table, ['filled']),
         'unfilled_col' => firstExistingColumn($conn, $table, ['unfilled']),
         'company_id_col' => firstExistingColumn($conn, $table, ['company_id']),
@@ -617,18 +617,29 @@ function checkDuplicate(mysqli $conn, string $fname, string $lname, ?string $dob
         return $empty;
     }
 
-    $stmt = $conn->prepare('
-        SELECT benef_id, email, dob, contact
+    // A fuzzy match without a name to compare against is unsafe — a shared
+    // DOB or blank contact number alone shouldn't flag two different people.
+    if ($fnameVal === '' || $lnameVal === '') {
+        return $empty;
+    }
+
+    $stmt = $conn->prepare(sprintf(
+        'SELECT benef_id, email, dob, contact, %s AS fname, %s AS lname
         FROM beneficiaries
         WHERE (email IS NOT NULL AND email <> "" AND email = ?)
            OR (dob IS NOT NULL AND dob = ?)
-           OR (contact IS NOT NULL AND contact = ?)
-        LIMIT 200
-    ');
+           OR (contact IS NOT NULL AND contact <> "" AND contact = ?)
+        LIMIT 200',
+        $firstCol ?: 'first_name',
+        $lastCol ?: 'last_name'
+    ));
 
     $stmt->bind_param('sss', $email, $dobVal, $contact);
     $stmt->execute();
     $result = $stmt->get_result();
+
+    $fnameNorm = normalizeKeyText($fnameVal);
+    $lnameNorm = normalizeKeyText($lnameVal);
 
     while ($row = $result->fetch_assoc()) {
         $score = 0;
@@ -636,11 +647,13 @@ function checkDuplicate(mysqli $conn, string $fname, string $lname, ?string $dob
         if ($dobVal !== '' && isset($row['dob']) && trim((string)$row['dob']) === $dobVal) $score++;
         if ($contact !== '' && isset($row['contact']) && trim((string)$row['contact']) === $contact) $score++;
 
-        if ($score >= 2) {
+        $nameMatches = normalizeKeyText((string)($row['fname'] ?? '')) === $fnameNorm
+            && normalizeKeyText((string)($row['lname'] ?? '')) === $lnameNorm;
+
+        if ($score >= 2 && $nameMatches) {
             return ['found' => true, 'user_id' => null, 'benef_id' => $row['benef_id']];
         }
     }
 
     return $empty;
 }
-

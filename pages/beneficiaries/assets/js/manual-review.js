@@ -104,8 +104,9 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
 
     if (selectedProgram === 'whip') {
       const mode = $('mf-h-whip-project-mode')?.value || 'search';
-      if (mode === 'new') {
-        details.push(['Project', `${$('mf-project-title')?.value || '—'} (new)`]);
+      if (mode === 'new' || mode === 'edit') {
+        const suffix = mode === 'new' ? ' (new)' : ' (edited — updates the master project)';
+        details.push(['Project', `${$('mf-project-title')?.value || '—'}${suffix}`]);
         details.push(['Project Contractor', $('mf-project-contractor')?.value || '—']);
         details.push(['Nature of Project', $('mf-project-nature')?.value || '—']);
         details.push(['Duration', $('mf-project-duration')?.value || '—']);
