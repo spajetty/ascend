@@ -72,6 +72,9 @@ try {
     if (!empty($state['insertedWiirpIds'])) {
         $deleteIds('wiirp', 'work_immersion_id', $state['insertedWiirpIds']);
     }
+    if (!empty($state['insertedBeneficiaryProgramIds'])) {
+        $deleteIds('beneficiary_programs', 'id', $state['insertedBeneficiaryProgramIds']);
+    }
     
     // 2. Delete docs related to beneficiary
     if (!empty($state['insertedDocIds'])) {
