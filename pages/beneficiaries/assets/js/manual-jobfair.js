@@ -171,11 +171,20 @@ export function bindJobFairAutocomplete() {
       const block = document.createElement('div');
       block.className = 'border border-gray-200 rounded-lg p-3 bg-gray-50';
       
+      const headerHtml = selectedEvents.length > 1 
+        ? `<div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2 truncate" title="${label}">Companies for: ${label}</div>`
+        : '';
+
       block.innerHTML = `
-        <div class="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-2">Companies for: ${label}</div>
+        ${headerHtml}
         <div class="relative">
           <div class="flex flex-wrap gap-2 mb-2 empty:hidden chips-container"></div>
-          <input type="text" placeholder="Search companies..." class="w-full bg-white px-3 py-1.5 border border-gray-300 rounded-md text-sm outline-none focus:border-blue-600 comp-input">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-gray-400">
+              <i class="fa-solid fa-magnifying-glass text-[11px]"></i>
+            </div>
+            <input type="text" placeholder="Search companies..." style="padding-left: 1.85rem;" class="w-full bg-white px-3 py-1.5 border border-gray-300 rounded-md text-sm outline-none focus:border-blue-600 comp-input">
+          </div>
           <div class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hidden max-h-40 overflow-y-auto overflow-x-hidden comp-dropdown" style="z-index: 9999;"></div>
           <div class="hidden-inputs"></div>
         </div>

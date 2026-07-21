@@ -413,10 +413,10 @@ function goPanel(n) {
     const tab = $('mf-stab-' + i);
     const num = $('mf-snum-' + i);
     if (!tab) continue;
-    tab.classList.remove('active', 'done');
+    tab.classList.remove('active', 'done', 'locked');
     if (i < n)        { tab.classList.add('done');   num.textContent = '✓'; }
     else if (i === n) { tab.classList.add('active'); num.textContent = i;   }
-    else                num.textContent = i;
+    else              { tab.classList.add('locked'); num.textContent = i;   }
   }
 
   // Progress bar

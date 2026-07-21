@@ -76,15 +76,25 @@
                             </div>
 
                             <div class="mf-field mf-col2" style="position: relative;">
-                                <div class="flex items-center justify-between gap-3 mb-1">
-                                    <label for="mf-jfevent-input" class="mb-0">Event(s) <span class="mf-req">*</span></label>
-                                    <button type="button" id="mf-add-jfevent" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+                                <div class="flex items-start justify-between gap-3 mb-2">
+                                    <div>
+                                        <label for="mf-jfevent-input" class="mb-0 block">Event(s) <span class="mf-req">*</span></label>
+                                        <span class="text-[11px] text-gray-500 leading-tight block mt-0.5">Select the job fair event(s) this beneficiary will attend or has attended.</span>
+                                    </div>
+                                    <button type="button" id="mf-add-jfevent" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors shrink-0">
                                         <i class="fa-solid fa-plus"></i>
                                         Add New Event
                                     </button>
                                 </div>
                                 <div id="mf-jfevent-chips" class="flex flex-wrap gap-2 mb-2 empty:hidden"></div>
-                                <input type="text" id="mf-jfevent-input" placeholder="Search and select events...">
+                                
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                        <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                                    </div>
+                                    <input type="text" id="mf-jfevent-input" style="padding-left: 2.25rem;" placeholder="Search and select events...">
+                                </div>
+
                                 <div id="mf-jfevent-dropdown"
                                     class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hidden max-h-60 overflow-y-auto overflow-x-hidden"
                                     style="z-index: 9999;"></div>
@@ -92,10 +102,14 @@
                                 <input type="hidden" id="mf-jfevent" value="">
                             </div>
 
-                            <div class="mf-field mf-col2" id="mf-jfcompanies-wrapper" style="display:none;">
-                                <label>Participating Companies <span class="mf-req">*</span></label>
+                            <div class="mf-field mf-col2 border-l-[3px] border-blue-200 pl-4 ml-1 mt-1" id="mf-jfcompanies-wrapper" style="display:none;">
+                                <label class="mb-3">Participating Companies <span class="mf-req">*</span></label>
                                 <div id="mf-jfcompany-lists" class="flex flex-col gap-3"></div>
                                 <input type="hidden" id="mf-jfcompany" value="">
+                            </div>
+                            <div class="mf-field">
+                                <label for="mf-jf-batch">Batch / Period <span class="mf-req">*</span></label>
+                                <input type="month" id="mf-jf-batch" name="batch_period">
                             </div>
                         </div>
                     </div>

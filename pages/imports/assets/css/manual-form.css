@@ -121,6 +121,8 @@
 .mf-step-tab:hover:not(.active)  { background: var(--mf-surface2); }
 .mf-step-tab.active              { background: var(--mf-accent-light); }
 .mf-step-tab.done                { background: var(--mf-accent2-light); }
+.mf-step-tab.locked              { cursor: not-allowed; opacity: 0.6; }
+.mf-step-tab.locked:hover        { background: transparent; }
 
 .mf-step-num {
   width: 20px; height: 20px;
