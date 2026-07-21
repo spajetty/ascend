@@ -9,7 +9,7 @@
                     <span id="mf-panel2-note-text">Fields specific to the selected program.</span>
                 </div>
 
-                <!-- EMPLOYER (jobmatch / firstjobseek / jobfair / whip) -->
+                <!-- EMPLOYER (jobmatch / firstjobseek / whip) -->
                 <div class="mf-card" id="mf-sec-employer" style="display:none;">
                     <div class="mf-card-head">
                         <div class="mf-card-icon"><i class="fa-solid fa-building"></i></div>

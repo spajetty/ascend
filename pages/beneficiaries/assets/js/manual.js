@@ -51,7 +51,7 @@ const SECTION_LABELS = {
 const PROG_SECTIONS = {
   jobmatch:      ['mf-sec-employer'],
   firstjobseek:  ['mf-sec-employer', 'mf-sec-ftj'],
-  jobfair:       ['mf-sec-employer', 'mf-sec-jobfair'],
+  jobfair:       ['mf-sec-jobfair'],
   accreditation: ['mf-sec-accred'],
   whip:          ['mf-sec-employer', 'mf-sec-whip'],
   spes:          ['mf-sec-spes'],

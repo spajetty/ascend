@@ -114,7 +114,20 @@ try {
     );
 
     if (!empty($duplicate['found'])) {
-        throw new RuntimeException('Duplicate beneficiary already exists in the database.');
+        $existingBenefId = (int)$duplicate['benef_id'];
+        
+        $progCheckStmt = $conn->prepare('SELECT id FROM beneficiary_programs WHERE benef_id = ? AND program_id = ?');
+        $progCheckStmt->bind_param('ii', $existingBenefId, $programId);
+        $progCheckStmt->execute();
+        $isAlreadyEnrolled = $progCheckStmt->get_result()->num_rows > 0;
+        $progCheckStmt->close();
+
+        if ($isAlreadyEnrolled) {
+            throw new RuntimeException('Duplicate beneficiary already exists in the database and is already enrolled in this program.');
+        } else {
+            // Re-use the existing beneficiary ID and just link the new program
+            $row['_sys_benef_id'] = $existingBenefId;
+        }
     }
 
     $conn->begin_transaction();
@@ -122,6 +135,22 @@ try {
     // Resolve Batch ID
     $batchId = null;
     $batchPeriod = trim((string)($_POST['batch_period'] ?? $_POST['spes_batch'] ?? $_POST['int_batch'] ?? $_POST['whip_batch'] ?? $_POST['school_batch'] ?? ''));
+
+    if ($program === 'Job Fair' && empty($batchPeriod)) {
+        $eventIdsRaw = $_POST['jobfairevent_ids'] ?? [];
+        if (!is_array($eventIdsRaw)) $eventIdsRaw = [$eventIdsRaw];
+        $firstEventId = (int)($eventIdsRaw[0] ?? 0);
+        if ($firstEventId) {
+            $evtStmt = $conn->prepare('SELECT date_start FROM job_fair_events WHERE jobfairevent_id = ?');
+            $evtStmt->bind_param('i', $firstEventId);
+            $evtStmt->execute();
+            $evtRes = $evtStmt->get_result()->fetch_assoc();
+            if ($evtRes && !empty($evtRes['date_start'])) {
+                $batchPeriod = date('Y-m', strtotime($evtRes['date_start']));
+            }
+        }
+    }
+
     if ($batchPeriod !== '') {
         $parts = explode('-', $batchPeriod);
         if (count($parts) === 2) {
@@ -156,14 +185,25 @@ try {
         $gipCategory = 'LGU';
     }
 
+    $programStatus = 'Registered';
+    if ($program === 'SPES') {
+        $programStatus = !empty($_POST['spes_status']) ? trim($_POST['spes_status']) : 'Registered';
+    } elseif (in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair'])) {
+        $programStatus = !empty($_POST['classification']) ? trim($_POST['classification']) : 'Registered';
+    } elseif (strpos($program, 'Workers Hiring') !== false) {
+        $programStatus = 'Placed';
+    }
+
     $ctx = [
         'program' => $program,
         'programId' => $programId,
         'batchId' => $batchId,
         'wiirpCategory' => trim((string)($_POST['inquiry_type'] ?? 'inquiry')),
         'gipCategory' => $gipCategory,
+        'programStatus' => $programStatus,
         'is_manual' => true
     ];
+
 
     $state = [
         'insertedBenefIds' => [],
@@ -172,6 +212,7 @@ try {
         'insertedJobMatchIds' => [],
         'insertedJobFairIds' => [],
         'createdEmployerIds' => [],
+        'insertedBeneficiaryProgramIds' => [],
         'warnings' => [],
     ];
 
