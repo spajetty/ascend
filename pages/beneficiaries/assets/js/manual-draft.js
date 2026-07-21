@@ -49,6 +49,7 @@ export function initDraftManager() {
 }
 
 function saveDraft() {
+    if (window._isRestoringDraft) return;
     const form = document.getElementById('manualEntryForm');
     if (!form) return;
     const formData = new FormData(form);
@@ -136,9 +137,13 @@ function showDraftModal(draftData, timestamp) {
     });
 }
 
-function restoreDraft(data) {
+async function restoreDraft(data) {
+    window._isRestoringDraft = true;
     const form = document.getElementById('manualEntryForm');
-    if (!form) return;
+    if (!form) {
+        window._isRestoringDraft = false;
+        return;
+    }
     
     // Pass 1: Standard inputs
     Object.entries(data).forEach(([key, value]) => {
@@ -212,5 +217,16 @@ function restoreDraft(data) {
     const dob = document.getElementById('mf-dob');
     if (dob && dob.value) dob.dispatchEvent(new Event('change'));
     
+    if (typeof window.restoreJobFairDraft === 'function' && data['__manualProgram'] === 'jobfair') {
+        await window.restoreJobFairDraft(data);
+    }
+
+    const jfBatchEl = document.getElementById('mf-jf-batch');
+    if (jfBatchEl && data.batch_period) {
+        jfBatchEl.value = data.batch_period;
+    }
+
+    window._isRestoringDraft = false;
+
     if (typeof window.showToast === 'function') window.showToast('Draft restored.', 'info');
 }

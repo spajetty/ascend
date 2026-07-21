@@ -58,7 +58,7 @@ export function bindJobFairAutocomplete() {
       const companyName = String(item?.company_name ?? '').trim();
       if (!companyId || !companyName || seen.has(companyId)) return;
       seen.add(companyId);
-      out.push({ company_id: companyId, company_name: companyName });
+      out.push({ company_id: companyId, company_name: companyName, position: item?.position || '' });
     });
     return out;
   };
@@ -87,8 +87,11 @@ export function bindJobFairAutocomplete() {
     }
 
     normalized.forEach(comp => {
-      if (!selectedCompaniesByEvent[selectedId].some(existing => Number(existing.company_id) === Number(comp.company_id))) {
+      const existing = selectedCompaniesByEvent[selectedId].find(c => Number(c.company_id) === Number(comp.company_id));
+      if (!existing) {
         selectedCompaniesByEvent[selectedId].push(comp);
+      } else if (comp.position) {
+        existing.position = comp.position;
       }
     });
 
@@ -106,6 +109,12 @@ export function bindJobFairAutocomplete() {
       if (comps.length === 0) hasAll = false;
     });
     if (compValidator) compValidator.value = hasAll ? '1' : '';
+  }
+
+  function dispatchFormChange() {
+    if (window._isRestoringDraft) return;
+    const form = document.getElementById('manualEntryForm');
+    if (form) form.dispatchEvent(new Event('change'));
   }
 
   function renderEvents() {
@@ -152,6 +161,7 @@ export function bindJobFairAutocomplete() {
       if (compWrapper) compWrapper.style.display = 'none';
       validateCompanies(); // Revalidate when empty
     }
+    dispatchFormChange();
   }
 
   async function renderCompanySections() {
@@ -201,16 +211,34 @@ export function bindJobFairAutocomplete() {
         chipsCont.innerHTML = '';
         hiddenCont.innerHTML = '';
         selectedCompaniesByEvent[evId].forEach(comp => {
-          const chip = document.createElement('div');
-          chip.className = 'inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-medium';
-          chip.innerHTML = `<span>${comp.company_name}</span>
-            <button type="button" class="text-emerald-500 hover:text-emerald-900 focus:outline-none">&times;</button>`;
-          chip.querySelector('button').addEventListener('click', () => {
+          const row = document.createElement('div');
+          row.className = 'flex flex-col sm:flex-row sm:items-center justify-between gap-2 bg-white border border-gray-200 p-2 rounded-lg shadow-xs transition-colors hover:border-blue-200 mt-1';
+          row.innerHTML = `
+            <div class="flex items-center justify-between sm:justify-start gap-2 shrink-0">
+              <span class="text-xs font-semibold text-gray-800">${comp.company_name}</span>
+              <button type="button" class="text-gray-400 hover:text-red-600 text-sm px-1 focus:outline-none remove-comp-btn" title="Remove">&times;</button>
+            </div>
+            <div class="w-full sm:w-60">
+              <input type="text" 
+                     name="jf_position[${evId}][${comp.company_id}]" 
+                     value="${comp.position || ''}" 
+                     placeholder="Position applied for (optional)" 
+                     class="w-full bg-gray-50 border border-gray-200 rounded-md px-2.5 py-1 text-xs outline-none focus:bg-white focus:border-blue-500 comp-pos-input">
+            </div>
+          `;
+
+          row.querySelector('.remove-comp-btn').addEventListener('click', () => {
             selectedCompaniesByEvent[evId] = selectedCompaniesByEvent[evId].filter(c => c.company_id !== comp.company_id);
             renderChips();
             validateCompanies();
           });
-          chipsCont.appendChild(chip);
+
+          row.querySelector('.comp-pos-input').addEventListener('input', (e) => {
+            comp.position = e.target.value;
+            dispatchFormChange();
+          });
+
+          chipsCont.appendChild(row);
 
           const hidden = document.createElement('input');
           hidden.type = 'hidden';
@@ -219,6 +247,7 @@ export function bindJobFairAutocomplete() {
           hiddenCont.appendChild(hidden);
         });
         validateCompanies();
+        dispatchFormChange();
       }
       
       renderChips();
@@ -323,6 +352,55 @@ export function bindJobFairAutocomplete() {
       }
     });
   }
+
+  window.restoreJobFairDraft = async function(data) {
+    if (!data) return;
+
+    let rawEvtIds = data['jobfairevent_ids[]'] || data['jobfairevent_ids'];
+    if (!rawEvtIds) return;
+    if (!Array.isArray(rawEvtIds)) rawEvtIds = [rawEvtIds];
+
+    const eventIds = rawEvtIds.map(v => Number(v)).filter(Boolean);
+    if (eventIds.length === 0) return;
+
+    selectedEvents = [];
+    selectedCompaniesByEvent = {};
+    cachedCompaniesByEvent = {};
+
+    await fetchAllJobFairEvents(true);
+
+    for (const eventId of eventIds) {
+      let companyIds = [];
+      Object.keys(data).forEach(key => {
+        if (key.startsWith(`jf_company_ids[${eventId}]`)) {
+          const val = data[key];
+          if (Array.isArray(val)) companyIds.push(...val);
+          else if (val) companyIds.push(val);
+        }
+      });
+
+      companyIds = companyIds.map(v => Number(v)).filter(Boolean);
+
+      const participants = await fetchEventParticipants(eventId);
+      const matchedCompanies = participants.filter(p => companyIds.includes(Number(p.company_id)));
+
+      matchedCompanies.forEach(comp => {
+        const posKey = `jf_position[${eventId}][${comp.company_id}]`;
+        if (data[posKey]) {
+          comp.position = data[posKey];
+        }
+      });
+
+      await addEventWithCompaniesById(eventId, matchedCompanies);
+    }
+  };
+
+  window.resetJobFair = function() {
+    selectedEvents = [];
+    selectedCompaniesByEvent = {};
+    renderEvents();
+    renderCompanySections();
+  };
 
   if (addEventBtn) {
     addEventBtn.addEventListener('click', () => {

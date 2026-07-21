@@ -34,11 +34,11 @@ export function validatePanel(idx, selectedProgram) {
   } else if (idx === 2) {
     const req2 = [];
     
-    if (['jobmatch', 'firstjobseek', 'jobfair', 'whip'].includes(selectedProgram)) {
+    if (['jobmatch', 'firstjobseek', 'whip'].includes(selectedProgram)) {
       req2.push('mf-company', 'mf-position', 'mf-batch');
     }
     if (selectedProgram === 'jobfair') {
-      req2.push('mf-jfevent', 'mf-jfcompany');
+      req2.push('mf-jfevent', 'mf-jfcompany', 'mf-jf-batch');
     }
     if (selectedProgram === 'whip') {
       req2.push('mf-project', 'mf-whip-batch');

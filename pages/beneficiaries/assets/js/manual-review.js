@@ -52,6 +52,14 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
       const type = document.querySelector('[data-group="jftype"].on')?.dataset.val || '—';
       details.push(['Job Fair Type', type]);
       details.push(['Batch / Period', $('mf-jf-batch')?.value || '—']);
+
+      const compInputs = document.querySelectorAll('#mf-jfcompany-lists input.comp-pos-input');
+      compInputs.forEach(input => {
+        const compRow = input.closest('.flex');
+        const compName = compRow ? (compRow.querySelector('span')?.textContent || 'Company') : 'Company';
+        const posVal = input.value.trim() || 'N/A';
+        details.push([compName, posVal]);
+      });
     }
 
     if (selectedProgram === 'spes') {

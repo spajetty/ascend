@@ -246,6 +246,8 @@ try {
             $companyMapRaw = [];
         }
 
+        $positionsRaw = $_POST['jf_position'] ?? [];
+
         $insertedRows = 0;
         $ins = $conn->prepare('INSERT INTO jobfair (benef_id, company_id, position, batch_id, jobfairevent_id) VALUES (?, ?, ?, ?, ?)');
 
@@ -261,7 +263,11 @@ try {
             }, $companyIdsRaw))));
 
             foreach ($companyIds as $companyId) {
-                $ins->bind_param('iisii', $benefId, $companyId, $position, $batchId, $eventId);
+                $compKey = (string)$companyId;
+                $pos = trim((string)($positionsRaw[$eventKey][$compKey] ?? $_POST['position'] ?? ''));
+                if (!$pos) $pos = 'N/A';
+
+                $ins->bind_param('iisii', $benefId, $companyId, $pos, $batchId, $eventId);
                 $ins->execute();
                 $insertedRows++;
                 $state['insertedJobFairIds'][] = (int)$ins->insert_id;

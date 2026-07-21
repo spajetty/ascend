@@ -823,6 +823,10 @@ function resetForm() {
   const form = document.getElementById('manualEntryForm');
   if (form) form.reset();
   
+  if (typeof window.resetJobFair === 'function') {
+    window.resetJobFair();
+  }
+  
   document.querySelectorAll('.mf-url-input').forEach(input => {
     input.value = '';
     input.dispatchEvent(new Event('input'));
