@@ -137,6 +137,17 @@ export function bindJobFairAutocomplete() {
     
     if (selectedEvents.length > 0) {
       if (compWrapper) compWrapper.style.display = 'block';
+      
+      const firstEv = selectedEvents[0];
+      if (firstEv.date_start) {
+        const batchEl = $('mf-jf-batch');
+        if (batchEl && !batchEl.value) {
+           const parts = firstEv.date_start.split('-');
+           if (parts.length >= 2) {
+             batchEl.value = `${parts[0]}-${parts[1]}`;
+           }
+        }
+      }
     } else {
       if (compWrapper) compWrapper.style.display = 'none';
       validateCompanies(); // Revalidate when empty

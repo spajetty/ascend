@@ -41,8 +41,8 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
 
     let details = [];
 
-    // Shared for Job Matching / FTJ / Job Fair
-    if (['jobmatch', 'firstjobseek', 'jobfair'].includes(selectedProgram)) {
+    // Shared for Job Matching / FTJ
+    if (['jobmatch', 'firstjobseek'].includes(selectedProgram)) {
       details.push(['Company', $('mf-company')?.value || '—']);
       details.push(['Position Applied', $('mf-position')?.value || '—']);
       details.push(['Batch / Period', $('mf-batch')?.value || '—']);
@@ -51,6 +51,7 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
     if (selectedProgram === 'jobfair') {
       const type = document.querySelector('[data-group="jftype"].on')?.dataset.val || '—';
       details.push(['Job Fair Type', type]);
+      details.push(['Batch / Period', $('mf-jf-batch')?.value || '—']);
     }
 
     if (selectedProgram === 'spes') {
