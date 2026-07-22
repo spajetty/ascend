@@ -402,37 +402,28 @@ export const programHeaders = {
         'Congressional District',
         'Grades Offered'
     ],
-    'Government Internship Program': 
-    [
-        'Last Name', 
-        'First Name', 
-        'Middle Name', 
-        'Extension Name', 
-        'Sex', 
-        'House/Block No./Street', 
-        'Barangay', 
-        'City', 
-        'District', 
-        //'Birthday', 
-        'Age', 
-        'Email address', 
-        'Contact Number', 
-        'Civil Status', 
-        'Program', 
-        'Classification', 
-        'Student Type',
-        'Highest Education Attained',
-        'School Name', 
-        'Course/Degree/Strand', 
-        'Start of Contract',
-        'End of Contract',
-        'No. of Days',
-        'Office Assignment',  
-        'Curriculum Vitae / Resume', 
-        'Proof of Residency', 
-        'Latest Credentials', 
-        'Letter of Intent', 
-        'Recommendation Letter'
+    'Government Internship Program': [
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
+        'Contact Number', 'Student/OSY', 'Highest Educ. Attainment'
+    ],
+    'Government Internship Program - LGU': [
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
+        'Contact Number', 'Student/OSY', 'Status', 'School', 
+        'Highest Educ. Attainment', 'Course', 'PWD', 'OFW Dependent', 
+        '4Ps Beneficiary', 'Proponent', 'Office Assignment', 
+        'Start of Contract', 'End of Contract', 
+        'Curriculum Vitae / Resume', 'Proof of Residency', 
+        'Latest Credentials', 'Letter of Intent', 'Recommendation Letter'
+    ],
+    'Government Internship Program - DOLE': [
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
+        'Contact Number', 'Student/OSY', 'Highest Educ. Attainment', 'PWD', 
+        'GSIS Beneficiary', 'Relationship', 'GSIS Benef. Contact No.',
+        'Curriculum Vitae / Resume', 'Proof of Residency', 
+        'Latest Credentials', 'Letter of Intent', 'Recommendation Letter'
     ],
 
     'Work Immersion and Internship Referral Program': 
