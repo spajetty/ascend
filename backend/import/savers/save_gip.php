@@ -20,20 +20,30 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         return 'skipped';
     }
 
-    $studentType = s(rowValue($row, ['Student Type', 'student_type'], 'student'));
-    if (!in_array($studentType, ['student', 'osy'])) {
+    $studentType = strtolower(s(rowValue($row, ['Student Type', 'Student/OSY', 'student_type'], 'student')));
+    if (!in_array($studentType, ['student', 'osy', 'college graduate'])) {
         $studentType = 'student';
     }
     
     $school = s(rowValue($row, ['School Name', 'School', 'school'], ''));
     $course = s(rowValue($row, ['Course/Degree/Strand', 'Course', 'course'], ''));
-    $highestEduc = s(rowValue($row, ['Highest Education Attained', 'Highest Education', 'highest_educ'], ''));
+    $highestEduc = s(rowValue($row, ['Highest Education Attained', 'Highest Educ. Attainment', 'Highest Education', 'highest_educ'], ''));
     
     $startOfContract = parseDateNullable(rowValue($row, ['Start of Contract', 'start_of_contract'], ''));
     $endOfContract = parseDateNullable(rowValue($row, ['End of Contract', 'end_of_contract'], ''));
     
     $days = parseIntNullable(rowValue($row, ['No. of Days', 'Days', 'days'], ''));
     $officeAssignment = s(rowValue($row, ['Office Assignment', 'office_assignment'], ''));
+
+    // New fields
+    $statusRaw = strtolower(s(rowValue($row, ['Status', 'status'], '')));
+    $status = in_array($statusRaw, ['yes', 'no']) ? $statusRaw : null;
+    
+    $proponent = s(rowValue($row, ['Proponent', 'proponent'], ''));
+    $gsisBeneficiary = s(rowValue($row, ['GSIS Beneficiary', 'gsis_beneficiary'], ''));
+    $relationship = s(rowValue($row, ['Relationship', 'relationship'], ''));
+    $rawGsisContact = s(rowValue($row, ['GSIS Benef. Contact No.', 'GSIS Benef. Contact No', 'gsis_benef_contact_no'], ''));
+    $gsisContact = substr(trim(explode('/', $rawGsisContact)[0]), 0, 15);
 
     $gipType = strtoupper(trim((string)($ctx['gipCategory'] ?? '')));
     $batchId = isset($ctx['batchId']) ? (int)$ctx['batchId'] : null;
@@ -56,6 +66,11 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         '`days`',
         '`office_assignment`',
         '`type`',
+        '`status`',
+        '`proponent`',
+        '`gsis_beneficiary`',
+        '`relationship`',
+        '`gsis_benef_contact_no`'
     ];
     $values = [
         $benefId,
@@ -68,8 +83,13 @@ function saveGipRow(mysqli $conn, array $row, array $ctx, array &$state): string
         $days,
         $officeAssignment,
         $gipType,
+        $status,
+        $proponent,
+        $gsisBeneficiary,
+        $relationship,
+        $gsisContact
     ];
-    $types = 'issssssiss';
+    $types = 'issssssisssssss';
 
     if (tableHasColumn($conn, 'gip', 'batch_id')) {
         $columns[] = '`batch_id`';
