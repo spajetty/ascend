@@ -512,6 +512,16 @@ if (wiirpCategoryEl) {
     });
 }
 
+const gipCategoryEl = document.getElementById('gipCategory');
+if (gipCategoryEl) {
+    gipCategoryEl.addEventListener('change', function () {
+        const selectedProgram = document.getElementById('excelProgram')?.value ?? '';
+        if (selectedProgram === 'Government Internship Program' && state.selectedFile) {
+            handleFile(state.selectedFile);
+        }
+    });
+}
+
 // ─── Upload zone toggle ───────────────────────────────────────────────────────
 export function setProgramSelectorsLocked(locked) {
     if (!excelSection || !excelProgram) return;
@@ -593,6 +603,9 @@ export function handleFile(file) {
         state.jobFairUnmatchedCompanies = [];
         state.jobFairCompanyMapping = {};
         if (fileInput) fileInput.value = '';
+        if (fileInfo) fileInfo.classList.add('hidden');
+        const dataPreview = document.getElementById('dataPreview');
+        if (dataPreview) dataPreview.classList.add('hidden');
     };
 
     const allowed = ['.xlsx', '.xls', '.csv'];
@@ -657,14 +670,27 @@ export function handleFile(file) {
         // Header validation — case-insensitive
         const headers      = Object.keys(json[0] || {});
         const headersLower = headers.map(h => h.toLowerCase());
-        const required     = programHeaders[program] ?? programHeaders['DEFAULT'] ?? [];
+        
+        let required = programHeaders[program] ?? programHeaders['DEFAULT'] ?? [];
+        
+        if (program === 'Government Internship Program') {
+            const cat = document.getElementById('gipCategory')?.value || 'LGU';
+            const specificCols = programHeaders['Government Internship Program - ' + cat] || [];
+            const uniqueColsMap = new Map();
+            [...required, ...specificCols].forEach(col => {
+                uniqueColsMap.set(col.toLowerCase().trim(), col);
+            });
+            required = Array.from(uniqueColsMap.values());
+        }
+
         const requiredLower = required.map(h => h.toLowerCase());
         const missing = required.filter(h => !headersLower.includes(h.toLowerCase()));
         const extra   = headers.filter(h => !requiredLower.includes(h.toLowerCase()));
 
         if (missing.length > 0) {
             showToast(`Missing required columns:\n${missing.join(', ')}`, 'error', 6000);
-            resetFileSelectionForRetry();
+            document.getElementById('dataPreview')?.classList.add('hidden');
+            setUploadEnabled(false);
             return;
         }
 
@@ -867,7 +893,7 @@ export function handleFile(file) {
                         const resolvedPrivateCols = resolveWiirpPrivatePreviewCols(firstPreviewRowKeys);
                         const resolvedPesoCols = resolveWiirpPesoPreviewCols(firstPreviewRowKeys);
 
-                        // For WIIRP uploads, include category-specific preview columns.
+                        // For WIIRP and GIP uploads, include category-specific preview columns.
                         let previewCols = required;
                         if (program === 'Work Immersion and Internship Referral Program') {
                             const cat = (wiirpCategory || '').toLowerCase();
@@ -876,6 +902,16 @@ export function handleFile(file) {
                             } else if (cat === 'peso-assigned') {
                                 previewCols = Array.from(new Set([...(required ?? []), ...resolvedPesoCols]));
                             }
+                        } else if (program === 'Government Internship Program') {
+                            const cat = gipCategory || 'LGU';
+                            const specificCols = programHeaders['Government Internship Program - ' + cat] || [];
+                            
+                            // Case-insensitive deduplication
+                            const uniqueColsMap = new Map();
+                            [...(required ?? []), ...specificCols].forEach(col => {
+                                uniqueColsMap.set(col.toLowerCase().trim(), col);
+                            });
+                            previewCols = Array.from(uniqueColsMap.values());
                         }
 
                         // Filter out category-specific headers from the "extra columns" list so they aren't shown as unmapped.
@@ -887,6 +923,10 @@ export function handleFile(file) {
                             } else if (cat === 'peso-assigned') {
                                 extraColsForPreview = (extra ?? []).filter(col => !isKnownWiirpPesoHeader(col));
                             }
+                        } else if (program === 'Government Internship Program') {
+                            const cat = gipCategory || 'LGU';
+                            const specificCols = programHeaders['Government Internship Program - ' + cat] || [];
+                            extraColsForPreview = (extra ?? []).filter(col => !specificCols.some(s => s.toLowerCase() === col.toLowerCase()));
                         }
                         showExcelPreview(result.data, result.summary, previewCols, extraColsForPreview);
                     } else {
