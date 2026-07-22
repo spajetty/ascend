@@ -75,7 +75,14 @@ export function previewTableHeaders(firstRow, allowedCols = null) {
 
     if (allowedCols) {
         const allowedLower = allowedCols.map(c => c.toLowerCase());
-        dataKeys = dataKeys.filter(k => allowedLower.includes(k.toLowerCase()));
+        const uniqueKeys = new Map();
+        for (const k of dataKeys) {
+            const lowerK = k.toLowerCase();
+            if (allowedLower.includes(lowerK)) {
+                uniqueKeys.set(lowerK, k);
+            }
+        }
+        dataKeys = Array.from(uniqueKeys.values());
     }
 
     const pinnedKeys = PINNED_LAST.filter(k => k in firstRow);
@@ -107,7 +114,14 @@ export function previewTableRows(rows, allowedCols = null) {
 
     if (allowedCols) {
         const allowedLower = allowedCols.map(c => c.toLowerCase());
-        dataKeys = dataKeys.filter(k => allowedLower.includes(k.toLowerCase()));
+        const uniqueKeys = new Map();
+        for (const k of dataKeys) {
+            const lowerK = k.toLowerCase();
+            if (allowedLower.includes(lowerK)) {
+                uniqueKeys.set(lowerK, k);
+            }
+        }
+        dataKeys = Array.from(uniqueKeys.values());
     }
 
     const pinnedKeys = PINNED_LAST.filter(k => k in firstRow);
