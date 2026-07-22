@@ -525,6 +525,7 @@ if (gipCategoryEl) {
 // ─── Upload zone toggle ───────────────────────────────────────────────────────
 export function setProgramSelectorsLocked(locked) {
     if (!excelSection || !excelProgram) return;
+    
     if (locked) {
         excelSection.disabled = true;
         excelProgram.disabled = true;
@@ -714,7 +715,7 @@ export function handleFile(file) {
         }
 
         if (hasProgramMismatch) {
-            if (program === 'Job Fair' && state.jobFairMismatchMode) {
+            if (state.jobFairMismatchMode) {
                 state.excelFileData = json;
                 state.selectedFile = file;
                 fileName.textContent = file.name;
