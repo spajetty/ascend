@@ -116,6 +116,7 @@ if (document.readyState === 'loading') {
 function bindProgramBar() {
   $('mf-sel-section').addEventListener('change', onSectionChange);
   $('mf-sel-program').addEventListener('change', onProgramChange);
+  $('mf-classification')?.addEventListener('change', syncGipFields);
   
   // Initialize state on load
   onSectionChange();
@@ -197,6 +198,8 @@ function syncClassificationOptions() {
   } else {
     classificationEl.value = '';
   }
+  
+  syncGipFields();
 }
 
 function bindAddressDropdowns() {
@@ -482,6 +485,7 @@ function applyProgramSections() {
   });
   
   syncWiirpFields();
+  syncGipFields();
 
   // Dynamic titles
   const internTitle = $('mf-internship-title');
@@ -529,6 +533,28 @@ function syncWiirpFields() {
   }
 }
 
+function syncGipFields() {
+  const status = $('mf-classification')?.value || '';
+  const lguSec = $('mf-gip-lgu-sec');
+  const doleSec = $('mf-gip-dole-sec');
+
+  if (selectedProgram === 'Government Internship Program' || selectedProgram === 'gip') {
+    if (status === 'Peso-Accepted') {
+      if (lguSec) lguSec.style.display = 'block';
+      if (doleSec) doleSec.style.display = 'none';
+    } else if (status === 'Dole-Accepted') {
+      if (lguSec) lguSec.style.display = 'none';
+      if (doleSec) doleSec.style.display = 'block';
+    } else {
+      if (lguSec) lguSec.style.display = 'none';
+      if (doleSec) doleSec.style.display = 'none';
+    }
+  } else {
+    if (lguSec) lguSec.style.display = 'none';
+    if (doleSec) doleSec.style.display = 'none';
+  }
+}
+
 // ── CHIPS (radio-style toggles) ───────────────────────────────────
 
 function bindChips() {
@@ -552,6 +578,9 @@ function bindChips() {
       hiddenInput.value = chip.dataset.val;
       if (group === 'inttype') {
         syncWiirpFields();
+      }
+      if (group === 'status') {
+        syncGipFields();
       }
     }
   });

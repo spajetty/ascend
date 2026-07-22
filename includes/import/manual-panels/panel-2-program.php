@@ -197,42 +197,71 @@
                                 </div>
                                 <input type="hidden" name="gip_student_type" id="mf-h-gipstutype" value="student">
                             </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-school">School <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-gip-school" name="gip_school" placeholder="School name">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-course">Course <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-gip-course" name="gip_course" placeholder="e.g. BSIT">
-                            </div>
                             <div class="mf-field mf-col2">
                                 <label for="mf-gip-highest-educ">Highest Education Attained <span class="mf-req">*</span></label>
                                 <input type="text" id="mf-gip-highest-educ" name="gip_highest_educ" placeholder="e.g. College Graduate">
                             </div>
                         </div>
 
-                        <div class="mf-sec-rule"><span>Contract Details</span></div>
+                        <!-- LGU specific fields -->
+                        <div id="mf-gip-lgu-sec" style="display:none;">
+                            <div class="mf-sec-rule" style="margin-top:20px;"><span>LGU Details</span></div>
+                            <div class="mf-grid mf-grid-2">
+                                <div class="mf-field">
+                                    <label for="mf-gip-school">School</label>
+                                    <input type="text" id="mf-gip-school" name="gip_school" placeholder="School name">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-course">Course</label>
+                                    <input type="text" id="mf-gip-course" name="gip_course" placeholder="e.g. BSIT">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-contract-start">Contract Start <span class="mf-req">*</span></label>
+                                    <input type="date" id="mf-gip-contract-start" name="gip_start_of_contract">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-contract-end">Contract End <span class="mf-req">*</span></label>
+                                    <input type="date" id="mf-gip-contract-end" name="gip_end_of_contract">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-days">No. of Days <span class="mf-req">*</span></label>
+                                    <input type="number" id="mf-gip-days" name="gip_days" min="1" placeholder="0">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-office">Office Assignment</label>
+                                    <input type="text" id="mf-gip-office" name="gip_office_assignment">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-proponent">Proponent</label>
+                                    <input type="text" id="mf-gip-proponent" name="gip_proponent" placeholder="Proponent">
+                                </div>
+                                <div class="mf-field">
+                                    <label>Status</label>
+                                    <select id="mf-gip-status" name="gip_status">
+                                        <option value="">— Select —</option>
+                                        <option value="yes">Yes</option>
+                                        <option value="no">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="mf-grid mf-grid-2">
-                            <div class="mf-field mf-col2">
-                                <label for="mf-gip-office">Office Assignment <span class="mf-req">*</span></label>
-                                <input type="text" id="mf-gip-office" name="gip_office_assignment">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-contract-start">Contract Start <span class="mf-req">*</span></label>
-                                <input type="date" id="mf-gip-contract-start" name="gip_start_of_contract">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-contract-end">Contract End <span class="mf-req">*</span></label>
-                                <input type="date" id="mf-gip-contract-end" name="gip_end_of_contract">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-days">No. of Days <span class="mf-req">*</span></label>
-                                <input type="number" id="mf-gip-days" name="gip_days" min="1" placeholder="0">
-                            </div>
-                            <div class="mf-field">
-                                <label for="mf-gip-batch">Batch <span class="mf-req">*</span></label>
-                                <input type="month" id="mf-gip-batch" name="gip_batch">
+                        <!-- DOLE specific fields -->
+                        <div id="mf-gip-dole-sec" style="display:none;">
+                            <div class="mf-sec-rule" style="margin-top:20px;"><span>DOLE Details</span></div>
+                            <div class="mf-grid mf-grid-2">
+                                <div class="mf-field">
+                                    <label for="mf-gip-gsis-beneficiary">GSIS Beneficiary</label>
+                                    <input type="text" id="mf-gip-gsis-beneficiary" name="gip_gsis_beneficiary" placeholder="Full Name">
+                                </div>
+                                <div class="mf-field">
+                                    <label for="mf-gip-relationship">Relationship</label>
+                                    <input type="text" id="mf-gip-relationship" name="gip_relationship" placeholder="Relationship">
+                                </div>
+                                <div class="mf-field mf-col2">
+                                    <label for="mf-gip-gsis-contact">GSIS Beneficiary Contact No.</label>
+                                    <input type="text" id="mf-gip-gsis-contact" name="gip_gsis_contact_no" placeholder="Contact Number">
+                                </div>
                             </div>
                         </div>
                     </div>

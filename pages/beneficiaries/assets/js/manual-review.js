@@ -90,14 +90,23 @@ export function buildReview(selectedProgram, selectedSection, PROGRAMS, SECTION_
     if (selectedProgram === 'gip') {
       const gipstutype = document.querySelector('[data-group="gipstutype"].on')?.dataset.val || '—';
       details.push(['Student Type', gipstutype]);
-      details.push(['School', $('mf-gip-school')?.value || '—']);
-      details.push(['Course', $('mf-gip-course')?.value || '—']);
+      const status = $('mf-h-status')?.value || '';
       details.push(['Highest Educ.', $('mf-gip-highest-educ')?.value || '—']);
-      details.push(['Office Assignment', $('mf-gip-office')?.value || '—']);
-      details.push(['Contract Start', $('mf-gip-contract-start')?.value || '—']);
-      details.push(['Contract End', $('mf-gip-contract-end')?.value || '—']);
-      details.push(['Days', $('mf-gip-days')?.value || '—']);
-      details.push(['Batch', $('mf-gip-batch')?.value || '—']);
+      
+      if (status === 'Peso-Accepted') {
+        details.push(['School', $('mf-gip-school')?.value || '—']);
+        details.push(['Course', $('mf-gip-course')?.value || '—']);
+        details.push(['Office Assignment', $('mf-gip-office')?.value || '—']);
+        details.push(['Proponent', $('mf-gip-proponent')?.value || '—']);
+        details.push(['Status', $('mf-gip-status')?.value || '—']);
+        details.push(['Contract Start', $('mf-gip-contract-start')?.value || '—']);
+        details.push(['Contract End', $('mf-gip-contract-end')?.value || '—']);
+        details.push(['Days', $('mf-gip-days')?.value || '—']);
+      } else if (status === 'Dole-Accepted') {
+        details.push(['GSIS Beneficiary', $('mf-gip-gsis-beneficiary')?.value || '—']);
+        details.push(['Relationship', $('mf-gip-relationship')?.value || '—']);
+        details.push(['GSIS Contact No.', $('mf-gip-gsis-contact')?.value || '—']);
+      }
     }
 
     if (selectedProgram === 'whip') {

@@ -62,16 +62,16 @@ export function validatePanel(idx, selectedProgram) {
       );
     }
     if (selectedProgram === 'gip') {
-      req2.push(
-        'mf-gip-school',
-        'mf-gip-course',
-        'mf-gip-highest-educ',
-        'mf-gip-office',
-        'mf-gip-contract-start',
-        'mf-gip-contract-end',
-        'mf-gip-days',
-        'mf-gip-batch'
-      );
+      const status = $('mf-h-status')?.value || '';
+      req2.push('mf-gip-highest-educ');
+      
+      if (status === 'Peso-Accepted') {
+        req2.push(
+          'mf-gip-contract-start',
+          'mf-gip-contract-end',
+          'mf-gip-days'
+        );
+      }
     }
     if (selectedProgram === 'wiirp') {
       req2.push(

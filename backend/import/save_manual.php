@@ -22,7 +22,7 @@ require_once __DIR__ . '/savers/save_wiirp.php';
 require_once __DIR__ . '/savers/save_gip.php';
 
 try {
-    $program = trim((string)($_POST['program'] ?? ''));
+    $program = trim((string) ($_POST['program'] ?? ''));
     if (!in_array($program, ['Job Matching and Referral', 'First Time Jobseeker', 'Job Fair', 'SPES', 'Government Internship Program', 'Work Immersion and Internship Referral Program'], true)) {
         throw new RuntimeException("Program '{$program}' is currently not supported for manual entry.");
     }
@@ -47,13 +47,13 @@ try {
         'Barangay' => $_POST['barangay'] ?? '',
         'District' => $_POST['district'] ?? '',
         'City' => $_POST['city'] ?? '',
-        
+
         // Employer Info
         'Company' => $_POST['company_name'] ?? '',
         'Position' => $_POST['position'] ?? '',
         'Occupational Permit' => $_POST['occ_permit'] ?? 0,
         'Health Card' => $_POST['health_card'] ?? 0,
-        
+
         // Documents
         'Proof of Residency' => $_POST['proof_of_residency'] ?? '',
         'Latest Credentials' => $_POST['latest_credential'] ?? '',
@@ -76,7 +76,7 @@ try {
         'start_of_contract' => $_POST['start_of_contract'] ?? '',
         'end_of_contract' => $_POST['end_of_contract'] ?? '',
         'days' => $_POST['days'] ?? '',
-        
+
         // WIIRP Fields
         'school' => $program === 'Government Internship Program' ? ($_POST['gip_school'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_school'] ?? '') : ($_POST['spes_school'] ?? '')),
         'course' => $program === 'Government Internship Program' ? ($_POST['gip_course'] ?? '') : ($program === 'Work Immersion and Internship Referral Program' ? ($_POST['int_course'] ?? '') : ($_POST['course'] ?? '')),
@@ -95,27 +95,32 @@ try {
         'office_assignment' => !empty($_POST['gip_office_assignment']) ? $_POST['gip_office_assignment'] : ($_POST['office_assignment'] ?? ''),
         'endorsement_1' => $_POST['endorsement_1'] ?? '',
         'endorsement_2' => $_POST['endorsement_2'] ?? '',
-        
+
         // GIP Specific Fields mapped to common names or unique names for saveGipRow
         // GIP Specific Fields mapped to common names or unique names for saveGipRow
         'student_type' => $program === 'Government Internship Program' ? ($_POST['gip_student_type'] ?? '') : ($_POST['student_type'] ?? ''),
         'start_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_start_of_contract'] ?? '') : ($_POST['start_of_contract'] ?? ''),
         'end_of_contract' => $program === 'Government Internship Program' ? ($_POST['gip_end_of_contract'] ?? '') : ($_POST['end_of_contract'] ?? ''),
         'days' => $program === 'Government Internship Program' ? ($_POST['gip_days'] ?? '') : ($_POST['days'] ?? ''),
+        'proponent' => $program === 'Government Internship Program' ? ($_POST['gip_proponent'] ?? '') : '',
+        'status' => $program === 'Government Internship Program' ? ($_POST['gip_status'] ?? '') : '',
+        'gsis_beneficiary' => $program === 'Government Internship Program' ? ($_POST['gip_gsis_beneficiary'] ?? '') : '',
+        'relationship' => $program === 'Government Internship Program' ? ($_POST['gip_relationship'] ?? '') : '',
+        'gsis_benef_contact_no' => $program === 'Government Internship Program' ? ($_POST['gip_gsis_contact_no'] ?? '') : '',
     ];
 
     $duplicate = checkDuplicate(
         $conn,
-        (string)$row['First Name'],
-        (string)$row['Last Name'],
-        $row['DOB'] !== '' ? (string)$row['DOB'] : null,
-        (string)$row['Contact'],
-        (string)$row['Email']
+        (string) $row['First Name'],
+        (string) $row['Last Name'],
+        $row['DOB'] !== '' ? (string) $row['DOB'] : null,
+        (string) $row['Contact'],
+        (string) $row['Email']
     );
 
     if (!empty($duplicate['found'])) {
-        $existingBenefId = (int)$duplicate['benef_id'];
-        
+        $existingBenefId = (int) $duplicate['benef_id'];
+
         $progCheckStmt = $conn->prepare('SELECT id FROM beneficiary_programs WHERE benef_id = ? AND program_id = ?');
         $progCheckStmt->bind_param('ii', $existingBenefId, $programId);
         $progCheckStmt->execute();
@@ -134,12 +139,13 @@ try {
 
     // Resolve Batch ID
     $batchId = null;
-    $batchPeriod = trim((string)($_POST['batch_period'] ?? $_POST['spes_batch'] ?? $_POST['int_batch'] ?? $_POST['whip_batch'] ?? $_POST['school_batch'] ?? ''));
+    $batchPeriod = trim((string) ($_POST['batch_period'] ?? $_POST['spes_batch'] ?? $_POST['int_batch'] ?? $_POST['whip_batch'] ?? $_POST['school_batch'] ?? ''));
 
     if ($program === 'Job Fair' && empty($batchPeriod)) {
         $eventIdsRaw = $_POST['jobfairevent_ids'] ?? [];
-        if (!is_array($eventIdsRaw)) $eventIdsRaw = [$eventIdsRaw];
-        $firstEventId = (int)($eventIdsRaw[0] ?? 0);
+        if (!is_array($eventIdsRaw))
+            $eventIdsRaw = [$eventIdsRaw];
+        $firstEventId = (int) ($eventIdsRaw[0] ?? 0);
         if ($firstEventId) {
             $evtStmt = $conn->prepare('SELECT date_start FROM job_fair_events WHERE jobfairevent_id = ?');
             $evtStmt->bind_param('i', $firstEventId);
@@ -154,30 +160,30 @@ try {
     if ($batchPeriod !== '') {
         $parts = explode('-', $batchPeriod);
         if (count($parts) === 2) {
-            $yearInt = (int)$parts[0];
-            $monthInt = (int)$parts[1];
-            
+            $yearInt = (int) $parts[0];
+            $monthInt = (int) $parts[1];
+
             // Check if batch exists
             $stmt = $conn->prepare('SELECT batch_id FROM import_batches WHERE month = ? AND year = ? AND file_name = "Manual Entry" LIMIT 1');
             $stmt->bind_param('ii', $monthInt, $yearInt);
             $stmt->execute();
             $res = $stmt->get_result()->fetch_assoc();
-            
+
             if ($res) {
-                $batchId = (int)$res['batch_id'];
+                $batchId = (int) $res['batch_id'];
             } else {
                 // Create new batch
-                $uploadedBy = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : null;
+                $uploadedBy = isset($_SESSION['user_id']) ? (int) $_SESSION['user_id'] : null;
                 $fileName = 'Manual Entry';
                 $insBatch = $conn->prepare('INSERT INTO import_batches (file_name, month, year, uploaded_by) VALUES (?, ?, ?, ?)');
                 $insBatch->bind_param('siii', $fileName, $monthInt, $yearInt, $uploadedBy);
                 $insBatch->execute();
-                $batchId = (int)$insBatch->insert_id;
+                $batchId = (int) $insBatch->insert_id;
             }
         }
     }
 
-    $classification = strtolower(trim((string)($_POST['classification'] ?? '')));
+    $classification = strtolower(trim((string) ($_POST['classification'] ?? '')));
     $gipCategory = '';
     if (strpos($classification, 'dole-accepted') !== false) {
         $gipCategory = 'DOLE';
@@ -198,7 +204,7 @@ try {
         'program' => $program,
         'programId' => $programId,
         'batchId' => $batchId,
-        'wiirpCategory' => trim((string)($_POST['inquiry_type'] ?? 'inquiry')),
+        'wiirpCategory' => trim((string) ($_POST['inquiry_type'] ?? 'inquiry')),
         'gipCategory' => $gipCategory,
         'programStatus' => $programStatus,
         'is_manual' => true
@@ -226,7 +232,7 @@ try {
             throw new RuntimeException('jobfair table does not exist.');
         }
 
-        $position = s((string)($_POST['position'] ?? '')) ?: 'N/A';
+        $position = s((string) ($_POST['position'] ?? '')) ?: 'N/A';
 
         $eventIdsRaw = $_POST['jobfairevent_ids'] ?? [];
         if (!is_array($eventIdsRaw)) {
@@ -234,7 +240,7 @@ try {
         }
 
         $eventIds = array_values(array_unique(array_filter(array_map(static function ($v) {
-            return is_numeric($v) ? (int)$v : 0;
+            return is_numeric($v) ? (int) $v : 0;
         }, $eventIdsRaw))));
 
         if (empty($eventIds)) {
@@ -252,25 +258,26 @@ try {
         $ins = $conn->prepare('INSERT INTO jobfair (benef_id, company_id, position, batch_id, jobfairevent_id) VALUES (?, ?, ?, ?, ?)');
 
         foreach ($eventIds as $eventId) {
-            $eventKey = (string)$eventId;
+            $eventKey = (string) $eventId;
             $companyIdsRaw = $companyMapRaw[$eventKey] ?? [];
             if (!is_array($companyIdsRaw)) {
                 $companyIdsRaw = [$companyIdsRaw];
             }
 
             $companyIds = array_values(array_unique(array_filter(array_map(static function ($v) {
-                return is_numeric($v) ? (int)$v : 0;
+                return is_numeric($v) ? (int) $v : 0;
             }, $companyIdsRaw))));
 
             foreach ($companyIds as $companyId) {
-                $compKey = (string)$companyId;
-                $pos = trim((string)($positionsRaw[$eventKey][$compKey] ?? $_POST['position'] ?? ''));
-                if (!$pos) $pos = 'N/A';
+                $compKey = (string) $companyId;
+                $pos = trim((string) ($positionsRaw[$eventKey][$compKey] ?? $_POST['position'] ?? ''));
+                if (!$pos)
+                    $pos = 'N/A';
 
                 $ins->bind_param('iisii', $benefId, $companyId, $pos, $batchId, $eventId);
                 $ins->execute();
                 $insertedRows++;
-                $state['insertedJobFairIds'][] = (int)$ins->insert_id;
+                $state['insertedJobFairIds'][] = (int) $ins->insert_id;
             }
         }
 
