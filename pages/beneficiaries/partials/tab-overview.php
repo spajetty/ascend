@@ -478,18 +478,18 @@
                             <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipHighestEduc">—</div>
                         </div>
                     </div>
-                    <div>
+                    <div id="gipSchoolWrapper">
                         <label style="font-size:11.5px;color:var(--text-muted);">School</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipSchool">—</div>
                     </div>
-                    <div>
+                    <div id="gipCourseWrapper">
                         <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCourse">—</div>
                     </div>
                 </div>
             </div>
-            
-            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
+
+            <div id="gipContractCard" class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
                     <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
                     <strong style="font-size:13px;">Contract Details</strong>
@@ -509,22 +509,55 @@
                         <label style="font-size:11.5px;color:var(--text-muted);">No. of Days</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipDays">—</div>
                     </div>
+                    <div id="gipLguExtrasWrapper">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div>
+                                <label style="font-size:11.5px;color:var(--text-muted);">Proponent</label>
+                                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipProponent">—</div>
+                            </div>
+                            <div>
+                                <label style="font-size:11.5px;color:var(--text-muted);">Status</label>
+                                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStatus">—</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
+
             <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
                 <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
                     <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
                     <strong style="font-size:13px;">Placement</strong>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div>
+                    <div id="gipOfficeAssignmentWrapper">
                         <label style="font-size:11.5px;color:var(--text-muted);">Office Assignment</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipOfficeAssignment">—</div>
                     </div>
                     <div>
                         <label style="font-size:11.5px;color:var(--text-muted);">Placement Type</label>
                         <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipType">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gipDoleCard" class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;display:none;">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
+                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
+                    <strong style="font-size:13px;">GSIS Details</strong>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">GSIS Beneficiary</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipGsisBeneficiary">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">Relationship</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipRelationship">—</div>
+                    </div>
+                    <div>
+                        <label style="font-size:11.5px;color:var(--text-muted);">GSIS Contact No.</label>
+                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipGsisContactNo">—</div>
                     </div>
                 </div>
             </div>

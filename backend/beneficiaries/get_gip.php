@@ -10,7 +10,8 @@ if ($benef_id <= 0) {
 
 try {
     $sql = "SELECT gip_id, benef_id, student_type, highest_educ, course, school, 
-                   start_of_contract, end_of_contract, days, office_assignment, type
+                   start_of_contract, end_of_contract, days, office_assignment, type,
+                   proponent, status, gsis_beneficiary, relationship, gsis_benef_contact_no
             FROM gip
             WHERE benef_id = ?
             ORDER BY created_at DESC, gip_id DESC
