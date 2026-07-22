@@ -1194,6 +1194,8 @@ function openEditGipModal() {
   document.getElementById('editGipDays').value = record.days ?? '';
   
   document.getElementById('editGipOfficeAssignment').value = record.office_assignment || '';
+  document.getElementById('editGipProponent').value = record.proponent || '';
+  document.getElementById('editGipStatus').value = record.status || '';
   document.getElementById('editGipType').value = record.type || '';
 
   document.getElementById('editGipGsisBeneficiary').value = record.gsis_beneficiary || '';
@@ -1235,6 +1237,8 @@ function submitEditGip() {
   formData.append('end_of_contract', document.getElementById('editGipEndContract').value);
   formData.append('days', document.getElementById('editGipDays').value.trim());
   formData.append('office_assignment', document.getElementById('editGipOfficeAssignment').value.trim());
+  formData.append('proponent', document.getElementById('editGipProponent').value.trim());
+  formData.append('status', document.getElementById('editGipStatus').value.trim());
   formData.append('type', document.getElementById('editGipType').value);
   formData.append('gsis_beneficiary', document.getElementById('editGipGsisBeneficiary').value.trim());
   formData.append('relationship', document.getElementById('editGipRelationship').value.trim());

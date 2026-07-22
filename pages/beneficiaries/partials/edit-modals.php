@@ -318,6 +318,14 @@
             <input type="hidden" id="editGipId" value="">
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
                 <div class="modal-field">
+                    <label>Placement Type</label>
+                    <select id="editGipType" disabled>
+                        <option value="">— Select —</option>
+                        <option value="DOLE">DOLE</option>
+                        <option value="LGU">LGU</option>
+                    </select>
+                </div>
+                <div class="modal-field">
                     <label>Student Type</label>
                     <select id="editGipStudentType">
                         <option value="student">Student</option>
@@ -328,43 +336,71 @@
                     <label>Highest Educational Attainment</label>
                     <input type="text" id="editGipHighestEduc" placeholder="Highest educational attainment">
                 </div>
-                <div class="modal-field">
-                    <label>Course</label>
-                    <input type="text" id="editGipCourse" placeholder="Course">
+            </div>
+
+            <!-- LGU FIELDS -->
+            <div id="gipLguFields" style="display:flex;flex-direction:column;gap:14px;margin-top:12px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+                    <div class="modal-field">
+                        <label>Course</label>
+                        <input type="text" id="editGipCourse" placeholder="Course">
+                    </div>
+                    <div class="modal-field">
+                        <label>School</label>
+                        <input type="text" id="editGipSchool" placeholder="School">
+                    </div>
                 </div>
-                <div class="modal-field">
-                    <label>School</label>
-                    <input type="text" id="editGipSchool" placeholder="School">
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                    <div class="modal-field">
+                        <label>Start of Contract</label>
+                        <input type="date" id="editGipStartContract">
+                    </div>
+                    <div class="modal-field">
+                        <label>End of Contract</label>
+                        <input type="date" id="editGipEndContract">
+                    </div>
+                    <div class="modal-field">
+                        <label>No. of Days</label>
+                        <input type="number" id="editGipDays" min="0">
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                    <div class="modal-field">
+                        <label>Office Assignment</label>
+                        <input type="text" id="editGipOfficeAssignment" placeholder="Office assignment">
+                    </div>
+                    <div class="modal-field">
+                        <label>Proponent</label>
+                        <input type="text" id="editGipProponent" placeholder="Proponent">
+                    </div>
+                    <div class="modal-field">
+                        <label>Status</label>
+                        <select id="editGipStatus">
+                            <option value="">— Select —</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-                <div class="modal-field">
-                    <label>Start of Contract</label>
-                    <input type="date" id="editGipStartContract">
-                </div>
-                <div class="modal-field">
-                    <label>End of Contract</label>
-                    <input type="date" id="editGipEndContract">
-                </div>
-                <div class="modal-field">
-                    <label>No. of Days</label>
-                    <input type="number" id="editGipDays" min="0">
-                </div>
-            </div>
-
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
-                <div class="modal-field">
-                    <label>Office Assignment</label>
-                    <input type="text" id="editGipOfficeAssignment" placeholder="Office assignment">
-                </div>
-                <div class="modal-field">
-                    <label>Placement Type</label>
-                    <select id="editGipType">
-                        <option value="">— Select —</option>
-                        <option value="DOLE">DOLE</option>
-                        <option value="LGU">LGU</option>
-                    </select>
+            <!-- DOLE FIELDS -->
+            <div id="gipDoleFields" style="display:none;flex-direction:column;gap:14px;margin-top:12px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
+                    <div class="modal-field">
+                        <label>GSIS Beneficiary</label>
+                        <input type="text" id="editGipGsisBeneficiary" placeholder="Full Name">
+                    </div>
+                    <div class="modal-field">
+                        <label>Relationship</label>
+                        <input type="text" id="editGipRelationship" placeholder="Relationship">
+                    </div>
+                    <div class="modal-field">
+                        <label>GSIS Beneficiary Contact No.</label>
+                        <input type="text" id="editGipGsisContact" placeholder="Contact Number">
+                    </div>
                 </div>
             </div>
         </div>
@@ -640,12 +676,20 @@
             <button class="modal-close" onclick="closeBulkDeleteModal()">✕</button>
         </div>
         <div class="modal-body">
-            <p style="margin:0;color:var(--text-secondary);line-height:1.6;">
+            <p id="bulkDeleteMainText" style="margin:0;color:var(--text-secondary);line-height:1.6;">
                 You are about to permanently delete
                 <strong id="bulkDeleteCount" style="color:var(--text-primary);">0</strong>
                 beneficiar<span id="bulkDeleteWord">ies</span>.
             </p>
-            <p style="margin:10px 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone. All associated records will be removed.</p>
+            
+            <div class="modal-field" id="bulkDeleteScopeContainer" style="margin-top: 18px; margin-bottom: 0;">
+                <label>Deletion Scope</label>
+                <select id="bulkDeleteScope" onchange="updateBulkDeleteWarning()">
+                    <option value="">Global Delete (Remove from system entirely)</option>
+                </select>
+            </div>
+            
+            <p id="bulkDeleteSubText" style="margin:16px 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone. All associated records will be removed.</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeBulkDeleteModal()">Cancel</button>
@@ -676,10 +720,14 @@
                     <span class="bulk-info-label">Applying to</span>
                     <span class="bulk-info-value"><strong id="bulkClassifyCount">0</strong> beneficiaries</span>
                 </div>
-                <div class="bulk-info-row" id="bulkClassifyProgramRow">
-                    <span class="bulk-info-label">Program</span>
-                    <span class="bulk-info-value" id="bulkClassifyProgramName" style="font-weight:600;color:var(--text-primary);">—</span>
-                </div>
+            </div>
+
+            <!-- Program field (dynamically populated) -->
+            <div class="modal-field" id="bulkClassifyProgramField" style="margin-top: 14px;">
+                <label>Program</label>
+                <select id="bulkClassifyProgramSelect" onchange="updateBulkClassifyProgram()">
+                    <option value="">— Select program —</option>
+                </select>
             </div>
 
             <!-- Mixed-program warning (shown only for Case 2) -->

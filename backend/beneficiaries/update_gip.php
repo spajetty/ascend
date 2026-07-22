@@ -12,7 +12,12 @@ $start_of_contract = isset($_POST['start_of_contract']) ? trim($_POST['start_of_
 $end_of_contract = isset($_POST['end_of_contract']) ? trim($_POST['end_of_contract']) : '';
 $days = isset($_POST['days']) && $_POST['days'] !== '' ? (int)$_POST['days'] : 0;
 $office_assignment = isset($_POST['office_assignment']) ? trim($_POST['office_assignment']) : '';
+$proponent = isset($_POST['proponent']) ? trim($_POST['proponent']) : '';
+$status = isset($_POST['status']) ? trim($_POST['status']) : '';
 $type = isset($_POST['type']) ? trim($_POST['type']) : '';
+$gsis_beneficiary = isset($_POST['gsis_beneficiary']) ? trim($_POST['gsis_beneficiary']) : '';
+$relationship = isset($_POST['relationship']) ? trim($_POST['relationship']) : '';
+$gsis_benef_contact_no = isset($_POST['gsis_benef_contact_no']) ? trim($_POST['gsis_benef_contact_no']) : '';
 
 if ($gip_id <= 0) {
     echo json_encode(['success' => false, 'error' => 'Invalid GIP record id']);
@@ -62,7 +67,12 @@ try {
                 end_of_contract = ?,
                 days = ?,
                 office_assignment = ?,
-                type = ?
+                proponent = ?,
+                status = ?,
+                type = ?,
+                gsis_beneficiary = ?,
+                relationship = ?,
+                gsis_benef_contact_no = ?
             WHERE gip_id = ? AND benef_id = ?";
 
     $stmt = $conn->prepare($sql);
@@ -71,7 +81,7 @@ try {
     }
 
     $stmt->bind_param(
-        'ssssssissii',
+        'ssssssisssssssii',
         $student_type,
         $school,
         $course,
@@ -80,7 +90,12 @@ try {
         $end_of_contract,
         $days,
         $office_assignment,
+        $proponent,
+        $status,
         $type,
+        $gsis_beneficiary,
+        $relationship,
+        $gsis_benef_contact_no,
         $gip_id,
         $benef_id
     );
