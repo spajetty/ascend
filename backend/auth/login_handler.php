@@ -121,6 +121,9 @@ $_SESSION['user_id']   = $user['user_id'];
 $_SESSION['user_name'] = strtok($user['fname'], ' ') . ' ' . $user['lname'];
 $_SESSION['user_role'] = $user['role'];   // 'Admin' or 'Staff'
 
+// Save email to a cookie for 30 days to pre-fill the login page
+setcookie('login_email', $email, time() + (86400 * 30), "/");
+
 /*
 function warmDashboardCache(): void {
     $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';

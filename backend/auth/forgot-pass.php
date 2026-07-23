@@ -80,10 +80,10 @@ if ($action === 'send_otp') {
         ";
         $mail->AltBody = "Your ASCEND password reset code is: $otp  (expires in 5 minutes)";
 
-        $mail->SMTPDebug = 2; // Remove after fixing
-        $mail->Debugoutput = function($str, $level) {
-            error_log("PHPMailer: $str");
-        };
+        // $mail->SMTPDebug = 2; // Removed to prevent breaking JSON response
+        // $mail->Debugoutput = function($str, $level) {
+        //     error_log("PHPMailer: $str");
+        // };
 
         $mail->send();
 

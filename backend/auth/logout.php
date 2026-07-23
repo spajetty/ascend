@@ -3,6 +3,7 @@ session_start();
 session_unset();
 session_destroy();
 
-header("Location: /pages/auth/login.php");
+$qs = !empty($_SERVER['QUERY_STRING']) ? '?' . $_SERVER['QUERY_STRING'] : '';
+header("Location: /pages/auth/login.php" . $qs);
 exit;
 ?>

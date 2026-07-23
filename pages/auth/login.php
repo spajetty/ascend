@@ -4,6 +4,8 @@ if (isset($_SESSION['user_id'])) {
     header("Location: /pages/dashboard/dashboard.php");
     exit;
 }
+
+$savedEmail = isset($_COOKIE['login_email']) ? $_COOKIE['login_email'] : '';
 ?>
 
 <!DOCTYPE html>
@@ -91,6 +93,7 @@ if (isset($_SESSION['user_id'])) {
                         id="email"
                         name="email"
                         placeholder="admin@example.com"
+                        value="<?= htmlspecialchars($savedEmail, ENT_QUOTES, 'UTF-8') ?>"
                         required
                         class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
                     >

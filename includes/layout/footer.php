@@ -59,7 +59,11 @@
       <span>Bugs, ideas, or questions — we read all of these</span>
     </div>
     <button class="fb-close " id="fb-close-panel">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px; height:14px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+        stroke-linejoin="round" style="width:14px; height:14px;">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
     </button>
   </div>
   <div class="fb-body">
@@ -259,44 +263,83 @@
 
 <script src="/assets/js/feedback.js?v=<?= time() ?>"></script>
 <!-- ── SESSION TIMEOUT MODAL ── -->
-<div id="session-timeout-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform transition-all scale-95 opacity-0 duration-300" id="session-timeout-content">
-        <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-            </svg>
-        </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">Session Expired</h3>
-        <p class="text-gray-500 mb-6">Your session has expired due to inactivity. Please log in again to continue.</p>
-        <button id="btn-timeout-login" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200">
-            Log In Again
-        </button>
+<div id="session-timeout-modal"
+  class="fixed inset-0 z-[10000] hidden items-center justify-center bg-gray-900/50 backdrop-blur-sm">
+  <div
+    class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center transform transition-all scale-95 opacity-0 duration-300"
+    id="session-timeout-content">
+    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+      <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+        </path>
+      </svg>
     </div>
+    <h3 class="text-xl font-bold text-gray-900 mb-2">Session Expired</h3>
+    <p class="text-gray-500 mb-6">Your session has expired due to inactivity. Please log in again to continue.</p>
+    <button id="btn-timeout-login"
+      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-xl transition duration-200">
+      Log In Again
+    </button>
+  </div>
 </div>
 
 <script>
-    (function() {
-        const timeoutDuration = <?= isset($timeout_duration) ? ($timeout_duration * 1000) : (3600 * 1000) ?>;
-        
-        function showTimeoutModal() {
-            const modal = document.getElementById('session-timeout-modal');
-            const content = document.getElementById('session-timeout-content');
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            requestAnimationFrame(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            });
-        }
+  (function () {
+    const timeoutDuration = 10000;
+    const storageKey = 'ascend_last_active';
 
-        document.getElementById('btn-timeout-login').addEventListener('click', function() {
-            window.location.href = '/pages/auth/login.php?error=timeout';
-        });
+    function updateActivity() {
+      localStorage.setItem(storageKey, Date.now().toString());
+    }
 
-        setTimeout(showTimeoutModal, timeoutDuration);
-    })();
+    // Initialize on load if not set, or if it's very old
+    const lastActive = localStorage.getItem(storageKey);
+    if (!lastActive || (Date.now() - parseInt(lastActive)) > timeoutDuration) {
+      updateActivity();
+    }
+
+    function showTimeoutModal() {
+      const modal = document.getElementById('session-timeout-modal');
+      const content = document.getElementById('session-timeout-content');
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+
+      requestAnimationFrame(() => {
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      });
+    }
+
+    document.getElementById('btn-timeout-login').addEventListener('click', function () {
+      window.location.href = '/backend/auth/logout.php?error=timeout';
+    });
+
+    // Track user activity to reset the timer
+    const activityEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+    let throttleTimer;
+    function handleActivity() {
+      if (throttleTimer) return;
+      throttleTimer = setTimeout(() => {
+        updateActivity();
+        throttleTimer = null;
+      }, 1000); // throttle storage updates to at most once per second
+    }
+
+    activityEvents.forEach(evt => {
+      document.addEventListener(evt, handleActivity, { passive: true });
+    });
+
+    // Check expiration every second (syncs across all tabs via localStorage)
+    const checkInterval = setInterval(() => {
+      const last = parseInt(localStorage.getItem(storageKey) || Date.now());
+      if (Date.now() - last >= timeoutDuration) {
+        clearInterval(checkInterval);
+        showTimeoutModal();
+      }
+    }, 1000);
+  })();
 </script>
 
 </body>
