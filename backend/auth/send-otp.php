@@ -7,6 +7,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require_once __DIR__ . '/../../api/RateLimiter.php';
+
 header("Content-Type: application/json");
 
 $email = $_POST['email'] ?? null;
@@ -16,11 +18,15 @@ if (!$email) {
     exit;
 }
 
-if (isset($_SESSION['otp_last_sent'])) {
-    if (time() - $_SESSION['otp_last_sent'] < 30) {
-        echo json_encode(["success" => false, "message" => "Please wait before resending OTP"]);
-        exit;
-    }
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!RateLimiter::check($conn, 'send_otp_ip', $ip, 10, 3600)) {
+    echo json_encode(["success" => false, "message" => "Too many OTP requests from your IP. Try again later."]);
+    exit;
+}
+
+if (!RateLimiter::check($conn, 'send_otp_email', $email, 1, 60)) {
+    echo json_encode(["success" => false, "message" => "Please wait before resending OTP."]);
+    exit;
 }
 
 $otp    = rand(100000, 999999);
@@ -29,8 +35,6 @@ $expiry = gmdate("Y-m-d H:i:s", time() + (5 * 60));
 $stmt = $conn->prepare("UPDATE users SET otp_code=?, otp_expiry=? WHERE email=?");
 $stmt->bind_param("sss", $otp, $expiry, $email);
 $stmt->execute();
-
-$_SESSION['otp_last_sent'] = time();
 
 $mail = new PHPMailer(true);
 

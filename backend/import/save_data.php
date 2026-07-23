@@ -15,6 +15,14 @@ if (!$input || !isset($input['data']) || !isset($input['program'])) {
     exit;
 }
 
+require_once __DIR__ . '/../../api/RateLimiter.php';
+
+$userId = isset($_SESSION['user_id']) ? (string)$_SESSION['user_id'] : 'unknown_user';
+if (!RateLimiter::check($conn, 'import_data', $userId, 15, 3600)) {
+    echo json_encode(['success' => false, 'error' => 'Rate limit exceeded. You can only perform 15 imports per hour.']);
+    exit;
+}
+
 $program = trim((string)$input['program']);
 $rows = $input['data'];
 $importMonthRaw = trim((string)($input['importMonth'] ?? ''));
@@ -74,6 +82,7 @@ $state = [
     'insertedSchoolIds' => [],
     'createdEmployerIds' => [],
     'insertedAccreditationIds' => [],
+    'insertedBeneficiaryProgramIds' => [],
     'warnings' => [],
 ];
 
@@ -355,6 +364,7 @@ try {
         !empty($state['insertedSPESEmploymentIds']) ||
         !empty($state['insertedSchoolIds']) ||
         !empty($state['insertedAccreditationIds']) ||
+        !empty($state['insertedBeneficiaryProgramIds']) ||
         $batchId !== null;
 
     if ($hasUndoPayload) {
@@ -394,6 +404,7 @@ try {
             'school_ids' => array_values(array_unique(array_map('intval', $state['insertedSchoolIds']))),
             'employer_ids' => array_values(array_unique(array_map('intval', $state['createdEmployerIds']))),
             'accreditation_ids' => array_values(array_unique(array_map('intval', $state['insertedAccreditationIds']))),
+            'beneficiary_program_ids' => array_values(array_unique(array_map('intval', $state['insertedBeneficiaryProgramIds']))),
         ];
     }
 

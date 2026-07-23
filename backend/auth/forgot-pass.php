@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
+require_once __DIR__ . '/../../api/RateLimiter.php';
+
 header("Content-Type: application/json");
 
 $action = $_POST['action'] ?? null;
@@ -21,10 +23,16 @@ if (!$action || !$email) {
 // Verifies the email exists, generates an OTP, and emails it to the user.
 // ──────────────────────────────────────────────────────────────────────────────
 if ($action === 'send_otp') {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 
-    // Rate-limit: 30 seconds between sends (keyed by email to survive page refresh)
-    $sessionKey = 'fp_otp_last_sent_' . md5($email);
-    if (isset($_SESSION[$sessionKey]) && time() - $_SESSION[$sessionKey] < 5) {
+    // Rate-limit: 10 requests per IP per hour
+    if (!RateLimiter::check($conn, 'forgot_pass_ip', $ip, 10, 3600)) {
+        echo json_encode(["success" => false, "message" => "Too many password reset requests from your IP. Try again later."]);
+        exit;
+    }
+
+    // Rate-limit: 1 request per email per 60 seconds
+    if (!RateLimiter::check($conn, 'forgot_pass_email', $email, 1, 60)) {
         echo json_encode(["success" => false, "message" => "Please wait before requesting another code."]);
         exit;
     }
@@ -47,8 +55,6 @@ if ($action === 'send_otp') {
     $stmt = $conn->prepare("UPDATE users SET otp_code = ?, otp_expiry = ? WHERE email = ?");
     $stmt->bind_param("sss", $otp, $expiry, $email);
     $stmt->execute();
-
-    $_SESSION[$sessionKey] = time();
 
     // Send email
     $mail = new PHPMailer(true);
@@ -109,6 +115,11 @@ if ($action === 'verify_otp') {
         exit;
     }
 
+    if (!RateLimiter::check($conn, 'verify_otp_email', $email, 5, 600)) {
+        echo json_encode(["success" => false, "message" => "Too many failed attempts. Try again later."]);
+        exit;
+    }
+
     $stmt = $conn->prepare("SELECT otp_code, otp_expiry FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
@@ -139,6 +150,8 @@ if ($action === 'verify_otp') {
     // Store a short-lived reset token in session so reset_password can't be
     // called without completing the OTP step first
     $_SESSION['fp_otp_verified_' . md5($email)] = time();
+
+    RateLimiter::clear($conn, 'verify_otp_email', $email);
 
     echo json_encode(["success" => true]);
     exit;

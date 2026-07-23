@@ -1,6 +1,13 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../../api/RateLimiter.php';
+
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!RateLimiter::check($conn, 'feedback_submit', $ip, 5, 3600)) {
+    echo json_encode(['success' => false, 'error' => 'Rate limit exceeded. You can only submit 5 feedback items per hour.']);
+    exit;
+}
 
 $type = isset($_POST['type']) ? trim($_POST['type']) : '';
 $subject = isset($_POST['subject']) ? trim($_POST['subject']) : '';

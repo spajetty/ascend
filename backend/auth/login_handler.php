@@ -1,6 +1,13 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../api/db.php';
+require_once __DIR__ . '/../../api/RateLimiter.php';
+
+$ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+if (!RateLimiter::check($conn, 'login', $ip, 20, 3600)) {
+    header("Location: /pages/auth/login.php?error=locked&wait=" . urlencode("Too many login attempts from your IP. Please try again later."));
+    exit;
+}
 
 $email    = trim($_POST['email']    ?? '');
 $password = trim($_POST['password'] ?? '');
@@ -120,6 +127,8 @@ $reset->execute();
 $_SESSION['user_id']   = $user['user_id'];
 $_SESSION['user_name'] = strtok($user['fname'], ' ') . ' ' . $user['lname'];
 $_SESSION['user_role'] = $user['role'];   // 'Admin' or 'Staff'
+
+RateLimiter::clear($conn, 'login', $ip);
 
 // Save email to a cookie for 30 days to pre-fill the login page
 setcookie('login_email', $email, time() + (86400 * 30), "/");
