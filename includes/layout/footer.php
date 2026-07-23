@@ -286,7 +286,7 @@
 
 <script>
   (function () {
-    const timeoutDuration = 10000;
+    const timeoutDuration = <?= isset($timeout_duration) ? ($timeout_duration * 1000) : (3600 * 1000) ?>;
     const storageKey = 'ascend_last_active';
 
     function updateActivity() {
