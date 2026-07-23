@@ -132,22 +132,23 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Event Type</th>
-                    <th>Venue</th>
-                    <th>Date</th>
-                    <th>Company</th>
-                    <th>Position</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="pJobFairEvents">
-                <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair records.
-                    </td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr>
+                        <th>Event Type</th>
+                        <th>Venue</th>
+                        <th>Date</th>
+                        <th>Company</th>
+                        <th>Position</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="pJobFairEvents">
+                    <tr>
+                        <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No job fair
+                            records.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -171,18 +172,19 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Occupational Permit</th>
-                    <th>Health Card</th>
-                </tr>
-            </thead>
-            <tbody id="pFirstTimeJobSeekerIssuance">
-                <tr>
-                    <td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance records.
-                    </td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr>
+                        <th>Occupational Permit</th>
+                        <th>Health Card</th>
+                    </tr>
+                </thead>
+                <tbody id="pFirstTimeJobSeekerIssuance">
+                    <tr>
+                        <td colspan="2" style="color:var(--text-muted);text-align:center;padding:16px;">No issuance
+                            records.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -209,23 +211,24 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Position</th>
-                    <th>Date Hired</th>
-                    <th>Company</th>
-                    <th>Project</th>
-                    <th>Duration</th>
-                    <th>Budget</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="pWhipProjects">
-                <tr>
-                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project records.
-                    </td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr>
+                        <th>Position</th>
+                        <th>Date Hired</th>
+                        <th>Company</th>
+                        <th>Project</th>
+                        <th>Duration</th>
+                        <th>Budget</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="pWhipProjects">
+                    <tr>
+                        <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No project
+                            records.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -335,7 +338,7 @@
                 </svg>
                 Assignment Details
             </h4>
-            
+
             <button class="edit-btn-icon" onclick="openAddWiirpAssignmentModal()"
                 style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
                 title="Add Wiirp Assignment">
@@ -347,22 +350,22 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Start Date</th>
-                    <th>End Date</th>
-                    <th>Required Hours</th>
-                    <th>Office Assignment</th>
-                    <th id="wiirpEndorsement1Header">Endorsement 1</th>
-                    <th id="wiirpEndorsement2Header">Endorsement 2</th>
-                </tr>
-            </thead>
-            <tbody id="pWiirpAssignments">
-                <tr>
-                    <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment
-                        records.</td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Required Hours</th>
+                        <th>Office Assignment</th>
+                        <th id="wiirpEndorsement1Header">Endorsement 1</th>
+                        <th id="wiirpEndorsement2Header">Endorsement 2</th>
+                    </tr>
+                </thead>
+                <tbody id="pWiirpAssignments">
+                    <tr>
+                        <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No assignment
+                            records.</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -424,22 +427,23 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Company</th>
-                    <th>Store Assignment</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Days</th>
-                    <th>Category</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="pSpesEmployment">
-                <tr>
-                    <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.</td>
-                </tr>
-            </tbody>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Store Assignment</th>
+                        <th>Start</th>
+                        <th>End</th>
+                        <th>Days</th>
+                        <th>Category</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pSpesEmployment">
+                    <tr>
+                        <td colspan="7" style="color:var(--text-muted);text-align:center;padding:16px;">No OJT records.
+                        </td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </div>
@@ -454,113 +458,34 @@
                 </svg>
                 Government Internship Program
             </h4>
-            <button class="edit-btn-icon" onclick="openEditGipModal()"
-                style="padding:4px 8px;display:flex;align-items:center;gap:5px;">
+            <button class="edit-btn-icon" onclick="openAddGipModal()"
+                style="padding:4px 8px;display:flex;align-items:center;gap:5px;background:var(--accent);color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;"
+                title="Add GIP Record">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3" />
+                    <path d="M12 5v14M5 12h14" />
                 </svg>
+                Add
             </button>
         </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                    <strong style="font-size:13px;">Academic Details</strong>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <div>
-                            <label style="font-size:11.5px;color:var(--text-muted);">Student Type</label>
-                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStudentType">—</div>
-                        </div>
-                        <div>
-                            <label style="font-size:11.5px;color:var(--text-muted);">Highest Educational Attainment</label>
-                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipHighestEduc">—</div>
-                        </div>
-                    </div>
-                    <div id="gipSchoolWrapper">
-                        <label style="font-size:11.5px;color:var(--text-muted);">School</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipSchool">—</div>
-                    </div>
-                    <div id="gipCourseWrapper">
-                        <label style="font-size:11.5px;color:var(--text-muted);">Course</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipCourse">—</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="gipContractCard" class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                    <strong style="font-size:13px;">Contract Details</strong>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                        <div>
-                            <label style="font-size:11.5px;color:var(--text-muted);">Start of Contract</label>
-                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStartContract">—</div>
-                        </div>
-                        <div>
-                            <label style="font-size:11.5px;color:var(--text-muted);">End of Contract</label>
-                            <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipEndContract">—</div>
-                        </div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">No. of Days</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipDays">—</div>
-                    </div>
-                    <div id="gipLguExtrasWrapper">
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <div>
-                                <label style="font-size:11.5px;color:var(--text-muted);">Proponent</label>
-                                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipProponent">—</div>
-                            </div>
-                            <div>
-                                <label style="font-size:11.5px;color:var(--text-muted);">Status</label>
-                                <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipStatus">—</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                    <strong style="font-size:13px;">Placement</strong>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div id="gipOfficeAssignmentWrapper">
-                        <label style="font-size:11.5px;color:var(--text-muted);">Office Assignment</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipOfficeAssignment">—</div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Placement Type</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipType">—</div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="gipDoleCard" class="info-card" style="margin:0;padding:12px;flex:1;min-width:260px;display:none;">
-                <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
-                    <span style="width:7px;height:7px;border-radius:999px;background:var(--accent);"></span>
-                    <strong style="font-size:13px;">GSIS Details</strong>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:10px;">
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">GSIS Beneficiary</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipGsisBeneficiary">—</div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">Relationship</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipRelationship">—</div>
-                    </div>
-                    <div>
-                        <label style="font-size:11.5px;color:var(--text-muted);">GSIS Contact No.</label>
-                        <div style="font-size:13.5px;font-weight:500;margin-top:2px;" id="pGipGsisContactNo">—</div>
-                    </div>
-                </div>
-            </div>
+        <div class="table-wrap">
+            <table class="emp-table" style="min-width: 700px;">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Start Contract</th>
+                        <th>End Contract</th>
+                        <th>Office Assignment</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="pGipRecords">
+                    <tr>
+                        <td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No GIP records.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -584,16 +509,16 @@
         </div>
         <div class="table-wrap">
             <table class="emp-table" style="min-width: 700px;">
-            <thead>
-                <tr>
-                    <th>Company</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                    <th>Note</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="pEmployment"></tbody>
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Note</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="pEmployment"></tbody>
             </table>
         </div>
     </div>
