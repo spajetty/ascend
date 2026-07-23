@@ -1283,7 +1283,12 @@ function openEditGipModal(gipId) {
 
   document.getElementById('editGipOfficeAssignment').value = record.office_assignment || '';
   document.getElementById('editGipProponent').value = record.proponent || '';
-  document.getElementById('editGipStatus').value = record.status || '';
+  const rawSt = (record.status || '').trim().toLowerCase();
+  const stSelect = document.getElementById('editGipStatus');
+  stSelect.value = '';
+  if (rawSt === 'active' || rawSt === 'yes') stSelect.value = 'Active';
+  else if (rawSt === 'completed' || rawSt === 'no') stSelect.value = 'Completed';
+  else if (rawSt === 'backed out') stSelect.value = 'Backed Out';
   document.getElementById('editGipGsisBeneficiary').value = record.gsis_beneficiary || '';
   document.getElementById('editGipRelationship').value = record.relationship || '';
   document.getElementById('editGipGsisContact').value = record.gsis_benef_contact_no || '';
