@@ -117,7 +117,8 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeDeleteWiirpAssignmentModal()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmDeleteWiirpAssignment()" style="background:#ef4444;color:white;">Delete</button>
+            <button class="btn-confirm" onclick="confirmDeleteWiirpAssignment()"
+                style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
@@ -302,7 +303,8 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeDeleteSpesEmploymentModal()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmDeleteSpesEmployment()" style="background:#ef4444;color:white;">Delete</button>
+            <button class="btn-confirm" onclick="confirmDeleteSpesEmployment()"
+                style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
@@ -319,7 +321,7 @@
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
                 <div class="modal-field">
                     <label>Placement Type</label>
-                    <select id="editGipType" disabled>
+                    <select id="editGipType">
                         <option value="">— Select —</option>
                         <option value="DOLE">DOLE</option>
                         <option value="LGU">LGU</option>
@@ -330,11 +332,21 @@
                     <select id="editGipStudentType">
                         <option value="student">Student</option>
                         <option value="osy">OSY</option>
+                        <option value="college graduate">College Graduate</option>
                     </select>
                 </div>
                 <div class="modal-field">
                     <label>Highest Educational Attainment</label>
                     <input type="text" id="editGipHighestEduc" placeholder="Highest educational attainment">
+                </div>
+                <div class="modal-field">
+                    <label>Status</label>
+                    <select id="editGipStatus">
+                        <option value="">— Select —</option>
+                        <option value="Active">Active</option>
+                        <option value="Completed">Completed</option>
+                        <option value="Backed Out">Backed Out</option>
+                    </select>
                 </div>
             </div>
 
@@ -375,19 +387,25 @@
                         <label>Proponent</label>
                         <input type="text" id="editGipProponent" placeholder="Proponent">
                     </div>
-                    <div class="modal-field">
-                        <label>Status</label>
-                        <select id="editGipStatus">
-                            <option value="">— Select —</option>
-                            <option value="yes">Yes</option>
-                            <option value="no">No</option>
-                        </select>
-                    </div>
                 </div>
             </div>
 
             <!-- DOLE FIELDS -->
             <div id="gipDoleFields" style="display:none;flex-direction:column;gap:14px;margin-top:12px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
+                    <div class="modal-field">
+                        <label>Start of Contract</label>
+                        <input type="date" id="editGipStartContractDole">
+                    </div>
+                    <div class="modal-field">
+                        <label>End of Contract</label>
+                        <input type="date" id="editGipEndContractDole">
+                    </div>
+                    <div class="modal-field">
+                        <label>No. of Days</label>
+                        <input type="number" id="editGipDaysDole" min="0">
+                    </div>
+                </div>
                 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;">
                     <div class="modal-field">
                         <label>GSIS Beneficiary</label>
@@ -443,7 +461,8 @@
                         </div>
                         <div class="modal-field">
                             <label>Required Hours</label>
-                            <input type="number" id="editWiirpRequiredHours" min="0" step="1" placeholder="Required hours">
+                            <input type="number" id="editWiirpRequiredHours" min="0" step="1"
+                                placeholder="Required hours">
                         </div>
                         <div class="modal-field">
                             <label>Year Level</label>
@@ -658,7 +677,8 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeDeleteEmploymentModal()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmDeleteEmploymentRecord()" style="background:#ef4444;color:white;">Delete</button>
+            <button class="btn-confirm" onclick="confirmDeleteEmploymentRecord()"
+                style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
@@ -668,8 +688,16 @@
     <div class="modal-box" style="max-width:440px;">
         <div class="modal-header">
             <div style="display:flex;align-items:center;gap:10px;">
-                <span style="width:34px;height:34px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+                <span
+                    style="width:34px;height:34px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14H6L5 6" />
+                        <path d="M10 11v6" />
+                        <path d="M14 11v6" />
+                        <path d="M9 6V4h6v2" />
+                    </svg>
                 </span>
                 <h3 style="color:#b91c1c;">Delete Beneficiaries</h3>
             </div>
@@ -681,15 +709,16 @@
                 <strong id="bulkDeleteCount" style="color:var(--text-primary);">0</strong>
                 beneficiar<span id="bulkDeleteWord">ies</span>.
             </p>
-            
+
             <div class="modal-field" id="bulkDeleteScopeContainer" style="margin-top: 18px; margin-bottom: 0;">
                 <label>Deletion Scope</label>
                 <select id="bulkDeleteScope" onchange="updateBulkDeleteWarning()">
                     <option value="">Global Delete (Remove from system entirely)</option>
                 </select>
             </div>
-            
-            <p id="bulkDeleteSubText" style="margin:16px 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone. All associated records will be removed.</p>
+
+            <p id="bulkDeleteSubText" style="margin:16px 0 0;font-size:13px;color:var(--text-muted);">This action cannot
+                be undone. All associated records will be removed.</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeBulkDeleteModal()">Cancel</button>
@@ -705,8 +734,13 @@
     <div class="modal-box" style="max-width:420px;">
         <div class="modal-header">
             <div style="display:flex;align-items:center;gap:10px;">
-                <span style="width:34px;height:34px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                <span
+                    style="width:34px;height:34px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9" />
+                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+                    </svg>
                 </span>
                 <h3>Update Classification</h3>
             </div>
@@ -732,7 +766,13 @@
 
             <!-- Mixed-program warning (shown only for Case 2) -->
             <div id="bulkClassifyWarning" class="bulk-classify-warning" style="display:none;">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px;">
+                    <path
+                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                    <line x1="12" y1="9" x2="12" y2="13" />
+                    <line x1="12" y1="17" x2="12.01" y2="17" />
+                </svg>
                 <span id="bulkClassifyWarningText"></span>
             </div>
 
@@ -763,7 +803,8 @@
             <input type="hidden" id="editJobFairId" value="">
             <div class="modal-field">
                 <label>Job Fair Event / Venue</label>
-                <select id="editJobFairEvent" onchange="loadJobFairCompanies(this.value)" style="max-width:100%; text-overflow:ellipsis;">
+                <select id="editJobFairEvent" onchange="loadJobFairCompanies(this.value)"
+                    style="max-width:100%; text-overflow:ellipsis;">
                     <option value="">Loading events…</option>
                 </select>
             </div>
@@ -795,7 +836,8 @@
         <div class="modal-body">
             <div class="modal-field">
                 <label>Job Fair Event / Venue</label>
-                <select id="addJobFairEvent" onchange="loadJobFairCompanies(this.value, '', 'addJobFairCompany')" style="max-width:100%; text-overflow:ellipsis;">
+                <select id="addJobFairEvent" onchange="loadJobFairCompanies(this.value, '', 'addJobFairCompany')"
+                    style="max-width:100%; text-overflow:ellipsis;">
                     <option value="">Loading events…</option>
                 </select>
             </div>
@@ -831,7 +873,27 @@
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeDeleteJobFairModal()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmDeleteJobFairRecord()" style="background:#ef4444;color:white;">Delete</button>
+            <button class="btn-confirm" onclick="confirmDeleteJobFairRecord()"
+                style="background:#ef4444;color:white;">Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Delete GIP Record Modal ── -->
+<div id="modalDeleteGip" class="timeline-modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:420px;">
+        <div class="modal-header">
+            <h3>Delete GIP Record</h3>
+            <button class="modal-close" onclick="closeDeleteGipModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this GIP record?</p>
+            <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeDeleteGipModal()">Cancel</button>
+            <button class="btn-confirm" onclick="confirmDeleteGip()"
+                style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
@@ -906,13 +968,14 @@
         </div>
         <div class="modal-body">
             <input type="hidden" id="deleteWhipId" value="">
-            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this project assignment?</p>
+            <p style="margin:0;color:var(--text-secondary);">Are you sure you want to delete this project assignment?
+            </p>
             <p style="margin:8px 0 0 0;font-size:13px;color:var(--text-muted);">This action cannot be undone.</p>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeDeleteWhipModal()">Cancel</button>
-            <button class="btn-confirm" onclick="confirmDeleteWhipRecord()" style="background:#ef4444;color:white;">Delete</button>
+            <button class="btn-confirm" onclick="confirmDeleteWhipRecord()"
+                style="background:#ef4444;color:white;">Delete</button>
         </div>
     </div>
 </div>
-
