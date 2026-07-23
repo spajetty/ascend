@@ -6,7 +6,7 @@ function _withModalSaveLoading(label, run) {
   const btn = window.AscendLoading?.getOpenModalConfirmButton?.() ?? null;
   if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, true, { label });
   return Promise.resolve(run()).finally(() => {
-      if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
+    if (btn && window.AscendLoading) window.AscendLoading.setButtonLoading(btn, false);
   });
 }
 
@@ -81,31 +81,31 @@ async function openProfile(benefId) {
   window.currentBeneficiary = b;  // Store full object for edit modals
 
   // ── Header ──
-  document.getElementById('profAvatar').textContent    = b.avatar;
-  document.getElementById('profName').textContent      = upperText(b.name);
-  document.getElementById('profAge').textContent       = calculateAge(b.dob);
+  document.getElementById('profAvatar').textContent = b.avatar;
+  document.getElementById('profName').textContent = upperText(b.name);
+  document.getElementById('profAge').textContent = calculateAge(b.dob);
   // Render Program Pill Bar
   const pillBar = document.getElementById('profProgramPillBar');
   if (pillBar) {
-      if (b.enrollments && b.enrollments.length > 0) {
-          pillBar.innerHTML = b.enrollments.map((e, idx) => 
-              `<button class="program-pill ${idx === 0 ? 'active' : ''}" onclick="selectProgramPill(${idx})">
+    if (b.enrollments && b.enrollments.length > 0) {
+      pillBar.innerHTML = b.enrollments.map((e, idx) =>
+        `<button class="program-pill ${idx === 0 ? 'active' : ''}" onclick="selectProgramPill(${idx})">
                   <span class="pill-dot"></span>
                   ${upperText(e.program_name)}
               </button>`
-          ).join('');
-      } else {
-          pillBar.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">No programs</span>`;
-      }
+      ).join('');
+    } else {
+      pillBar.innerHTML = `<span style="font-size: 12px; color: var(--text-muted);">No programs</span>`;
+    }
   }
 
   document.getElementById('profLastVisit').textContent = upperText(safeText(b.lastVisit));
-  document.getElementById('profVisit').textContent     = upperText(safeText(b.visit));
+  document.getElementById('profVisit').textContent = upperText(safeText(b.visit));
 
   // Show visit badge and dates only if there's at least one PESO visit record
   const visitBadgeContainer = document.getElementById('visitBadgeContainer');
   const profileDatesContainer = document.getElementById('profileDatesContainer');
-  
+
   // Fetch visit count from activity history
   fetch(`../../backend/beneficiaries/get_visit_count.php?benef_id=${encodeURIComponent(b.benef_id)}`)
     .then(r => r.json())
@@ -121,27 +121,27 @@ async function openProfile(benefId) {
     });
 
   // ── Overview tab ──
-  document.getElementById('pFullName').textContent  = upperText(b.name);
-  document.getElementById('pGender').textContent    = upperText(b.gender);
-  document.getElementById('pDob').textContent       = upperText(b.dob);
-  document.getElementById('pCivil').textContent     = upperText(b.civil);
-  document.getElementById('pAddress').textContent   = upperText(b.address);
-  document.getElementById('pEmail').textContent     = b.emailAddr;
-  document.getElementById('pEmail').href            = `mailto:${b.emailAddr}`;
-  document.getElementById('pPhone').textContent     = upperText(b.phone);
-  document.getElementById('pNotes').textContent     = (b.notes && String(b.notes).trim()) ? b.notes : 'No case notes yet.';
+  document.getElementById('pFullName').textContent = upperText(b.name);
+  document.getElementById('pGender').textContent = upperText(b.gender);
+  document.getElementById('pDob').textContent = upperText(b.dob);
+  document.getElementById('pCivil').textContent = upperText(b.civil);
+  document.getElementById('pAddress').textContent = upperText(b.address);
+  document.getElementById('pEmail').textContent = b.emailAddr;
+  document.getElementById('pEmail').href = `mailto:${b.emailAddr}`;
+  document.getElementById('pPhone').textContent = upperText(b.phone);
+  document.getElementById('pNotes').textContent = (b.notes && String(b.notes).trim()) ? b.notes : 'No case notes yet.';
 
   // Select first program pill by default to load status badge and program-specific cards
   if (b.enrollments && b.enrollments.length > 0) {
-      window.selectProgramPill(0);
+    window.selectProgramPill(0);
   } else {
-      // Fallback if no programs
-      _updateProgramCards(b, null);
-      const sb = document.getElementById('profStatusBadge');
-      if (sb) {
-          sb.className = 'status-badge-pill status-registered';
-          sb.textContent = 'Registered';
-      }
+    // Fallback if no programs
+    _updateProgramCards(b, null);
+    const sb = document.getElementById('profStatusBadge');
+    if (sb) {
+      sb.className = 'status-badge-pill status-registered';
+      sb.textContent = 'Registered';
+    }
   }
 
   // ── Employment: show spinner then lazy-load from API ──
@@ -179,7 +179,7 @@ async function openProfile(benefId) {
   switchTab('overview', document.querySelector('#profileView .tab-btn'));
 
   // ── View transition ──
-  const listEl    = document.getElementById('listView');
+  const listEl = document.getElementById('listView');
   const profileEl = document.getElementById('profileView');
 
   listEl.classList.add('view-exit');
@@ -187,9 +187,9 @@ async function openProfile(benefId) {
   profileEl.style.display = 'block';
 
   const topbarBreadcrumb = document.getElementById('topbarBreadcrumb');
-  const topbarTitle      = document.getElementById('topbarTitle');
+  const topbarTitle = document.getElementById('topbarTitle');
   if (topbarBreadcrumb) topbarBreadcrumb.style.display = 'flex';
-  if (topbarTitle)      topbarTitle.classList.add('hidden');
+  if (topbarTitle) topbarTitle.classList.add('hidden');
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -205,17 +205,17 @@ async function openProfile(benefId) {
 
 /** Animate back to the list view. */
 function closeProfile() {
-  const listEl    = document.getElementById('listView');
+  const listEl = document.getElementById('listView');
   const profileEl = document.getElementById('profileView');
 
   profileEl.classList.remove('view-active');
-  profileEl.style.opacity   = '0';
+  profileEl.style.opacity = '0';
   profileEl.style.transform = 'translateX(18px)';
 
   const topbarBreadcrumb = document.getElementById('topbarBreadcrumb');
-  const topbarTitle      = document.getElementById('topbarTitle');
+  const topbarTitle = document.getElementById('topbarTitle');
   if (topbarBreadcrumb) topbarBreadcrumb.style.display = 'none';
-  if (topbarTitle)      topbarTitle.classList.remove('hidden');
+  if (topbarTitle) topbarTitle.classList.remove('hidden');
 
   listEl.style.display = 'block';
   listEl.style.opacity = '0';
@@ -230,8 +230,8 @@ function closeProfile() {
   });
 
   setTimeout(() => {
-    profileEl.style.display   = 'none';
-    profileEl.style.opacity   = '';
+    profileEl.style.display = 'none';
+    profileEl.style.opacity = '';
     profileEl.style.transform = '';
   }, 200);
 }
@@ -449,7 +449,7 @@ function submitEditPersonal() {
   _withModalSaveLoading('Saving…', () => fetch(`../../backend/beneficiaries/update_personal.php`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    body: JSON.stringify({
       benef_id: id,
       first_name: first,
       middle_name: middle,
@@ -464,45 +464,45 @@ function submitEditPersonal() {
       city: city
     })
   })
-  .then(r => r.json())
-  .then(j => {
-    if (j && j.success) {
-      // update local object and UI
-      const b = window.currentBeneficiary || {};
-      b.name = fullName || b.name;
-      b.dob = dob || b.dob;
-      b.gender = sex || b.gender;
-      b.civil = civil || b.civil;
-      b.house_no = house_no || b.house_no;
-      b.barangay = barangay || b.barangay;
-      b.district = district || b.district;
-      b.city = city || b.city;
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        // update local object and UI
+        const b = window.currentBeneficiary || {};
+        b.name = fullName || b.name;
+        b.dob = dob || b.dob;
+        b.gender = sex || b.gender;
+        b.civil = civil || b.civil;
+        b.house_no = house_no || b.house_no;
+        b.barangay = barangay || b.barangay;
+        b.district = district || b.district;
+        b.city = city || b.city;
 
-      // Build a display address
-      const addrParts = [];
-      if (b.house_no) addrParts.push(b.house_no);
-      if (b.barangay) addrParts.push(b.barangay);
-      if (b.district) addrParts.push(b.district);
-      if (b.city) addrParts.push(b.city);
-      b.address = addrParts.join(', ');
+        // Build a display address
+        const addrParts = [];
+        if (b.house_no) addrParts.push(b.house_no);
+        if (b.barangay) addrParts.push(b.barangay);
+        if (b.district) addrParts.push(b.district);
+        if (b.city) addrParts.push(b.city);
+        b.address = addrParts.join(', ');
 
-      document.getElementById('pFullName').textContent = b.name;
-      document.getElementById('profName').textContent = b.name;
-      document.getElementById('profAge').textContent = calculateAge(b.dob);
-      document.getElementById('pDob').textContent = dob ? new Date(dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : (b.dob || '—');
-      document.getElementById('pGender').textContent = b.gender || '—';
-      document.getElementById('pCivil').textContent = b.civil || '—';
-      document.getElementById('pAddress').textContent = b.address || '—';
+        document.getElementById('pFullName').textContent = b.name;
+        document.getElementById('profName').textContent = b.name;
+        document.getElementById('profAge').textContent = calculateAge(b.dob);
+        document.getElementById('pDob').textContent = dob ? new Date(dob).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : (b.dob || '—');
+        document.getElementById('pGender').textContent = b.gender || '—';
+        document.getElementById('pCivil').textContent = b.civil || '—';
+        document.getElementById('pAddress').textContent = b.address || '—';
 
-      _showEditToast('Personal information saved.', 'success');
-      closeEditPersonalModal();
-    } else {
-      _showEditToast(j.message || 'Failed to save personal information.', 'error');
-    }
-  })).catch(err => {
-    console.error('[profile.js] submitEditPersonal error', err);
-    _showEditToast('Failed to save personal information.', 'error');
-  });
+        _showEditToast('Personal information saved.', 'success');
+        closeEditPersonalModal();
+      } else {
+        _showEditToast(j.message || 'Failed to save personal information.', 'error');
+      }
+    })).catch(err => {
+      console.error('[profile.js] submitEditPersonal error', err);
+      _showEditToast('Failed to save personal information.', 'error');
+    });
 }
 
 // ── Contact Information ──────────────────────────────────────────────────────
@@ -565,31 +565,31 @@ function submitEditContact() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ benef_id: id, contact: phone, email })
   })
-  .then(r => r.json())
-  .then(j => {
-    if (j && j.success) {
-      const b = window.currentBeneficiary || {};
-      b.emailAddr = email || b.emailAddr;
-      b.phone = phone || b.phone;
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        const b = window.currentBeneficiary || {};
+        b.emailAddr = email || b.emailAddr;
+        b.phone = phone || b.phone;
 
-      const emailEl = document.getElementById('pEmail');
-      if (emailEl) {
-        emailEl.textContent = b.emailAddr || '—';
-        emailEl.href = `mailto:${b.emailAddr || ''}`;
+        const emailEl = document.getElementById('pEmail');
+        if (emailEl) {
+          emailEl.textContent = b.emailAddr || '—';
+          emailEl.href = `mailto:${b.emailAddr || ''}`;
+        }
+
+        const phoneEl = document.getElementById('pPhone');
+        if (phoneEl) phoneEl.textContent = b.phone || '—';
+
+        _showEditToast('Contact information saved.', 'success');
+        closeEditContactModal();
+      } else {
+        _showEditToast(j.message || 'Failed to save contact information.', 'error');
       }
-
-      const phoneEl = document.getElementById('pPhone');
-      if (phoneEl) phoneEl.textContent = b.phone || '—';
-
-      _showEditToast('Contact information saved.', 'success');
-      closeEditContactModal();
-    } else {
-      _showEditToast(j.message || 'Failed to save contact information.', 'error');
-    }
-  })).catch(err => {
-    console.error('[profile.js] submitEditContact error', err);
-    _showEditToast('Failed to save contact information.', 'error');
-  });
+    })).catch(err => {
+      console.error('[profile.js] submitEditContact error', err);
+      _showEditToast('Failed to save contact information.', 'error');
+    });
 }
 
 // ── Case Notes ───────────────────────────────────────────────────────────────
@@ -618,22 +618,22 @@ function submitEditNotes() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ benef_id: Number(benefId), notes }),
   }))
-  .then(r => r.json())
-  .then(j => {
-    if (j && j.success) {
-      // Update UI
-      const pNotes = document.getElementById('pNotes');
-      if (pNotes) pNotes.textContent = notes || '';
-      if (window.currentBeneficiary) window.currentBeneficiary.notes = notes;
-      _showEditToast('Case notes saved.', 'success');
-      closeEditNotesModal();
-    } else {
-      _showEditToast(j.message || 'Failed to save case notes.', 'error');
-    }
-  }).catch(err => {
-    console.error('[profile.js] submitEditNotes error', err);
-    _showEditToast('Failed to save case notes.', 'error');
-  });
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        // Update UI
+        const pNotes = document.getElementById('pNotes');
+        if (pNotes) pNotes.textContent = notes || '';
+        if (window.currentBeneficiary) window.currentBeneficiary.notes = notes;
+        _showEditToast('Case notes saved.', 'success');
+        closeEditNotesModal();
+      } else {
+        _showEditToast(j.message || 'Failed to save case notes.', 'error');
+      }
+    }).catch(err => {
+      console.error('[profile.js] submitEditNotes error', err);
+      _showEditToast('Failed to save case notes.', 'error');
+    });
 }
 
 // ── Education & Skills ───────────────────────────────────────────────────────
@@ -684,12 +684,12 @@ function confirmDeleteEmploymentRecord() {
       if (j && j.success) {
         _showEditToast('Employment record deleted successfully.', 'success');
         closeDeleteEmploymentModal();
-        
+
         // Refresh employment table
         const empEl = document.getElementById('pEmployment');
         if (empEl) {
           empEl.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>';
-          
+
           fetchEmploymentHistory(window.currentBeneficiaryId).then(history => {
             empEl.innerHTML = history.length
               ? history.map((e, idx) => `
@@ -755,12 +755,12 @@ function _submitEmploymentRecord(endpoint, successMessage, errorMessage, modalCl
       if (j && j.success) {
         _showEditToast(successMessage, 'success');
         modalCloseFn();
-        
+
         // Refresh employment table
         const empEl = document.getElementById('pEmployment');
         if (empEl) {
           empEl.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>';
-          
+
           fetchEmploymentHistory(window.currentBeneficiaryId).then(history => {
             empEl.innerHTML = history.length
               ? history.map((e, idx) => `
@@ -1156,59 +1156,150 @@ function confirmDeleteWiirpAssignment() {
   );
 }
 
-function openEditGipModal() {
-  const record = window.currentGipRecord;
+// ---------------- GIP Edit/Add/Delete Handlers ----------------
+
+function _gipDoleModeElements() {
+  return {
+    start: 'editGipStartContractDole',
+    end: 'editGipEndContractDole',
+    days: 'editGipDaysDole'
+  };
+}
+
+function openAddGipModal() {
+  window.currentGipMode = 'add';
+  window.currentGipRecord = null;
+
+  document.getElementById('editGipId').value = '';
+  document.getElementById('editGipType').value = 'LGU';
+  document.getElementById('editGipType').removeAttribute('disabled');
+  document.getElementById('editGipStudentType').value = 'student';
+  document.getElementById('editGipHighestEduc').value = '';
+  document.getElementById('editGipCourse').value = '';
+  document.getElementById('editGipSchool').value = '';
+  document.getElementById('editGipStartContract').value = '';
+  document.getElementById('editGipEndContract').value = '';
+  document.getElementById('editGipDays').value = '';
+  document.getElementById('editGipOfficeAssignment').value = '';
+  document.getElementById('editGipProponent').value = '';
+  document.getElementById('editGipStatus').value = '';
+  document.getElementById('editGipGsisBeneficiary').value = '';
+  document.getElementById('editGipRelationship').value = '';
+  document.getElementById('editGipGsisContact').value = '';
+
+  const dole = _gipDoleModeElements();
+  const doleStart = document.getElementById(dole.start);
+  const doleEnd = document.getElementById(dole.end);
+  const doleDays = document.getElementById(dole.days);
+  if (doleStart) doleStart.value = '';
+  if (doleEnd) doleEnd.value = '';
+  if (doleDays) doleDays.value = '';
+
+  document.getElementById('gipLguFields').style.display = 'flex';
+  document.getElementById('gipDoleFields').style.display = 'none';
+
+  document.getElementById('editGipType').onchange = function () {
+    if (this.value === 'DOLE') {
+      document.getElementById('gipLguFields').style.display = 'none';
+      document.getElementById('gipDoleFields').style.display = 'flex';
+    } else {
+      document.getElementById('gipLguFields').style.display = 'flex';
+      document.getElementById('gipDoleFields').style.display = 'none';
+    }
+  };
+
+  const titleEl = document.querySelector('#modalEditGip .modal-header h3');
+  const confirmBtn = document.querySelector('#modalEditGip .btn-confirm');
+  if (titleEl) titleEl.textContent = 'Add GIP Record';
+  if (confirmBtn) confirmBtn.textContent = 'Add Record';
+
+  _toggleEditModal('modalEditGip', 'flex');
+}
+
+function openEditGipModal(gipId) {
+  const recs = Array.isArray(window.currentGipRecords) ? window.currentGipRecords : [];
+  const record = recs.find(r => String(r.gip_id) === String(gipId));
+
   if (!record) {
-    _showEditToast('No GIP record to edit.', 'error');
+    _showEditToast('Could not load the selected GIP record.', 'error');
     return;
   }
 
+  window.currentGipMode = 'edit';
+  window.currentGipRecord = record;
+
   document.getElementById('editGipId').value = record.gip_id || '';
+  document.getElementById('editGipType').value = record.type || '';
+  document.getElementById('editGipType').setAttribute('disabled', 'disabled');
+  document.getElementById('editGipType').onchange = null;
   document.getElementById('editGipStudentType').value = record.student_type || 'student';
   document.getElementById('editGipHighestEduc').value = record.highest_educ || '';
   document.getElementById('editGipCourse').value = record.course || '';
   document.getElementById('editGipSchool').value = record.school || '';
-  
-  const formatDateForInput = (val) => val ? val.substring(0, 10) : '';
-  const startInput = document.getElementById('editGipStartContract');
-  const endInput = document.getElementById('editGipEndContract');
 
-  startInput.value = formatDateForInput(record.start_of_contract);
-  endInput.value = formatDateForInput(record.end_of_contract);
+  const formatDateForModalInput = (val) => val ? val.substring(0, 10) : '';
+  const isDole = (record.type || '').toUpperCase() === 'DOLE';
 
-  const updateDates = () => {
-    if (startInput.value) endInput.min = startInput.value;
-    else endInput.removeAttribute('min');
-    
-    if (endInput.value) startInput.max = endInput.value;
-    else startInput.removeAttribute('max');
+  const lguStartInput = document.getElementById('editGipStartContract');
+  const lguEndInput = document.getElementById('editGipEndContract');
+  const dole = _gipDoleModeElements();
+  const doleStartInput = document.getElementById(dole.start);
+  const doleEndInput = document.getElementById(dole.end);
+
+  if (isDole) {
+    lguStartInput.value = '';
+    lguEndInput.value = '';
+    if (doleStartInput) doleStartInput.value = formatDateForModalInput(record.start_of_contract);
+    if (doleEndInput) doleEndInput.value = formatDateForModalInput(record.end_of_contract);
+  } else {
+    lguStartInput.value = formatDateForModalInput(record.start_of_contract);
+    lguEndInput.value = formatDateForModalInput(record.end_of_contract);
+    if (doleStartInput) doleStartInput.value = '';
+    if (doleEndInput) doleEndInput.value = '';
+  }
+
+  const wireDateBounds = (startInput, endInput) => {
+    if (!startInput || !endInput) return;
+    const updateDates = () => {
+      if (startInput.value) endInput.min = startInput.value;
+      else endInput.removeAttribute('min');
+
+      if (endInput.value) startInput.max = endInput.value;
+      else startInput.removeAttribute('max');
+    };
+    startInput.onchange = updateDates;
+    startInput.oninput = updateDates;
+    endInput.onchange = updateDates;
+    endInput.oninput = updateDates;
+    updateDates();
   };
 
-  startInput.onchange = updateDates;
-  startInput.oninput = updateDates;
-  endInput.onchange = updateDates;
-  endInput.oninput = updateDates;
-  
-  updateDates();
+  wireDateBounds(lguStartInput, lguEndInput);
+  wireDateBounds(doleStartInput, doleEndInput);
 
-  document.getElementById('editGipDays').value = record.days ?? '';
-  
+  document.getElementById('editGipDays').value = isDole ? '' : (record.days ?? '');
+  const doleDaysInput = document.getElementById(dole.days);
+  if (doleDaysInput) doleDaysInput.value = isDole ? (record.days ?? '') : '';
+
   document.getElementById('editGipOfficeAssignment').value = record.office_assignment || '';
   document.getElementById('editGipProponent').value = record.proponent || '';
   document.getElementById('editGipStatus').value = record.status || '';
-  document.getElementById('editGipType').value = record.type || '';
-
   document.getElementById('editGipGsisBeneficiary').value = record.gsis_beneficiary || '';
   document.getElementById('editGipRelationship').value = record.relationship || '';
   document.getElementById('editGipGsisContact').value = record.gsis_benef_contact_no || '';
 
-  if ((record.type || '').toUpperCase() === 'DOLE') {
+  if (isDole) {
     document.getElementById('gipLguFields').style.display = 'none';
     document.getElementById('gipDoleFields').style.display = 'flex';
   } else {
     document.getElementById('gipLguFields').style.display = 'flex';
     document.getElementById('gipDoleFields').style.display = 'none';
   }
+
+  const titleEl = document.querySelector('#modalEditGip .modal-header h3');
+  const confirmBtn = document.querySelector('#modalEditGip .btn-confirm');
+  if (titleEl) titleEl.textContent = 'Edit GIP Record';
+  if (confirmBtn) confirmBtn.textContent = 'Save Changes';
 
   _toggleEditModal('modalEditGip', 'flex');
 }
@@ -1217,32 +1308,53 @@ function closeEditGipModal() {
   _toggleEditModal('modalEditGip', 'none');
 }
 
-function submitEditGip() {
-  const gip_id = document.getElementById('editGipId').value;
-  const record = window.currentGipRecord;
+function _collectGipFormData() {
+  const typeVal = document.getElementById('editGipType').value;
+  const isDole = String(typeVal).toUpperCase() === 'DOLE';
+  const dole = _gipDoleModeElements();
 
-  if (!gip_id || !record) {
-    _showEditToast('No GIP record selected.', 'error');
-    return;
-  }
+  const startVal = isDole
+    ? (document.getElementById(dole.start)?.value || '')
+    : document.getElementById('editGipStartContract').value;
+  const endVal = isDole
+    ? (document.getElementById(dole.end)?.value || '')
+    : document.getElementById('editGipEndContract').value;
+  const daysVal = isDole
+    ? (document.getElementById(dole.days)?.value.trim() || '')
+    : document.getElementById('editGipDays').value.trim();
 
   const formData = new FormData();
-  formData.append('gip_id', gip_id);
   formData.append('benef_id', window.currentBeneficiaryId || '');
   formData.append('student_type', document.getElementById('editGipStudentType').value);
   formData.append('highest_educ', document.getElementById('editGipHighestEduc').value.trim());
   formData.append('course', document.getElementById('editGipCourse').value.trim());
   formData.append('school', document.getElementById('editGipSchool').value.trim());
-  formData.append('start_of_contract', document.getElementById('editGipStartContract').value);
-  formData.append('end_of_contract', document.getElementById('editGipEndContract').value);
-  formData.append('days', document.getElementById('editGipDays').value.trim());
+  formData.append('start_of_contract', startVal);
+  formData.append('end_of_contract', endVal);
+  formData.append('days', daysVal);
   formData.append('office_assignment', document.getElementById('editGipOfficeAssignment').value.trim());
   formData.append('proponent', document.getElementById('editGipProponent').value.trim());
   formData.append('status', document.getElementById('editGipStatus').value.trim());
-  formData.append('type', document.getElementById('editGipType').value);
+  formData.append('type', typeVal);
   formData.append('gsis_beneficiary', document.getElementById('editGipGsisBeneficiary').value.trim());
   formData.append('relationship', document.getElementById('editGipRelationship').value.trim());
   formData.append('gsis_benef_contact_no', document.getElementById('editGipGsisContact').value.trim());
+  return formData;
+}
+
+function submitEditGip() {
+  if (window.currentGipMode === 'add') {
+    return submitAddGip();
+  }
+
+  const gip_id = document.getElementById('editGipId').value;
+  if (!gip_id) {
+    _showEditToast('No GIP record selected.', 'error');
+    return;
+  }
+
+  const formData = _collectGipFormData();
+  formData.append('gip_id', gip_id);
 
   _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_gip.php', {
     method: 'POST',
@@ -1253,15 +1365,76 @@ function submitEditGip() {
       if (j && j.success) {
         _showEditToast('GIP record updated successfully.', 'success');
         closeEditGipModal();
-        if (window.currentBeneficiaryId) {
-          openProfile(window.currentBeneficiaryId);
-        }
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
       } else {
         _showEditToast(j?.error || 'Error updating GIP record.', 'error');
       }
     }))
     .catch(() => {
       _showEditToast('Error updating GIP record.', 'error');
+    });
+}
+
+function submitAddGip() {
+  const formData = _collectGipFormData();
+
+  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_gip.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('GIP record added successfully.', 'success');
+        closeEditGipModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error adding GIP record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error adding GIP record.', 'error');
+    });
+}
+
+function deleteGipRecord(gipId) {
+  if (!gipId) return;
+  window.pendingGipDeleteId = gipId;
+  _toggleEditModal('modalDeleteGip', 'flex');
+}
+
+function closeDeleteGipModal() {
+  window.pendingGipDeleteId = 0;
+  _toggleEditModal('modalDeleteGip', 'none');
+}
+
+function confirmDeleteGip() {
+  const gipId = window.pendingGipDeleteId;
+  if (!gipId) {
+    closeDeleteGipModal();
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('gip_id', gipId);
+  formData.append('benef_id', window.currentBeneficiaryId || '');
+
+  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_gip.php', {
+    method: 'POST',
+    body: formData
+  })
+    .then(r => r.json())
+    .then(j => {
+      if (j && j.success) {
+        _showEditToast('GIP record deleted.', 'success');
+        closeDeleteGipModal();
+        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+      } else {
+        _showEditToast(j?.error || 'Error deleting GIP record.', 'error');
+      }
+    }))
+    .catch(() => {
+      _showEditToast('Error deleting GIP record.', 'error');
     });
 }
 
@@ -1273,7 +1446,7 @@ function openEditIssuanceModal() {
   const jobseekIdEl = document.getElementById('editIssuanceJobseekId');
   const occEl = document.getElementById('editIssuanceOccPermit');
   const healthEl = document.getElementById('editIssuanceHealthCard');
-  
+
   if (!rec) {
     jobseekIdEl.value = '';
     occEl.value = '0';
@@ -1283,19 +1456,19 @@ function openEditIssuanceModal() {
     _toggleEditModal('modalEditIssuance', 'flex');
     return;
   }
-  
+
   const jobseekId = rec.jobseek_id || '';
   const occValue = Number(rec.occ_permit) === 1 ? '1' : '0';
   const healthValue = Number(rec.health_card) === 1 ? '1' : '0';
-  
+
   console.log('Setting form values:', { jobseekId, occValue, healthValue });
-  
+
   jobseekIdEl.value = jobseekId;
   occEl.value = occValue;
   healthEl.value = healthValue;
   if (titleEl) titleEl.textContent = 'Edit Issuance Status';
   if (submitBtn) submitBtn.textContent = 'Save Changes';
-  
+
   _toggleEditModal('modalEditIssuance', 'flex');
 }
 
@@ -1307,14 +1480,14 @@ function submitUpdateIssuance() {
   const jobseek_id = document.getElementById('editIssuanceJobseekId').value.trim();
   const occVal = document.getElementById('editIssuanceOccPermit').value;
   const healthVal = document.getElementById('editIssuanceHealthCard').value;
-  
+
   console.log('Form field values:', { jobseek_id, occVal, healthVal });
   console.log('Field element checks:', {
     jobseekIdEl: document.getElementById('editIssuanceJobseekId'),
     occEl: document.getElementById('editIssuanceOccPermit'),
     healthEl: document.getElementById('editIssuanceHealthCard')
   });
-  
+
   if (!window.currentBeneficiaryId) {
     _showEditToast('No beneficiary selected.', 'error');
     return;
@@ -1322,7 +1495,7 @@ function submitUpdateIssuance() {
 
   const occInt = parseInt(occVal, 10);
   const healthInt = parseInt(healthVal, 10);
-  
+
   console.log('Parsed values for submission:', { jobseek_id, occInt, healthInt });
 
   const formData = new FormData();
@@ -1363,7 +1536,7 @@ function submitUpdateIssuance() {
 
 // Make functions global
 window.openEditPersonalModal = openEditPersonalModal;
-    window.currentSpesRecord = null;
+window.currentSpesRecord = null;
 window.closeEditPersonalModal = closeEditPersonalModal;
 window.submitEditPersonal = submitEditPersonal;
 window.openEditContactModal = openEditContactModal;
@@ -1399,8 +1572,14 @@ window.submitAddWiirpAssignment = submitAddWiirpAssignment;
 window.deleteWiirpAssignment = deleteWiirpAssignment;
 window.closeDeleteWiirpAssignmentModal = closeDeleteWiirpAssignmentModal;
 window.confirmDeleteWiirpAssignment = confirmDeleteWiirpAssignment;
+window.openAddGipModal = openAddGipModal;
 window.openEditGipModal = openEditGipModal;
 window.closeEditGipModal = closeEditGipModal;
+window.submitEditGip = submitEditGip;
+window.submitAddGip = submitAddGip;
+window.deleteGipRecord = deleteGipRecord;
+window.closeDeleteGipModal = closeDeleteGipModal;
+window.confirmDeleteGip = confirmDeleteGip;
 
 // ── Edit Job Fair ────────────────────────────────────────────────────────────
 
@@ -1410,7 +1589,7 @@ function loadJobFairCompanies(eventId, selectedCompanyId = '', targetSelectId = 
     compSelect.innerHTML = '<option value="">— Select event first —</option>';
     return;
   }
-  
+
   compSelect.innerHTML = '<option value="">Loading companies…</option>';
   fetch(`../../backend/beneficiaries/get_jobfair_companies.php?event_id=${eventId}`)
     .then(r => r.json())
@@ -1440,13 +1619,13 @@ function loadJobFairCompanies(eventId, selectedCompanyId = '', targetSelectId = 
 function openEditJobFairModal(index) {
   const r = window.currentJobFairRecords[index];
   if (!r) return;
-  
+
   document.getElementById('editJobFairId').value = r.jobfair_id;
   document.getElementById('editJobFairPosition').value = r.position || '';
-  
+
   const evtSelect = document.getElementById('editJobFairEvent');
   evtSelect.innerHTML = '<option value="">Loading events…</option>';
-  
+
   fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
     .then(res => res.json())
     .then(j => {
@@ -1471,7 +1650,7 @@ function openEditJobFairModal(index) {
     .catch(() => {
       evtSelect.innerHTML = '<option value="">Error loading events</option>';
     });
-    
+
   _toggleEditModal('modalEditJobFair', 'flex');
 }
 
@@ -1484,12 +1663,12 @@ function submitEditJobFair() {
   const jobfairevent_id = document.getElementById('editJobFairEvent').value;
   const company_id = document.getElementById('editJobFairCompany').value;
   const position = document.getElementById('editJobFairPosition').value.trim();
-  
+
   if (!jobfairevent_id || !company_id) {
     _showEditToast('Event and Company are required.', 'error');
     return;
   }
-  
+
   _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_jobfair.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1527,10 +1706,10 @@ window.loadJobFairCompanies = loadJobFairCompanies;
 function openAddJobFairModal() {
   document.getElementById('addJobFairPosition').value = '';
   document.getElementById('addJobFairCompany').innerHTML = '<option value="">— Select event first —</option>';
-  
+
   const evtSelect = document.getElementById('addJobFairEvent');
   evtSelect.innerHTML = '<option value="">Loading events…</option>';
-  
+
   fetch('../../backend/beneficiaries/get_jobfair_events_options.php')
     .then(res => res.json())
     .then(j => {
@@ -1551,7 +1730,7 @@ function openAddJobFairModal() {
     .catch(() => {
       evtSelect.innerHTML = '<option value="">Error loading events</option>';
     });
-    
+
   _toggleEditModal('modalAddJobFair', 'flex');
 }
 
@@ -1563,12 +1742,12 @@ function submitAddJobFair() {
   const jobfairevent_id = document.getElementById('addJobFairEvent').value;
   const company_id = document.getElementById('addJobFairCompany').value;
   const position = document.getElementById('addJobFairPosition').value.trim();
-  
+
   if (!jobfairevent_id || !company_id) {
     _showEditToast('Event and Company are required.', 'error');
     return;
   }
-  
+
   _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_jobfair.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1615,7 +1794,7 @@ function closeDeleteJobFairModal() {
 function confirmDeleteJobFairRecord() {
   const id = document.getElementById('deleteJobFairId').value;
   if (!id) return;
-  
+
   _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_jobfair.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1647,10 +1826,10 @@ window.confirmDeleteJobFairRecord = confirmDeleteJobFairRecord;
 function openAddWhipModal() {
   document.getElementById('addWhipPosition').value = '';
   document.getElementById('addWhipDateHired').value = '';
-  
+
   const projSelect = document.getElementById('addWhipProject');
   projSelect.innerHTML = '<option value="">Loading projects…</option>';
-  
+
   fetch('../../backend/beneficiaries/get_projects_options.php')
     .then(res => res.json())
     .then(j => {
@@ -1671,7 +1850,7 @@ function openAddWhipModal() {
     .catch(() => {
       projSelect.innerHTML = '<option value="">Error loading projects</option>';
     });
-    
+
   _toggleEditModal('modalAddWhip', 'flex');
 }
 
@@ -1683,12 +1862,12 @@ function submitAddWhip() {
   const project_id = document.getElementById('addWhipProject').value;
   const position = document.getElementById('addWhipPosition').value.trim();
   const date_hired = document.getElementById('addWhipDateHired').value;
-  
+
   if (!project_id) {
     _showEditToast('Project is required.', 'error');
     return;
   }
-  
+
   _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_whip.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1723,14 +1902,14 @@ window.submitAddWhip = submitAddWhip;
 function openEditWhipModal(index) {
   const r = window.currentWhipRecords[index];
   if (!r) return;
-  
+
   document.getElementById('editWhipId').value = r.whip_id;
   document.getElementById('editWhipPosition').value = r.position || '';
   document.getElementById('editWhipDateHired').value = formatDateForInput(r.date_hired) || '';
-  
+
   const projSelect = document.getElementById('editWhipProject');
   projSelect.innerHTML = '<option value="">Loading projects…</option>';
-  
+
   fetch('../../backend/beneficiaries/get_projects_options.php')
     .then(res => res.json())
     .then(j => {
@@ -1754,7 +1933,7 @@ function openEditWhipModal(index) {
     .catch(() => {
       projSelect.innerHTML = '<option value="">Error loading projects</option>';
     });
-    
+
   _toggleEditModal('modalEditWhip', 'flex');
 }
 
@@ -1767,12 +1946,12 @@ function submitEditWhip() {
   const project_id = document.getElementById('editWhipProject').value;
   const position = document.getElementById('editWhipPosition').value.trim();
   const date_hired = document.getElementById('editWhipDateHired').value;
-  
+
   if (!project_id) {
     _showEditToast('Project is required.', 'error');
     return;
   }
-  
+
   _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_whip.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1813,7 +1992,7 @@ function closeDeleteWhipModal() {
 function confirmDeleteWhipRecord() {
   const id = document.getElementById('deleteWhipId').value;
   if (!id) return;
-  
+
   _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_whip.php', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1848,49 +2027,49 @@ window.openEditIssuanceModal = openEditIssuanceModal;
 window.closeEditIssuanceModal = closeEditIssuanceModal;
 window.submitUpdateIssuance = submitUpdateIssuance;
 
-window.selectProgramPill = function(idx) {
-    const b = window.currentBeneficiary;
-    if (!b || !b.enrollments || !b.enrollments[idx]) return;
-    
-    // Update pills styling
-    const pillBar = document.getElementById('profProgramPillBar');
-    if (pillBar) {
-        const buttons = pillBar.querySelectorAll('button');
-        buttons.forEach((btn, i) => {
-            if (i === idx) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-    }
+window.selectProgramPill = function (idx) {
+  const b = window.currentBeneficiary;
+  if (!b || !b.enrollments || !b.enrollments[idx]) return;
 
-    const enrollment = b.enrollments[idx];
-    const programName = (enrollment.program_name || '').trim();
-    
-    // Update status badge
-    const statusNorm = (enrollment.status || '').trim();
-    const statusKey  = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1).toLowerCase();
-    const statusMap = {
-      Hired:      ['status-hired',      'Hired'],
-      Placed:     ['status-hired',      'Placed'],
-      Referred:   ['status-referred',   'Referred'],
-      Registered: ['status-registered', 'Registered'],
-    };
-    const [cls, lbl] = statusMap[statusKey] || ['status-registered', statusNorm || 'Unknown'];
-    const sb = document.getElementById('profStatusBadge');
-    if (sb) {
-        sb.className   = `status-badge-pill ${cls}`;
-        sb.textContent = lbl;
-    }
-    
-    // Update cards visibility and fetch data if needed
-    _updateProgramCards(b, programName);
+  // Update pills styling
+  const pillBar = document.getElementById('profProgramPillBar');
+  if (pillBar) {
+    const buttons = pillBar.querySelectorAll('button');
+    buttons.forEach((btn, i) => {
+      if (i === idx) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+  }
+
+  const enrollment = b.enrollments[idx];
+  const programName = (enrollment.program_name || '').trim();
+
+  // Update status badge
+  const statusNorm = (enrollment.status || '').trim();
+  const statusKey = statusNorm.charAt(0).toUpperCase() + statusNorm.slice(1).toLowerCase();
+  const statusMap = {
+    Hired: ['status-hired', 'Hired'],
+    Placed: ['status-hired', 'Placed'],
+    Referred: ['status-referred', 'Referred'],
+    Registered: ['status-registered', 'Registered'],
+  };
+  const [cls, lbl] = statusMap[statusKey] || ['status-registered', statusNorm || 'Unknown'];
+  const sb = document.getElementById('profStatusBadge');
+  if (sb) {
+    sb.className = `status-badge-pill ${cls}`;
+    sb.textContent = lbl;
+  }
+
+  // Update cards visibility and fetch data if needed
+  _updateProgramCards(b, programName);
 };
 
 function _updateProgramCards(b, overrideProgramName) {
-    // This function replaces the inline logic that was formerly inside openProfile()
-    
+  // This function replaces the inline logic that was formerly inside openProfile()
+
   const educationCard = document.getElementById('educationCard');
   const jobFairCard = document.getElementById('jobFairCard');
   const firstTimeJobSeekerCard = document.getElementById('firstTimeJobSeekerCard');
@@ -1919,7 +2098,7 @@ function _updateProgramCards(b, overrideProgramName) {
     if (wiirpCard) wiirpCard.style.display = 'none';
 
     const eventsEl = document.getElementById('pJobFairEvents');
-    
+
     if (eventsEl) eventsEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_jobfair.php?benef_id=${encodeURIComponent(b.benef_id)}`)
@@ -2275,158 +2454,158 @@ function _updateProgramCards(b, overrideProgramName) {
     if (spesEmploymentCard) spesEmploymentCard.style.display = 'none';
   }
 
-// ---------------- SPES Employment Edit Handlers ----------------
-window.editSpesEmployment = function (employmentId) {
-  const recs = Array.isArray(window.currentSpesEmploymentRecords) ? window.currentSpesEmploymentRecords : [];
-  const record = recs.find(r => String(r.employment_id) === String(employmentId));
-  if (!record) {
-    _showEditToast('Could not load the selected OJT record.', 'error');
-    return;
-  }
-  openEditSpesEmploymentModal(record);
-};
+  // ---------------- SPES Employment Edit Handlers ----------------
+  window.editSpesEmployment = function (employmentId) {
+    const recs = Array.isArray(window.currentSpesEmploymentRecords) ? window.currentSpesEmploymentRecords : [];
+    const record = recs.find(r => String(r.employment_id) === String(employmentId));
+    if (!record) {
+      _showEditToast('Could not load the selected OJT record.', 'error');
+      return;
+    }
+    openEditSpesEmploymentModal(record);
+  };
 
-window.openEditSpesEmploymentModal = function (record) {
-  if (!record) return;
-  window.currentSpesEmploymentMode = 'edit';
-  document.getElementById('editSpesEmploymentId').value = record.employment_id || '';
-  document.getElementById('editSpesEmploymentStore').value = record.store_assignment || '';
-  document.getElementById('editSpesEmploymentStart').value = record.start_of_contract || '';
-  document.getElementById('editSpesEmploymentEnd').value = record.end_of_contract || '';
-  document.getElementById('editSpesEmploymentDays').value = record.days || '';
-  document.getElementById('editSpesEmploymentCategory').value = record.category || '';
-  _loadEmploymentCompanies('editSpesEmploymentCompany', record.company_id || '');
-  _toggleEditModal('modalEditSpesEmployment', 'flex');
-};
+  window.openEditSpesEmploymentModal = function (record) {
+    if (!record) return;
+    window.currentSpesEmploymentMode = 'edit';
+    document.getElementById('editSpesEmploymentId').value = record.employment_id || '';
+    document.getElementById('editSpesEmploymentStore').value = record.store_assignment || '';
+    document.getElementById('editSpesEmploymentStart').value = record.start_of_contract || '';
+    document.getElementById('editSpesEmploymentEnd').value = record.end_of_contract || '';
+    document.getElementById('editSpesEmploymentDays').value = record.days || '';
+    document.getElementById('editSpesEmploymentCategory').value = record.category || '';
+    _loadEmploymentCompanies('editSpesEmploymentCompany', record.company_id || '');
+    _toggleEditModal('modalEditSpesEmployment', 'flex');
+  };
 
-window.closeEditSpesEmploymentModal = function () {
-  _toggleEditModal('modalEditSpesEmployment', 'none');
-};
+  window.closeEditSpesEmploymentModal = function () {
+    _toggleEditModal('modalEditSpesEmployment', 'none');
+  };
 
-window.submitEditSpesEmployment = function () {
-  const employmentId = document.getElementById('editSpesEmploymentId').value;
-  if (!employmentId || window.currentSpesEmploymentMode === 'add') {
-    return window.submitAddSpesEmployment();
-  }
+  window.submitEditSpesEmployment = function () {
+    const employmentId = document.getElementById('editSpesEmploymentId').value;
+    if (!employmentId || window.currentSpesEmploymentMode === 'add') {
+      return window.submitAddSpesEmployment();
+    }
 
-  const formData = new FormData();
-  formData.append('employment_id', employmentId);
-  formData.append('benef_id', window.currentBeneficiaryId || '');
-  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
-  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
-  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
-  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
-  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
-  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+    const formData = new FormData();
+    formData.append('employment_id', employmentId);
+    formData.append('benef_id', window.currentBeneficiaryId || '');
+    formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+    formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+    formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+    formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+    formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+    formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
 
-  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_spes_employment.php', {
-    method: 'POST',
-    body: formData
-  })
-    .then(r => r.json())
-    .then(j => {
-      if (j && j.success) {
-        _showEditToast('OJT employment updated successfully.', 'success');
-        closeEditSpesEmploymentModal();
-        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
-      } else {
-        _showEditToast(j?.error || 'Error updating OJT employment.', 'error');
-      }
-    }).catch(() => {
-      _showEditToast('Error updating OJT employment.', 'error');
+    _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/update_spes_employment.php', {
+      method: 'POST',
+      body: formData
     })
-  );
-};
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.success) {
+          _showEditToast('OJT employment updated successfully.', 'success');
+          closeEditSpesEmploymentModal();
+          if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+        } else {
+          _showEditToast(j?.error || 'Error updating OJT employment.', 'error');
+        }
+      }).catch(() => {
+        _showEditToast('Error updating OJT employment.', 'error');
+      })
+    );
+  };
 
-// ---------------- SPES Employment Add/Delete Handlers ----------------
-window.openAddSpesEmploymentModal = function () {
-  window.currentSpesEmploymentMode = 'add';
-  document.getElementById('editSpesEmploymentId').value = '';
-  document.getElementById('editSpesEmploymentStore').value = '';
-  document.getElementById('editSpesEmploymentStart').value = '';
-  document.getElementById('editSpesEmploymentEnd').value = '';
-  document.getElementById('editSpesEmploymentDays').value = '';
-  document.getElementById('editSpesEmploymentCategory').value = '';
-  _loadEmploymentCompanies('editSpesEmploymentCompany', '');
-  const header = document.querySelector('#modalEditSpesEmployment .modal-header h3');
-  if (header) header.textContent = 'Add SPES OJT Employment';
-  const confirmBtn = document.querySelector('#modalEditSpesEmployment .btn-confirm');
-  if (confirmBtn) {
-    confirmBtn.textContent = 'Add';
-    confirmBtn.onclick = submitAddSpesEmployment;
+  // ---------------- SPES Employment Add/Delete Handlers ----------------
+  window.openAddSpesEmploymentModal = function () {
+    window.currentSpesEmploymentMode = 'add';
+    document.getElementById('editSpesEmploymentId').value = '';
+    document.getElementById('editSpesEmploymentStore').value = '';
+    document.getElementById('editSpesEmploymentStart').value = '';
+    document.getElementById('editSpesEmploymentEnd').value = '';
+    document.getElementById('editSpesEmploymentDays').value = '';
+    document.getElementById('editSpesEmploymentCategory').value = '';
+    _loadEmploymentCompanies('editSpesEmploymentCompany', '');
+    const header = document.querySelector('#modalEditSpesEmployment .modal-header h3');
+    if (header) header.textContent = 'Add SPES OJT Employment';
+    const confirmBtn = document.querySelector('#modalEditSpesEmployment .btn-confirm');
+    if (confirmBtn) {
+      confirmBtn.textContent = 'Add';
+      confirmBtn.onclick = submitAddSpesEmployment;
+    }
+    _toggleEditModal('modalEditSpesEmployment', 'flex');
+  };
+
+  window.submitAddSpesEmployment = function () {
+    const formData = new FormData();
+    formData.append('benef_id', window.currentBeneficiaryId || '');
+    formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
+    formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
+    formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
+    formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
+    formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
+    formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+
+    _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_spes_employment.php', {
+      method: 'POST',
+      body: formData
+    })
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.success) {
+          _showEditToast('OJT employment added successfully.', 'success');
+          closeEditSpesEmploymentModal();
+          if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+        } else {
+          _showEditToast(j?.error || 'Error adding OJT employment.', 'error');
+        }
+      }).catch(() => {
+        _showEditToast('Error adding OJT employment.', 'error');
+      })
+    );
+  };
+
+  function deleteSpesEmployment(employmentId) {
+    if (!employmentId) return;
+    document.getElementById('deleteSpesEmploymentId').value = employmentId;
+    _toggleEditModal('modalDeleteSpesEmployment', 'flex');
   }
-  _toggleEditModal('modalEditSpesEmployment', 'flex');
-};
 
-window.submitAddSpesEmployment = function () {
-  const formData = new FormData();
-  formData.append('benef_id', window.currentBeneficiaryId || '');
-  formData.append('company_id', document.getElementById('editSpesEmploymentCompany').value || '');
-  formData.append('store_assignment', document.getElementById('editSpesEmploymentStore').value.trim());
-  formData.append('start_of_contract', document.getElementById('editSpesEmploymentStart').value || '');
-  formData.append('end_of_contract', document.getElementById('editSpesEmploymentEnd').value || '');
-  formData.append('days', document.getElementById('editSpesEmploymentDays').value || '');
-  formData.append('category', document.getElementById('editSpesEmploymentCategory').value || '');
+  window.closeDeleteSpesEmploymentModal = function () {
+    _toggleEditModal('modalDeleteSpesEmploymentModal' in window ? 'modalDeleteSpesEmployment' : 'modalDeleteSpesEmployment', 'none');
+    document.getElementById('deleteSpesEmploymentId').value = '';
+  };
 
-  _withModalSaveLoading('Saving…', () => fetch('../../backend/beneficiaries/add_spes_employment.php', {
-    method: 'POST',
-    body: formData
-  })
-    .then(r => r.json())
-    .then(j => {
-      if (j && j.success) {
-        _showEditToast('OJT employment added successfully.', 'success');
-        closeEditSpesEmploymentModal();
-        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
-      } else {
-        _showEditToast(j?.error || 'Error adding OJT employment.', 'error');
-      }
-    }).catch(() => {
-      _showEditToast('Error adding OJT employment.', 'error');
+  window.confirmDeleteSpesEmployment = function () {
+    const id = document.getElementById('deleteSpesEmploymentId').value;
+    if (!id) return;
+    const formData = new FormData();
+    formData.append('employment_id', id);
+    formData.append('benef_id', window.currentBeneficiaryId || '');
+
+    _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_spes_employment.php', {
+      method: 'POST',
+      body: formData
     })
-  );
-};
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.success) {
+          _showEditToast('OJT employment deleted.', 'success');
+          closeDeleteSpesEmploymentModal();
+          if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
+        } else {
+          _showEditToast(j?.error || 'Error deleting OJT employment.', 'error');
+        }
+      }).catch(() => {
+        _showEditToast('Error deleting OJT employment.', 'error');
+      })
+    );
+  };
 
-function deleteSpesEmployment(employmentId) {
-  if (!employmentId) return;
-  document.getElementById('deleteSpesEmploymentId').value = employmentId;
-  _toggleEditModal('modalDeleteSpesEmployment', 'flex');
-}
-
-window.closeDeleteSpesEmploymentModal = function () {
-  _toggleEditModal('modalDeleteSpesEmployment', 'none');
-  document.getElementById('deleteSpesEmploymentId').value = '';
-};
-
-window.confirmDeleteSpesEmployment = function () {
-  const id = document.getElementById('deleteSpesEmploymentId').value;
-  if (!id) return;
-  const formData = new FormData();
-  formData.append('employment_id', id);
-  formData.append('benef_id', window.currentBeneficiaryId || '');
-
-  _withModalSaveLoading('Deleting…', () => fetch('../../backend/beneficiaries/delete_spes_employment.php', {
-    method: 'POST',
-    body: formData
-  })
-    .then(r => r.json())
-    .then(j => {
-      if (j && j.success) {
-        _showEditToast('OJT employment deleted.', 'success');
-        closeDeleteSpesEmploymentModal();
-        if (window.currentBeneficiaryId) openProfile(window.currentBeneficiaryId);
-      } else {
-        _showEditToast(j?.error || 'Error deleting OJT employment.', 'error');
-      }
-    }).catch(() => {
-      _showEditToast('Error deleting OJT employment.', 'error');
-    })
-  );
-};
-
-window.deleteSpesEmployment = deleteSpesEmployment;
-window.closeDeleteSpesEmploymentModal = window.closeDeleteSpesEmploymentModal;
-window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
+  window.deleteSpesEmployment = deleteSpesEmployment;
+  window.closeDeleteSpesEmploymentModal = window.closeDeleteSpesEmploymentModal;
+  window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
 
   if (programName === 'Government Internship Program') {
     if (educationCard) educationCard.style.display = 'none';
@@ -2438,159 +2617,72 @@ window.confirmDeleteSpesEmployment = window.confirmDeleteSpesEmployment;
     if (wiirpCard) wiirpCard.style.display = 'none';
     if (gipCard) gipCard.style.display = 'block';
 
-    const gipFields = {
-      pGipStudentType: 'pGipStudentType',
-      pGipHighestEduc: 'pGipHighestEduc',
-      pGipSchool: 'pGipSchool',
-      pGipCourse: 'pGipCourse',
-      pGipStartContract: 'pGipStartContract',
-      pGipEndContract: 'pGipEndContract',
-      pGipDays: 'pGipDays',
-      pGipOfficeAssignment: 'pGipOfficeAssignment',
-      pGipType: 'pGipType',
-      pGipProponent: 'pGipProponent',
-      pGipStatus: 'pGipStatus',
-      pGipGsisBeneficiary: 'pGipGsisBeneficiary',
-      pGipRelationship: 'pGipRelationship',
-      pGipGsisContactNo: 'pGipGsisContactNo'
-    };
-
-    // Show/hide the DOLE- and LGU-specific sections of the GIP card based on record.type.
-    // Called with `null` (no record / fetch error) falls back to the LGU layout.
-    const toggleGipTypeSections = (type) => {
-      const isDole = String(type || '').trim().toUpperCase() === 'DOLE';
-      const schoolWrapper = document.getElementById('gipSchoolWrapper');
-      const courseWrapper = document.getElementById('gipCourseWrapper');
-      const contractCard = document.getElementById('gipContractCard');
-      const officeWrapper = document.getElementById('gipOfficeAssignmentWrapper');
-      const doleCard = document.getElementById('gipDoleCard');
-      const lguExtrasWrapper = document.getElementById('gipLguExtrasWrapper');
-
-      if (schoolWrapper) schoolWrapper.style.display = isDole ? 'none' : '';
-      if (courseWrapper) courseWrapper.style.display = isDole ? 'none' : '';
-      if (contractCard) contractCard.style.display = isDole ? 'none' : '';
-      if (officeWrapper) officeWrapper.style.display = isDole ? 'none' : '';
-      if (lguExtrasWrapper) lguExtrasWrapper.style.display = isDole ? 'none' : '';
-      if (doleCard) doleCard.style.display = isDole ? 'block' : 'none';
-    };
-
-    // Clear all fields initially
-    Object.values(gipFields).forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = 'Loading…';
-    });
+    const gipEl = document.getElementById('pGipRecords');
+    if (gipEl) gipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Loading…</td></tr>`;
 
     fetch(`../../backend/beneficiaries/get_gip.php?benef_id=${encodeURIComponent(b.benef_id)}`)
       .then(r => r.json())
       .then(j => {
-        if (j && j.success && j.record) {
-          const r = j.record;
-          window.currentGipRecord = r;
+        if (!gipEl) return;
 
-          const formatDate = (value) => {
-            if (!value) return '—';
-            const date = new Date(value);
-            return isNaN(date.getTime())
-              ? String(value)
-              : date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-          };
+        const formatDate = (value) => {
+          if (!value) return '—';
+          const date = new Date(value);
+          return isNaN(date.getTime())
+            ? String(value)
+            : date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        };
+        const getStatusBadge = (r) => {
+          const st = String(r.status || '').trim().toLowerCase();
+          if (st === 'active') return '<span class="badge badge-hired">Active</span>';
+          if (st === 'completed') return '<span class="badge badge-registered">Completed</span>';
+          if (st === 'backed out') return '<span class="badge" style="background:#fee2e2;color:#b91c1c;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;">Backed Out</span>';
 
-          const formatBool = (value) => {
-            return Number(value) === 1 ? 'Yes' : 'No';
-          };
+          // Fallback if status is empty:
+          const isActive = !r.end_of_contract || new Date(r.end_of_contract) >= new Date(new Date().toDateString());
+          return isActive ? '<span class="badge badge-hired">Active</span>' : '<span class="badge badge-registered">Completed</span>';
+        };
 
-          const formatType = (value) => {
-            if (value === 'DOLE') return 'DOLE';
-            if (value === 'LGU') return 'LGU';
-            return String(value || '—');
-          };
+        const rows = Array.isArray(j?.records) ? j.records : [];
+        if (j && j.success && rows.length) {
+          window.currentGipRecords = rows;
 
-          const formatEdLevel = (value) => {
-            if (value === 'college') return 'College';
-            if (value === 'shs') return 'Senior High School';
-            return String(value || '—');
-          };
-
-          const formatYesNo = (value) => {
-            const v = String(value || '').trim().toLowerCase();
-            if (v === 'yes') return 'Yes';
-            if (v === 'no') return 'No';
-            return value ? upperText(value) : '—';
-          };
-
-          if (document.getElementById('pGipStudentType')) {
-            const st = r.student_type ? (r.student_type.toLowerCase() === 'osy' ? 'OSY' : 'Student') : '—';
-            document.getElementById('pGipStudentType').textContent = st;
-          }
-          if (document.getElementById('pGipHighestEduc')) {
-            document.getElementById('pGipHighestEduc').textContent = upperText(r.highest_educ);
-          }
-          if (document.getElementById('pGipSchool')) {
-            document.getElementById('pGipSchool').textContent = upperText(r.school);
-          }
-          if (document.getElementById('pGipCourse')) {
-            document.getElementById('pGipCourse').textContent = upperText(r.course);
-          }
-          if (document.getElementById('pGipStartContract')) {
-            document.getElementById('pGipStartContract').textContent = formatDate(r.start_of_contract);
-          }
-          if (document.getElementById('pGipEndContract')) {
-            document.getElementById('pGipEndContract').textContent = formatDate(r.end_of_contract);
-          }
-          if (document.getElementById('pGipDays')) {
-            document.getElementById('pGipDays').textContent = r.days != null ? String(r.days) : '—';
-          }
-          if (document.getElementById('pGipOfficeAssignment')) {
-            document.getElementById('pGipOfficeAssignment').textContent = upperText(r.office_assignment);
-          }
-          if (document.getElementById('pGipType')) {
-            document.getElementById('pGipType').textContent = upperText(formatType(r.type));
-          }
-          if (document.getElementById('pGipProponent')) {
-            document.getElementById('pGipProponent').textContent = upperText(r.proponent);
-          }
-          if (document.getElementById('pGipStatus')) {
-            document.getElementById('pGipStatus').textContent = formatYesNo(r.status);
-          }
-          if (document.getElementById('pGipGsisBeneficiary')) {
-            document.getElementById('pGipGsisBeneficiary').textContent = upperText(r.gsis_beneficiary);
-          }
-          if (document.getElementById('pGipRelationship')) {
-            document.getElementById('pGipRelationship').textContent = upperText(r.relationship);
-          }
-          if (document.getElementById('pGipGsisContactNo')) {
-            document.getElementById('pGipGsisContactNo').textContent = upperText(r.gsis_benef_contact_no);
-          }
-
-          toggleGipTypeSections(r.type);
+          gipEl.innerHTML = rows.map(r => `
+            <tr>
+              <td><span class="badge badge-registered">${upperText(r.type)}</span></td>
+              <td>${formatDate(r.start_of_contract)}</td>
+              <td>${formatDate(r.end_of_contract)}</td>
+              <td style="font-weight:500;">${upperText(r.office_assignment)}</td>
+              <td>${getStatusBadge(r)}</td>
+              <td style="text-align:center;gap:6px;display:flex;align-items:center;justify-content:center;">
+                <button type="button" class="edit-btn-icon" onclick="openEditGipModal(${r.gip_id})" title="Edit GIP">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                </button>
+                <button type="button" class="delete-btn-icon" onclick="deleteGipRecord(${r.gip_id})" title="Delete GIP" style="background:transparent;border:none;color:var(--danger);cursor:pointer;">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                </button>
+              </td>
+            </tr>
+          `).join('');
         } else {
-          window.currentGipRecord = null;
-          Object.values(gipFields).forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.textContent = 'No GIP records.';
-          });
-          toggleGipTypeSections(null);
+          window.currentGipRecords = [];
+          gipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">No GIP records.</td></tr>`;
         }
       })
       .catch(() => {
-        window.currentGipRecord = null;
-        Object.values(gipFields).forEach(id => {
-          const el = document.getElementById(id);
-          if (el) el.textContent = 'Error loading records.';
-        });
-        toggleGipTypeSections(null);
+        window.currentGipRecords = [];
+        if (gipEl) gipEl.innerHTML = `<tr><td colspan="6" style="color:var(--text-muted);text-align:center;padding:16px;">Error loading records.</td></tr>`;
       });
   } else if (gipCard) {
     gipCard.style.display = 'none';
   }
-
   if (educationCard) {
     educationCard.style.display = hideEducationCard ? 'none' : '';
   }
 
   if (!hideEducationCard) {
     document.getElementById('pEducation').textContent = upperText(b.education);
-    document.getElementById('pSkills').innerHTML      = (b.skills || []).map(s => `<span class="skill-tag">${upperText(s)}</span>`).join('');
+    document.getElementById('pSkills').innerHTML = (b.skills || []).map(s => `<span class="skill-tag">${upperText(s)}</span>`).join('');
   }
 
 }
