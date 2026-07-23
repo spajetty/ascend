@@ -72,8 +72,11 @@
         <select id="sectionFilter" onchange="onSectionChange()">
             <option value="">All Sections</option>
         </select>
-        <select id="programFilter" onchange="filterTable()">
+        <select id="programFilter" onchange="onProgramChange()">
             <option value="">All Programs</option>
+        </select>
+        <select id="categoryFilter" onchange="filterTable()" style="display:none;">
+            <option value="">All Categories</option>
         </select>
         <select id="statusFilter" onchange="filterTable()">
             <option value="">All Statuses</option>
