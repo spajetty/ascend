@@ -14,18 +14,21 @@ try {
                    proponent, status, gsis_beneficiary, relationship, gsis_benef_contact_no
             FROM gip
             WHERE benef_id = ?
-            ORDER BY created_at DESC, gip_id DESC
-            LIMIT 1";
+            ORDER BY start_of_contract DESC, gip_id DESC";
 
     $stmt = $conn->prepare($sql);
     $stmt->bind_param('i', $benef_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $record = $result->fetch_assoc();
+
+    $records = [];
+    while ($row = $result->fetch_assoc()) {
+        $records[] = $row;
+    }
 
     echo json_encode([
         'success' => true,
-        'record' => $record
+        'records' => $records
     ]);
     $stmt->close();
 } catch (Exception $e) {
