@@ -10,6 +10,14 @@ $course = isset($_POST['course']) ? trim($_POST['course']) : '';
 $highest_educ = isset($_POST['highest_educ']) ? trim($_POST['highest_educ']) : '';
 $start_of_contract = isset($_POST['start_of_contract']) ? trim($_POST['start_of_contract']) : '';
 $end_of_contract = isset($_POST['end_of_contract']) ? trim($_POST['end_of_contract']) : '';
+
+if ($start_of_contract === '') {
+    echo json_encode(['success' => false, 'error' => 'Start of contract is required']);
+    exit;
+}
+if ($end_of_contract === '') {
+    $end_of_contract = null;
+}
 $days = isset($_POST['days']) && $_POST['days'] !== '' ? (int)$_POST['days'] : 0;
 $office_assignment = isset($_POST['office_assignment']) ? trim($_POST['office_assignment']) : '';
 $proponent = isset($_POST['proponent']) ? trim($_POST['proponent']) : '';
