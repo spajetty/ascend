@@ -8,6 +8,9 @@ $status = isset($_POST['status']) ? trim($_POST['status']) : '';
 $date_of_record = isset($_POST['date_of_record']) ? trim($_POST['date_of_record']) : '';
 $notes = isset($_POST['notes']) ? trim($_POST['notes']) : '';
 
+session_start();
+$user_id = isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0;
+
 if ($benef_id <= 0) {
     echo json_encode(['success' => false, 'error' => 'Invalid beneficiary id']);
     exit;
@@ -28,16 +31,21 @@ if (!$date_of_record) {
     exit;
 }
 
+if ($user_id <= 0) {
+    echo json_encode(['success' => false, 'error' => 'Unauthenticated user']);
+    exit;
+}
+
 try {
-    $sql = "INSERT INTO emphistory (benef_id, company_id, classification, date_of_record, notes, created_at)
-            VALUES (?, ?, ?, ?, ?, NOW())";
+    $sql = "INSERT INTO emphistory (user_id, benef_id, company_id, classification, date_of_record, notes, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, NOW())";
 
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         throw new Exception('Prepare failed: ' . $conn->error);
     }
 
-    $stmt->bind_param('iisss', $benef_id, $company_id, $status, $date_of_record, $notes);
+    $stmt->bind_param('iiisss', $user_id, $benef_id, $company_id, $status, $date_of_record, $notes);
     
     if (!$stmt->execute()) {
         throw new Exception('Execute failed: ' . $stmt->error);
