@@ -35,7 +35,8 @@ export function formatColumnName(str) {
 export function classificationBadge(value) {
     if (!value) return '<span class="text-gray-300 text-xs">—</span>';
     const normalized = titleCase(String(value).trim());
-    const cls = classificationColors[normalized] ?? 'bg-gray-100 text-gray-600';
+    const lookupKey = String(value).trim().toLowerCase();
+    const cls = classificationColors[lookupKey] ?? 'bg-gray-100 text-gray-600';
     return `<span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold ${cls}">${escapeHtml(normalized)}</span>`;
 }
 
