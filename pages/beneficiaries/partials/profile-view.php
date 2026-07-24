@@ -12,12 +12,15 @@
                     <h2 id="profName">Rosa Cruz</h2>
                     <span class="status-badge-pill status-registered" id="profStatusBadge">Registered</span>
                 </div>
-                <div class="sub" id="profProgram">Government Internship Program • Employment Facilitation</div>
                 <div class="age">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
                     </svg>
                     <span id="profAge">24 years old</span>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;">Enrolled Programs</div>
+                    <div class="sub" id="profProgramPillBar" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
                 </div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px;display:none;" id="visitBadgeContainer">

@@ -49,6 +49,7 @@ function mapRow(b) {
     program:     b.program_name || '—',
     spes_status: b.spes_status || '',
     status:      b.classification || '—',
+    enrollments: b.enrollments || [],
     email:       b.email     || '—',
     contact:     b.contact   || '—',
 

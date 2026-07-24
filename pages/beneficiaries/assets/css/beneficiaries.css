@@ -859,4 +859,35 @@ tbody tr.row-selected:hover { background: #dbeafe; }
   font-size: 13px;
   line-height: 1.55;
 }
-
+
+/* Program Pills */
+.program-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: #eff4fe;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.program-pill .pill-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #8ab4f8;
+}
+.program-pill.active {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: white;
+  box-shadow: 0 4px 8px rgba(59, 130, 246, 0.2);
+}
+.program-pill.active .pill-dot {
+  background: #c3d9ff;
+}
