@@ -107,34 +107,30 @@ export const importStatusStyles = {
 // WHIP) won't have this column in their Excel so the cell will just be empty.
 export const classificationColors = {
     // ── Job Matching & Referral ──────────────────────────────────────────────
-    'Registered': 'bg-blue-100 text-blue-700',
-    'Referred': 'bg-orange-100 text-orange-600',
-    'Interviewed': 'bg-purple-100 text-purple-700',
-    'Qualified': 'bg-emerald-100 text-emerald-700',
-    'Not Qualified': 'bg-red-100 text-red-600',
-    'Placed/Hots': 'bg-teal-100 text-teal-700',
-    'HOTS': 'bg-amber-100 text-amber-700',
-    'For Further Interview': 'bg-yellow-100 text-yellow-700',
+    'registered': 'bg-blue-100 text-blue-700',
+    'referred': 'bg-orange-100 text-orange-600',
+    'interviewed': 'bg-purple-100 text-purple-700',
+    'qualified': 'bg-emerald-100 text-emerald-700',
+    'not qualified': 'bg-red-100 text-red-600',
+    'placed/hots': 'bg-teal-100 text-teal-700',
+    'hots': 'bg-amber-100 text-amber-700',
+    'for further interview': 'bg-yellow-100 text-yellow-700',
 
     // ── First Time Job Seekers (shares most with Job Matching) ───────────────
-    'First-Time Job Seeker': 'bg-blue-100 text-blue-700',
-    'Issued': 'bg-indigo-100 text-indigo-700',
-    // Referred, Interviewed, Qualified, Not Qualified, Placed/Hots,
-    // For Further Interview — already defined above, reused automatically
+    'first-time job seeker': 'bg-blue-100 text-blue-700',
+    'issued': 'bg-indigo-100 text-indigo-700',
 
     // ── SPES ─────────────────────────────────────────────────────────────────
-    'Placed': 'bg-teal-100 text-teal-700',
-    // Registered, Referred — already defined above
+    'placed': 'bg-teal-100 text-teal-700',
 
     // ── Government Internship Program and Work Immersion ────────────────────────────────────────
-    'Peso-Accepted': 'bg-emerald-100 text-emerald-700',
-    'Private-Accepted': 'bg-teal-100 text-teal-700',
+    'peso-accepted': 'bg-emerald-100 text-emerald-700',
+    'private-accepted': 'bg-teal-100 text-teal-700',
 
     // ── Work Immersion ───────────────────────────────────────────────────────
-    'Inquired': 'bg-blue-100 text-blue-700',
-    'Not Proceeded': 'bg-red-100 text-red-600',
-    // Referred, Interviewed, Peso-Accepted, Private-Accepted — already defined above
-    'Dole-Accepted': 'bg-emerald-100 text-emerald-700',
+    'inquired': 'bg-blue-100 text-blue-700',
+    'not proceeded': 'bg-red-100 text-red-600',
+    'dole-accepted': 'bg-emerald-100 text-emerald-700',
 };
 
 export const statusColors = {
@@ -157,15 +153,15 @@ export const programHeaders = {
     'DEFAULT': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'Birthday', 'Contact Number'],
 
     // Non-person programs
-    'Employers Accreditation': 
-    [   'Month', 
-        'Accreditation', 
-        'Company', 
-        'Est. Type', 
-        'Industry', 
-        'City/Municipality/Province'
-    ],
-    
+    'Employers Accreditation':
+        ['Month',
+            'Accreditation',
+            'Company',
+            'Est. Type',
+            'Industry',
+            'City/Municipality/Province'
+        ],
+
     'Workers Hiring for Infrastructure Projects - Beneficiaries': [
         'Last Name',
         'First Name',
@@ -280,40 +276,40 @@ export const programHeaders = {
         'Valid ID',
         'Brgy Clearance',
     ],
-    
+
     'SPES': [
-        'Last Name', 
-        'First Name', 
-        'Middle Name', 
-        'Suffix', 
-        'Sex', 
-        'House No/Street', 
-        'Barangay', 
-        'City', 
-        'District', 
-        'Birthday', 
-        'Age', 
-        'Email', 
-        'Contact', 
-        'Civil Status', 
-        'Student/OSY', 
-        'Program', 
-        'Classification', 
+        'Last Name',
+        'First Name',
+        'Middle Name',
+        'Suffix',
+        'Sex',
+        'House No/Street',
+        'Barangay',
+        'City',
+        'District',
+        'Birthday',
+        'Age',
+        'Email',
+        'Contact',
+        'Civil Status',
+        'Student/OSY',
+        'Program',
+        'Classification',
         'Status',
-        'School', 
-        'Highest Educ. Attainment', 
-        'Course', 
+        'School',
+        'Highest Educ. Attainment',
+        'Course',
         'OFW Dependent',
-        'PWD', 
-        '4PS Beneficiary', 
-        '4PS Household ID No.', 
-        'Company', 
-        'Store Assignment', 
-        'Start of Contract', 
-        'End of Contract', 
-        'Resume', 
-        'B-Cert', 
-        'Valid ID', 
+        'PWD',
+        '4PS Beneficiary',
+        '4PS Household ID No.',
+        'Company',
+        'Store Assignment',
+        'Start of Contract',
+        'End of Contract',
+        'Resume',
+        'B-Cert',
+        'Valid ID',
         'Brgy Clearance'
     ],
     'Schools': [
@@ -322,62 +318,62 @@ export const programHeaders = {
         'Grades Offered'
     ],
     'Government Internship Program': [
-        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
-        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street',
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex',
         'Contact Number', 'Student/OSY', 'Highest Educ. Attainment'
     ],
     'Government Internship Program - LGU': [
-        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
-        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
-        'Contact Number', 'Student/OSY', 'Status', 'School', 
-        'Highest Educ. Attainment', 'Course', 'PWD', 'OFW Dependent', 
-        '4Ps Beneficiary', 'Proponent', 'Office Assignment', 
-        'Start of Contract', 'End of Contract', 
-        'Curriculum Vitae / Resume', 'Proof of Residency', 
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street',
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex',
+        'Contact Number', 'Student/OSY', 'Status', 'School',
+        'Highest Educ. Attainment', 'Course', 'PWD', 'OFW Dependent',
+        '4Ps Beneficiary', 'Proponent', 'Office Assignment',
+        'Start of Contract', 'End of Contract',
+        'Curriculum Vitae / Resume', 'Proof of Residency',
         'Latest Credentials', 'Letter of Intent', 'Recommendation Letter'
     ],
     'Government Internship Program - DOLE': [
-        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street', 
-        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex', 
-        'Contact Number', 'Student/OSY', 'Highest Educ. Attainment', 'PWD', 
+        'Last Name', 'First Name', 'Middle Name', 'Suffix', 'House No/Street',
+        'Barangay', 'City', 'District', 'Birthdate', 'Age', 'Sex',
+        'Contact Number', 'Student/OSY', 'Highest Educ. Attainment', 'PWD',
         'GSIS Beneficiary', 'Relationship', 'GSIS Benef. Contact No.',
-        'Curriculum Vitae / Resume', 'Proof of Residency', 
+        'Curriculum Vitae / Resume', 'Proof of Residency',
         'Latest Credentials', 'Letter of Intent', 'Recommendation Letter'
     ],
 
-    'Work Immersion and Internship Referral Program': 
-    [
-        'Last Name', 
-        'First Name', 
-        'Middle Name', 
-        'Extension Name', 
-        'Sex', 
-        'House/Block No./Street', 
-        'Barangay', 
-        'City', 
-        'District', 
-        'Age', 
-        'Email address', 
-        'Contact Number', 
-        'Civil Status', 
-        'Program', 
-        'Classification', 
-        'Inquiry Via', 
-        'School Name', 
-        'Year Level', 
-        'Course/Degree/Strand', 
-        'Required Work Immersion / Internship Hours', 
-        'Preferred Host Organization Type', 
-        'Preferred Industry / Field of Internship', 
-        'Are you willing to be assigned outside your preferred field if not available?', 
-        'Internship Schedule / Availability',
-        'Internship Availability Date (Start of Internship)',
-        'Curriculum Vitae / Resume', 
-        'Proof of Residency', 
-        'Latest Credentials', 
-        'Letter of Intent', 
-        'Recommendation Letter'
-    ],
+    'Work Immersion and Internship Referral Program':
+        [
+            'Last Name',
+            'First Name',
+            'Middle Name',
+            'Extension Name',
+            'Sex',
+            'House/Block No./Street',
+            'Barangay',
+            'City',
+            'District',
+            'Age',
+            'Email address',
+            'Contact Number',
+            'Civil Status',
+            'Program',
+            'Classification',
+            'Inquiry Via',
+            'School Name',
+            'Year Level',
+            'Course/Degree/Strand',
+            'Required Work Immersion / Internship Hours',
+            'Preferred Host Organization Type',
+            'Preferred Industry / Field of Internship',
+            'Are you willing to be assigned outside your preferred field if not available?',
+            'Internship Schedule / Availability',
+            'Internship Availability Date (Start of Internship)',
+            'Curriculum Vitae / Resume',
+            'Proof of Residency',
+            'Latest Credentials',
+            'Letter of Intent',
+            'Recommendation Letter'
+        ],
 
     //'Career Development Support Program': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'CareerGoal', 'TrainingNeeded', 'CurrentStatus'],
     //'LMI Orientation': ['Last Name', 'First Name', 'Middle Name', 'Suffix', 'Sex', 'House No.', 'Barangay', 'City', 'District', 'Birthday', 'Age', 'Email', 'Contact', 'Civil Status', 'Program', 'Classification', 'OrientationDate', 'Venue', 'CurrentStatus']
