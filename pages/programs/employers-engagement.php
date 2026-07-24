@@ -291,32 +291,56 @@ function renderWhip(data) {
     const tbody = document.getElementById('whip-tbody');
     if (!data || !data.rows.length) { clearLoading('whip-tbody', 5); return; }
 
-    const allRows = computeRowGender(data.rows);
-    const rows    = allRows.slice(-PREVIEW_ROWS);
-    const totals  = data.totals;
+    // Group rows by project and month/year
+    const map = new Map();
+    data.rows.forEach(r => {
+        const date = r.date_hired ? new Date(r.date_hired) : null;
+        const month = date ? date.toLocaleString('en-US', { month: 'short' }) : '—';
+        const year = date ? date.getFullYear() : '—';
+        const key = `${year}-${month}_${r.project_id || 'none'}`;
 
-    const totM = allRows.reduce((s, r) => s + +r.male,   0);
-    const totF = allRows.reduce((s, r) => s + +r.female, 0);
-    const totT = totM + totF;
+        if (!map.has(key)) {
+            map.set(key, {
+                month,
+                year,
+                project_title: r.project_title || '—',
+                male: 0,
+                female: 0
+            });
+        }
+        
+        const g = map.get(key);
+        const sex = (r.sex || '').toLowerCase();
+        if (sex === 'male') g.male++;
+        if (sex === 'female') g.female++;
+    });
+
+    // Convert map to array and take the first few
+    const groupedRows = Array.from(map.values());
+    const rows = groupedRows.slice(0, PREVIEW_ROWS);
+
+    // Totals come from the pre-calculated backend payload
+    const totals = data.totals;
 
     let html = '';
     rows.forEach(r => {
+        const rowTotal = r.male + r.female;
         html += `<tr class="border-b border-gray-50 hover:bg-gray-50">
-            <td class="px-6 py-3 text-gray-800 font-semibold">${(r.month ?? '—').toUpperCase()} ${r.year}</td>
-            <td class="px-4 py-3 text-gray-600">${escHtml(r.project_title || '—')}</td>
+            <td class="px-6 py-3 text-gray-800 font-semibold">${(r.month).toUpperCase()} ${r.year}</td>
+            <td class="px-4 py-3 text-gray-600">${escHtml(r.project_title)}</td>
             <td class="px-4 py-3 text-gray-600">${r.male}</td>
             <td class="px-4 py-3 text-gray-600">${r.female}</td>
-            <td class="px-4 py-3 text-gray-700 font-semibold">${r.total}</td>
+            <td class="px-4 py-3 text-gray-700 font-semibold">${rowTotal}</td>
         </tr>`;
     });
 
     html += `<tr class="bg-gray-50 border-t-2 border-gray-200">
         <td class="px-6 py-3 text-gray-800 font-bold text-xs">TOTAL</td>
         <td class="px-4 py-3 text-gray-400">—</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold">${totM}</td>
-        <td class="px-4 py-3 text-gray-700 font-semibold">${totF}</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.male}</td>
+        <td class="px-4 py-3 text-gray-700 font-semibold">${totals.female}</td>
         <td class="px-4 py-3">
-            <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totT}</span>
+            <span class="bg-orange-200 text-orange-700 font-bold text-xs px-3 py-1 rounded-full">${totals.total}</span>
         </td>
     </tr>`;
 
