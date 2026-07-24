@@ -9,7 +9,9 @@
         "test": "pest"
     },
     "require-dev": {
-        "pestphp/pest": "^3.8"
+        "pestphp/pest": "^3.8",
+        "guzzlehttp/guzzle": "^8.0",
+        "illuminate/collections": "^12.64"
     },
     "autoload-dev": {
         "psr-4": {
