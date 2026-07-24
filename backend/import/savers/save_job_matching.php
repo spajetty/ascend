@@ -62,6 +62,20 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         }
         $ins->execute();
         $state['insertedJobMatchIds'][] = (int)$ins->insert_id;
+
+        // Insert into emphistory
+        if (tableExists($conn, 'emphistory')) {
+            $userId = isset($ctx['userId']) && is_numeric($ctx['userId']) ? (int)$ctx['userId'] : (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0);
+            $historyClass = trim((string)($ctx['programStatus'] ?? 'Registered'));
+            $historyDate = date('Y-m-d');
+            $historyNotes = ($ctx['is_manual'] ?? false) ? 'Manual Entry - Job Matching' : 'Excel Import - Job Matching';
+            $empIns = $conn->prepare('INSERT INTO emphistory (user_id, benef_id, classification, date_of_record, company_id, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+            if ($empIns) {
+                $empIns->bind_param('iissis', $userId, $benefId, $historyClass, $historyDate, $companyId, $historyNotes);
+                $empIns->execute();
+            }
+        }
+        
         return 'saved';
     }
 
@@ -129,6 +143,20 @@ function saveJobMatchingFamilyRow(mysqli $conn, array $row, int $benefId, array 
         }
         $ins->execute();
         $state['insertedFirstJobSeekIds'][] = (int)$ins->insert_id;
+
+        // Insert into emphistory
+        if (tableExists($conn, 'emphistory')) {
+            $userId = isset($ctx['userId']) && is_numeric($ctx['userId']) ? (int)$ctx['userId'] : (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0);
+            $historyClass = trim((string)($ctx['programStatus'] ?? 'Registered'));
+            $historyDate = date('Y-m-d');
+            $historyNotes = ($ctx['is_manual'] ?? false) ? 'Manual Entry - First Time Jobseeker' : 'Excel Import - First Time Jobseeker';
+            $empIns = $conn->prepare('INSERT INTO emphistory (user_id, benef_id, classification, date_of_record, company_id, notes, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())');
+            if ($empIns) {
+                $empIns->bind_param('iissis', $userId, $benefId, $historyClass, $historyDate, $companyId, $historyNotes);
+                $empIns->execute();
+            }
+        }
+
         return 'saved';
     }
 
